@@ -8,7 +8,9 @@
 
 // TODO !! SEMAPHORE
 
+namespace nitrokey {
 namespace device {
+
 enum class CommError 
 {
 	ERR_NO_ERROR = 0,
@@ -61,5 +63,7 @@ class Stick20 : public Device {
 public:
 	Stick20();
 };
+
+}
 }
 #endif

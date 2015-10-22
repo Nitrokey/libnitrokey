@@ -1,10 +1,14 @@
 #include <chrono>
 #include <thread>
 #include <cstddef>
+#include <stdexcept>
 #include <hidapi/hidapi.h>
 #include "device.h"
+#include "log.h"
+#include "misc.h"
 
-using namespace device;
+using namespace nitrokey::device;
+using namespace nitrokey::log;
 
 Device::Device()
 : m_vid(0), m_pid(0),
@@ -13,13 +17,19 @@ Device::Device()
   mp_devhandle(NULL) {}
 
 bool Device::connect() {
-	hid_init();
+	Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
+	hid_init();
 	mp_devhandle = hid_open(m_vid, m_pid, NULL);
 	return mp_devhandle != NULL;
 }
 
 CommError Device::send(const void *packet) {
+	Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
+
+	if (mp_devhandle == NULL)
+		throw std::runtime_error("Attempted HID send on an invalid descriptor.");
+
 	return (CommError)(
 		hid_send_feature_report(mp_devhandle, (const unsigned char *)(packet),
 			HID_REPORT_SIZE));
@@ -28,6 +38,11 @@ CommError Device::send(const void *packet) {
 CommError Device::recv(void *packet) {
 	CommError status;
 	int retry_count = 0;
+
+	Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
+
+	if (mp_devhandle == NULL)
+		throw std::runtime_error("Attempted HID receive on an invalid descriptor.");
 
 	for(;;) {
 		status = (CommError)(

@@ -9,7 +9,7 @@
 #include "inttypes.h"
 #include "cxx_semantics.h"
 #include "device.h"
-#include "utils/crc32.h"
+#include "crc32.h"
 
 #define STICK20_UPDATE_MODE_VID 0x03EB
 #define STICK20_UPDATE_MODE_PID 0x2FF1

@@ -25,11 +25,11 @@ int main() {
 	}
 
 	{
-	for (int i=0; i<32; i++) {
-		GetSlotName::CommandTransaction::CommandPayload slotname_req;
-		slotname_req.slot_number=i;
-		auto slot_resp = GetSlotName::CommandTransaction::run(stick);
-		cout << slot_resp.slot_name << endl;
-	}
+		for (int i=0; i<32; i++) {
+			GetSlotName::CommandTransaction::CommandPayload slotname_req;
+			slotname_req.slot_number=i;
+			auto slot_resp = GetSlotName::CommandTransaction::run(stick);
+			cout << slot_resp.slot_name << endl;
+		}
 	}
 }

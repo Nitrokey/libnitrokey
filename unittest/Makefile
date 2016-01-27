@@ -4,7 +4,7 @@ LD = $(CXX)
 
 INCLUDE = -I../include
 LIB = -L../build
-LDLIBS = -lhidapi-libusb -lnitrokey
+LDLIBS = -lnitrokey
 BUILD = build
 
 CXXFLAGS = -std=c++14 -fPIC

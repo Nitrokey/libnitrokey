@@ -16,7 +16,7 @@ DEPENDS = $(CXXSOURCES:%.cc=$(BUILD)/%.d)
 all: $(OBJ) $(BUILD)/libnitrokey.so unittest
 
 $(BUILD)/libnitrokey.so: $(OBJ) $(DEPENDS)
-	$(CXX) $(SOFLAGS) $(OBJ) -o $@
+	$(CXX) $(SOFLAGS) $(OBJ) $(LIB) -o $@
 
 $(BUILD)/%.d: %.cc
 	$(CXX) -M $< -o $@ $(INCLUDE) $(CXXFLAGS)

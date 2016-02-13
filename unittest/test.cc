@@ -10,9 +10,10 @@ using namespace nitrokey::proto::stick10;
 using namespace nitrokey::log;
 
 int main() {
-	Stick20 stick;
+	Stick10 stick;
+        cout << stick.connect() << endl;
 
-	Log::instance().set_loglevel(Loglevel::DEBUG);
+	Log::instance().set_loglevel(Loglevel::DEBUG_L2);
 
 	{
 		auto resp = GetStatus::CommandTransaction::run(stick);

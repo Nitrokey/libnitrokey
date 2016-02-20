@@ -3,7 +3,7 @@ CXX = $(PREFIX)-g++
 LD = $(CXX)
 
 INCLUDE = -Iinclude/
-LIB = -lusb-1.0
+LIB = -lusb-1.0 -lpthread
 #LIB = -lhidapi-libusb
 BUILD = build
 

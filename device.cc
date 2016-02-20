@@ -56,7 +56,7 @@ CommError Device::recv(void *packet) {
 		status = (CommError)(
 			hid_get_feature_report(mp_devhandle, (unsigned char *)(packet),
 				HID_REPORT_SIZE));
-		if (status == CommError::ERR_NO_ERROR || retry_count++ >= m_retry_count)
+		if ((int)status >0 || retry_count++ >= m_retry_count)
 			break;
 		std::this_thread::sleep_for(m_retry_timeout);
 	}

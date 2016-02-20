@@ -41,10 +41,10 @@ public:
 		out << "Raw HID packet:" << std::endl;
 		out << ::nitrokey::misc::hexdump((const char *)(&pod), sizeof pod);
 
-		out << "Device status:\t" << pod.device_status << std::endl;
+		out << "Device status:\t" << pod.device_status + 0 << std::endl;
 		out << "Command ID:\t" << commandid_to_string((CommandID)(pod.command_id)) << std::endl;
 		out << "Last command CRC:\t" << pod.last_command_crc << std::endl;
-		out << "Last command status:\t" << pod.last_command_status << std::endl;
+		out << "Last command status:\t" << pod.last_command_status + 0 << std::endl;
 		out << "CRC:\t" << pod.crc << std::endl;
 
 		out << "Payload:" << std::endl;

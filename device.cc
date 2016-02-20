@@ -48,6 +48,7 @@ CommError Device::recv(void *packet) {
 	int retry_count = 0;
 
 	Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
+        std::this_thread::sleep_for( std::chrono::milliseconds(5000) );
 
 	if (mp_devhandle == NULL)
 		throw std::runtime_error("Attempted HID receive on an invalid descriptor.");

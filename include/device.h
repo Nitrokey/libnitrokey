@@ -27,6 +27,7 @@ public:
 	// lack of device is not actually an error,
 	// so it doesn't throw
 	virtual bool connect(); 
+	virtual bool disconnect(); 
 
 	/*
 	 *	Sends packet of HID_REPORT_SIZE.

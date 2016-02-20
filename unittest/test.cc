@@ -32,4 +32,5 @@ int main() {
 			auto slot = ReadSlot::CommandTransaction::run(stick, slot_req);
 		}
 	}
+        stick.disconnect();
 }

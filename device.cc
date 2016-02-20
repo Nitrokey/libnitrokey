@@ -16,11 +16,19 @@ Device::Device()
   m_retry_timeout(50),
   mp_devhandle(NULL) {}
 
+bool Device::disconnect() {
+	Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
+
+	hid_exit();
+	mp_devhandle = NULL;
+	return true;
+}
 bool Device::connect() {
 	Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
 	hid_init();
 	mp_devhandle = hid_open(m_vid, m_pid, NULL);
+	hid_init();
 	return mp_devhandle != NULL;
 }
 

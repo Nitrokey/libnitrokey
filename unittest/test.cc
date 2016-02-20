@@ -26,7 +26,7 @@ int main() {
 	}
 
 	{
-		for (int i=0; i<10; i++) {
+		for (int i=0x20; i<0x23; i++) {
 			ReadSlot::CommandTransaction::CommandPayload slot_req;
 			slot_req.slot_number = i;
 			auto slot = ReadSlot::CommandTransaction::run(stick, slot_req);

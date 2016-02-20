@@ -26,9 +26,9 @@ bool Device::disconnect() {
 bool Device::connect() {
 	Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
-	hid_init();
+	//hid_init();
 	mp_devhandle = hid_open(m_vid, m_pid, NULL);
-	hid_init();
+	//hid_init();
 	return mp_devhandle != NULL;
 }
 

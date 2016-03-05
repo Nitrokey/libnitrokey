@@ -2,7 +2,7 @@ CC  = $(PREFIX)-gcc
 CXX = $(PREFIX)-g++
 LD = $(CXX)
 
-INCLUDE = -I../include
+INCLUDE = -I../include -ICatch/single_include/
 LIB = -L../build
 LDLIBS = -lnitrokey
 BUILD = build

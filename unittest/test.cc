@@ -26,10 +26,11 @@ int main() {
 	}
 
 	{
-		for (int i=0x20; i<0x23; i++) {
+		for (int i=0x20; i<0x25; i++) {
 			ReadSlot::CommandTransaction::CommandPayload slot_req;
 			slot_req.slot_number = i;
 			auto slot = ReadSlot::CommandTransaction::run(stick, slot_req);
+                        auto resp = GetStatus::CommandTransaction::run(stick);
 		}
 	}
         stick.disconnect();

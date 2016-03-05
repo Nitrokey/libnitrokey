@@ -1,5 +1,6 @@
 CC  = $(PREFIX)-gcc
-CXX = $(PREFIX)-g++
+#CXX = $(PREFIX)-g++
+CXX = clang++-3.6
 LD = $(CXX)
 
 INCLUDE = -I../include -ICatch/single_include/

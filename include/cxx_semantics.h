@@ -7,9 +7,9 @@
  *	There's no need to include Boost for a simple subset this project needs.
  */
 namespace semantics {
-	class non_constructible {
-		non_constructible() {}
-	};
+class non_constructible {
+  non_constructible() {}
+};
 }
 
 #endif

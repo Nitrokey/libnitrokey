@@ -8,7 +8,6 @@ namespace misc {
 
 std::string hexdump(const char *p, size_t size);
 uint32_t stm_crc32(const uint8_t *data, size_t size);
-
 }
 }
 

@@ -40,6 +40,8 @@ public:
 		std::stringstream out;
 
 
+                // FIXME use values from firmware (possibly generate separate 
+                // header automatically)
                 std::string status[4];
                 status[0] = " STATUS_READY";
                 status[1]= " STATUS_BUSY";

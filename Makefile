@@ -3,11 +3,10 @@ CXX = $(PREFIX)-g++
 LD = $(CXX)
 
 INCLUDE = -Iinclude/
-LIB = -lusb-1.0 -lpthread
-#LIB = -lhidapi-libusb
+LIB = -lhidapi-libusb
 BUILD = build
 
-CXXFLAGS = -std=c++14 -fPIC -fpermissive
+CXXFLAGS = -std=c++14 -fPIC 
 SOFLAGS = -shared
 
 CXXSOURCES = $(wildcard *.cc)

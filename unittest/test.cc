@@ -25,7 +25,7 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
   bool connected = stick.connect();
   REQUIRE(connected == true);
 
- // Log::instance().set_loglevel(Loglevel::DEBUG_L2);
+  Log::instance().set_loglevel(Loglevel::DEBUG);
 
   auto resp = GetStatus::CommandTransaction::run(stick);
 
@@ -33,40 +33,47 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
   strcpy((char *)(authreq.card_password), "12345678");
   FirstAuthenticate::CommandTransaction::run(stick, authreq);
 
+  {
+    EnablePasswordSafe::CommandTransaction::CommandPayload authreq;
+    strcpy((char *)(authreq.password), "123456");
+    EnablePasswordSafe::CommandTransaction::run(stick, authreq);
+  }
+
   REQUIRE(getSlotName(stick, 0x20) == std::string("1"));
   REQUIRE(getSlotName(stick, 0x21) == std::string("slot2"));
 
   {
- auto resp = GetPasswordRetryCount::CommandTransaction::run(stick);
- REQUIRE( resp.password_retry_count == 3 );
+    auto resp = GetPasswordRetryCount::CommandTransaction::run(stick);
+    REQUIRE(resp.password_retry_count == 3);
   }
   {
- auto resp = GetUserPasswordRetryCount::CommandTransaction::run(stick);
- REQUIRE( resp.password_retry_count == 3 );
-  }
-
-  {
-  GetPasswordSafeSlotName::CommandTransaction::CommandPayload slot;
-  slot.slot_number = 0;
-  auto resp2 = GetPasswordSafeSlotName::CommandTransaction::run(stick, slot);
-  std::string sName(reinterpret_cast<char *>(resp2.slot_name));
-  REQUIRE(sName == std::string("web1"));
+    auto resp = GetUserPasswordRetryCount::CommandTransaction::run(stick);
+    REQUIRE(resp.password_retry_count == 3);
   }
 
   {
-  GetPasswordSafeSlotPassword::CommandTransaction::CommandPayload slot;
-  slot.slot_number = 0;
-  auto resp2 = GetPasswordSafeSlotPassword::CommandTransaction::run(stick, slot);
-  std::string sName(reinterpret_cast<char *>(resp2.slot_password));
-  REQUIRE(sName == std::string("pass1"));
+    GetPasswordSafeSlotName::CommandTransaction::CommandPayload slot;
+    slot.slot_number = 0;
+    auto resp2 = GetPasswordSafeSlotName::CommandTransaction::run(stick, slot);
+    std::string sName(reinterpret_cast<char *>(resp2.slot_name));
+    REQUIRE(sName == std::string("web1"));
   }
 
   {
-  GetPasswordSafeSlotLogin::CommandTransaction::CommandPayload slot;
-  slot.slot_number = 0;
-  auto resp2 = GetPasswordSafeSlotLogin::CommandTransaction::run(stick, slot);
-  std::string sName(reinterpret_cast<char *>(resp2.slot_login));
-  REQUIRE(sName == std::string("login1"));
+    GetPasswordSafeSlotPassword::CommandTransaction::CommandPayload slot;
+    slot.slot_number = 0;
+    auto resp2 =
+        GetPasswordSafeSlotPassword::CommandTransaction::run(stick, slot);
+    std::string sName(reinterpret_cast<char *>(resp2.slot_password));
+    REQUIRE(sName == std::string("pass1"));
+  }
+
+  {
+    GetPasswordSafeSlotLogin::CommandTransaction::CommandPayload slot;
+    slot.slot_number = 0;
+    auto resp2 = GetPasswordSafeSlotLogin::CommandTransaction::run(stick, slot);
+    std::string sName(reinterpret_cast<char *>(resp2.slot_login));
+    REQUIRE(sName == std::string("login1"));
   }
 
   stick.disconnect();

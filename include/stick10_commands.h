@@ -196,10 +196,11 @@ class GetPasswordRetryCount : Command<CommandID::GET_PASSWORD_RETRY_COUNT> {
     uint8_t password_retry_count;
 
     bool isValid() const { return true; }
-    std::string dissect() const { 
+    std::string dissect() const {
       std::stringstream ss;
-      ss << " password_retry_count\t" << password_retry_count<< std::endl;
-        return ss.str(); }
+      ss << " password_retry_count\t" << password_retry_count << std::endl;
+      return ss.str();
+    }
   } __packed;
 
   typedef Transaction<command_id(), struct EmptyPayload, struct ResponsePayload>
@@ -213,10 +214,11 @@ class GetUserPasswordRetryCount
     uint8_t password_retry_count;
 
     bool isValid() const { return true; }
-    std::string dissect() const { 
+    std::string dissect() const {
       std::stringstream ss;
-      ss << " password_retry_count\t" << password_retry_count<< std::endl;
-        return ss.str(); }
+      ss << " password_retry_count\t" << password_retry_count << std::endl;
+      return ss.str();
+    }
   } __packed;
 
   typedef Transaction<command_id(), struct EmptyPayload, struct ResponsePayload>
@@ -241,20 +243,22 @@ class GetPasswordSafeSlotName : Command<CommandID::GET_PW_SAFE_SLOT_NAME> {
     uint8_t slot_number;
 
     bool isValid() const { return !(slot_number & 0xF0); }
-    std::string dissect() const { 
+    std::string dissect() const {
       std::stringstream ss;
       ss << "slot_number\t" << slot_number << std::endl;
-        return ss.str(); }
+      return ss.str();
+    }
   } __packed;
 
   struct ResponsePayload {
     uint8_t slot_name[PWS_SLOTNAME_LENGTH];
 
     bool isValid() const { return true; }
-    std::string dissect() const { 
+    std::string dissect() const {
       std::stringstream ss;
-      ss << " slot_name\t" <<  slot_name << std::endl;
-        return ss.str(); }
+      ss << " slot_name\t" << slot_name << std::endl;
+      return ss.str();
+    }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload,
@@ -268,20 +272,22 @@ class GetPasswordSafeSlotPassword
     uint8_t slot_number;
 
     bool isValid() const { return !(slot_number & 0xF0); }
-    std::string dissect() const { 
+    std::string dissect() const {
       std::stringstream ss;
-      ss << "   slot_number\t" <<   slot_number<< std::endl;
-        return ss.str(); }
+      ss << "   slot_number\t" << slot_number << std::endl;
+      return ss.str();
+    }
   } __packed;
 
   struct ResponsePayload {
     uint8_t slot_password[PWS_PASSWORD_LENGTH];
 
     bool isValid() const { return true; }
-    std::string dissect() const { 
+    std::string dissect() const {
       std::stringstream ss;
-      ss << " slot_password\t" <<   slot_password << std::endl;
-        return ss.str(); }
+      ss << " slot_password\t" << slot_password << std::endl;
+      return ss.str();
+    }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload,
@@ -295,20 +301,22 @@ class GetPasswordSafeSlotLogin
     uint8_t slot_number;
 
     bool isValid() const { return !(slot_number & 0xF0); }
-    std::string dissect() const { 
+    std::string dissect() const {
       std::stringstream ss;
-      ss << "   slot_number\t" <<   slot_number<< std::endl;
-        return ss.str(); }
+      ss << "   slot_number\t" << slot_number << std::endl;
+      return ss.str();
+    }
   } __packed;
 
   struct ResponsePayload {
     uint8_t slot_login[PWS_LOGINNAME_LENGTH];
 
     bool isValid() const { return true; }
-    std::string dissect() const { 
+    std::string dissect() const {
       std::stringstream ss;
-      ss << " slot_login\t" << slot_login<< std::endl;
-        return ss.str(); }
+      ss << " slot_login\t" << slot_login << std::endl;
+      return ss.str();
+    }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload,
@@ -360,6 +368,11 @@ class EnablePasswordSafe : Command<CommandID::PW_SAFE_ENABLE> {
     uint8_t password[30];
 
     bool isValid() const { return true; }
+    std::string dissect() const {
+      std::stringstream ss;
+      ss << " password\t" << password << std::endl;
+      return ss.str();
+    }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>

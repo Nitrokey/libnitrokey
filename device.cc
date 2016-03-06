@@ -44,24 +44,42 @@ CommError Device::send(const void *packet) {
 }
 
 CommError Device::recv(void *packet) {
-  CommError status;
+  // FIXME change CommError return value to int (return value of
+  // hid_get_feature_report)
+  int status;
   int retry_count = 0;
 
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
-  std::this_thread::sleep_for(std::chrono::milliseconds(
-      5000));  // FIXME remove timeout in favor of sync communication
 
   if (mp_devhandle == NULL)
     throw std::runtime_error("Attempted HID receive on an invalid descriptor.");
 
+  // FIXME extract error handling and repeating to parent function in
+  // device_proto:192
   for (;;) {
-    status = (CommError)(hid_get_feature_report(
-        mp_devhandle, (unsigned char *)(packet), HID_REPORT_SIZE));
-    if ((int)status > 0 || retry_count++ >= m_retry_count) break;
+    status = (hid_get_feature_report(mp_devhandle, (unsigned char *)(packet),
+                                     HID_REPORT_SIZE));
+
+    // FIXME handle getting libhid error message somewhere else
+    auto pwherr = hid_error(mp_devhandle);
+    std::wstring wherr = (pwherr != NULL) ? pwherr : L"No error message";
+    std::string herr(wherr.begin(), wherr.end());
+    Log::instance()(std::string("libhid error message: ") + herr,
+                    Loglevel::DEBUG_L2);
+
+    if (status > 0) break;  // success
+    if (retry_count++ >= m_retry_count) {
+      Log::instance()(
+          "Maximum retry count reached" + std::to_string(retry_count),
+          Loglevel::WARNING);
+      break;
+    }
+    Log::instance()("Retrying... " + std::to_string(retry_count),
+                    Loglevel::DEBUG);
     std::this_thread::sleep_for(m_retry_timeout);
   }
 
-  return status;
+  return (CommError)status;
 }
 
 Stick10::Stick10() {

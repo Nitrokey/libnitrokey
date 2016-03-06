@@ -1,6 +1,7 @@
 #ifndef DEVICE_PROTO_H
 #define DEVICE_PROTO_H
 #include <utility>
+#include <thread>
 #include <type_traits>
 #include <stdexcept>
 #include <string>
@@ -179,7 +180,18 @@ class Transaction : semantics::non_constructible {
           std::string("Device error while sending command ") +
           std::to_string((int)(status)));
 
-    status = dev.recv(&resp);
+    // FIXME make checks done in device:recv here
+    int retry = dev.get_retry_count();
+    while (retry-- > 0) {
+      status = dev.recv(&resp);
+      if (resp.device_status == 0) break;
+      Log::instance()("Device status is not ready (CRC error?) retrying..",
+                      Loglevel::DEBUG);  // FIXME translate device_status to log
+      Log::instance()("Invalid incoming HID packet:", Loglevel::DEBUG_L2);
+      Log::instance()((std::string)(resp), Loglevel::DEBUG_L2);
+      std::this_thread::sleep_for(dev.get_retry_timeout());
+      continue;
+    }
     if ((int)(status) < 0 && status != CommError::ERR_NO_ERROR)
       throw std::runtime_error(
           std::string("Device error while executing command ") +

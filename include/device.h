@@ -39,6 +39,11 @@ class Device {
    */
   virtual CommError recv(void *packet);
 
+  int get_retry_count() { return m_retry_count; }
+  const;
+  std::chrono::milliseconds get_retry_timeout() { return m_retry_timeout; }
+  const;
+
  protected:
   uint16_t m_vid;
   uint16_t m_pid;

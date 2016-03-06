@@ -13,7 +13,7 @@ using namespace nitrokey::log;
 Device::Device()
     : m_vid(0),
       m_pid(0),
-      m_retry_count(4),
+      m_retry_count(40),
       m_retry_timeout(50),
       mp_devhandle(NULL) {}
 

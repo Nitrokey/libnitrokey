@@ -2,10 +2,11 @@
 #include "catch.hpp"
 
 #include <iostream>
-#include <string.h>
+//#include <string.h>
 #include "device_proto.h"
 #include "log.h"
 #include "stick10_commands.h"
+#include <cstdlib>
 
 using namespace std;
 using namespace nitrokey::device;
@@ -20,7 +21,25 @@ std::string getSlotName(Stick10 &stick, int slotNo) {
   return sName;
 }
 
-void setSecret (uint8_t slot_secret[]){}; 
+void setSecret (uint8_t slot_secret[], const char* secretHex){
+    assert(strlen(secretHex)%2==0);
+   char buf[2];
+   for(int i=0; i<strlen(secretHex); i++){
+       buf[i%2] = secretHex[i];
+       if (i%2==1){
+           slot_secret[i/2] = strtoul(buf, NULL, 16) & 0xFF;
+       }
+   } 
+}; 
+
+TEST_CASE("test secret", "[functions]") {
+    uint8_t slot_secret[21];
+    slot_secret[20] = 0;
+    const char* secretHex = "3132333435363738393031323334353637383930";
+    setSecret(slot_secret, secretHex);
+    WARN(slot_secret);
+    REQUIRE(strcmp("12345678901234567890",reinterpret_cast<char *>(slot_secret) ) == 0 );
+}
 
 TEST_CASE("Slot names are correct", "[slotNames]") {
   Stick10 stick;
@@ -40,11 +59,13 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
   {
     WriteToHOTPSlot::CommandTransaction::CommandPayload hwrite;
     hwrite.slot_number = 0;
-    strcpy(hwrite.slot_name, "rfc_test");
-    strcpy(hwrite.slot_secret, "");
-    hwrite.slot_config;
-    strcpy(hwrite.slot_token_id, "");
-    strcpy(hwrite.slot_counter, "");
+    strcpy(reinterpret_cast<char *>(hwrite.slot_name), "rfc_test");
+    //strcpy(reinterpret_cast<char *>(hwrite.slot_secret), "");
+    const char* secretHex = "3132333435363738393031323334353637383930";
+    setSecret(hwrite.slot_secret, secretHex);
+    //hwrite.slot_config;
+    strcpy(reinterpret_cast<char *>(hwrite.slot_token_id), "");
+    strcpy(reinterpret_cast<char *>(hwrite.slot_counter), "");
   }
 
 

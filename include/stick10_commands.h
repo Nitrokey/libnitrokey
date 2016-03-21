@@ -139,6 +139,11 @@ class GetHOTP : Command<CommandID::GET_CODE> {
     uint8_t code[18];
 
     bool isValid() const { return true; }
+    std::string dissect() const {
+      std::stringstream ss;
+      ss << "code:\t" << (code) << std::endl;
+      return ss.str();
+    }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>

@@ -63,12 +63,12 @@ class ResponseDissector : semantics::non_constructible {
     out << ::nitrokey::misc::hexdump((const char *)(&pod), sizeof pod);
 
     out << "Device status:\t" << pod.device_status + 0 << " "
-        << cmd[pod.device_status] << std::endl;
+        << status[pod.device_status] << std::endl;
     out << "Command ID:\t" << commandid_to_string((CommandID)(pod.command_id))
         << std::endl;
     out << "Last command CRC:\t" << pod.last_command_crc << std::endl;
     out << "Last command status:\t" << pod.last_command_status + 0 << " "
-        << status[pod.last_command_status] << std::endl;
+        << cmd[pod.last_command_status] << std::endl;
     out << "CRC:\t" << pod.crc << std::endl;
 
     out << "Payload:" << std::endl;

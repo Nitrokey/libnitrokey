@@ -23,6 +23,7 @@ std::string getSlotName(Stick10 &stick, int slotNo) {
 
 void setSecret (uint8_t slot_secret[], const char* secretHex){
     assert(strlen(secretHex)%2==0);
+    //assert(strlen(secretHex)==(sizeof slot_secret)*2);
    char buf[2];
    for(int i=0; i<strlen(secretHex); i++){
        buf[i%2] = secretHex[i];
@@ -37,7 +38,7 @@ TEST_CASE("test secret", "[functions]") {
     slot_secret[20] = 0;
     const char* secretHex = "3132333435363738393031323334353637383930";
     setSecret(slot_secret, secretHex);
-    WARN(slot_secret);
+    CAPTURE(slot_secret);
     REQUIRE(strcmp("12345678901234567890",reinterpret_cast<char *>(slot_secret) ) == 0 );
 }
 
@@ -58,7 +59,7 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
 
   {
     WriteToHOTPSlot::CommandTransaction::CommandPayload hwrite;
-    hwrite.slot_number = 0;
+    hwrite.slot_number = 0xF;
     strcpy(reinterpret_cast<char *>(hwrite.slot_name), "rfc_test");
     //strcpy(reinterpret_cast<char *>(hwrite.slot_secret), "");
     const char* secretHex = "3132333435363738393031323334353637383930";
@@ -66,6 +67,12 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
     //hwrite.slot_config;
     strcpy(reinterpret_cast<char *>(hwrite.slot_token_id), "");
     strcpy(reinterpret_cast<char *>(hwrite.slot_counter), "");
+    WriteToHOTPSlot::CommandTransaction::run(stick, hwrite);
+
+    GetHOTP::CommandTransaction::CommandPayload gh;
+    gh.slot_number =  0xF;
+    GetHOTP::CommandTransaction::run(stick, gh);
+
   }
 
 

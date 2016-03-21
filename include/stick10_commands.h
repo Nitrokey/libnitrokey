@@ -68,6 +68,16 @@ class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
     uint8_t slot_counter[8];
 
     bool isValid() const { return !(slot_number & 0xF0); }
+    std::string dissect() const {
+        std::stringstream ss;
+        ss << "slot_number:\t" << (int)(slot_number) << std::endl;
+        ss << "slot_name" << slot_name << std::endl;
+        ss << "slot_secret" << slot_secret << std::endl;
+        ss << "slot_config" << slot_config << std::endl;
+        ss << "slot_token_id" << slot_token_id << std::endl;
+        ss << "slot_counter" << slot_counter << std::endl;
+        return ss.str();
+    }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -118,6 +128,17 @@ class GetHOTP : Command<CommandID::GET_CODE> {
     uint8_t slot_number;
 
     bool isValid() const { return !(slot_number & 0xF0); }
+    std::string dissect() const {
+      std::stringstream ss;
+      ss << "slot_number:\t" << (int)(slot_number) << std::endl;
+      return ss.str();
+    }
+  } __packed;
+
+  struct ResponsePayload {
+    uint8_t code[18];
+
+    bool isValid() const { return true; }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>

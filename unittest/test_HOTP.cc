@@ -81,11 +81,25 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
     //run hotp command
     WriteToHOTPSlot::CommandTransaction::run(stick, hwrite);
 
-    GetHOTP::CommandTransaction::CommandPayload gh;
-    gh.slot_number =  0x10;
-    auto resp = GetHOTP::CommandTransaction::run(stick, gh);
-    REQUIRE( string(reinterpret_cast<char *>(resp.code)) == "755224");
+    uint32_t codes[] = {
+            755224,
+            287082,
+            359152,
+            969429,
+            338314,
+            254676,
+            287922,
+            162583,
+            399871,
+            520489
+    };
 
+    for( auto code: codes){
+        GetHOTP::CommandTransaction::CommandPayload gh;
+        gh.slot_number =  0x10;
+        auto resp = GetHOTP::CommandTransaction::run(stick, gh);
+        REQUIRE( resp.code == code);
+    }
   }
 
 

@@ -136,12 +136,19 @@ class GetHOTP : Command<CommandID::GET_CODE> {
   } __packed;
 
   struct ResponsePayload {
-    uint8_t code[18];
+      union {
+          uint8_t whole_response[18]; //TODO remove if not needed
+          struct {
+              uint32_t code;
+              uint8_t config;
+          } __packed;
+      } __packed;
 
     bool isValid() const { return true; }
     std::string dissect() const {
       std::stringstream ss;
       ss << "code:\t" << (code) << std::endl;
+      ss << "config:\t" << "TODO" /*(config) */<< std::endl; //TODO show byte field options
       return ss.str();
     }
   } __packed;

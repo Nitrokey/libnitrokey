@@ -54,7 +54,7 @@ TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
   {
     WriteToHOTPSlot::CommandTransaction::CommandPayload hwrite;
     hwrite.slot_number = 0x10;
-    strcpy(reinterpret_cast<char *>(hwrite.slot_name), "rfc4226_libnitro_test");
+    strcpy(reinterpret_cast<char *>(hwrite.slot_name), "rfc4226_lib");
     //strcpy(reinterpret_cast<char *>(hwrite.slot_secret), "");
     const char* secretHex = "3132333435363738393031323334353637383930";
     hexStringToByte(hwrite.slot_secret, secretHex);

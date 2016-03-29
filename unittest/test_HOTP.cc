@@ -51,15 +51,17 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
 
   auto resp = GetStatus::CommandTransaction::run(stick);
 
+  const char * temporary_password = "123456789012345678901234";
   {
-  FirstAuthenticate::CommandTransaction::CommandPayload authreq;
-  strcpy((char *)(authreq.card_password), "12345678");
-  FirstAuthenticate::CommandTransaction::run(stick, authreq);
+      FirstAuthenticate::CommandTransaction::CommandPayload authreq;
+      strcpy((char *)(authreq.card_password), "12345678");
+     // strcpy((char *)(authreq.temporary_password), temporary_password);
+      FirstAuthenticate::CommandTransaction::run(stick, authreq);
   }
 
   {
     WriteToHOTPSlot::CommandTransaction::CommandPayload hwrite;
-    hwrite.slot_number = 0xF;
+    hwrite.slot_number = 0x10;
     strcpy(reinterpret_cast<char *>(hwrite.slot_name), "rfc_test");
     //strcpy(reinterpret_cast<char *>(hwrite.slot_secret), "");
     const char* secretHex = "3132333435363738393031323334353637383930";
@@ -67,11 +69,22 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
     //hwrite.slot_config;
     strcpy(reinterpret_cast<char *>(hwrite.slot_token_id), "");
     strcpy(reinterpret_cast<char *>(hwrite.slot_counter), "");
+
+    //authorize writehotp first
+    {
+        Authorize::CommandTransaction::CommandPayload auth;
+        // strcpy((char *)(auth.temporary_password), temporary_password);
+        auth.crc_to_authorize = WriteToHOTPSlot::CommandTransaction::getCRC(hwrite);
+        Authorize::CommandTransaction::run(stick, auth);
+  }
+    
+    //run hotp command
     WriteToHOTPSlot::CommandTransaction::run(stick, hwrite);
 
     GetHOTP::CommandTransaction::CommandPayload gh;
-    gh.slot_number =  0xF;
-    GetHOTP::CommandTransaction::run(stick, gh);
+    gh.slot_number =  0x10;
+    auto resp = GetHOTP::CommandTransaction::run(stick, gh);
+    REQUIRE( string(reinterpret_cast<char *>(resp.code)) == "755224");
 
   }
 

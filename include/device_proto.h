@@ -151,6 +151,15 @@ class Transaction : semantics::non_constructible {
   static_assert(sizeof(ResponsePacket) == HID_REPORT_SIZE,
                 "ResponsePacket type is not the right size");
 
+  static uint32_t getCRC(
+          const command_payload &payload) {
+    OutgoingPacket outp;
+    outp.initialize();
+    outp.payload = payload;
+    outp.update_CRC();
+    return outp.crc;
+  }
+
   static response_payload run(device::Device &dev,
                               const command_payload &payload) {
     using namespace ::nitrokey::device;

@@ -127,7 +127,7 @@ class GetHOTP : Command<CommandID::GET_CODE> {
   struct CommandPayload {
     uint8_t slot_number;
 
-    bool isValid() const { return !(slot_number & 0xF0); }
+    bool isValid() const { return (slot_number & 0xF0); }
     std::string dissect() const {
       std::stringstream ss;
       ss << "slot_number:\t" << (int)(slot_number) << std::endl;
@@ -146,7 +146,7 @@ class GetHOTP : Command<CommandID::GET_CODE> {
     }
   } __packed;
 
-  typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+  typedef Transaction<command_id(), struct CommandPayload, struct ResponsePayload>
       CommandTransaction;
 };
 
@@ -473,8 +473,15 @@ class UserAuthenticate : Command<CommandID::USER_AUTHENTICATE> {
 class Authorize : Command<CommandID::AUTHORIZE> {
  public:
   struct CommandPayload {
-    uint8_t crc[4];
-    uint8_t password[25];
+    uint32_t  crc_to_authorize;
+    uint8_t temporary_password[25];
+
+    std::string dissect() const {
+      std::stringstream ss;
+      ss << "  crc_to_authorize:\t" <<   crc_to_authorize<< std::endl;
+      ss << " temporary_password:\t" << temporary_password<< std::endl;
+      return ss.str();
+    }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -484,8 +491,14 @@ class Authorize : Command<CommandID::AUTHORIZE> {
 class UserAuthorize : Command<CommandID::USER_AUTHORIZE> {
  public:
   struct CommandPayload {
-    uint8_t crc[4];
-    uint8_t password[25];
+    uint8_t crc_to_authorize[4];
+    uint8_t temporary_password[25];
+    std::string dissect() const {
+      std::stringstream ss;
+      ss << " crc_to_authorize:\t" <<  crc_to_authorize<< std::endl;
+      ss << " temporary_password:\t" << temporary_password<< std::endl;
+      return ss.str();
+    }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>

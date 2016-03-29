@@ -71,11 +71,11 @@ class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
     std::string dissect() const {
         std::stringstream ss;
         ss << "slot_number:\t" << (int)(slot_number) << std::endl;
-        ss << "slot_name" << slot_name << std::endl;
-        ss << "slot_secret" << slot_secret << std::endl;
-        ss << "slot_config" << slot_config << std::endl;
-        ss << "slot_token_id" << slot_token_id << std::endl;
-        ss << "slot_counter" << slot_counter << std::endl;
+        ss << "slot_name:\t" << slot_name << std::endl;
+        ss << "slot_secret:\t" << slot_secret << std::endl;
+        ss << "slot_config:\t" << slot_config << std::endl;
+        ss << "slot_token_id:\t" << slot_token_id << std::endl;
+        ss << "slot_counter:\t" << slot_counter << std::endl;
         return ss.str();
     }
   } __packed;

@@ -13,36 +13,27 @@ using namespace nitrokey::device;
 using namespace nitrokey::proto::stick10;
 using namespace nitrokey::log;
 
-std::string getSlotName(Stick10 &stick, int slotNo) {
-  ReadSlot::CommandTransaction::CommandPayload slot_req;
-  slot_req.slot_number = slotNo;
-  auto slot = ReadSlot::CommandTransaction::run(stick, slot_req);
-  std::string sName(reinterpret_cast<char *>(slot.slot_name));
-  return sName;
-}
-
-void setSecret (uint8_t slot_secret[], const char* secretHex){
-    assert(strlen(secretHex)%2==0);
-    //assert(strlen(secretHex)==(sizeof slot_secret)*2);
-   char buf[2];
-   for(int i=0; i<strlen(secretHex); i++){
-       buf[i%2] = secretHex[i];
-       if (i%2==1){
-           slot_secret[i/2] = strtoul(buf, NULL, 16) & 0xFF;
-       }
-   } 
+void hexStringToByte(uint8_t data[], const char* hexString){
+    assert(strlen(hexString)%2==0);
+    char buf[2];
+    for(int i=0; i<strlen(hexString); i++){
+        buf[i%2] = hexString[i];
+        if (i%2==1){
+            data[i/2] = strtoul(buf, NULL, 16) & 0xFF;
+        }
+    } 
 }; 
 
 TEST_CASE("test secret", "[functions]") {
     uint8_t slot_secret[21];
     slot_secret[20] = 0;
     const char* secretHex = "3132333435363738393031323334353637383930";
-    setSecret(slot_secret, secretHex);
+     hexStringToByte(slot_secret, secretHex);
     CAPTURE(slot_secret);
     REQUIRE(strcmp("12345678901234567890",reinterpret_cast<char *>(slot_secret) ) == 0 );
 }
 
-TEST_CASE("Slot names are correct", "[slotNames]") {
+TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
   Stick10 stick;
   bool connected = stick.connect();
   REQUIRE(connected == true);
@@ -59,16 +50,17 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
       FirstAuthenticate::CommandTransaction::run(stick, authreq);
   }
 
+  //test according to https://tools.ietf.org/html/rfc4226#page-32
   {
     WriteToHOTPSlot::CommandTransaction::CommandPayload hwrite;
     hwrite.slot_number = 0x10;
-    strcpy(reinterpret_cast<char *>(hwrite.slot_name), "rfc_test");
+    strcpy(reinterpret_cast<char *>(hwrite.slot_name), "rfc4226_libnitro_test");
     //strcpy(reinterpret_cast<char *>(hwrite.slot_secret), "");
     const char* secretHex = "3132333435363738393031323334353637383930";
-    setSecret(hwrite.slot_secret, secretHex);
-    //hwrite.slot_config;
-    strcpy(reinterpret_cast<char *>(hwrite.slot_token_id), "");
-    strcpy(reinterpret_cast<char *>(hwrite.slot_counter), "");
+    hexStringToByte(hwrite.slot_secret, secretHex);
+    //hwrite.slot_config; //TODO check various configs in separate test cases
+    //strcpy(reinterpret_cast<char *>(hwrite.slot_token_id), "");
+    //strcpy(reinterpret_cast<char *>(hwrite.slot_counter), "");
 
     //authorize writehotp first
     {
@@ -82,16 +74,8 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
     WriteToHOTPSlot::CommandTransaction::run(stick, hwrite);
 
     uint32_t codes[] = {
-            755224,
-            287082,
-            359152,
-            969429,
-            338314,
-            254676,
-            287922,
-            162583,
-            399871,
-            520489
+            755224, 287082, 359152, 969429, 338314, 
+            254676, 287922, 162583, 399871, 520489
     };
 
     for( auto code: codes){

@@ -34,8 +34,9 @@ TEST_CASE("test secret", "[functions]") {
 }
 
 TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
-  Stick10 stick;
-  bool connected = stick.connect();
+    Stick10 stick;
+    bool connected = stick.connect();
+
   REQUIRE(connected == true);
 
   Log::instance().set_loglevel(Loglevel::DEBUG);
@@ -84,6 +85,15 @@ TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
         auto resp = GetHOTP::CommandTransaction::run(stick, gh);
         REQUIRE( resp.code == code);
     }
+    //checking slot programmed before with nitro-app
+    /*
+    for( auto code: codes){
+        GetHOTP::CommandTransaction::CommandPayload gh;
+        gh.slot_number =  0x12;
+        auto resp = GetHOTP::CommandTransaction::run(stick, gh);
+        REQUIRE( resp.code == code);
+    }
+    */
   }
 
 

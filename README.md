@@ -3,6 +3,17 @@
 Warning! Before you run unittests please either change both your Admin and User PINs on your Nitrostick to defaults (12345678 and 123456 respectively) or change the values in tests source code. If its too late, you can always reset your Nitrokey using instructions from [homepage](
 https://www.nitrokey.com/de/documentation/how-reset-nitrokey).
 
+To clone please use git's --recursive option like in:
+```bash
+git clone --recursive https://github.com/Nitrokey/libnitrokey.git
+```
+or for already cloned repository:
+```bash
+git clone https://github.com/Nitrokey/libnitrokey.git
+cd libnitrokey
+git submodule update --init --recursive
+```
+
 Libnitrokey do not have at the moment any documentation. Most helpful for
 now would be unittests [currently hotp_tests branch - still in
 development, but they should show how to handle operations with Nitrokeys and

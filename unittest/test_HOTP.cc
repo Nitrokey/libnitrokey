@@ -46,7 +46,7 @@ TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
   {
       FirstAuthenticate::CommandTransaction::CommandPayload authreq;
       strcpy((char *)(authreq.card_password), "12345678");
-     // strcpy((char *)(authreq.temporary_password), temporary_password);
+      strcpy((char *)(authreq.temporary_password), temporary_password);
       FirstAuthenticate::CommandTransaction::run(stick, authreq);
   }
 
@@ -65,7 +65,7 @@ TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
     //authorize writehotp first
     {
         Authorize::CommandTransaction::CommandPayload auth;
-        // strcpy((char *)(auth.temporary_password), temporary_password);
+        strcpy((char *)(auth.temporary_password), temporary_password);
         auth.crc_to_authorize = WriteToHOTPSlot::CommandTransaction::getCRC(hwrite);
         Authorize::CommandTransaction::run(stick, auth);
   }

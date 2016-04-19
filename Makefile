@@ -6,14 +6,13 @@ INCLUDE = -Iinclude/
 LIB = -lhidapi-libusb
 BUILD = build
 
-CXXFLAGS = -std=c++14 -fPIC
-SOFLAGS = -shared
+CXXFLAGS = -std=c++14
 
 CXXSOURCES = $(wildcard *.cc)
-OBJ = $(CXXSOURCES:%.cc=$(BUILD)/%.o)
+OBJ = $(CXXSOURCES:%.cc:$(BUILD)/%.o)
 
 $(BUILD)/libnitrokey.so: $(OBJ)
-	$(CXX) $(SOFLAGS) $(OBJ) -o $@
+	$(CXX) -shared $(OBJ) -o $@
 
 $(BUILD)/%.o: %.cc
 	$(CXX) -c $< -o $@ $(INCLUDE) $(CXXFLAGS)
@@ -21,17 +20,12 @@ $(BUILD)/%.o: %.cc
 all: $(OBJ) $(BUILD)/libnitrokey.so
 
 clean:
-	rm -f $(OBJ)
-	rm -f $(BUILD)/libnitrokey.so
-	make -C unittest clean
+	rm $(OBJ)
+	rm $(BUILD)/libnitrokey.so
 
 mrproper: clean
-	rm -f $(BUILD)/*.d
+	rm $(BUILD)/*.d
 
-unittest: all
-	make -C unittest
-	cd unittest/build && ln -fs ../../build/libnitrokey.so .
-
-.PHONY: all clean mrproper unittest
+.PHONY: all clean mrproper
 
 include $(wildcard build/*.d)

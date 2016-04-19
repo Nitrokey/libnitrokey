@@ -59,6 +59,8 @@ TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
     //strcpy(reinterpret_cast<char *>(hwrite.slot_secret), "");
     const char* secretHex = "3132333435363738393031323334353637383930";
     hexStringToByte(hwrite.slot_secret, secretHex);
+    // reset the HOTP counter
+    memset(hwrite.slot_counter, 0, 8);
     //hwrite.slot_config; //TODO check various configs in separate test cases
     //strcpy(reinterpret_cast<char *>(hwrite.slot_token_id), "");
     //strcpy(reinterpret_cast<char *>(hwrite.slot_counter), "");

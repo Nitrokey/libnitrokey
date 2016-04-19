@@ -46,7 +46,7 @@ TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
   {
       FirstAuthenticate::CommandTransaction::CommandPayload authreq;
       strcpy((char *)(authreq.card_password), "12345678");
-     // strcpy((char *)(authreq.temporary_password), temporary_password);
+      strcpy((char *)(authreq.temporary_password), temporary_password);
       FirstAuthenticate::CommandTransaction::run(stick, authreq);
   }
 
@@ -58,14 +58,25 @@ TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
     //strcpy(reinterpret_cast<char *>(hwrite.slot_secret), "");
     const char* secretHex = "3132333435363738393031323334353637383930";
     hexStringToByte(hwrite.slot_secret, secretHex);
-    //hwrite.slot_config; //TODO check various configs in separate test cases
+
+    // We need to reset the counter of the slot, in case the slot was used earlier
+    hwrite.slot_counter[0] = 0;
+    hwrite.slot_counter[1] = 0;
+    hwrite.slot_counter[2] = 0;
+    hwrite.slot_counter[3] = 0;
+    hwrite.slot_counter[4] = 0;
+    hwrite.slot_counter[5] = 0;
+    hwrite.slot_counter[6] = 0;
+    hwrite.slot_counter[7] = 0;
+
+    //TODO check various configs in separate test cases
     //strcpy(reinterpret_cast<char *>(hwrite.slot_token_id), "");
     //strcpy(reinterpret_cast<char *>(hwrite.slot_counter), "");
 
     //authorize writehotp first
     {
         Authorize::CommandTransaction::CommandPayload auth;
-        // strcpy((char *)(auth.temporary_password), temporary_password);
+        strcpy((char *)(auth.temporary_password), temporary_password);
         auth.crc_to_authorize = WriteToHOTPSlot::CommandTransaction::getCRC(hwrite);
         Authorize::CommandTransaction::run(stick, auth);
   }

@@ -1,8 +1,6 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main()
 #include "catch.hpp"
-
 #include <iostream>
-//#include <string.h>
 #include "device_proto.h"
 #include "log.h"
 #include "stick10_commands.h"
@@ -21,14 +19,14 @@ void hexStringToByte(uint8_t data[], const char* hexString){
         if (i%2==1){
             data[i/2] = strtoul(buf, NULL, 16) & 0xFF;
         }
-    } 
-}; 
+    }
+};
 
 TEST_CASE("test secret", "[functions]") {
     uint8_t slot_secret[21];
     slot_secret[20] = 0;
     const char* secretHex = "3132333435363738393031323334353637383930";
-     hexStringToByte(slot_secret, secretHex);
+    hexStringToByte(slot_secret, secretHex);
     CAPTURE(slot_secret);
     REQUIRE(strcmp("12345678901234567890",reinterpret_cast<char *>(slot_secret) ) == 0 );
 }
@@ -60,7 +58,7 @@ TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
     const char* secretHex = "3132333435363738393031323334353637383930";
     hexStringToByte(hwrite.slot_secret, secretHex);
     // reset the HOTP counter
-    memset(hwrite.slot_counter, 0, 8);
+//    memset(hwrite.slot_counter, 0, 8);
     //hwrite.slot_config; //TODO check various configs in separate test cases
     //strcpy(reinterpret_cast<char *>(hwrite.slot_token_id), "");
     //strcpy(reinterpret_cast<char *>(hwrite.slot_counter), "");
@@ -72,12 +70,12 @@ TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
         auth.crc_to_authorize = WriteToHOTPSlot::CommandTransaction::getCRC(hwrite);
         Authorize::CommandTransaction::run(stick, auth);
   }
-    
+
     //run hotp command
     WriteToHOTPSlot::CommandTransaction::run(stick, hwrite);
 
     uint32_t codes[] = {
-            755224, 287082, 359152, 969429, 338314, 
+            755224, 287082, 359152, 969429, 338314,
             254676, 287922, 162583, 399871, 520489
     };
 

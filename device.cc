@@ -3,9 +3,9 @@
 #include <cstddef>
 #include <stdexcept>
 #include <hidapi/hidapi.h>
-#include "device.h"
-#include "log.h"
-#include "misc.h"
+#include "include/misc.h"
+#include "include/device.h"
+#include "include/log.h"
 
 using namespace nitrokey::device;
 using namespace nitrokey::log;

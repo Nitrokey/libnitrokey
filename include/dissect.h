@@ -5,6 +5,7 @@
 #define DISSECT_H
 #include <string>
 #include <sstream>
+#include <iomanip>
 #include "misc.h"
 #include "cxx_semantics.h"
 #include "command_id.h"
@@ -66,7 +67,8 @@ class ResponseDissector : semantics::non_constructible {
         << status[pod.device_status] << std::endl;
     out << "Command ID:\t" << commandid_to_string((CommandID)(pod.command_id))
         << std::endl;
-    out << "Last command CRC:\t" << pod.last_command_crc << std::endl;
+    out << "Last command CRC:\t" << std::hex << std::setw(2) << std::setfill('0')
+            << pod.last_command_crc << std::endl;
     out << "Last command status:\t" << pod.last_command_status + 0 << " "
         << cmd[pod.last_command_status] << std::endl;
     out << "CRC:\t" << pod.crc << std::endl;

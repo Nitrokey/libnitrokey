@@ -1,9 +1,12 @@
 #ifndef STICK10_COMMANDS_H
 #define STICK10_COMMANDS_H
+#include <bitset>
+#include <iomanip>
 #include <string>
 #include <sstream>
 #include "inttypes.h"
 #include "command.h"
+#include "device_proto.h"
 
 namespace nitrokey {
 namespace proto {
@@ -18,13 +21,23 @@ class GetSlotName : public Command<CommandID::READ_SLOT_NAME> {
   struct CommandPayload {
     uint8_t slot_number;
 
-    bool isValid() const { return !(slot_number & 0xF0); }
+    bool isValid() const { return slot_number<0x10+3; }
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << "slot_number:\t" << (int)(slot_number) << std::endl;
+          return ss.str();
+      }
   } __packed;
 
   struct ResponsePayload {
     uint8_t slot_name[15];
 
     bool isValid() const { return true; }
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << "slot_name:\t" << slot_name << std::endl;
+          return ss.str();
+      }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload,
@@ -37,6 +50,11 @@ class EraseSlot : Command<CommandID::ERASE_SLOT> {
     uint8_t slot_number;
 
     bool isValid() const { return !(slot_number & 0xF0); }
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << "slot_number:\t" << (int)(slot_number) << std::endl;
+          return ss.str();
+      }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -56,6 +74,7 @@ class SetTime : Command<CommandID::SET_TIME> {
       CommandTransaction;
 };
 
+
 // TODO duplicate TOTP
 class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
  public:
@@ -65,7 +84,7 @@ class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
     uint8_t slot_secret[20];
     uint8_t slot_config;
     uint8_t slot_token_id[13];
-    uint8_t slot_counter[8];
+      uint64_t slot_counter;
 
     bool isValid() const { return !(slot_number & 0xF0); }
     std::string dissect() const {
@@ -73,9 +92,12 @@ class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
         ss << "slot_number:\t" << (int)(slot_number) << std::endl;
         ss << "slot_name:\t" << slot_name << std::endl;
         ss << "slot_secret:\t" << slot_secret << std::endl;
-        ss << "slot_config:\t" << slot_config << std::endl;
-        ss << "slot_token_id:\t" << slot_token_id << std::endl;
-        ss << "slot_counter:\t" << slot_counter << std::endl;
+        ss << "slot_config:\t" << std::bitset<8>((int)slot_config) << std::endl;
+        ss << "slot_token_id:\t";
+        for (auto i : slot_token_id)
+            ss << std::hex << std::setw(2) << std::setfill('0')<< (int) i << " " ;
+        ss << std::endl;
+        ss << "slot_counter:\t" << (int)slot_counter << std::endl;
         return ss.str();
     }
   } __packed;
@@ -120,6 +142,47 @@ class GetCode : Command<CommandID::GET_CODE> {
 
   typedef Transaction<command_id(), struct CommandPayload,
                       struct ResponsePayload> CommandTransaction;
+};
+
+class GetTOTP : Command<CommandID::GET_CODE> {
+ public:
+  struct CommandPayload {
+    uint8_t slot_number;
+    uint64_t challenge;
+    uint64_t last_totp_time;
+    uint8_t last_interval;
+
+    bool isValid() const { return !(slot_number & 0xF0); }
+    std::string dissect() const {
+      std::stringstream ss;
+      ss << "slot_number:\t" << (int)(slot_number) << std::endl;
+      ss << "challenge:\t" << (challenge) << std::endl;
+      ss << "last_totp_time:\t" << (last_totp_time) << std::endl;
+      ss << "last_interval:\t" << (int)(last_interval) << std::endl;
+      return ss.str();
+    }
+  } __packed;
+
+  struct ResponsePayload {
+      union {
+          uint8_t whole_response[18]; //TODO remove if not needed
+          struct {
+              uint32_t code;
+              uint8_t config;
+          } __packed;
+      } __packed;
+
+    bool isValid() const { return true; }
+    std::string dissect() const {
+      std::stringstream ss;
+      ss << "code:\t" << (code) << std::endl;
+      ss << "config:\t" << "TODO" /*(config) */<< std::endl; //TODO show byte field options
+      return ss.str();
+    }
+  } __packed;
+
+  typedef Transaction<command_id(), struct CommandPayload, struct ResponsePayload>
+      CommandTransaction;
 };
 
 class GetHOTP : Command<CommandID::GET_CODE> {
@@ -444,6 +507,15 @@ class WriteGeneralConfig : Command<CommandID::WRITE_CONFIG> {
       CommandTransaction;
 };
 
+//            struct clear_on_const {
+//                clear_on_const(){
+//                    initialize();
+//                }
+//                void initialize(){
+//                    bzero(this, sizeof(*this));
+//                }
+//        };
+
 class FirstAuthenticate : Command<CommandID::FIRST_AUTHENTICATE> {
  public:
   struct CommandPayload {
@@ -451,6 +523,7 @@ class FirstAuthenticate : Command<CommandID::FIRST_AUTHENTICATE> {
     uint8_t temporary_password[25];
 
     bool isValid() const { return true; }
+    void initialize(){ bzero(this, sizeof(*this)); }
 
     std::string dissect() const {
       std::stringstream ss;
@@ -480,12 +553,14 @@ class UserAuthenticate : Command<CommandID::USER_AUTHENTICATE> {
 class Authorize : Command<CommandID::AUTHORIZE> {
  public:
   struct CommandPayload {
-    uint32_t  crc_to_authorize;
+    uint32_t crc_to_authorize;
     uint8_t temporary_password[25];
 
-    std::string dissect() const {
+      void initialize(){ bzero(this, sizeof(*this)); }
+
+      std::string dissect() const {
       std::stringstream ss;
-      ss << "  crc_to_authorize:\t" <<   crc_to_authorize<< std::endl;
+      ss << " crc_to_authorize:\t" << std::hex << std::setw(2) << std::setfill('0') << crc_to_authorize<< std::endl;
       ss << " temporary_password:\t" << temporary_password<< std::endl;
       return ss.str();
     }

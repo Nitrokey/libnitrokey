@@ -68,6 +68,12 @@ class SetTime : Command<CommandID::SET_TIME> {
     uint64_t time;  // posix time
 
     bool isValid() const { return reset && reset != 1; }
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << "reset:\t" << (int)(reset) << std::endl;
+          ss << "time:\t" << (time) << std::endl;
+          return ss.str();
+      }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>

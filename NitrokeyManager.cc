@@ -68,6 +68,7 @@ namespace nitrokey{
     uint32_t NitrokeyManager::get_TOTP_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
                                                 uint8_t last_interval) {
         assert(is_valid_totp_slot_number(slot_number));
+        slot_number = get_internal_slot_number_for_totp(slot_number);
         auto gt = get_payload<GetTOTP>();
         gt.slot_number = slot_number;
         gt.challenge = challenge;
@@ -119,8 +120,10 @@ namespace nitrokey{
         return false;
     }
 
+    enum totp_config{digits8=0, enter, tokenID};
+
     bool NitrokeyManager::write_TOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret,
-                                              uint16_t time_window, const char *temporary_password) {
+                                          uint16_t time_window, bool use_8_digits, const char *temporary_password) {
         assert(is_valid_totp_slot_number(slot_number));
         assert(strlen(secret)==20); //160 bits
         assert(strlen(slot_name)<=15);
@@ -131,7 +134,9 @@ namespace nitrokey{
         strcpy((char *) payload.slot_secret, secret);
         strcpy((char *) payload.slot_name, slot_name);
         payload.slot_interval = time_window; //FIXME naming
-        payload.slot_config; //TODO
+        bitset<8> config; //FIXME better config manipulation
+        config.set(totp_config::digits8, use_8_digits);
+        payload.slot_config = (uint8_t) config.to_ulong();
 
         auto auth = get_payload<Authorize>();
         strcpy((char *) (auth.temporary_password), temporary_password);
@@ -166,6 +171,21 @@ namespace nitrokey{
         strcpy((char *) (authreq.temporary_password), temporary_password);
         FirstAuthenticate::CommandTransaction::run(*device, authreq);
         return true;
+    }
+
+    bool NitrokeyManager::set_time(uint64_t time) {
+        auto p = get_payload<SetTime>();
+        p.reset = 1;
+        p.time = time;
+        SetTime::CommandTransaction::run(*device, p);
+        return false;
+    }
+
+    bool NitrokeyManager::mark_time() {
+        auto p = get_payload<SetTime>();
+        p.reset = 0;
+        SetTime::CommandTransaction::run(*device, p);
+        return false;
     }
 
 

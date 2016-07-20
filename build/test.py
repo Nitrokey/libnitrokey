@@ -46,15 +46,30 @@ if __name__ == "__main__":
     for i in range(3):
         s.append(C.NK_get_hotp_code(i))
     print(repr(s))
-    print((s))
+    print(s)
     # C.NK_set_debug(True)
 
-    s = []
-    C.NK_write_hotp_slot(1, 'python_test', '12345678901234567890', 0, '123123123')
-    C.NK_set_debug(False)
-    for i in range(3):
-        s.append(C.NK_get_hotp_code(1))
-    print((s))
+    # s = []
+    # C.NK_write_hotp_slot(1, 'python_test', '12345678901234567890', 0, '123123123')
+    # C.NK_set_debug(False)
+    # for i in range(3):
+    #     s.append(C.NK_get_hotp_code(1))
+    # print((s))
+
+    # C.NK_totp_mark_time()
+
+    # test according to https://tools.ietf.org/html/rfc6238#appendix-B
+    C.NK_write_totp_slot(1, 'python_test', '12345678901234567890', 30, True, '123123123')
     C.NK_set_debug(True)
-    C.NK_write_totp_slot(1, 'python_test', '12345678901234567890', 30, '123123123')
-    print ( C.NK_get_totp_code(1, 59, 0, 30) )
+    test_data = [
+        (59, 1, 94287082),
+        (1111111109, 0x00000000023523EC, 7081804),
+        (1111111111, 0x00000000023523ED, 14050471),
+        (1234567890, 0x000000000273EF07, 89005924),
+    ]
+    a = []
+    for t, T, code in test_data:
+        C.NK_totp_set_time(t)
+        r = C.NK_get_totp_code(1, T, 0, 30)  # FIXME T is not changing the outcome
+        a.append((r, code == r))
+    print(a)

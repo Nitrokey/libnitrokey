@@ -38,7 +38,7 @@ if __name__ == "__main__":
     for i in range(3):
         s.append(ffi.string(C.NK_get_hotp_slot_name(i)))
     print(repr(s))
-    print((s))
+    print(s)
 
     s = []
     for i in range(16):
@@ -57,10 +57,22 @@ if __name__ == "__main__":
     # print((s))
 
     # C.NK_totp_mark_time()
+    # C.NK_set_debug(True)
+
+
+    # https://tools.ietf.org/html/rfc4226#page-32
+    C.NK_write_hotp_slot(1, 'python_test', '12345678901234567890', 0, '123123123')
+    test_data = [
+        755224, 287082, 359152, 969429, 338314, 254676, 287922, 162583, 399871, 520489,
+    ]
+    a = []
+    for code in test_data:
+        r = C.NK_get_hotp_code(1)
+        a.append((r, code == r))
+    print(a)
 
     # test according to https://tools.ietf.org/html/rfc6238#appendix-B
     C.NK_write_totp_slot(1, 'python_test', '12345678901234567890', 30, True, '123123123')
-    C.NK_set_debug(True)
     test_data = [
         (59, 1, 94287082),
         (1111111109, 0x00000000023523EC, 7081804),

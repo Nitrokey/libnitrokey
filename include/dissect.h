@@ -26,9 +26,11 @@ class QueryDissector : semantics::non_constructible {
     out << "Contents:" << std::endl;
     out << "Command ID:\t" << commandid_to_string((CommandID)(pod.command_id))
         << std::endl;
-    out << "CRC:\t" << pod.crc << std::endl;
+      out << "CRC:\t"
+        << std::hex << std::setw(2) << std::setfill('0')
+        << pod.crc << std::endl;
 
-    out << "Payload:" << std::endl;
+      out << "Payload:" << std::endl;
     out << pod.payload.dissect();
     return out.str();
   }
@@ -67,11 +69,14 @@ class ResponseDissector : semantics::non_constructible {
         << status[pod.device_status] << std::endl;
     out << "Command ID:\t" << commandid_to_string((CommandID)(pod.command_id))
         << std::endl;
-    out << "Last command CRC:\t" << std::hex << std::setw(2) << std::setfill('0')
+    out << "Last command CRC:\t"
+            << std::hex << std::setw(2) << std::setfill('0')
             << pod.last_command_crc << std::endl;
     out << "Last command status:\t" << pod.last_command_status + 0 << " "
         << cmd[pod.last_command_status] << std::endl;
-    out << "CRC:\t" << pod.crc << std::endl;
+    out << "CRC:\t"
+            << std::hex << std::setw(2) << std::setfill('0')
+            << pod.crc << std::endl;
 
     out << "Payload:" << std::endl;
     out << pod.payload.dissect();

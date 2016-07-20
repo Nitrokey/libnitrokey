@@ -9,6 +9,7 @@ namespace nitrokey{
 
     template <typename T>
     auto get_payload(){
+        //Create, initialize and return by value command payload
         typename T::CommandPayload st;
         bzero(&st, sizeof(st));
         return st;
@@ -107,11 +108,11 @@ namespace nitrokey{
         strcpy((char *) payload.slot_secret, secret);
         strcpy((char *) payload.slot_name, slot_name);
         payload.slot_counter = hotp_counter;
-        payload.slot_config;
+        payload.slot_config; //TODO
 
         auto auth = get_payload<Authorize>();
         strcpy((char *) (auth.temporary_password), temporary_password);
-        auth.crc_to_authorize = auth.crc_to_authorize = WriteToHOTPSlot::CommandTransaction::getCRC(payload);
+        auth.crc_to_authorize = WriteToHOTPSlot::CommandTransaction::getCRC(payload);
         Authorize::CommandTransaction::run(*device, auth);
 
         auto resp = WriteToHOTPSlot::CommandTransaction::run(*device, payload);

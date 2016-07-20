@@ -7,6 +7,13 @@ namespace nitrokey{
     template <typename T>
     void initialize(T& st){ bzero(&st, sizeof(st)); }
 
+    template <typename T>
+    auto get_payload(){
+        typename T::CommandPayload st;
+        bzero(&st, sizeof(st));
+        return st;
+    }
+
     NitrokeyManager * NitrokeyManager::_instance = nullptr;
 
     NitrokeyManager::NitrokeyManager(): device(nullptr) {
@@ -45,7 +52,7 @@ namespace nitrokey{
 
     uint32_t NitrokeyManager::get_HOTP_code(uint8_t slot_number) {
         assert(is_valid_hotp_slot_number(slot_number));
-        GetHOTP::CommandTransaction::CommandPayload gh;
+        auto gh = get_payload<GetHOTP>();
         gh.slot_number = get_internal_slot_number_for_hotp(slot_number);
         auto resp = GetHOTP::CommandTransaction::run(*device, gh);
         return resp.code;
@@ -60,7 +67,7 @@ namespace nitrokey{
     uint32_t NitrokeyManager::get_TOTP_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
                                                 uint8_t last_interval) {
         assert(is_valid_totp_slot_number(slot_number));
-        GetTOTP::CommandTransaction::CommandPayload gt;
+        auto gt = get_payload<GetTOTP>();
         gt.slot_number = slot_number;
         gt.challenge = challenge;
         gt.last_interval = last_interval;
@@ -70,7 +77,7 @@ namespace nitrokey{
     }
 
     bool NitrokeyManager::erase_slot(uint8_t slot_number) {
-        EraseSlot::CommandTransaction::CommandPayload p;
+        auto p = get_payload<EraseSlot>();
         p.slot_number = slot_number;
         auto resp = EraseSlot::CommandTransaction::run(*device,p);
         return true;
@@ -95,16 +102,14 @@ namespace nitrokey{
         assert(strlen(slot_name)<=15);
 
         slot_number = get_internal_slot_number_for_hotp(slot_number);
-        WriteToHOTPSlot::CommandPayload payload;
+        auto payload = get_payload<WriteToHOTPSlot>();
         payload.slot_number = slot_number;
         strcpy((char *) payload.slot_secret, secret);
         strcpy((char *) payload.slot_name, slot_name);
         payload.slot_counter = hotp_counter;
         payload.slot_config;
-        memset(payload.slot_token_id, 0, sizeof(payload.slot_token_id)); //?????
 
-        Authorize::CommandPayload auth;
-        initialize(auth);
+        auto auth = get_payload<Authorize>();
         strcpy((char *) (auth.temporary_password), temporary_password);
         auth.crc_to_authorize = auth.crc_to_authorize = WriteToHOTPSlot::CommandTransaction::getCRC(payload);
         Authorize::CommandTransaction::run(*device, auth);
@@ -131,15 +136,14 @@ namespace nitrokey{
     }
 
     uint8_t *NitrokeyManager::get_slot_name(uint8_t slot_number) const {
-        GetSlotName::CommandPayload payload;
+        auto payload = get_payload<GetSlotName>();
         payload.slot_number = slot_number;
         auto resp = GetSlotName::CommandTransaction::run(*device, payload);
         return (uint8_t *) strdup((const char *) resp.slot_name);
     }
 
     bool NitrokeyManager::authorize(const char *pin, const char *temporary_password) {
-        FirstAuthenticate::CommandPayload authreq;
-        initialize(authreq); //TODO
+        auto authreq = get_payload<FirstAuthenticate>();
         strcpy((char *) (authreq.card_password), pin);
         strcpy((char *) (authreq.temporary_password), temporary_password);
         FirstAuthenticate::CommandTransaction::run(*device, authreq);

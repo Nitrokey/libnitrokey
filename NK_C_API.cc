@@ -28,7 +28,7 @@ extern uint32_t NK_get_hotp_code(uint8_t slot_number){
 extern uint32_t NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
                                  uint8_t last_interval){
     auto m = NitrokeyManager::instance();
-    return m->get_TOTP_code(slot_number, 0, 0, 0);
+    return m->get_TOTP_code(slot_number, challenge, last_totp_time, last_interval);
 }
 
 extern int NK_erase_hotp_slot(uint8_t slot_number) {
@@ -46,9 +46,10 @@ extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const 
     return m->write_HOTP_slot(slot_number, slot_name, secret, hotp_counter, temporary_password);
 }
 
-extern int NK_write_totp_slot(uint8_t slot_number, const char *secret, uint16_t time_window) {
+extern int NK_write_totp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint16_t time_window,
+                              const char *temporary_password) {
     auto m = NitrokeyManager::instance();
-    return m->write_TOTP_slot(slot_number, secret, time_window);
+    return m->write_TOTP_slot(slot_number, slot_name, secret, time_window, temporary_password);
 }
 
 extern const char* NK_get_totp_slot_name(uint8_t slot_number){

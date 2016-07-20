@@ -116,7 +116,20 @@ class WriteToTOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
     uint8_t slot_token_id[13];
     uint16_t slot_interval;
 
-    bool isValid() const { return !(slot_number & 0xF0); }
+    bool isValid() const { return !(slot_number & 0xF0); } //TODO check
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << "slot_number:\t" << (int)(slot_number) << std::endl;
+          ss << "slot_name:\t" << slot_name << std::endl;
+          ss << "slot_secret:\t" << slot_secret << std::endl;
+          ss << "slot_config:\t" << std::bitset<8>((int)slot_config) << std::endl;
+          ss << "slot_token_id:\t";
+          for (auto i : slot_token_id)
+              ss << std::hex << std::setw(2) << std::setfill('0')<< (int) i << " " ;
+          ss << std::endl;
+          ss << "slot_interval:\t" << (int)slot_interval << std::endl;
+          return ss.str();
+      }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>

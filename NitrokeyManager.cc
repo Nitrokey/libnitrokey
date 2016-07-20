@@ -8,7 +8,7 @@ namespace nitrokey{
     void initialize(T& st){ bzero(&st, sizeof(st)); }
 
     template <typename T>
-    auto get_payload(){
+    typename T::CommandPayload get_payload(){
         //Create, initialize and return by value command payload
         typename T::CommandPayload st;
         bzero(&st, sizeof(st));
@@ -119,9 +119,26 @@ namespace nitrokey{
         return false;
     }
 
-    bool NitrokeyManager::write_TOTP_slot(uint8_t slot_number, const char *secret, uint16_t time_window) {
+    bool NitrokeyManager::write_TOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret,
+                                              uint16_t time_window, const char *temporary_password) {
         assert(is_valid_totp_slot_number(slot_number));
+        assert(strlen(secret)==20); //160 bits
+        assert(strlen(slot_name)<=15);
+
         slot_number = get_internal_slot_number_for_totp(slot_number);
+        auto payload = get_payload<WriteToTOTPSlot>();
+        payload.slot_number = slot_number;
+        strcpy((char *) payload.slot_secret, secret);
+        strcpy((char *) payload.slot_name, slot_name);
+        payload.slot_interval = time_window; //FIXME naming
+        payload.slot_config; //TODO
+
+        auto auth = get_payload<Authorize>();
+        strcpy((char *) (auth.temporary_password), temporary_password);
+        auth.crc_to_authorize = WriteToTOTPSlot::CommandTransaction::getCRC(payload);
+        Authorize::CommandTransaction::run(*device, auth);
+
+        auto resp = WriteToTOTPSlot::CommandTransaction::run(*device, payload);
         return false;
     }
 

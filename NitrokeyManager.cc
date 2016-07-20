@@ -104,7 +104,7 @@ namespace nitrokey{
         memset(payload.slot_token_id, 0, sizeof(payload.slot_token_id)); //?????
 
         Authorize::CommandPayload auth;
-        auth.initialize();
+        initialize(auth);
         strcpy((char *) (auth.temporary_password), temporary_password);
         auth.crc_to_authorize = auth.crc_to_authorize = WriteToHOTPSlot::CommandTransaction::getCRC(payload);
         Authorize::CommandTransaction::run(*device, auth);
@@ -140,7 +140,6 @@ namespace nitrokey{
     bool NitrokeyManager::authorize(const char *pin, const char *temporary_password) {
         FirstAuthenticate::CommandPayload authreq;
         initialize(authreq); //TODO
-        authreq.initialize();
         strcpy((char *) (authreq.card_password), pin);
         strcpy((char *) (authreq.temporary_password), temporary_password);
         FirstAuthenticate::CommandTransaction::run(*device, authreq);

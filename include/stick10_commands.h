@@ -507,15 +507,6 @@ class WriteGeneralConfig : Command<CommandID::WRITE_CONFIG> {
       CommandTransaction;
 };
 
-//            struct clear_on_const {
-//                clear_on_const(){
-//                    initialize();
-//                }
-//                void initialize(){
-//                    bzero(this, sizeof(*this));
-//                }
-//        };
-
 class FirstAuthenticate : Command<CommandID::FIRST_AUTHENTICATE> {
  public:
   struct CommandPayload {
@@ -523,7 +514,6 @@ class FirstAuthenticate : Command<CommandID::FIRST_AUTHENTICATE> {
     uint8_t temporary_password[25];
 
     bool isValid() const { return true; }
-    void initialize(){ bzero(this, sizeof(*this)); }
 
     std::string dissect() const {
       std::stringstream ss;
@@ -555,8 +545,6 @@ class Authorize : Command<CommandID::AUTHORIZE> {
   struct CommandPayload {
     uint32_t crc_to_authorize;
     uint8_t temporary_password[25];
-
-      void initialize(){ bzero(this, sizeof(*this)); }
 
       std::string dissect() const {
       std::stringstream ss;

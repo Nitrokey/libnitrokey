@@ -47,7 +47,7 @@ if __name__ == "__main__":
         s.append(C.NK_get_hotp_code(i))
     print(repr(s))
     print((s))
-    C.NK_set_debug(True)
+    # C.NK_set_debug(True)
 
     s = []
     C.NK_write_hotp_slot(1, 'python_test', '12345678901234567890', 0, '123123123')
@@ -55,3 +55,6 @@ if __name__ == "__main__":
     for i in range(3):
         s.append(C.NK_get_hotp_code(1))
     print((s))
+    C.NK_set_debug(True)
+    C.NK_write_totp_slot(1, 'python_test', '12345678901234567890', 30, '123123123')
+    print ( C.NK_get_totp_code(1, 59, 0, 30) )

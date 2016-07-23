@@ -185,7 +185,7 @@ namespace nitrokey{
         return false;
     }
 
-    bool NitrokeyManager::mark_time() {
+    bool NitrokeyManager::get_time() {
         auto p = get_payload<SetTime>();
         p.reset = 0;
         SetTime::CommandTransaction::run(*device, p);

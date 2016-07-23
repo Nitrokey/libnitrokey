@@ -72,7 +72,7 @@ extern int NK_totp_set_time(uint64_t time){
 }
 extern int NK_totp_mark_time(){
     auto m = NitrokeyManager::instance();
-    return m->mark_time();
+    return m->get_time();
 }
 
 }

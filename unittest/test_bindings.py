@@ -6,7 +6,6 @@ ffi = cffi.FFI()
 
 @pytest.fixture(scope="module")
 def C(request):
-
     fp = '../NK_C_API.h'
 
     declarations = []
@@ -22,10 +21,12 @@ def C(request):
 
     C = ffi.dlopen("../build/libnitrokey.so")
     C.NK_login('12345678', '123123123')
-    C.NK_set_debug(True)
+
+    # C.NK_set_debug(True)
     def fin():
         C.NK_logout()
         request.addfinalizer(fin)
+
     return C
 
 
@@ -56,19 +57,23 @@ def test_TOTP_RFC(C):
 
 
 def test_get_slot_names(C):
-    s = []
     for i in range(16):
-        s.append(ffi.string(C.NK_get_totp_slot_name(i)))
+        name = ffi.string(C.NK_get_totp_slot_name(i))
+        if name == '':
+            assert C.NK_get_last_command_status() == 3 # NOT PROGRAMMED
     for i in range(3):
-        s.append(ffi.string(C.NK_get_hotp_slot_name(i)))
-    print(repr(s))
-    print(s)
+        name = ffi.string(C.NK_get_hotp_slot_name(i))
+        if name == '':
+            assert C.NK_get_last_command_status() == 3  # NOT PROGRAMMED
+
 
 def test_get_OTP_codes(C):
-    s = []
     for i in range(16):
-        s.append(C.NK_get_totp_code(i, 0, 0, 0))
+        code = C.NK_get_totp_code(i, 0, 0, 0)
+        if code == 0:
+            assert C.NK_get_last_command_status() == 3  # NOT PROGRAMMED
+
     for i in range(3):
-        s.append(C.NK_get_hotp_code(i))
-    print(repr(s))
-    print(s)
+        code = C.NK_get_hotp_code(i)
+        if code == 0:
+            assert C.NK_get_last_command_status() == 3  # NOT PROGRAMMED

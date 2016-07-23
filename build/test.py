@@ -25,6 +25,7 @@ if __name__ == "__main__":
     # C.NK_set_debug(False)
 
     a = C.NK_write_hotp_slot(1, 'python_test', '12345678901234567890', 0, 'faketemppass')
+    # a = C.NK_write_hotp_slot(1, 'python_test', '12345678901234567890', 0, '123123123')
     print(a)
     exit()
 

@@ -22,6 +22,6 @@ set(SOURCE_FILES
     log.cc
     misc.cc
     NitrokeyManager.cc
-        NK_C_API.cc)
+        NK_C_API.cc include/CommandFailedException.cpp include/CommandFailedException.h)
 
 add_executable(libnitrokey ${SOURCE_FILES})

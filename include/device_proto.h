@@ -14,6 +14,7 @@
 #include "log.h"
 #include "command_id.h"
 #include "dissect.h"
+#include "CommandFailedException.h"
 
 #define STICK20_UPDATE_MODE_VID 0x03EB
 #define STICK20_UPDATE_MODE_PID 0x2FF1
@@ -212,6 +213,7 @@ class Transaction : semantics::non_constructible {
     Log::instance()((std::string)(resp), Loglevel::DEBUG);
 
     if (!resp.isValid()) throw std::runtime_error("Invalid incoming packet");
+    if (resp.last_command_status!=0) throw CommandFailedException(resp.command_id, resp.last_command_status);
 
     // See: DeviceResponse
     return resp.payload;

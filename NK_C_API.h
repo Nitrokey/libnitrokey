@@ -21,7 +21,8 @@ extern int NK_write_totp_slot(uint8_t slot_number, const char *slot_name, const 
 extern uint32_t NK_get_hotp_code(uint8_t slot_number);
 extern uint32_t NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time, uint8_t last_interval);
 extern int NK_totp_set_time(uint64_t time);
-extern int NK_totp_mark_time();
+extern int NK_totp_get_time();
+extern uint8_t NK_get_last_command_status();
 }
 
 

@@ -17,12 +17,16 @@ for declaration in declarations:
 C = ffi.dlopen("./libnitrokey.so")
 
 if __name__ == "__main__":
-    C.NK_set_debug(False)
+    # C.NK_set_debug(False)
     C.NK_set_debug(True)
     a = C.NK_login('12345678', '123123123')
     # a = C.NK_logout()
     print(a)
-    C.NK_set_debug(False)
+    # C.NK_set_debug(False)
+
+    a = C.NK_write_hotp_slot(1, 'python_test', '12345678901234567890', 0, 'faketemppass')
+    print(a)
+    exit()
 
     # print(''.center(40, '#'))
     print(ffi.string(C.NK_status()))

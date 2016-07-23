@@ -5,7 +5,15 @@
 namespace nitrokey{
 
     template <typename T>
-    void initialize(T& st){ bzero(&st, sizeof(st)); }
+    void strcpyT(T& dest, const char* src){
+        const int s = sizeof dest;
+//        strcpy((char*) &dest, src);
+        memcpy(&dest, src, s);
+        dest[s-1] = 0;
+    }
+
+//    template <typename T>
+//    void initialize(T& st){ bzero(&st, sizeof(st)); }
 
     template <typename T>
     typename T::CommandPayload get_payload(){
@@ -97,6 +105,7 @@ namespace nitrokey{
         return erase_slot(slot_number);
     }
 
+
     bool NitrokeyManager::write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint64_t hotp_counter,
                                               const char *temporary_password) {
         assert(is_valid_hotp_slot_number(slot_number));
@@ -106,13 +115,13 @@ namespace nitrokey{
         slot_number = get_internal_slot_number_for_hotp(slot_number);
         auto payload = get_payload<WriteToHOTPSlot>();
         payload.slot_number = slot_number;
-        strcpy((char *) payload.slot_secret, secret);
-        strcpy((char *) payload.slot_name, slot_name);
+        strcpyT(payload.slot_secret, secret);
+        strcpyT(payload.slot_name, slot_name);
         payload.slot_counter = hotp_counter;
         payload.slot_config; //TODO
 
         auto auth = get_payload<Authorize>();
-        strcpy((char *) (auth.temporary_password), temporary_password);
+        strcpyT(auth.temporary_password, temporary_password);
         auth.crc_to_authorize = WriteToHOTPSlot::CommandTransaction::getCRC(payload);
         Authorize::CommandTransaction::run(*device, auth);
 
@@ -124,22 +133,22 @@ namespace nitrokey{
 
     bool NitrokeyManager::write_TOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret,
                                           uint16_t time_window, bool use_8_digits, const char *temporary_password) {
+        auto payload = get_payload<WriteToTOTPSlot>();
         assert(is_valid_totp_slot_number(slot_number));
-        assert(strlen(secret)==20); //160 bits
-        assert(strlen(slot_name)<=15);
+        assert(strlen(secret) == sizeof payload.slot_secret); //160 bits
+        assert(strlen(slot_name) <= sizeof payload.slot_name);
 
         slot_number = get_internal_slot_number_for_totp(slot_number);
-        auto payload = get_payload<WriteToTOTPSlot>();
         payload.slot_number = slot_number;
-        strcpy((char *) payload.slot_secret, secret);
-        strcpy((char *) payload.slot_name, slot_name);
+        strcpyT(payload.slot_secret, secret);
+        strcpyT(payload.slot_name, slot_name);
         payload.slot_interval = time_window; //FIXME naming
         bitset<8> config; //FIXME better config manipulation
         config.set(totp_config::digits8, use_8_digits);
         payload.slot_config = (uint8_t) config.to_ulong();
 
         auto auth = get_payload<Authorize>();
-        strcpy((char *) (auth.temporary_password), temporary_password);
+        strcpyT(auth.temporary_password, temporary_password);
         auth.crc_to_authorize = WriteToTOTPSlot::CommandTransaction::getCRC(payload);
         Authorize::CommandTransaction::run(*device, auth);
 //        auto auth_successful = device->last_command_sucessfull();
@@ -170,8 +179,12 @@ namespace nitrokey{
 
     bool NitrokeyManager::authorize(const char *pin, const char *temporary_password) {
         auto authreq = get_payload<FirstAuthenticate>();
-        strcpy((char *) (authreq.card_password), pin);
-        strcpy((char *) (authreq.temporary_password), temporary_password);
+
+        assert(strlen(pin) < sizeof authreq.card_password); //160 bits
+        assert(strlen(temporary_password) < sizeof authreq.temporary_password);
+
+        strcpyT(authreq.card_password, pin);
+        strcpyT(authreq.temporary_password, temporary_password);
         FirstAuthenticate::CommandTransaction::run(*device, authreq);
         return true;
     }

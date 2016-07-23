@@ -120,7 +120,7 @@ namespace nitrokey{
         return false;
     }
 
-    enum totp_config{digits8=0, enter, tokenID};
+    enum totp_config{digits8=0, enter=1, tokenID=2};
 
     bool NitrokeyManager::write_TOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret,
                                           uint16_t time_window, bool use_8_digits, const char *temporary_password) {

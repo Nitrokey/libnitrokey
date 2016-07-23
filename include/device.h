@@ -42,6 +42,13 @@ class Device {
   int get_retry_count() const { return m_retry_count; };
   std::chrono::milliseconds get_retry_timeout() const { return m_retry_timeout; };
 
+    int get_last_command_status() const;
+    void set_last_command_status(uint8_t _err) { last_command_status = _err;} ;
+    bool last_command_sucessfull() const {return last_command_status == 0;};
+
+private:
+    uint8_t last_command_status;
+
  protected:
   uint16_t m_vid;
   uint16_t m_pid;

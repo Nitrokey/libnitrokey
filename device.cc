@@ -15,7 +15,8 @@ Device::Device()
       m_pid(0),
       m_retry_count(40),
       m_retry_timeout(50),
-      mp_devhandle(NULL) {}
+      mp_devhandle(NULL),
+      last_command_status(0){}
 
 bool Device::disconnect() {
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);

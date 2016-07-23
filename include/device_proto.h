@@ -193,6 +193,8 @@ class Transaction : semantics::non_constructible {
     int retry = dev.get_retry_count();
     while (retry-- > 0) {
       status = dev.recv(&resp);
+
+      dev.set_last_command_status(resp.last_command_status); // FIXME should be handled on device.recv
       if (resp.device_status == 0) break;
       Log::instance()("Device status is not ready (CRC error?) retrying..",
                       Loglevel::DEBUG);  // FIXME translate device_status to log

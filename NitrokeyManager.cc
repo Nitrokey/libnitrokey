@@ -115,9 +115,11 @@ namespace nitrokey{
         strcpy((char *) (auth.temporary_password), temporary_password);
         auth.crc_to_authorize = WriteToHOTPSlot::CommandTransaction::getCRC(payload);
         Authorize::CommandTransaction::run(*device, auth);
+        auto auth_successful = device->last_command_sucessfull();
 
         auto resp = WriteToHOTPSlot::CommandTransaction::run(*device, payload);
-        return false;
+        auto write_successful = device->last_command_sucessfull();
+        return auth_successful && write_successful;
     }
 
     enum totp_config{digits8=0, enter=1, tokenID=2};

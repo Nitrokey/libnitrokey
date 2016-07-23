@@ -3,7 +3,6 @@ import cffi
 
 ffi = cffi.FFI()
 
-
 @pytest.fixture(scope="module")
 def C(request):
     fp = '../NK_C_API.h'
@@ -57,6 +56,7 @@ def test_TOTP_RFC(C):
 
 
 def test_get_slot_names(C):
+    # TODO add setup to have at least one slot not programmed
     for i in range(16):
         name = ffi.string(C.NK_get_totp_slot_name(i))
         if name == '':
@@ -68,6 +68,7 @@ def test_get_slot_names(C):
 
 
 def test_get_OTP_codes(C):
+    # TODO add setup to have at least one slot not programmed
     for i in range(16):
         code = C.NK_get_totp_code(i, 0, 0, 0)
         if code == 0:

@@ -7,13 +7,9 @@ namespace nitrokey{
     template <typename T>
     void strcpyT(T& dest, const char* src){
         const int s = sizeof dest;
-//        strcpy((char*) &dest, src);
-        memcpy(&dest, src, s);
-        dest[s-1] = 0;
+        assert(strlen(src) <= s);
+        strncpy((char*) &dest, src, s);
     }
-
-//    template <typename T>
-//    void initialize(T& st){ bzero(&st, sizeof(st)); }
 
     template <typename T>
     typename T::CommandPayload get_payload(){

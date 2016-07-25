@@ -340,12 +340,28 @@ class GetUserPasswordRetryCount
       CommandTransaction;
 };
 
+    template <typename T, typename Q, int N>
+    void write_array(T &ss, Q (&arr)[N]){
+        ss << std::hex << std::setfill('0') << std::setw(2);
+        for (int i=0; i<N; i++){
+            ss << arr[i] << " ";
+        }
+        ss << std::endl;
+    };
+
+
 class GetPasswordSafeSlotStatus : Command<CommandID::GET_PW_SAFE_SLOT_STATUS> {
  public:
   struct ResponsePayload {
     uint8_t password_safe_status[PWS_SLOT_COUNT];
 
     bool isValid() const { return true; }
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << "password_safe_status\t";
+          write_array(ss, password_safe_status);
+          return ss.str();
+      }
   } __packed;
 
   typedef Transaction<command_id(), struct EmptyPayload, struct ResponsePayload>

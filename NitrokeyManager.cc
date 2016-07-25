@@ -213,5 +213,15 @@ namespace nitrokey{
         ChangeAdminPin::CommandTransaction::run(*device, p);
     }
 
+    void NitrokeyManager::enable_password_safe(const char *user_pin) {
+        auto p = get_payload<EnablePasswordSafe>();
+        strcpyT(p.password, user_pin);
+        EnablePasswordSafe::CommandTransaction::run(*device, p);
+    }
+
+    void NitrokeyManager::get_password_safe_slot_status() {
+        GetPasswordSafeSlotStatus::CommandTransaction::run(*device);
+    }
+
 
 }

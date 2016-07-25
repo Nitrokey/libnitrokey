@@ -40,6 +40,10 @@ namespace nitrokey {
         void change_user_PIN(char *current_PIN, char *new_PIN);
         void change_admin_PIN(char *current_PIN, char *new_PIN);
 
+        void enable_password_safe(const char *user_pin);
+
+        void get_password_safe_slot_status();
+
     private:
         NitrokeyManager();
         ~NitrokeyManager();

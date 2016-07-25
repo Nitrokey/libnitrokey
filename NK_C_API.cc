@@ -197,5 +197,27 @@ extern int NK_change_user_PIN(char *current_PIN, char *new_PIN){
     return 0;
 }
 
+extern int NK_enable_password_safe(const char *user_pin){
+    auto m = NitrokeyManager::instance();
+    try {
+        m->enable_password_safe(user_pin);
+    }
+    catch (CommandFailedException & commandFailedException){
+        NK_last_command_status = commandFailedException.last_command_status;
+        return commandFailedException.last_command_status;
+    }
+    return 0;
+}
+extern int NK_get_password_safe_slot_status(){
+    auto m = NitrokeyManager::instance();
+    try {
+        m->get_password_safe_slot_status();
+    }
+    catch (CommandFailedException & commandFailedException){
+        NK_last_command_status = commandFailedException.last_command_status;
+        return commandFailedException.last_command_status;
+    }
+    return 0;
+}
 
 }

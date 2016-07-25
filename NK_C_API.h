@@ -10,7 +10,7 @@ extern "C"
 {
 //Make sure each function's declaration is in one line (for automatic python declaration processing)
 extern void NK_set_debug(bool state);
-extern int NK_login(const char *pin, const char *temporary_password);
+extern int NK_login(const char *admin_pin, const char *temporary_password);
 extern int NK_logout();
 extern const char * NK_status();
 extern const char * NK_get_totp_slot_name(uint8_t slot_number);

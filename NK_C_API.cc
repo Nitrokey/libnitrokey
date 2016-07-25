@@ -13,11 +13,11 @@ extern uint8_t NK_get_last_command_status(){
     return _copy;
 }
 
-extern int NK_login(const char *pin, const char *temporary_password) {
+extern int NK_login(const char *admin_pin, const char *temporary_password) {
     auto m = NitrokeyManager::instance();
     try {
         m->connect();
-        m->authorize(pin, temporary_password);
+        m->authorize(admin_pin, temporary_password);
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;

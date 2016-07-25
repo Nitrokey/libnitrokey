@@ -37,6 +37,9 @@ namespace nitrokey {
         const char * get_totp_slot_name(uint8_t slot_number);
         const char * get_hotp_slot_name(uint8_t slot_number);
 
+        void change_user_PIN(char *current_PIN, char *new_PIN);
+        void change_admin_PIN(char *current_PIN, char *new_PIN);
+
     private:
         NitrokeyManager();
         ~NitrokeyManager();
@@ -51,6 +54,7 @@ namespace nitrokey {
         uint8_t get_internal_slot_number_for_totp(uint8_t slot_number) const;
         bool erase_slot(uint8_t slot_number);
         uint8_t *get_slot_name(uint8_t slot_number) const;
+
     };
 }
 

@@ -173,4 +173,29 @@ extern int NK_totp_get_time(){
     return 0;
 }
 
+extern int NK_change_admin_PIN(char *current_PIN, char *new_PIN){
+    auto m = NitrokeyManager::instance();
+    try {
+        m->change_admin_PIN(current_PIN, new_PIN);
+    }
+    catch (CommandFailedException & commandFailedException){
+        NK_last_command_status = commandFailedException.last_command_status;
+        return commandFailedException.last_command_status;
+    }
+    return 0;
+}
+
+extern int NK_change_user_PIN(char *current_PIN, char *new_PIN){
+    auto m = NitrokeyManager::instance();
+    try {
+        m->change_user_PIN(current_PIN, new_PIN);
+    }
+    catch (CommandFailedException & commandFailedException){
+        NK_last_command_status = commandFailedException.last_command_status;
+        return commandFailedException.last_command_status;
+    }
+    return 0;
+}
+
+
 }

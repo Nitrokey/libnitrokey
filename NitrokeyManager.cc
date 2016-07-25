@@ -176,7 +176,7 @@ namespace nitrokey{
     bool NitrokeyManager::authorize(const char *pin, const char *temporary_password) {
         auto authreq = get_payload<FirstAuthenticate>();
 
-        assert(strlen(pin) < sizeof authreq.card_password); //160 bits
+        assert(strlen(pin) < sizeof authreq.card_password);
         assert(strlen(temporary_password) < sizeof authreq.temporary_password);
 
         strcpyT(authreq.card_password, pin);
@@ -198,6 +198,19 @@ namespace nitrokey{
         p.reset = 0;
         SetTime::CommandTransaction::run(*device, p);
         return false;
+    }
+
+    void NitrokeyManager::change_user_PIN(char *current_PIN, char *new_PIN) {
+        auto p = get_payload<ChangeUserPin>();
+        strcpyT(p.old_pin, current_PIN);
+        strcpyT(p.new_pin, new_PIN);
+        ChangeUserPin::CommandTransaction::run(*device, p);
+    }
+    void NitrokeyManager::change_admin_PIN(char *current_PIN, char *new_PIN) {
+        auto p = get_payload<ChangeAdminPin>();
+        strcpyT(p.old_pin, current_PIN);
+        strcpyT(p.new_pin, new_PIN);
+        ChangeAdminPin::CommandTransaction::run(*device, p);
     }
 
 

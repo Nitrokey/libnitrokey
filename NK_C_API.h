@@ -23,6 +23,8 @@ extern uint32_t NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64
 extern int NK_totp_set_time(uint64_t time);
 extern int NK_totp_get_time();
 extern uint8_t NK_get_last_command_status();
+extern int NK_change_admin_PIN(char *current_PIN, char *new_PIN);
+extern int NK_change_user_PIN(char *current_PIN, char *new_PIN);
 }
 
 

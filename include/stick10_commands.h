@@ -611,6 +611,12 @@ class ChangeUserPin : Command<CommandID::CHANGE_USER_PIN> {
   struct CommandPayload {
     uint8_t old_pin[25];
     uint8_t new_pin[25];
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << " old_pin:\t" <<  old_pin<< std::endl;
+          ss << " new_pin:\t" << new_pin<< std::endl;
+          return ss.str();
+      }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -633,6 +639,12 @@ class ChangeAdminPin : Command<CommandID::CHANGE_ADMIN_PIN> {
   struct CommandPayload {
     uint8_t old_pin[25];
     uint8_t new_pin[25];
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << " old_pin:\t" <<  old_pin<< std::endl;
+          ss << " new_pin:\t" << new_pin<< std::endl;
+          return ss.str();
+      }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>

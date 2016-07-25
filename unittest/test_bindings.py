@@ -1,5 +1,18 @@
 import pytest
 import cffi
+from enum import Enum
+
+RFC_SECRET = '12345678901234567890'
+
+class DefaultPasswords(Enum):
+    ADMIN = '12345678'
+    USER = '123456'
+
+class DeviceErrorCode(Enum):
+    STATUS_OK = 0
+    NOT_PROGRAMMED = 3
+    WRONG_PASSWORD = 4
+
 
 ffi = cffi.FFI()
 
@@ -24,9 +37,26 @@ def C(request):
     # C.NK_set_debug(True)
     def fin():
         C.NK_logout()
-        request.addfinalizer(fin)
+
+    request.addfinalizer(fin)
 
     return C
+
+
+def test_admin_PIN_change(C):
+    C.NK_set_debug(True)
+    assert C.NK_change_admin_PIN('wrong_password', '123123123') == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_change_admin_PIN(DefaultPasswords.ADMIN, '123123123') == DeviceErrorCode.STATUS_OK
+    assert C.NK_change_admin_PIN('123123123', DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+    C.NK_set_debug(False)
+
+
+def test_user_PIN_change(C):
+    C.NK_set_debug(True)
+    assert C.NK_change_user_PIN('wrong_password', '123123123') == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_change_user_PIN(DefaultPasswords.USER, '123123123') == DeviceErrorCode.STATUS_OK
+    assert C.NK_change_user_PIN('123123123', DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    C.NK_set_debug(False)
 
 
 def test_HOTP_RFC(C):

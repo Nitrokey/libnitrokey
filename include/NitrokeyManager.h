@@ -47,6 +47,8 @@ namespace nitrokey {
         uint8_t get_admin_retry_count();
         uint8_t get_user_retry_count();
 
+        void lock_device();
+
     private:
         NitrokeyManager();
         ~NitrokeyManager();

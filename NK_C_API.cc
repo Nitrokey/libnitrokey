@@ -1,6 +1,6 @@
 #include <cstring>
 #include "NK_C_API.h"
-
+#include <functional>
 using namespace nitrokey;
 
 static uint8_t NK_last_command_status = 0;
@@ -9,6 +9,18 @@ template <typename T>
 auto get_with_result(T func){
     try {
         return func();
+    }
+    catch (CommandFailedException & commandFailedException){
+        NK_last_command_status = commandFailedException.last_command_status;
+        return commandFailedException.last_command_status;
+    }
+}
+
+template <typename T>
+uint8_t get_without_result(T func){
+    try {
+        func();
+        return 0;
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
@@ -242,6 +254,13 @@ extern uint8_t NK_get_admin_retry_count(){
     auto m = NitrokeyManager::instance();
     return get_with_result([&](){
         return m->get_admin_retry_count();
+    });
+}
+
+extern int NK_lock_device(){
+    auto m = NitrokeyManager::instance();
+    return get_without_result([&](){
+        return m->lock_device();
     });
 }
 

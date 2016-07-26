@@ -29,6 +29,7 @@ extern uint8_t NK_get_user_retry_count();
 extern uint8_t NK_get_admin_retry_count();
 extern int NK_enable_password_safe(const char *user_pin);
 extern int NK_get_password_safe_slot_status();
+extern int NK_lock_device();
 }
 
 

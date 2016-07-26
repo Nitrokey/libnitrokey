@@ -232,5 +232,9 @@ namespace nitrokey{
         return response.password_retry_count;
     }
 
+    void NitrokeyManager::lock_device() {
+        LockDevice::CommandTransaction::run(*device);
+    }
+
 
 }

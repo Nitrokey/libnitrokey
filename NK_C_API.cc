@@ -1,9 +1,19 @@
 #include <cstring>
 #include "NK_C_API.h"
-#include <functional>
 using namespace nitrokey;
 
 static uint8_t NK_last_command_status = 0;
+
+template <typename T>
+const char* get_with_string_result(T func){
+    try {
+        return func();
+    }
+    catch (CommandFailedException & commandFailedException){
+        NK_last_command_status = commandFailedException.last_command_status;
+        return "";
+    }
+}
 
 template <typename T>
 auto get_with_result(T func){
@@ -262,6 +272,30 @@ extern int NK_lock_device(){
     return get_without_result([&](){
         return m->lock_device();
     });
+}
+
+extern const char *NK_get_password_safe_slot_name(uint8_t slot_number, const char *temporary_password) {
+    auto m = NitrokeyManager::instance();
+    return get_with_string_result([&](){
+        return m->get_password_safe_slot_name(slot_number, temporary_password);
+    });
+}
+
+extern const char *NK_get_password_safe_slot_login(uint8_t slot_number) {
+    auto m = NitrokeyManager::instance();
+    return get_with_string_result([&](){
+        return m->get_password_safe_slot_login(slot_number);
+    });
+}
+extern const char *NK_get_password_safe_slot_password(uint8_t slot_number) {
+    auto m = NitrokeyManager::instance();
+    return get_with_string_result([&](){
+        return m->get_password_safe_slot_password(slot_number);
+    });
+}
+extern int NK_write_password_safe_slot(){
+    auto m = NitrokeyManager::instance();
+    //TODO
 }
 
 

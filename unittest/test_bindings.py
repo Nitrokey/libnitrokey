@@ -2,8 +2,10 @@ import pytest
 import cffi
 from enum import Enum
 
-RFC_SECRET = '12345678901234567890'
+ffi = cffi.FFI()
+gs = ffi.string
 
+RFC_SECRET = '12345678901234567890'
 
 class DefaultPasswords(Enum):
     ADMIN = '12345678'
@@ -14,10 +16,7 @@ class DeviceErrorCode(Enum):
     STATUS_OK = 0
     NOT_PROGRAMMED = 3
     WRONG_PASSWORD = 4
-
-
-ffi = cffi.FFI()
-
+    STATUS_NOT_AUTHORIZED = 5
 
 @pytest.fixture(scope="module")
 def C(request):
@@ -53,6 +52,18 @@ def test_enable_password_safe(C):
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe('wrong_password') == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+
+
+def test_get_password_safe_slot_name(C):
+    C.NK_set_debug(True)
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert gs(C.NK_get_password_safe_slot_name(0, '123123123')) == ''
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_NOT_AUTHORIZED
+
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    assert gs(C.NK_get_password_safe_slot_name(0, '123123123')) == '1'
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+    C.NK_set_debug(False)
 
 
 def test_password_safe_slot_status(C):

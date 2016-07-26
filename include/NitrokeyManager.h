@@ -49,6 +49,10 @@ namespace nitrokey {
 
         void lock_device();
 
+        const char *get_password_safe_slot_name(uint8_t slot_number, const char *temporary_password);
+        const char *get_password_safe_slot_password(uint8_t slot_number);
+        const char *get_password_safe_slot_login(uint8_t slot_number);
+
     private:
         NitrokeyManager();
         ~NitrokeyManager();
@@ -63,7 +67,6 @@ namespace nitrokey {
         uint8_t get_internal_slot_number_for_totp(uint8_t slot_number) const;
         bool erase_slot(uint8_t slot_number);
         uint8_t *get_slot_name(uint8_t slot_number) const;
-
     };
 }
 

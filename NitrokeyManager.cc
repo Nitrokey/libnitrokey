@@ -236,5 +236,31 @@ namespace nitrokey{
         LockDevice::CommandTransaction::run(*device);
     }
 
+    const char *NitrokeyManager::get_password_safe_slot_name(uint8_t slot_number, const char *temporary_password) {
+        auto p = get_payload<GetPasswordSafeSlotName>();
+        p.slot_number = slot_number;
+
+        auto auth = get_payload<UserAuthorize>();
+        strcpyT(auth.temporary_password, temporary_password);
+        auth.crc_to_authorize = GetPasswordSafeSlotName::CommandTransaction::getCRC(p);
+        UserAuthorize::CommandTransaction::run(*device, auth);
+
+        auto response = GetPasswordSafeSlotName::CommandTransaction::run(*device, p);
+        return strdup((const char *) response.slot_name);
+    }
+
+    const char *NitrokeyManager::get_password_safe_slot_login(uint8_t slot_number) {
+        auto p = get_payload<GetPasswordSafeSlotLogin>();
+        p.slot_number = slot_number;
+        auto response = GetPasswordSafeSlotLogin::CommandTransaction::run(*device, p);
+        return strdup((const char *) response.slot_login);
+    }
+
+    const char *NitrokeyManager::get_password_safe_slot_password(uint8_t slot_number) {
+        auto p = get_payload<GetPasswordSafeSlotPassword>();
+        p.slot_number = slot_number;
+        auto response = GetPasswordSafeSlotPassword::CommandTransaction::run(*device, p);
+        return strdup((const char *) response.slot_password);
+    }
 
 }

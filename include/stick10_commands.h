@@ -587,6 +587,12 @@ class UserAuthenticate : Command<CommandID::USER_AUTHENTICATE> {
     uint8_t temporary_password[25];
 
     bool isValid() const { return true; }
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << "card_password:\t" << card_password << std::endl;
+          ss << "temporary_password:\t" << temporary_password << std::endl;
+          return ss.str();
+      }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>

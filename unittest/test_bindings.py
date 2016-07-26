@@ -12,7 +12,7 @@ class DefaultPasswords(Enum):
     ADMIN = '12345678'
     USER = '123456'
     ADMIN_TEMP = '123123123'
-
+    USER_TEMP = '234234234'
 
 class DeviceErrorCode(Enum):
     STATUS_OK = 0
@@ -38,6 +38,7 @@ def C(request):
 
     C = ffi.dlopen("../build/libnitrokey.so")
     C.NK_login(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP)
+    assert C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP) == DeviceErrorCode.STATUS_OK
 
     # C.NK_set_debug(True)
 
@@ -45,7 +46,6 @@ def C(request):
         print ('\nFinishing connection to device')
         C.NK_logout()
         print ('Finished')
-
     request.addfinalizer(fin)
 
     return C
@@ -58,12 +58,10 @@ def test_enable_password_safe(C):
 
 
 def test_write_password_safe_slot(C):
-    C.NK_set_debug(True)
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_write_password_safe_slot(0, 'slotname1', 'login1', 'pass1') == DeviceErrorCode.STATUS_NOT_AUTHORIZED
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_password_safe_slot(0, 'slotname1', 'login1', 'pass1') == DeviceErrorCode.STATUS_OK
-    C.NK_set_debug(False)
 
 
 def test_get_password_safe_slot_name(C):
@@ -163,7 +161,12 @@ def test_TOTP_RFC(C):
 
 
 def test_get_slot_names(C):
-    # TODO add setup to have at least one slot not programmed
+    C.NK_set_debug(True)
+    # assert C.NK_erase_totp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    # erasing slot invalidates temporary password, so requesting authentication
+    # assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    # assert C.NK_erase_hotp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+
     for i in range(16):
         name = ffi.string(C.NK_get_totp_slot_name(i))
         if name == '':
@@ -175,7 +178,9 @@ def test_get_slot_names(C):
 
 
 def test_get_OTP_codes(C):
-    # TODO add setup to have at least one slot not programmed
+    C.NK_set_debug(True)
+    # assert C.NK_erase_hotp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    # assert C.NK_erase_totp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     for i in range(16):
         code = C.NK_get_totp_code(i, 0, 0, 0)
         if code == 0:

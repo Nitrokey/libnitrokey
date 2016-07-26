@@ -17,7 +17,7 @@ namespace nitrokey {
     public:
         static NitrokeyManager *instance();
 
-        bool authorize(const char *pin, const char *temporary_password);
+        bool first_authenticate(const char *pin, const char *temporary_password);
         bool write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint64_t hotp_counter,
                                      const char *temporary_password);
         bool write_TOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret,
@@ -27,8 +27,8 @@ namespace nitrokey {
                                        uint8_t last_interval);
         bool set_time(uint64_t time);
         bool get_time();
-        bool erase_totp_slot(uint8_t slot_number);
-        bool erase_hotp_slot(uint8_t slot_number);
+        bool erase_totp_slot(uint8_t slot_number, const char *temporary_password);
+        bool erase_hotp_slot(uint8_t slot_number, const char *temporary_password);
         bool connect();
         bool disconnect();
         void set_debug(bool state);
@@ -59,6 +59,8 @@ namespace nitrokey {
 
         void erase_password_safe_slot(uint8_t slot_number);
 
+        void user_authenticate(const char *user_password, const char *temporary_password);
+
     private:
         NitrokeyManager();
         ~NitrokeyManager();
@@ -72,7 +74,7 @@ namespace nitrokey {
         bool is_valid_password_safe_slot_number(uint8_t slot_number) const;
         uint8_t get_internal_slot_number_for_hotp(uint8_t slot_number) const;
         uint8_t get_internal_slot_number_for_totp(uint8_t slot_number) const;
-        bool erase_slot(uint8_t slot_number);
+        bool erase_slot(uint8_t slot_number, const char *temporary_password);
         uint8_t *get_slot_name(uint8_t slot_number) const;
 
     };

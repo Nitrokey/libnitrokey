@@ -50,7 +50,7 @@ extern int NK_login(const char *admin_pin, const char *temporary_password) {
     auto m = NitrokeyManager::instance();
     try {
         m->connect();
-        m->authorize(admin_pin, temporary_password);
+        m->first_authenticate(admin_pin, temporary_password);
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
@@ -69,6 +69,21 @@ extern int NK_logout() {
         return commandFailedException.last_command_status;
     }
     return 0;
+}
+
+extern int NK_first_authenticate(const char* admin_password, const char* admin_temporary_password){
+    auto m = NitrokeyManager::instance();
+    return get_without_result( [&](){
+        return m->first_authenticate(admin_password, admin_temporary_password);
+    });
+}
+
+
+extern int NK_user_authenticate(const char* user_password, const char* user_temporary_password){
+    auto m = NitrokeyManager::instance();
+    return get_without_result( [&](){
+        return m->user_authenticate(user_password, user_temporary_password);
+    });
 }
 
 extern const char * NK_status() {
@@ -106,10 +121,10 @@ extern uint32_t NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64
     return 0;
 }
 
-extern int NK_erase_hotp_slot(uint8_t slot_number) {
+extern int NK_erase_hotp_slot(uint8_t slot_number, const char *temporary_password) {
     auto m = NitrokeyManager::instance();
     try {
-        m->erase_hotp_slot(slot_number);
+        m->erase_hotp_slot(slot_number, temporary_password);
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
@@ -118,10 +133,10 @@ extern int NK_erase_hotp_slot(uint8_t slot_number) {
     return 0;
 }
 
-extern int NK_erase_totp_slot(uint8_t slot_number) {
+extern int NK_erase_totp_slot(uint8_t slot_number, const char *temporary_password) {
     auto m = NitrokeyManager::instance();
     try {
-        m->erase_totp_slot(slot_number);
+        m->erase_totp_slot(slot_number, temporary_password);
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;

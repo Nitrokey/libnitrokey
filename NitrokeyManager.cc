@@ -82,23 +82,29 @@ namespace nitrokey{
         return resp.code;
     }
 
-    bool NitrokeyManager::erase_slot(uint8_t slot_number) {
+    bool NitrokeyManager::erase_slot(uint8_t slot_number, const char *temporary_password) {
         auto p = get_payload<EraseSlot>();
         p.slot_number = slot_number;
+
+        auto auth = get_payload<Authorize>();
+        strcpyT(auth.temporary_password, temporary_password);
+        auth.crc_to_authorize = EraseSlot::CommandTransaction::getCRC(p);
+        Authorize::CommandTransaction::run(*device, auth);
+
         auto resp = EraseSlot::CommandTransaction::run(*device,p);
         return true;
     }
 
-    bool NitrokeyManager::erase_hotp_slot(uint8_t slot_number) {
+    bool NitrokeyManager::erase_hotp_slot(uint8_t slot_number, const char *temporary_password) {
         assert(is_valid_hotp_slot_number(slot_number));
         slot_number = get_internal_slot_number_for_hotp(slot_number);
-        return erase_slot(slot_number);
+        return erase_slot(slot_number, temporary_password);
     }
 
-    bool NitrokeyManager::erase_totp_slot(uint8_t slot_number) {
+    bool NitrokeyManager::erase_totp_slot(uint8_t slot_number, const char *temporary_password) {
         assert(is_valid_totp_slot_number(slot_number));
         slot_number = get_internal_slot_number_for_totp(slot_number);
-        return erase_slot(slot_number);
+        return erase_slot(slot_number, temporary_password);
     }
 
 
@@ -173,7 +179,7 @@ namespace nitrokey{
         return (uint8_t *) strdup((const char *) resp.slot_name);
     }
 
-    bool NitrokeyManager::authorize(const char *pin, const char *temporary_password) {
+    bool NitrokeyManager::first_authenticate(const char *pin, const char *temporary_password) {
         auto authreq = get_payload<FirstAuthenticate>();
 
         assert(strlen(pin) < sizeof authreq.card_password);
@@ -292,6 +298,13 @@ namespace nitrokey{
         auto p = get_payload<ErasePasswordSafeSlot>();
         p.slot_number = slot_number;
         ErasePasswordSafeSlot::CommandTransaction::run(*device, p);
+    }
+
+    void NitrokeyManager::user_authenticate(const char *user_password, const char *temporary_password) {
+        auto p = get_payload<UserAuthenticate>();
+        strcpyT(p.card_password, user_password);
+        strcpyT(p.temporary_password, temporary_password);
+        UserAuthenticate::CommandTransaction::run(*device, p);
     }
 
 }

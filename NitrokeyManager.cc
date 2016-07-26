@@ -277,4 +277,10 @@ namespace nitrokey{
         SetPasswordSafeSlotData2::CommandTransaction::run(*device, p2);
     }
 
+    void NitrokeyManager::erase_password_safe_slot(uint8_t slot_number) {
+        auto p = get_payload<ErasePasswordSafeSlot>();
+        p.slot_number = slot_number;
+        ErasePasswordSafeSlot::CommandTransaction::run(*device, p);
+    }
+
 }

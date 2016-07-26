@@ -11,6 +11,7 @@ RFC_SECRET = '12345678901234567890'
 class DefaultPasswords(Enum):
     ADMIN = '12345678'
     USER = '123456'
+    ADMIN_TEMP = '123123123'
 
 
 class DeviceErrorCode(Enum):
@@ -83,6 +84,13 @@ def test_get_password_safe_slot_login_password(C):
     slot_password = gs(C.NK_get_password_safe_slot_password(0, '123123123'))
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     assert slot_password == 'pass1'
+
+
+def test_erase_password_safe_slot(C):
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    assert C.NK_erase_password_safe_slot(0) == DeviceErrorCode.STATUS_OK
+    assert gs(C.NK_get_password_safe_slot_name(0, DefaultPasswords.ADMIN_TEMP)) == ''
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK  # TODO should be DeviceErrorCode.NOT_PROGRAMMED ?
 
 
 def test_password_safe_slot_status(C):

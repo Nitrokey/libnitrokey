@@ -301,6 +301,13 @@ extern int NK_write_password_safe_slot(uint8_t slot_number, const char *slot_nam
     });
 }
 
+extern int NK_erase_password_safe_slot(uint8_t slot_number) {
+    auto m = NitrokeyManager::instance();
+    return get_without_result([&](){
+        m->erase_password_safe_slot(slot_number);
+    });
+}
+
 
 }
 

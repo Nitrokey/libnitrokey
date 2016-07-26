@@ -57,6 +57,8 @@ namespace nitrokey {
     write_password_safe_slot(uint8_t slot_number, const char *slot_name, const char *slot_login,
                                  const char *slot_password);
 
+        void erase_password_safe_slot(uint8_t slot_number);
+
     private:
         NitrokeyManager();
         ~NitrokeyManager();

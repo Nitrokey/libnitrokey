@@ -90,7 +90,7 @@ def test_erase_password_safe_slot(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert C.NK_erase_password_safe_slot(0) == DeviceErrorCode.STATUS_OK
     assert gs(C.NK_get_password_safe_slot_name(0, DefaultPasswords.ADMIN_TEMP)) == ''
-    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK  # TODO should be DeviceErrorCode.NOT_PROGRAMMED ?
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK  # TODO shouldn't be DeviceErrorCode.NOT_PROGRAMMED ?
 
 
 def test_password_safe_slot_status(C):

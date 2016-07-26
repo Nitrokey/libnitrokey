@@ -220,7 +220,8 @@ namespace nitrokey{
     }
 
     void NitrokeyManager::get_password_safe_slot_status() {
-        GetPasswordSafeSlotStatus::CommandTransaction::run(*device); //TODO FIXME
+        auto responsePayload = GetPasswordSafeSlotStatus::CommandTransaction::run(*device); //TODO FIXME
+        responsePayload.password_safe_status;
     }
 
     uint8_t NitrokeyManager::get_user_retry_count() {
@@ -237,6 +238,7 @@ namespace nitrokey{
     }
 
     const char *NitrokeyManager::get_password_safe_slot_name(uint8_t slot_number, const char *temporary_password) {
+        assert (is_valid_password_safe_slot_number(slot_number));
         auto p = get_payload<GetPasswordSafeSlotName>();
         p.slot_number = slot_number;
 
@@ -249,7 +251,10 @@ namespace nitrokey{
         return strdup((const char *) response.slot_name);
     }
 
+    bool NitrokeyManager::is_valid_password_safe_slot_number(uint8_t slot_number) const { return slot_number < 16; }
+
     const char *NitrokeyManager::get_password_safe_slot_login(uint8_t slot_number, const char *temporary_password) {
+        assert (is_valid_password_safe_slot_number(slot_number));
         auto p = get_payload<GetPasswordSafeSlotLogin>();
         p.slot_number = slot_number;
         auto response = GetPasswordSafeSlotLogin::CommandTransaction::run(*device, p);
@@ -257,6 +262,7 @@ namespace nitrokey{
     }
 
     const char *NitrokeyManager::get_password_safe_slot_password(uint8_t slot_number, const char *temporary_password) {
+        assert (is_valid_password_safe_slot_number(slot_number));
         auto p = get_payload<GetPasswordSafeSlotPassword>();
         p.slot_number = slot_number;
         auto response = GetPasswordSafeSlotPassword::CommandTransaction::run(*device, p);
@@ -265,6 +271,7 @@ namespace nitrokey{
 
     void NitrokeyManager::write_password_safe_slot(uint8_t slot_number, const char *slot_name, const char *slot_login,
                                                        const char *slot_password) {
+        assert (is_valid_password_safe_slot_number(slot_number));
         auto p = get_payload<SetPasswordSafeSlotData>();
         p.slot_number = slot_number;
         strcpyT(p.slot_name, slot_name);
@@ -278,6 +285,7 @@ namespace nitrokey{
     }
 
     void NitrokeyManager::erase_password_safe_slot(uint8_t slot_number) {
+        assert (is_valid_password_safe_slot_number(slot_number));
         auto p = get_payload<ErasePasswordSafeSlot>();
         p.slot_number = slot_number;
         ErasePasswordSafeSlot::CommandTransaction::run(*device, p);

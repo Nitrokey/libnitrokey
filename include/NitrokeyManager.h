@@ -69,6 +69,7 @@ namespace nitrokey {
 
         bool is_valid_hotp_slot_number(uint8_t slot_number) const;
         bool is_valid_totp_slot_number(uint8_t slot_number) const;
+        bool is_valid_password_safe_slot_number(uint8_t slot_number) const;
         uint8_t get_internal_slot_number_for_hotp(uint8_t slot_number) const;
         uint8_t get_internal_slot_number_for_totp(uint8_t slot_number) const;
         bool erase_slot(uint8_t slot_number);

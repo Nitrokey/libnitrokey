@@ -35,10 +35,10 @@ def C(request):
             ffi.cdef(declaration)
 
     C = ffi.dlopen("../build/libnitrokey.so")
-    C.NK_set_debug(False)
     C.NK_login('12345678', '123123123')
 
     # C.NK_set_debug(True)
+
     def fin():
         print ('\nFinishing connection to device')
         C.NK_logout()
@@ -50,6 +50,7 @@ def C(request):
 
 
 def test_enable_password_safe(C):
+    # lock device
     assert C.NK_enable_password_safe('wrong_password') == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
@@ -70,6 +71,22 @@ def test_user_PIN_change(C):
     assert C.NK_change_user_PIN('wrong_password', '123123123') == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_change_user_PIN(DefaultPasswords.USER, '123123123') == DeviceErrorCode.STATUS_OK
     assert C.NK_change_user_PIN('123123123', DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+
+
+def test_admin_retry_counts(C):
+    assert C.NK_get_admin_retry_count() == 3
+    assert C.NK_change_admin_PIN('wrong_password', '123123123') == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_get_admin_retry_count() == 3 - 1
+    assert C.NK_change_admin_PIN(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+    assert C.NK_get_admin_retry_count() == 3
+
+
+def test_user_retry_counts(C):
+    assert C.NK_get_user_retry_count() == 3
+    assert C.NK_enable_password_safe('wrong_password') == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_get_user_retry_count() == 3 - 1
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    assert C.NK_get_user_retry_count() == 3
 
 
 def test_HOTP_RFC(C):

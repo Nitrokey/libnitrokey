@@ -313,7 +313,7 @@ class GetPasswordRetryCount : Command<CommandID::GET_PASSWORD_RETRY_COUNT> {
     bool isValid() const { return true; }
     std::string dissect() const {
       std::stringstream ss;
-      ss << " password_retry_count\t" << password_retry_count << std::endl;
+      ss << " password_retry_count\t" << (int)password_retry_count << std::endl;
       return ss.str();
     }
   } __packed;
@@ -331,7 +331,7 @@ class GetUserPasswordRetryCount
     bool isValid() const { return true; }
     std::string dissect() const {
       std::stringstream ss;
-      ss << " password_retry_count\t" << password_retry_count << std::endl;
+      ss << " password_retry_count\t" << (int)password_retry_count << std::endl;
       return ss.str();
     }
   } __packed;

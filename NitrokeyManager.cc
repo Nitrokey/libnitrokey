@@ -220,7 +220,16 @@ namespace nitrokey{
     }
 
     void NitrokeyManager::get_password_safe_slot_status() {
-        GetPasswordSafeSlotStatus::CommandTransaction::run(*device);
+        GetPasswordSafeSlotStatus::CommandTransaction::run(*device); //TODO FIXME
+    }
+
+    uint8_t NitrokeyManager::get_user_retry_count() {
+        auto response = GetUserPasswordRetryCount::CommandTransaction::run(*device);
+        return response.password_retry_count;
+    }
+    uint8_t NitrokeyManager::get_admin_retry_count() {
+        auto response = GetPasswordRetryCount::CommandTransaction::run(*device);
+        return response.password_retry_count;
     }
 
 

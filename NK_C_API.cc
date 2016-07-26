@@ -5,6 +5,17 @@ using namespace nitrokey;
 
 static uint8_t NK_last_command_status = 0;
 
+template <typename T>
+auto get_with_result(T func){
+    try {
+        return func();
+    }
+    catch (CommandFailedException & commandFailedException){
+        NK_last_command_status = commandFailedException.last_command_status;
+        return commandFailedException.last_command_status;
+    }
+}
+
 extern "C"
 {
 extern uint8_t NK_get_last_command_status(){
@@ -211,7 +222,7 @@ extern int NK_enable_password_safe(const char *user_pin){
 extern int NK_get_password_safe_slot_status(){
     auto m = NitrokeyManager::instance();
     try {
-        m->get_password_safe_slot_status();
+        m->get_password_safe_slot_status(); //TODO FIXME
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
@@ -220,4 +231,20 @@ extern int NK_get_password_safe_slot_status(){
     return 0;
 }
 
+extern uint8_t NK_get_user_retry_count(){
+    auto m = NitrokeyManager::instance();
+    return get_with_result([&](){
+        return m->get_user_retry_count();
+    });
 }
+
+extern uint8_t NK_get_admin_retry_count(){
+    auto m = NitrokeyManager::instance();
+    return get_with_result([&](){
+        return m->get_admin_retry_count();
+    });
+}
+
+
+}
+

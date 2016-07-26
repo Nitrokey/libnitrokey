@@ -25,6 +25,8 @@ extern int NK_totp_get_time();
 extern uint8_t NK_get_last_command_status();
 extern int NK_change_admin_PIN(char *current_PIN, char *new_PIN);
 extern int NK_change_user_PIN(char *current_PIN, char *new_PIN);
+extern uint8_t NK_get_user_retry_count();
+extern uint8_t NK_get_admin_retry_count();
 extern int NK_enable_password_safe(const char *user_pin);
 extern int NK_get_password_safe_slot_status();
 }

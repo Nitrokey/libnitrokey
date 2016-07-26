@@ -44,6 +44,9 @@ namespace nitrokey {
 
         void get_password_safe_slot_status();
 
+        uint8_t get_admin_retry_count();
+        uint8_t get_user_retry_count();
+
     private:
         NitrokeyManager();
         ~NitrokeyManager();

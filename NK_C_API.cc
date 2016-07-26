@@ -241,16 +241,17 @@ extern int NK_enable_password_safe(const char *user_pin){
     }
     return 0;
 }
-extern int NK_get_password_safe_slot_status(){
+extern uint8_t * NK_get_password_safe_slot_status(){
     auto m = NitrokeyManager::instance();
+    auto res = new uint8_t[16];
+    memset(res, 0, 16);
     try {
-        m->get_password_safe_slot_status(); //TODO FIXME
+        return m->get_password_safe_slot_status(); //TODO FIXME
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
-        return commandFailedException.last_command_status;
     }
-    return 0;
+    return res;
 }
 
 extern uint8_t NK_get_user_retry_count(){

@@ -32,7 +32,7 @@ extern uint8_t NK_get_user_retry_count();
 extern uint8_t NK_get_admin_retry_count();
 //password safe
 extern int NK_enable_password_safe(const char *user_pin);
-extern int NK_get_password_safe_slot_status();
+extern uint8_t * NK_get_password_safe_slot_status();
 extern const char *NK_get_password_safe_slot_name(uint8_t slot_number, const char *temporary_password);
 extern const char *NK_get_password_safe_slot_login(uint8_t slot_number, const char *temporary_password);
 extern const char *NK_get_password_safe_slot_password(uint8_t slot_number, const char *temporary_password);

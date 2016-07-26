@@ -37,7 +37,7 @@ def C(request):
             ffi.cdef(declaration)
 
     C = ffi.dlopen("../build/libnitrokey.so")
-    C.NK_login('12345678', '123123123')
+    C.NK_login(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP)
 
     # C.NK_set_debug(True)
 
@@ -68,20 +68,20 @@ def test_write_password_safe_slot(C):
 
 def test_get_password_safe_slot_name(C):
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
-    assert gs(C.NK_get_password_safe_slot_name(0, '123123123')) == ''
+    assert gs(C.NK_get_password_safe_slot_name(0, DefaultPasswords.ADMIN_TEMP)) == ''
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_NOT_AUTHORIZED
 
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
-    assert gs(C.NK_get_password_safe_slot_name(0, '123123123')) == 'slotname1'
+    assert gs(C.NK_get_password_safe_slot_name(0, DefaultPasswords.ADMIN_TEMP)) == 'slotname1'
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
 
 def test_get_password_safe_slot_login_password(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
-    slot_login = C.NK_get_password_safe_slot_login(0, '123123123')
+    slot_login = C.NK_get_password_safe_slot_login(0, DefaultPasswords.ADMIN_TEMP)
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     assert gs(slot_login) == 'login1'
-    slot_password = gs(C.NK_get_password_safe_slot_password(0, '123123123'))
+    slot_password = gs(C.NK_get_password_safe_slot_password(0, DefaultPasswords.ADMIN_TEMP))
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     assert slot_password == 'pass1'
 
@@ -100,20 +100,20 @@ def test_password_safe_slot_status(C):
 
 
 def test_admin_PIN_change(C):
-    assert C.NK_change_admin_PIN('wrong_password', '123123123') == DeviceErrorCode.WRONG_PASSWORD
-    assert C.NK_change_admin_PIN(DefaultPasswords.ADMIN, '123123123') == DeviceErrorCode.STATUS_OK
-    assert C.NK_change_admin_PIN('123123123', DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+    assert C.NK_change_admin_PIN('wrong_password', DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_change_admin_PIN(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_change_admin_PIN(DefaultPasswords.ADMIN_TEMP, DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
 
 
 def test_user_PIN_change(C):
-    assert C.NK_change_user_PIN('wrong_password', '123123123') == DeviceErrorCode.WRONG_PASSWORD
-    assert C.NK_change_user_PIN(DefaultPasswords.USER, '123123123') == DeviceErrorCode.STATUS_OK
-    assert C.NK_change_user_PIN('123123123', DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    assert C.NK_change_user_PIN('wrong_password', DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_change_user_PIN(DefaultPasswords.USER, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_change_user_PIN(DefaultPasswords.ADMIN_TEMP, DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
 
 def test_admin_retry_counts(C):
     assert C.NK_get_admin_retry_count() == 3
-    assert C.NK_change_admin_PIN('wrong_password', '123123123') == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_change_admin_PIN('wrong_password', DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_get_admin_retry_count() == 3 - 1
     assert C.NK_change_admin_PIN(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_get_admin_retry_count() == 3
@@ -129,7 +129,7 @@ def test_user_retry_counts(C):
 
 def test_HOTP_RFC(C):
     # https://tools.ietf.org/html/rfc4226#page-32
-    C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, '123123123')
+    C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, DefaultPasswords.ADMIN_TEMP)
     test_data = [
         755224, 287082, 359152, 969429, 338314, 254676, 287922, 162583, 399871, 520489,
     ]
@@ -140,7 +140,7 @@ def test_HOTP_RFC(C):
 
 def test_TOTP_RFC(C):
     # test according to https://tools.ietf.org/html/rfc6238#appendix-B
-    C.NK_write_totp_slot(1, 'python_test', RFC_SECRET, 30, True, '123123123')
+    C.NK_write_totp_slot(1, 'python_test', RFC_SECRET, 30, True, DefaultPasswords.ADMIN_TEMP)
     test_data = [
         (59, 1, 94287082),
         (1111111109, 0x00000000023523EC, 7081804),

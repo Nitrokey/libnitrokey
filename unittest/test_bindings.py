@@ -55,7 +55,7 @@ def test_enable_password_safe(C):
 
 
 def test_get_password_safe_slot_name(C):
-    C.NK_set_debug(True)
+    # C.NK_set_debug(True)
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert gs(C.NK_get_password_safe_slot_name(0, '123123123')) == ''
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_NOT_AUTHORIZED
@@ -63,6 +63,17 @@ def test_get_password_safe_slot_name(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert gs(C.NK_get_password_safe_slot_name(0, '123123123')) == '1'
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+    # C.NK_set_debug(False)
+
+def test_get_password_safe_slot_login_password(C):
+    C.NK_set_debug(True)
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    slot_login = C.NK_get_password_safe_slot_login(0, '123123123')
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+    assert gs(slot_login) == '1'
+    slot_password = gs(C.NK_get_password_safe_slot_password(0, '123123123'))
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+    assert slot_password == '1'
     C.NK_set_debug(False)
 
 

@@ -281,16 +281,16 @@ extern const char *NK_get_password_safe_slot_name(uint8_t slot_number, const cha
     });
 }
 
-extern const char *NK_get_password_safe_slot_login(uint8_t slot_number) {
+extern const char *NK_get_password_safe_slot_login(uint8_t slot_number, const char *temporary_password) {
     auto m = NitrokeyManager::instance();
     return get_with_string_result([&](){
-        return m->get_password_safe_slot_login(slot_number);
+        return m->get_password_safe_slot_login(slot_number, temporary_password);
     });
 }
-extern const char *NK_get_password_safe_slot_password(uint8_t slot_number) {
+extern const char *NK_get_password_safe_slot_password(uint8_t slot_number, const char *temporary_password) {
     auto m = NitrokeyManager::instance();
     return get_with_string_result([&](){
-        return m->get_password_safe_slot_password(slot_number);
+        return m->get_password_safe_slot_password(slot_number, temporary_password);
     });
 }
 extern int NK_write_password_safe_slot(){

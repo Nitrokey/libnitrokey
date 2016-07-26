@@ -376,7 +376,7 @@ class GetPasswordSafeSlotName : Command<CommandID::GET_PW_SAFE_SLOT_NAME> {
     bool isValid() const { return !(slot_number & 0xF0); }
     std::string dissect() const {
       std::stringstream ss;
-      ss << "slot_number\t" << slot_number << std::endl;
+      ss << "slot_number\t" << (int)slot_number << std::endl;
       return ss.str();
     }
   } __packed;
@@ -387,7 +387,7 @@ class GetPasswordSafeSlotName : Command<CommandID::GET_PW_SAFE_SLOT_NAME> {
     bool isValid() const { return true; }
     std::string dissect() const {
       std::stringstream ss;
-      ss << " slot_name\t" << slot_name << std::endl;
+      ss << " slot_name\t" << (char*)slot_name << std::endl;
       return ss.str();
     }
   } __packed;
@@ -405,7 +405,7 @@ class GetPasswordSafeSlotPassword
     bool isValid() const { return !(slot_number & 0xF0); }
     std::string dissect() const {
       std::stringstream ss;
-      ss << "   slot_number\t" << slot_number << std::endl;
+      ss << "   slot_number\t" << (int)slot_number << std::endl;
       return ss.str();
     }
   } __packed;
@@ -416,7 +416,7 @@ class GetPasswordSafeSlotPassword
     bool isValid() const { return true; }
     std::string dissect() const {
       std::stringstream ss;
-      ss << " slot_password\t" << slot_password << std::endl;
+      ss << " slot_password\t" << (char*)slot_password << std::endl;
       return ss.str();
     }
   } __packed;
@@ -434,7 +434,7 @@ class GetPasswordSafeSlotLogin
     bool isValid() const { return !(slot_number & 0xF0); }
     std::string dissect() const {
       std::stringstream ss;
-      ss << "   slot_number\t" << slot_number << std::endl;
+      ss << "   slot_number\t" << (int)slot_number << std::endl;
       return ss.str();
     }
   } __packed;
@@ -445,7 +445,7 @@ class GetPasswordSafeSlotLogin
     bool isValid() const { return true; }
     std::string dissect() const {
       std::stringstream ss;
-      ss << " slot_login\t" << slot_login << std::endl;
+      ss << " slot_login\t" << (char*)slot_login << std::endl;
       return ss.str();
     }
   } __packed;

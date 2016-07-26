@@ -462,6 +462,13 @@ class SetPasswordSafeSlotData : Command<CommandID::SET_PW_SAFE_SLOT_DATA_1> {
     uint8_t slot_password[PWS_PASSWORD_LENGTH];
 
     bool isValid() const { return !(slot_number & 0xF0); }
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << " slot_number\t" << (int)slot_number << std::endl;
+          ss << " slot_name\t" << (char*)slot_name << std::endl;
+          ss << " slot_password\t" << (char*)slot_password << std::endl;
+          return ss.str();
+      }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -475,6 +482,12 @@ class SetPasswordSafeSlotData2 : Command<CommandID::SET_PW_SAFE_SLOT_DATA_2> {
     uint8_t slot_name[PWS_SLOTNAME_LENGTH];
 
     bool isValid() const { return !(slot_number & 0xF0); }
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << " slot_number\t" << (int)slot_number << std::endl;
+          ss << " slot_name\t" << (char*)slot_name << std::endl;
+          return ss.str();
+      }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -487,6 +500,12 @@ class ErasePasswordSafeSlot : Command<CommandID::PW_SAFE_ERASE_SLOT> {
     uint8_t slot_number;
 
     bool isValid() const { return !(slot_number & 0xF0); }
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << " slot_number\t" << (int)slot_number << std::endl;
+          return ss.str();
+      }
+
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -496,12 +515,12 @@ class ErasePasswordSafeSlot : Command<CommandID::PW_SAFE_ERASE_SLOT> {
 class EnablePasswordSafe : Command<CommandID::PW_SAFE_ENABLE> {
  public:
   struct CommandPayload {
-    uint8_t password[30];
+    uint8_t user_password[30];
 
     bool isValid() const { return true; }
     std::string dissect() const {
       std::stringstream ss;
-      ss << " password\t" << password << std::endl;
+      ss << " user_password\t" << (char*) user_password << std::endl;
       return ss.str();
     }
   } __packed;

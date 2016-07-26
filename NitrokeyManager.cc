@@ -215,7 +215,7 @@ namespace nitrokey{
 
     void NitrokeyManager::enable_password_safe(const char *user_pin) {
         auto p = get_payload<EnablePasswordSafe>();
-        strcpyT(p.password, user_pin);
+        strcpyT(p.user_password, user_pin);
         EnablePasswordSafe::CommandTransaction::run(*device, p);
     }
 

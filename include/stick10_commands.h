@@ -479,13 +479,13 @@ class SetPasswordSafeSlotData2 : Command<CommandID::SET_PW_SAFE_SLOT_DATA_2> {
  public:
   struct CommandPayload {
     uint8_t slot_number;
-    uint8_t slot_name[PWS_SLOTNAME_LENGTH];
+    uint8_t slot_login_name[PWS_LOGINNAME_LENGTH];
 
     bool isValid() const { return !(slot_number & 0xF0); }
       std::string dissect() const {
           std::stringstream ss;
           ss << " slot_number\t" << (int)slot_number << std::endl;
-          ss << " slot_name\t" << (char*)slot_name << std::endl;
+          ss << " slot_login_name\t" << (char*)slot_login_name << std::endl;
           return ss.str();
       }
   } __packed;

@@ -270,7 +270,7 @@ extern uint8_t NK_get_admin_retry_count(){
 extern int NK_lock_device(){
     auto m = NitrokeyManager::instance();
     return get_without_result([&](){
-        return m->lock_device();
+        m->lock_device();
     });
 }
 
@@ -293,9 +293,12 @@ extern const char *NK_get_password_safe_slot_password(uint8_t slot_number, const
         return m->get_password_safe_slot_password(slot_number, temporary_password);
     });
 }
-extern int NK_write_password_safe_slot(){
+extern int NK_write_password_safe_slot(uint8_t slot_number, const char *slot_name, const char *slot_login,
+                                       const char *slot_password) {
     auto m = NitrokeyManager::instance();
-    //TODO
+    return get_without_result([&](){
+        m->write_password_safe_slot(slot_number, slot_name, slot_login, slot_password);
+    });
 }
 
 

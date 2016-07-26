@@ -263,4 +263,18 @@ namespace nitrokey{
         return strdup((const char *) response.slot_password);
     }
 
+    void NitrokeyManager::write_password_safe_slot(uint8_t slot_number, const char *slot_name, const char *slot_login,
+                                                       const char *slot_password) {
+        auto p = get_payload<SetPasswordSafeSlotData>();
+        p.slot_number = slot_number;
+        strcpyT(p.slot_name, slot_name);
+        strcpyT(p.slot_password, slot_password);
+        SetPasswordSafeSlotData::CommandTransaction::run(*device, p);
+
+        auto p2 = get_payload<SetPasswordSafeSlotData2>();
+        p2.slot_number = slot_number;
+        strcpyT(p2.slot_login_name, slot_login);
+        SetPasswordSafeSlotData2::CommandTransaction::run(*device, p2);
+    }
+
 }

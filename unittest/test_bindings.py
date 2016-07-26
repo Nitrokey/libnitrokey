@@ -7,6 +7,7 @@ gs = ffi.string
 
 RFC_SECRET = '12345678901234567890'
 
+
 class DefaultPasswords(Enum):
     ADMIN = '12345678'
     USER = '123456'
@@ -17,6 +18,7 @@ class DeviceErrorCode(Enum):
     NOT_PROGRAMMED = 3
     WRONG_PASSWORD = 4
     STATUS_NOT_AUTHORIZED = 5
+
 
 @pytest.fixture(scope="module")
 def C(request):
@@ -54,27 +56,33 @@ def test_enable_password_safe(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
 
+def test_write_password_safe_slot(C):
+    C.NK_set_debug(True)
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_password_safe_slot(0, 'slotname1', 'login1', 'pass1') == DeviceErrorCode.STATUS_NOT_AUTHORIZED
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_password_safe_slot(0, 'slotname1', 'login1', 'pass1') == DeviceErrorCode.STATUS_OK
+    C.NK_set_debug(False)
+
+
 def test_get_password_safe_slot_name(C):
-    # C.NK_set_debug(True)
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert gs(C.NK_get_password_safe_slot_name(0, '123123123')) == ''
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_NOT_AUTHORIZED
 
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
-    assert gs(C.NK_get_password_safe_slot_name(0, '123123123')) == '1'
+    assert gs(C.NK_get_password_safe_slot_name(0, '123123123')) == 'slotname1'
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
-    # C.NK_set_debug(False)
+
 
 def test_get_password_safe_slot_login_password(C):
-    C.NK_set_debug(True)
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     slot_login = C.NK_get_password_safe_slot_login(0, '123123123')
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
-    assert gs(slot_login) == '1'
+    assert gs(slot_login) == 'login1'
     slot_password = gs(C.NK_get_password_safe_slot_password(0, '123123123'))
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
-    assert slot_password == '1'
-    C.NK_set_debug(False)
+    assert slot_password == 'pass1'
 
 
 def test_password_safe_slot_status(C):

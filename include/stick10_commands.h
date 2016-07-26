@@ -342,9 +342,8 @@ class GetUserPasswordRetryCount
 
     template <typename T, typename Q, int N>
     void write_array(T &ss, Q (&arr)[N]){
-        ss << std::hex << std::setfill('0') << std::setw(2);
         for (int i=0; i<N; i++){
-            ss << arr[i] << " ";
+            ss << std::hex << std::setfill('0') << std::setw(2) << (int)arr[i] << " ";
         }
         ss << std::endl;
     };

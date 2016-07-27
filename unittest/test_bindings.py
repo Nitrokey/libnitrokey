@@ -38,7 +38,7 @@ def C(request):
             ffi.cdef(declaration)
 
     C = ffi.dlopen("../build/libnitrokey.so")
-    C.NK_set_debug(False)
+    # C.NK_set_debug(False)
     C.NK_login(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP)
     assert C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP) == DeviceErrorCode.STATUS_OK
 
@@ -98,6 +98,8 @@ def test_erase_password_safe_slot(C):
 
 def test_password_safe_slot_status(C):
     C.NK_set_debug(True)
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    assert C.NK_erase_password_safe_slot(0) == DeviceErrorCode.STATUS_OK
     safe_slot_status = C.NK_get_password_safe_slot_status()
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     is_slot_programmed = list(ffi.cast("uint8_t [16]", safe_slot_status)[0:16])
@@ -105,7 +107,7 @@ def test_password_safe_slot_status(C):
     assert is_slot_programmed[
                0] == 0  # FIXME not programmed, assuming erased in preceeding test, add writing and erasing
     assert is_slot_programmed[1] == 1  # FIXME assuming slot 1 is programmed, not writing there in this tests, same as ^
-    C.NK_set_debug(False)
+    # C.NK_set_debug(False)
 
 
 def test_admin_PIN_change(C):
@@ -140,7 +142,9 @@ def test_user_retry_counts(C):
     assert C.NK_get_user_retry_count() == default_user_retry_count
 
 
-def test_HOTP_RFC(C):
+def test_HOTP_RFC_no_pin_protection(C):
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(True, True, True, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # https://tools.ietf.org/html/rfc4226#page-32
     C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, DefaultPasswords.ADMIN_TEMP)
     test_data = [
@@ -151,7 +155,9 @@ def test_HOTP_RFC(C):
         assert code == r
 
 
-def test_TOTP_RFC(C):
+def test_TOTP_RFC_no_pin_protection(C):
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(True, True, True, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # test according to https://tools.ietf.org/html/rfc6238#appendix-B
     C.NK_write_totp_slot(1, 'python_test', RFC_SECRET, 30, True, DefaultPasswords.ADMIN_TEMP)
     test_data = [

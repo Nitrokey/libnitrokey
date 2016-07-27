@@ -250,12 +250,6 @@ namespace nitrokey{
         assert (is_valid_password_safe_slot_number(slot_number));
         auto p = get_payload<GetPasswordSafeSlotName>();
         p.slot_number = slot_number;
-
-        auto auth = get_payload<UserAuthorize>();
-        strcpyT(auth.temporary_password, temporary_password);
-        auth.crc_to_authorize = GetPasswordSafeSlotName::CommandTransaction::getCRC(p);
-        UserAuthorize::CommandTransaction::run(*device, auth);
-
         auto response = GetPasswordSafeSlotName::CommandTransaction::run(*device, p);
         return strdup((const char *) response.slot_name);
     }

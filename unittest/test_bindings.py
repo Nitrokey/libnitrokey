@@ -65,8 +65,10 @@ def test_write_password_safe_slot(C):
 
 
 def test_get_password_safe_slot_name(C):
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_password_safe_slot(0, 'slotname1', 'login1', 'pass1') == DeviceErrorCode.STATUS_OK
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
-    assert gs(C.NK_get_password_safe_slot_name(0, DefaultPasswords.ADMIN_TEMP)) == ''
+    assert gs(C.NK_get_password_safe_slot_name(0, DefaultPasswords.USER_TEMP)) == ''
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_NOT_AUTHORIZED
 
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK

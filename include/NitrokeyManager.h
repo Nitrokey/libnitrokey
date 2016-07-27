@@ -49,9 +49,9 @@ namespace nitrokey {
 
         void lock_device();
 
-        const char *get_password_safe_slot_name(uint8_t slot_number, const char *temporary_password);
-        const char *get_password_safe_slot_password(uint8_t slot_number, const char *temporary_password);
-        const char *get_password_safe_slot_login(uint8_t slot_number, const char *temporary_password);
+        const char *get_password_safe_slot_name(uint8_t slot_number);
+        const char *get_password_safe_slot_password(uint8_t slot_number);
+        const char *get_password_safe_slot_login(uint8_t slot_number);
 
         void
     write_password_safe_slot(uint8_t slot_number, const char *slot_name, const char *slot_login,

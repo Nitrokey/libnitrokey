@@ -68,20 +68,20 @@ def test_get_password_safe_slot_name(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_password_safe_slot(0, 'slotname1', 'login1', 'pass1') == DeviceErrorCode.STATUS_OK
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
-    assert gs(C.NK_get_password_safe_slot_name(0, DefaultPasswords.USER_TEMP)) == ''
+    assert gs(C.NK_get_password_safe_slot_name(0)) == ''
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_NOT_AUTHORIZED
 
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
-    assert gs(C.NK_get_password_safe_slot_name(0, DefaultPasswords.ADMIN_TEMP)) == 'slotname1'
+    assert gs(C.NK_get_password_safe_slot_name(0)) == 'slotname1'
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
 
 def test_get_password_safe_slot_login_password(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
-    slot_login = C.NK_get_password_safe_slot_login(0, DefaultPasswords.ADMIN_TEMP)
+    slot_login = C.NK_get_password_safe_slot_login(0)
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     assert gs(slot_login) == 'login1'
-    slot_password = gs(C.NK_get_password_safe_slot_password(0, DefaultPasswords.ADMIN_TEMP))
+    slot_password = gs(C.NK_get_password_safe_slot_password(0))
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     assert slot_password == 'pass1'
 
@@ -89,7 +89,7 @@ def test_get_password_safe_slot_login_password(C):
 def test_erase_password_safe_slot(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert C.NK_erase_password_safe_slot(0) == DeviceErrorCode.STATUS_OK
-    assert gs(C.NK_get_password_safe_slot_name(0, DefaultPasswords.ADMIN_TEMP)) == ''
+    assert gs(C.NK_get_password_safe_slot_name(0)) == ''
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK  # TODO CHECK shouldn't this be DeviceErrorCode.NOT_PROGRAMMED ?
 
 
@@ -164,7 +164,7 @@ def test_TOTP_RFC(C):
 
 def test_get_slot_names(C):
     C.NK_set_debug(True)
-    # assert C.NK_erase_totp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_erase_totp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # erasing slot invalidates temporary password, so requesting authentication
     # assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # assert C.NK_erase_hotp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK

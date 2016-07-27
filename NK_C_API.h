@@ -39,9 +39,9 @@ extern uint8_t NK_get_admin_retry_count();
 //password safe
 extern int NK_enable_password_safe(const char *user_pin);
 extern uint8_t * NK_get_password_safe_slot_status();
-extern const char *NK_get_password_safe_slot_name(uint8_t slot_number, const char *temporary_password);
-extern const char *NK_get_password_safe_slot_login(uint8_t slot_number, const char *temporary_password);
-extern const char *NK_get_password_safe_slot_password(uint8_t slot_number, const char *temporary_password);
+extern const char *NK_get_password_safe_slot_name(uint8_t slot_number);
+extern const char *NK_get_password_safe_slot_login(uint8_t slot_number);
+extern const char *NK_get_password_safe_slot_password(uint8_t slot_number);
 extern int NK_write_password_safe_slot(uint8_t slot_number, const char *slot_name, const char *slot_login, const char *slot_password);
 extern int NK_erase_password_safe_slot(uint8_t slot_number);
 }

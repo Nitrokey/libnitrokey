@@ -154,10 +154,15 @@ extern const char * NK_status() {
     return "";
 }
 
-extern uint32_t NK_get_hotp_code(uint8_t slot_number){
+
+extern uint32_t NK_get_hotp_code(uint8_t slot_number) {
+    return NK_get_hotp_code_PIN(slot_number, "");
+}
+
+extern uint32_t NK_get_hotp_code_PIN(uint8_t slot_number, const char* user_temporary_password){
     auto m = NitrokeyManager::instance();
     try {
-        return m->get_HOTP_code(slot_number);
+        return m->get_HOTP_code(slot_number, user_temporary_password);
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
@@ -167,9 +172,14 @@ extern uint32_t NK_get_hotp_code(uint8_t slot_number){
 
 extern uint32_t NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
                                  uint8_t last_interval){
+    return NK_get_totp_code_PIN(slot_number, challenge, last_totp_time, last_interval, "");
+}
+
+extern uint32_t NK_get_totp_code_PIN(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
+                                 uint8_t last_interval, const char* user_temporary_password){
     auto m = NitrokeyManager::instance();
     try {
-        return m->get_TOTP_code(slot_number, challenge, last_totp_time, last_interval);
+        return m->get_TOTP_code(slot_number, challenge, last_totp_time, last_interval, user_temporary_password);
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
@@ -379,7 +389,6 @@ extern int NK_erase_password_safe_slot(uint8_t slot_number) {
         m->erase_password_safe_slot(slot_number);
     });
 }
-
 
 }
 

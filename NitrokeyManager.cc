@@ -19,6 +19,16 @@ namespace nitrokey{
         return st;
     }
 
+
+    // package type to auth, auth type [Authorize,UserAuthorize]
+    template <typename S, typename A, typename T>
+    void auth_package(T& package, const char* admin_temporary_password, Device * device){
+        auto auth = get_payload<A>();
+        strcpyT(auth.temporary_password, admin_temporary_password);
+        auth.crc_to_authorize = S::CommandTransaction::getCRC(package);
+        A::CommandTransaction::run(*device, auth);
+    }
+
     NitrokeyManager * NitrokeyManager::_instance = nullptr;
 
     NitrokeyManager::NitrokeyManager(): device(nullptr) {
@@ -55,12 +65,17 @@ namespace nitrokey{
         return response.dissect();
     }
 
-    uint32_t NitrokeyManager::get_HOTP_code(uint8_t slot_number) {
+    uint32_t NitrokeyManager::get_HOTP_code(uint8_t slot_number, const char *user_temporary_password) {
         assert(is_valid_hotp_slot_number(slot_number));
         auto gh = get_payload<GetHOTP>();
         gh.slot_number = get_internal_slot_number_for_hotp(slot_number);
-        auto resp = GetHOTP::CommandTransaction::run(*device, gh);
+
         //TODO handle user authorization requests (taken from config)
+        if(user_temporary_password != nullptr && strlen(user_temporary_password)!=0){ //FIXME use string instead of strlen
+            auth_package<GetHOTP, UserAuthorize>(gh, user_temporary_password, device);
+        }
+
+        auto resp = GetHOTP::CommandTransaction::run(*device, gh);
         return resp.code;
     }
 
@@ -71,7 +86,8 @@ namespace nitrokey{
     uint8_t NitrokeyManager::get_internal_slot_number_for_hotp(uint8_t slot_number) const { return (uint8_t) (0x10 + slot_number); }
 
     uint32_t NitrokeyManager::get_TOTP_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
-                                                uint8_t last_interval) {
+                                            uint8_t last_interval,
+                                            const char *user_temporary_password) {
         assert(is_valid_totp_slot_number(slot_number));
         slot_number = get_internal_slot_number_for_totp(slot_number);
         auto gt = get_payload<GetTOTP>();
@@ -79,8 +95,11 @@ namespace nitrokey{
         gt.challenge = challenge;
         gt.last_interval = last_interval;
         gt.last_totp_time = last_totp_time;
-        auto resp = GetTOTP::CommandTransaction::run(*device, gt);
         //TODO handle user authorization requests (taken from config)
+        if(user_temporary_password != nullptr && strlen(user_temporary_password)!=0){ //FIXME use string instead of strlen
+            auth_package<GetTOTP, UserAuthorize>(gt, user_temporary_password, device);
+        }
+        auto resp = GetTOTP::CommandTransaction::run(*device, gt);
         return resp.code;
     }
 
@@ -321,6 +340,7 @@ namespace nitrokey{
         UnlockUserPassword::CommandTransaction::run(*device, p);
     }
 
+
     void NitrokeyManager::write_config(bool numlock, bool capslock, bool scrolllock, bool enable_user_password, bool delete_user_password, const char *admin_temporary_password) {
         auto p = get_payload<WriteGeneralConfig>();
         p.numlock = (uint8_t) numlock;
@@ -329,10 +349,7 @@ namespace nitrokey{
         p.enable_user_password = (uint8_t) enable_user_password;
         p.delete_user_password = (uint8_t) delete_user_password;
 
-        auto auth = get_payload<Authorize>();
-        strcpyT(auth.temporary_password, admin_temporary_password);
-        auth.crc_to_authorize = WriteGeneralConfig::CommandTransaction::getCRC(p);
-        Authorize::CommandTransaction::run(*device, auth);
+        auth_package<WriteGeneralConfig, Authorize>(p, admin_temporary_password, device);
 
         WriteGeneralConfig::CommandTransaction::run(*device, p);
     }

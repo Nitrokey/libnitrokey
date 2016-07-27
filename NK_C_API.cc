@@ -5,6 +5,24 @@ using namespace nitrokey;
 static uint8_t NK_last_command_status = 0;
 
 template <typename T>
+T* array_dup(std::vector<T>& v){
+    auto d = new T[v.size()];
+    std::copy(v.begin(), v.end(), d);
+    return d;
+}
+
+template <typename T>
+uint8_t * get_with_array_result(T func){
+    try {
+        return func();
+    }
+    catch (CommandFailedException & commandFailedException){
+        NK_last_command_status = commandFailedException.last_command_status;
+        return nullptr;
+    }
+}
+
+template <typename T>
 const char* get_with_string_result(T func){
     try {
         return func();
@@ -113,6 +131,16 @@ extern int NK_write_config(bool numlock, bool capslock, bool scrolllock, bool en
         return m->write_config(numlock, capslock, scrolllock, enable_user_password, delete_user_password, admin_temporary_password);
     });
 }
+
+
+extern uint8_t* NK_read_config(){
+    auto m = NitrokeyManager::instance();
+    return get_with_array_result( [&](){
+        auto v = m->read_config();
+        return array_dup(v);
+    });
+}
+
 
 extern const char * NK_status() {
     auto m = NitrokeyManager::instance();

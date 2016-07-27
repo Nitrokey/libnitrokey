@@ -337,4 +337,11 @@ namespace nitrokey{
         WriteGeneralConfig::CommandTransaction::run(*device, p);
     }
 
+    vector<uint8_t> NitrokeyManager::read_config() {
+        auto responsePayload = GetStatus::CommandTransaction::run(*device);
+        vector<uint8_t> v = vector<uint8_t>(responsePayload.general_config,
+                                            responsePayload.general_config+sizeof(responsePayload.general_config));
+        return v;
+    }
+
 }

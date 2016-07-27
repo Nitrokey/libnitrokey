@@ -213,9 +213,25 @@ def test_get_code_user_authorize(C):
     code = C.NK_get_totp_code(0, 0, 0, 0)
     assert code == 0
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_NOT_AUTHORIZED
-    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # disable PIN protection with write_config
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(True, True, True, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     code = C.NK_get_totp_code(0, 0, 0, 0)
     assert code != 0
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+
+
+def cast_pointer_to_tuple(obj, typen, len):
+    # usage:
+    #     config = cast_pointer_to_tuple(config_raw_data, 'uint8_t', 5)
+    return tuple(ffi.cast("%s [%d]" % (typen, len), obj)[0:len])
+
+
+def test_read_write_config(C):
+    C.NK_set_debug(True)
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(True, True, True, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    config_raw_data = C.NK_read_config()
+    config = cast_pointer_to_tuple(config_raw_data, 'uint8_t', 5)
+    assert config == (True, True, True, False, True)
+

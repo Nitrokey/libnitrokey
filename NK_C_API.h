@@ -21,6 +21,7 @@ extern int NK_factory_reset(const char* admin_password);
 extern int NK_build_aes_key(const char* admin_password);
 extern int NK_unlock_user_password(const char* admin_password);
 extern int NK_write_config(bool numlock, bool capslock, bool scrolllock, bool enable_user_password, bool delete_user_password, const char *admin_temporary_password);
+extern uint8_t* NK_read_config();
 //otp
 extern const char * NK_get_totp_slot_name(uint8_t slot_number);
 extern const char * NK_get_hotp_slot_name(uint8_t slot_number);

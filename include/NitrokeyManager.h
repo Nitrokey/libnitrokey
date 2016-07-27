@@ -5,6 +5,7 @@
 #include "log.h"
 #include "device_proto.h"
 #include "stick10_commands.h"
+#include <vector>
 
 namespace nitrokey {
     using namespace nitrokey::device;
@@ -69,6 +70,8 @@ namespace nitrokey {
 
         void write_config(bool numlock, bool capslock, bool scrolllock, bool enable_user_password,
                           bool delete_user_password, const char *admin_temporary_password);
+
+        vector<uint8_t> read_config();
 
     private:
         NitrokeyManager();

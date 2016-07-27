@@ -61,6 +61,12 @@ namespace nitrokey {
 
         void user_authenticate(const char *user_password, const char *temporary_password);
 
+        void factory_reset(const char *admin_password);
+
+        void build_aes_key(const char *admin_password);
+
+        void unlock_user_password(const char *admin_password);
+
     private:
         NitrokeyManager();
         ~NitrokeyManager();

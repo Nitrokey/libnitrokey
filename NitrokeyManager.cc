@@ -307,4 +307,22 @@ namespace nitrokey{
         UserAuthenticate::CommandTransaction::run(*device, p);
     }
 
+    void NitrokeyManager::build_aes_key(const char *admin_password) {
+        auto p = get_payload<BuildAESKey>();
+        strcpyT(p.admin_password, admin_password);
+        BuildAESKey::CommandTransaction::run(*device, p);
+    }
+
+    void NitrokeyManager::factory_reset(const char *admin_password) {
+        auto p = get_payload<FactoryReset>();
+        strcpyT(p.admin_password, admin_password);
+        FactoryReset::CommandTransaction::run(*device, p);
+    }
+
+    void NitrokeyManager::unlock_user_password(const char *admin_password) {
+        auto p = get_payload<UnlockUserPassword>();
+        strcpyT(p.admin_password, admin_password);
+        UnlockUserPassword::CommandTransaction::run(*device, p);
+    }
+
 }

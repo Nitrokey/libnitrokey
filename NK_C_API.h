@@ -17,6 +17,9 @@ extern uint8_t NK_get_last_command_status();
 extern int NK_lock_device();
 extern int NK_user_authenticate(const char* user_password, const char* user_temporary_password);
 extern int NK_first_authenticate(const char* admin_password, const char* admin_temporary_password);
+extern int NK_factory_reset(const char* admin_password);
+extern int NK_build_aes_key(const char* admin_password);
+extern int NK_unlock_user_password(const char* admin_password);
 //otp
 extern const char * NK_get_totp_slot_name(uint8_t slot_number);
 extern const char * NK_get_hotp_slot_name(uint8_t slot_number);

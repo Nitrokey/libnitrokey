@@ -637,7 +637,12 @@ class UserAuthorize : Command<CommandID::USER_AUTHORIZE> {
 class UnlockUserPassword : Command<CommandID::UNLOCK_USER_PASSWORD> {
  public:
   struct CommandPayload {
-    uint8_t admin_password[20];  // TODO
+    uint8_t admin_password[20];
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << " admin_password:\t" <<  admin_password<< std::endl;
+          return ss.str();
+      }
   } __packed;
 
   // TODO could we get the stick to return the retry count?
@@ -700,7 +705,12 @@ class LockDevice : Command<CommandID::LOCK_DEVICE> {
 class FactoryReset : Command<CommandID::FACTORY_RESET> {
  public:
   struct CommandPayload {
-    uint8_t password[20];
+    uint8_t admin_password[20];
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << " admin_password:\t" <<  admin_password<< std::endl;
+          return ss.str();
+      }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -710,7 +720,12 @@ class FactoryReset : Command<CommandID::FACTORY_RESET> {
 class BuildAESKey : Command<CommandID::NEW_AES_KEY> {
  public:
   struct CommandPayload {
-    uint8_t password[20];
+    uint8_t admin_password[20];
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << " admin_password:\t" <<  admin_password<< std::endl;
+          return ss.str();
+      }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>

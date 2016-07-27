@@ -153,7 +153,7 @@ def test_user_auth(C):
 
 def check_RFC_codes(C, func, prep=None):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     test_data = [
         755224, 287082, 359152, 969429, 338314, 254676, 287922, 162583, 399871, 520489,
     ]
@@ -165,19 +165,24 @@ def check_RFC_codes(C, func, prep=None):
 
 
 def test_HOTP_RFC_pin_protection(C):
+    C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(True, True, True, True, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # check_RFC_codes(C, lambda x: C.NK_get_hotp_code_PIN(x, DefaultPasswords.USER_TEMP), lambda: C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP))
     assert C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_get_hotp_code_PIN(1, DefaultPasswords.USER_TEMP) == 755224
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
 
+def test_HOTP_RFC_no_pin_protection_8digits(C):
+    assert False # TODO to write
+
+
 def test_HOTP_RFC_no_pin_protection(C):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(True, True, True, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # https://tools.ietf.org/html/rfc4226#page-32

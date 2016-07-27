@@ -212,10 +212,10 @@ extern int NK_erase_totp_slot(uint8_t slot_number, const char *temporary_passwor
 }
 
 extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter,
-                              const char *temporary_password) {
+                              bool use_8_digits, const char *temporary_password) {
     auto m = NitrokeyManager::instance();
     try {
-        m->write_HOTP_slot(slot_number, slot_name, secret, hotp_counter, temporary_password);
+        m->write_HOTP_slot(slot_number, slot_name, secret, hotp_counter, use_8_digits, temporary_password);
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;

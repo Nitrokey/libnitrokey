@@ -27,7 +27,7 @@ extern const char * NK_get_totp_slot_name(uint8_t slot_number);
 extern const char * NK_get_hotp_slot_name(uint8_t slot_number);
 extern int NK_erase_hotp_slot(uint8_t slot_number, const char *temporary_password);
 extern int NK_erase_totp_slot(uint8_t slot_number, const char *temporary_password);
-extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter, const char *temporary_password);
+extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter, bool use_8_digits, const char *temporary_password);
 extern int NK_write_totp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint16_t time_window, bool use_8_digits, const char *temporary_password);
 extern uint32_t NK_get_hotp_code(uint8_t slot_number);
 extern uint32_t NK_get_hotp_code_PIN(uint8_t slot_number, const char* user_temporary_password);

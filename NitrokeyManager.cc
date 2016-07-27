@@ -130,7 +130,7 @@ namespace nitrokey{
 
 
     bool NitrokeyManager::write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint64_t hotp_counter,
-                                              const char *temporary_password) {
+                                              bool use_8_digits, const char *temporary_password) {
         assert(is_valid_hotp_slot_number(slot_number));
         assert(strlen(secret)==20); //160 bits
         assert(strlen(slot_name)<=15);
@@ -141,7 +141,7 @@ namespace nitrokey{
         strcpyT(payload.slot_secret, secret);
         strcpyT(payload.slot_name, slot_name);
         payload.slot_counter = hotp_counter;
-        payload.slot_config; //TODO
+        payload.use_8_digits = use_8_digits;
 
         auto auth = get_payload<Authorize>();
         strcpyT(auth.temporary_password, temporary_password);
@@ -151,8 +151,6 @@ namespace nitrokey{
         auto resp = WriteToHOTPSlot::CommandTransaction::run(*device, payload);
         return true;
     }
-
-    enum totp_config{digits8=0, enter=1, tokenID=2};
 
     bool NitrokeyManager::write_TOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret,
                                           uint16_t time_window, bool use_8_digits, const char *temporary_password) {
@@ -166,9 +164,7 @@ namespace nitrokey{
         strcpyT(payload.slot_secret, secret);
         strcpyT(payload.slot_name, slot_name);
         payload.slot_interval = time_window; //FIXME naming
-        bitset<8> config; //FIXME better config manipulation
-        config.set(totp_config::digits8, use_8_digits);
-        payload.slot_config = (uint8_t) config.to_ulong();
+        payload.use_8_digits = use_8_digits;
 
         auto auth = get_payload<Authorize>();
         strcpyT(auth.temporary_password, temporary_password);

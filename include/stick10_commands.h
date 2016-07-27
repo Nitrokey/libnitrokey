@@ -88,7 +88,14 @@ class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
     uint8_t slot_number;
     uint8_t slot_name[15];
     uint8_t slot_secret[20];
-    uint8_t slot_config;
+    union{
+      uint8_t _slot_config;
+        struct{
+            bool use_8_digits   : 1;
+            bool use_enter      : 1;
+            bool use_tokenID    : 1;
+        };
+    };
     uint8_t slot_token_id[13];
       uint64_t slot_counter;
 
@@ -98,7 +105,11 @@ class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
         ss << "slot_number:\t" << (int)(slot_number) << std::endl;
         ss << "slot_name:\t" << slot_name << std::endl;
         ss << "slot_secret:\t" << slot_secret << std::endl;
-        ss << "slot_config:\t" << std::bitset<8>((int)slot_config) << std::endl;
+        ss << "slot_config:\t" << std::bitset<8>((int)_slot_config) << std::endl;
+        ss << "\tuse_8_digits(0):\t" << use_8_digits << std::endl;
+        ss << "\tuse_enter(1):\t" << use_enter << std::endl;
+        ss << "\tuse_tokenID(2):\t" << use_tokenID << std::endl;
+
         ss << "slot_token_id:\t";
         for (auto i : slot_token_id)
             ss << std::hex << std::setw(2) << std::setfill('0')<< (int) i << " " ;
@@ -118,7 +129,14 @@ class WriteToTOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
     uint8_t slot_number;
     uint8_t slot_name[15];
     uint8_t slot_secret[20];
-    uint8_t slot_config;
+      union{
+          uint8_t _slot_config;
+          struct{
+              bool use_8_digits   : 1;
+              bool use_enter      : 1;
+              bool use_tokenID    : 1;
+          };
+      };
     uint8_t slot_token_id[13];
     uint16_t slot_interval;
 
@@ -128,7 +146,7 @@ class WriteToTOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
           ss << "slot_number:\t" << (int)(slot_number) << std::endl;
           ss << "slot_name:\t" << slot_name << std::endl;
           ss << "slot_secret:\t" << slot_secret << std::endl;
-          ss << "slot_config:\t" << std::bitset<8>((int)slot_config) << std::endl;
+          ss << "slot_config:\t" << std::bitset<8>((int)_slot_config) << std::endl;
           ss << "slot_token_id:\t";
           for (auto i : slot_token_id)
               ss << std::hex << std::setw(2) << std::setfill('0')<< (int) i << " " ;

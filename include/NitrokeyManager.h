@@ -20,7 +20,7 @@ namespace nitrokey {
 
         bool first_authenticate(const char *pin, const char *temporary_password);
         bool write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint64_t hotp_counter,
-                                     const char *temporary_password);
+                                     bool use_8_digits, const char *temporary_password);
         bool write_TOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret,
                              uint16_t time_window, bool use_8_digits, const char *temporary_password);
         uint32_t get_HOTP_code(uint8_t slot_number, const char *user_temporary_password);

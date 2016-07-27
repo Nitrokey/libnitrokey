@@ -229,9 +229,19 @@ def cast_pointer_to_tuple(obj, typen, len):
 
 def test_read_write_config(C):
     C.NK_set_debug(True)
+
+    # let's set sample config with pin protection and disabled capslock
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(True, False, True, True, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    config_raw_data = C.NK_read_config()
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+    config = cast_pointer_to_tuple(config_raw_data, 'uint8_t', 5)
+    assert config == (True, False, True, True, False)
+
+    # restore defaults and check
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(True, True, True, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     config_raw_data = C.NK_read_config()
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     config = cast_pointer_to_tuple(config_raw_data, 'uint8_t', 5)
     assert config == (True, True, True, False, True)
-

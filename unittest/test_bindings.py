@@ -37,10 +37,11 @@ def C(request):
             ffi.cdef(declaration)
 
     C = ffi.dlopen("../build/libnitrokey.so")
+    C.NK_set_debug(False)
     C.NK_login(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP)
     assert C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP) == DeviceErrorCode.STATUS_OK
 
-    # C.NK_set_debug(True)
+    # C.NK_status()
 
     def fin():
         print ('\nFinishing connection to device')
@@ -164,10 +165,11 @@ def test_TOTP_RFC(C):
 
 def test_get_slot_names(C):
     C.NK_set_debug(True)
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_erase_totp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # erasing slot invalidates temporary password, so requesting authentication
-    # assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    # assert C.NK_erase_hotp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_erase_hotp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
 
     for i in range(16):
         name = ffi.string(C.NK_get_totp_slot_name(i))

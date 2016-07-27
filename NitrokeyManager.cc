@@ -60,6 +60,7 @@ namespace nitrokey{
         auto gh = get_payload<GetHOTP>();
         gh.slot_number = get_internal_slot_number_for_hotp(slot_number);
         auto resp = GetHOTP::CommandTransaction::run(*device, gh);
+        //TODO handle user authorization requests (taken from config)
         return resp.code;
     }
 
@@ -79,6 +80,7 @@ namespace nitrokey{
         gt.last_interval = last_interval;
         gt.last_totp_time = last_totp_time;
         auto resp = GetTOTP::CommandTransaction::run(*device, gt);
+        //TODO handle user authorization requests (taken from config)
         return resp.code;
     }
 
@@ -317,6 +319,22 @@ namespace nitrokey{
         auto p = get_payload<UnlockUserPassword>();
         strcpyT(p.admin_password, admin_password);
         UnlockUserPassword::CommandTransaction::run(*device, p);
+    }
+
+    void NitrokeyManager::write_config(bool numlock, bool capslock, bool scrolllock, bool enable_user_password, bool delete_user_password, const char *admin_temporary_password) {
+        auto p = get_payload<WriteGeneralConfig>();
+        p.numlock = (uint8_t) numlock;
+        p.capslock = (uint8_t) capslock;
+        p.scrolllock = (uint8_t) scrolllock;
+        p.enable_user_password = (uint8_t) enable_user_password;
+        p.delete_user_password = (uint8_t) delete_user_password;
+
+        auto auth = get_payload<Authorize>();
+        strcpyT(auth.temporary_password, admin_temporary_password);
+        auth.crc_to_authorize = WriteGeneralConfig::CommandTransaction::getCRC(p);
+        Authorize::CommandTransaction::run(*device, auth);
+
+        WriteGeneralConfig::CommandTransaction::run(*device, p);
     }
 
 }

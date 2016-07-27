@@ -106,6 +106,13 @@ extern int NK_unlock_user_password(const char* admin_password){
     });
 }
 
+extern int NK_write_config(bool numlock, bool capslock, bool scrolllock, bool enable_user_password, bool delete_user_password,
+                           const char *admin_temporary_password) {
+    auto m = NitrokeyManager::instance();
+    return get_without_result( [&](){
+        return m->write_config(numlock, capslock, scrolllock, enable_user_password, delete_user_password, admin_temporary_password);
+    });
+}
 
 extern const char * NK_status() {
     auto m = NitrokeyManager::instance();

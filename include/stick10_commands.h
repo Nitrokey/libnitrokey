@@ -280,9 +280,16 @@ class GetStatus : Command<CommandID::GET_STATUS> {
   struct ResponsePayload {
     uint16_t firmware_version;
     uint8_t card_serial[4];
-    uint8_t general_config[3];
-    uint8_t otp_password_config[2];
-
+      union {
+          uint8_t general_config[5];
+          struct{
+              uint8_t numlock;
+              uint8_t capslock;
+              uint8_t scrolllock;
+              uint8_t enable_user_password;
+              uint8_t delete_user_password;
+          };
+      };
     bool isValid() const { return true; }
 
     std::string dissect() const {
@@ -294,10 +301,13 @@ class GetStatus : Command<CommandID::GET_STATUS> {
       ss << "general_config:\t"
          << ::nitrokey::misc::hexdump((const char *)(general_config),
                                       sizeof general_config);
-      ss << "otp_password_config:\t"
-         << ::nitrokey::misc::hexdump((const char *)(otp_password_config),
-                                      sizeof otp_password_config);
-      return ss.str();
+        ss << "numlock:\t" << (bool)numlock << std::endl;
+        ss << "capslock:\t" << (bool)capslock << std::endl;
+        ss << "scrolllock:\t" << (bool)scrolllock << std::endl;
+        ss << "enable_user_password:\t" << (bool) enable_user_password << std::endl;
+        ss << "delete_user_password:\t" << (bool) delete_user_password << std::endl;
+
+        return ss.str();
     }
   } __packed;
 
@@ -553,7 +563,25 @@ class PasswordSafeSendSlotViaHID : Command<CommandID::PW_SAFE_SEND_DATA> {
 class WriteGeneralConfig : Command<CommandID::WRITE_CONFIG> {
  public:
   struct CommandPayload {
-    uint8_t config[5];
+    union{
+        uint8_t config[5];
+        struct{
+            uint8_t numlock;
+            uint8_t capslock;
+            uint8_t scrolllock;
+            uint8_t enable_user_password;
+            uint8_t delete_user_password;
+        };
+    };
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << "numlock:\t" << (bool)numlock << std::endl;
+          ss << "capslock:\t" << (bool)capslock << std::endl;
+          ss << "scrolllock:\t" << (bool)scrolllock << std::endl;
+          ss << "enable_user_password:\t" << (bool) enable_user_password << std::endl;
+          ss << "delete_user_password:\t" << (bool) delete_user_password << std::endl;
+          return ss.str();
+      }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>

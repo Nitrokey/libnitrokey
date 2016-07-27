@@ -67,6 +67,9 @@ namespace nitrokey {
 
         void unlock_user_password(const char *admin_password);
 
+        void write_config(bool numlock, bool capslock, bool scrolllock, bool enable_user_password,
+                          bool delete_user_password, const char *admin_temporary_password);
+
     private:
         NitrokeyManager();
         ~NitrokeyManager();

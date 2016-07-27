@@ -14,6 +14,7 @@ class DefaultPasswords(Enum):
     ADMIN_TEMP = '123123123'
     USER_TEMP = '234234234'
 
+
 class DeviceErrorCode(Enum):
     STATUS_OK = 0
     NOT_PROGRAMMED = 3
@@ -47,6 +48,7 @@ def C(request):
         print ('\nFinishing connection to device')
         C.NK_logout()
         print ('Finished')
+
     request.addfinalizer(fin)
 
     return C
@@ -100,7 +102,8 @@ def test_password_safe_slot_status(C):
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     is_slot_programmed = list(ffi.cast("uint8_t [16]", safe_slot_status)[0:16])
     print ((is_slot_programmed, len(is_slot_programmed)))
-    assert is_slot_programmed[0] == 0  # FIXME not programmed, assuming erased in preceeding test, add writing and erasing
+    assert is_slot_programmed[
+               0] == 0  # FIXME not programmed, assuming erased in preceeding test, add writing and erasing
     assert is_slot_programmed[1] == 1  # FIXME assuming slot 1 is programmed, not writing there in this tests, same as ^
     C.NK_set_debug(False)
 
@@ -196,3 +199,23 @@ def test_get_OTP_codes(C):
         code = C.NK_get_hotp_code(i)
         if code == 0:
             assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
+
+
+def test_get_code_user_authorize(C):
+    C.NK_set_debug(True)
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_totp_slot(0, 'python_otp_auth', RFC_SECRET, 30, True,
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    # enable PIN protection of OTP codes with write_config
+    # TODO create convinience function on C API side to enable/disable OTP USER_PIN protection
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(True, True, True, True, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    code = C.NK_get_totp_code(0, 0, 0, 0)
+    assert code == 0
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_NOT_AUTHORIZED
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    # disable PIN protection with write_config
+    assert C.NK_write_config(True, True, True, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    code = C.NK_get_totp_code(0, 0, 0, 0)
+    assert code != 0
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK

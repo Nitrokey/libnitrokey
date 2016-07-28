@@ -199,9 +199,10 @@ class Transaction : semantics::non_constructible {
       status = dev.recv(&resp);
 
       dev.set_last_command_status(resp.last_command_status); // FIXME should be handled on device.recv
-      if (resp.device_status == 0) break;
-      Log::instance()("Device status is not ready (CRC error?) retrying..",
-                      Loglevel::DEBUG);  // FIXME translate device_status to log
+
+      if (resp.device_status == 0 && resp.last_command_crc == outp.crc) break;
+      Log::instance()("Device is not ready or received packet's last CRC is not equal to sent CRC packet, retrying...",
+                      Loglevel::DEBUG);
       Log::instance()("Invalid incoming HID packet:", Loglevel::DEBUG_L2);
       Log::instance()((std::string)(resp), Loglevel::DEBUG_L2);
       std::this_thread::sleep_for(dev.get_retry_timeout());

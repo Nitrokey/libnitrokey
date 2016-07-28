@@ -91,4 +91,5 @@ Stick10::Stick10() {
 Stick20::Stick20() {
   m_vid = 0x20a0;
   m_pid = 0x4109;
+  m_retry_timeout = std::chrono::milliseconds(500);
 }

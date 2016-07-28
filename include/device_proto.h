@@ -165,6 +165,7 @@ class Transaction : semantics::non_constructible {
                               const command_payload &payload) {
     using namespace ::nitrokey::device;
     using namespace ::nitrokey::log;
+      using namespace std::chrono_literals;
 
     Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
@@ -190,7 +191,9 @@ class Transaction : semantics::non_constructible {
           std::string("Device error while sending command ") +
           std::to_string((int)(status)));
 
-    // FIXME make checks done in device:recv here
+      std::this_thread::sleep_for(1000ms);
+
+      // FIXME make checks done in device:recv here
     int retry = dev.get_retry_count();
     while (retry-- > 0) {
       status = dev.recv(&resp);

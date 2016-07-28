@@ -15,6 +15,7 @@ template <typename T>
 uint8_t * get_with_array_result(T func){
     try {
         return func();
+        NK_last_command_status = 0;
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
@@ -26,6 +27,7 @@ template <typename T>
 const char* get_with_string_result(T func){
     try {
         return func();
+        NK_last_command_status = 0;
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
@@ -37,6 +39,7 @@ template <typename T>
 auto get_with_result(T func){
     try {
         return func();
+        NK_last_command_status = 0;
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
@@ -48,6 +51,7 @@ template <typename T>
 uint8_t get_without_result(T func){
     try {
         func();
+        NK_last_command_status = 0;
         return 0;
     }
     catch (CommandFailedException & commandFailedException){
@@ -69,6 +73,7 @@ extern int NK_login(const char *admin_pin, const char *temporary_password) {
     try {
         m->connect();
         m->first_authenticate(admin_pin, temporary_password);
+        NK_last_command_status = 0;
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;

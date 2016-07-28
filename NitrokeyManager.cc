@@ -36,8 +36,17 @@ namespace nitrokey{
     }
     NitrokeyManager::~NitrokeyManager() {delete _instance; delete device;}
 
-    bool NitrokeyManager::connect() {
-        device = new Stick10();
+    bool NitrokeyManager::connect(const char *device_model) {
+        switch (device_model[0]){
+            case 'P':
+                device = new Stick10();
+                break;
+            case 'S':
+                device = new Stick20();
+                break;
+            default:
+                throw std::runtime_error("Unknown model");
+        }
         return device->connect();
     }
 

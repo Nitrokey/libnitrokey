@@ -30,7 +30,7 @@ namespace nitrokey {
         bool get_time();
         bool erase_totp_slot(uint8_t slot_number, const char *temporary_password);
         bool erase_hotp_slot(uint8_t slot_number, const char *temporary_password);
-        bool connect();
+        bool connect(const char *device_model);
         bool disconnect();
         void set_debug(bool state);
         string get_status();

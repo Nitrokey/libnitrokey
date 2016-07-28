@@ -39,7 +39,7 @@ def C(request):
 
     C = ffi.dlopen("../build/libnitrokey.so")
     C.NK_set_debug(False)
-    C.NK_login(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP)
+    C.NK_login(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP, 'P')
     assert C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP) == DeviceErrorCode.STATUS_OK
 
     # C.NK_status()

@@ -31,13 +31,13 @@ class Device {
   /*
    *	Sends packet of HID_REPORT_SIZE.
    */
-  virtual CommError send(const void *packet);
+  virtual int send(const void *packet);
 
   /*
    *	Gets packet of HID_REPORT_SIZE.
    *	Can sleep. See below.
    */
-  virtual CommError recv(void *packet);
+  virtual int recv(void *packet);
 
   int get_retry_count() const { return m_retry_count; };
   std::chrono::milliseconds get_retry_timeout() const { return m_retry_timeout; };

@@ -34,17 +34,17 @@ bool Device::connect() {
   return mp_devhandle != NULL;
 }
 
-CommError Device::send(const void *packet) {
+int Device::send(const void *packet) {
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
   if (mp_devhandle == NULL)
     throw std::runtime_error("Attempted HID send on an invalid descriptor.");
 
-  return (CommError)(hid_send_feature_report(
+  return (hid_send_feature_report(
       mp_devhandle, (const unsigned char *)(packet), HID_REPORT_SIZE));
 }
 
-CommError Device::recv(void *packet) {
+int Device::recv(void *packet) {
   // FIXME change CommError return value to int (return value of
   // hid_get_feature_report)
   int status;
@@ -80,7 +80,7 @@ CommError Device::recv(void *packet) {
     std::this_thread::sleep_for(m_retry_timeout);
   }
 
-  return (CommError)status;
+  return status;
 }
 
 Stick10::Stick10() {

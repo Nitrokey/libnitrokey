@@ -168,7 +168,7 @@ class Transaction : semantics::non_constructible {
 
     Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
-    CommError status;
+    int status;
     OutgoingPacket outp;
     ResponsePacket resp;
 
@@ -185,7 +185,7 @@ class Transaction : semantics::non_constructible {
     if (!outp.isValid()) throw std::runtime_error("Invalid outgoing packet");
 
     status = dev.send(&outp);
-    if ((int)(status) < 0 && status != CommError::ERR_NO_ERROR)
+    if (status <= 0)
       throw std::runtime_error(
           std::string("Device error while sending command ") +
           std::to_string((int)(status)));
@@ -204,10 +204,10 @@ class Transaction : semantics::non_constructible {
       std::this_thread::sleep_for(dev.get_retry_timeout());
       continue;
     }
-    if ((int)(status) < 0 && status != CommError::ERR_NO_ERROR)
+    if (status <= 0)
       throw std::runtime_error(
           std::string("Device error while executing command ") +
-          std::to_string((int)(status)));
+          std::to_string(status));
 
     Log::instance()("Incoming HID packet:", Loglevel::DEBUG);
     Log::instance()((std::string)(resp), Loglevel::DEBUG);

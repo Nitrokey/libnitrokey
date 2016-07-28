@@ -68,11 +68,10 @@ extern uint8_t NK_get_last_command_status(){
     return _copy;
 }
 
-extern int NK_login(const char *admin_pin, const char *temporary_password, const char *device_model) {
+extern int NK_login(const char *device_model) {
     auto m = NitrokeyManager::instance();
     try {
         m->connect(device_model);
-        m->first_authenticate(admin_pin, temporary_password);
         NK_last_command_status = 0;
     }
     catch (CommandFailedException & commandFailedException){

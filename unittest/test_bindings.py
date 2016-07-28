@@ -103,14 +103,13 @@ def test_password_safe_slot_status(C):
     C.NK_set_debug(True)
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert C.NK_erase_password_safe_slot(0) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_password_safe_slot(1, 'slotname2', 'login2', 'pass2') == DeviceErrorCode.STATUS_OK
     safe_slot_status = C.NK_get_password_safe_slot_status()
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     is_slot_programmed = list(ffi.cast("uint8_t [16]", safe_slot_status)[0:16])
     print ((is_slot_programmed, len(is_slot_programmed)))
-    assert is_slot_programmed[
-               0] == 0  # FIXME not programmed, assuming erased in preceeding test, add writing and erasing
-    assert is_slot_programmed[1] == 1  # FIXME assuming slot 1 is programmed, not writing there in this tests, same as ^
-    # C.NK_set_debug(False)
+    assert is_slot_programmed[0] == 0
+    assert is_slot_programmed[1] == 1
 
 
 def test_admin_PIN_change(C):

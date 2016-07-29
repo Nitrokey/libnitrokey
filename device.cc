@@ -85,6 +85,7 @@ Stick10::Stick10() {
   m_vid = 0x20a0;
   m_pid = 0x4108;
   m_model = DeviceModel::PRO;
+    m_send_receive_delay = 10ms;
 }
 
 Stick20::Stick20() {
@@ -92,5 +93,5 @@ Stick20::Stick20() {
   m_pid = 0x4109;
   m_retry_timeout = std::chrono::milliseconds(500);
   m_model = DeviceModel::STORAGE;
-
+    m_send_receive_delay = 1000ms;
 }

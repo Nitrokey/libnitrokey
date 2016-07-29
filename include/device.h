@@ -10,6 +10,7 @@
 
 namespace nitrokey {
 namespace device {
+    using namespace std::chrono_literals;
 
 enum class CommError {
   ERR_NO_ERROR = 0,
@@ -25,7 +26,8 @@ enum class DeviceModel{
 };
 
 class Device {
- public:
+
+public:
   Device();
 
   // lack of device is not actually an error,
@@ -46,6 +48,7 @@ class Device {
 
   int get_retry_count() const { return m_retry_count; };
   std::chrono::milliseconds get_retry_timeout() const { return m_retry_timeout; };
+    std::chrono::milliseconds get_send_receive_delay() const {return m_send_receive_delay;}
 
     int get_last_command_status() const;
     void set_last_command_status(uint8_t _err) { last_command_status = _err;} ;
@@ -66,6 +69,7 @@ private:
    */
   int m_retry_count;
   std::chrono::milliseconds m_retry_timeout;
+  std::chrono::milliseconds m_send_receive_delay;
 
   hid_device *mp_devhandle;
 };

@@ -191,7 +191,7 @@ class Transaction : semantics::non_constructible {
           std::string("Device error while sending command ") +
           std::to_string((int)(status)));
 
-      std::this_thread::sleep_for(1000ms);
+      std::this_thread::sleep_for(dev.get_send_receive_delay());
 
       // FIXME make checks done in device:recv here
     int retry = dev.get_retry_count();

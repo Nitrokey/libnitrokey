@@ -5,12 +5,14 @@
 #include "log.h"
 #include "device_proto.h"
 #include "stick10_commands.h"
+#include "stick20_commands.h"
 #include <vector>
 
 namespace nitrokey {
     using namespace nitrokey::device;
     using namespace std;
     using namespace nitrokey::proto::stick10;
+    using namespace nitrokey::proto::stick20;
     using namespace nitrokey::proto;
     using namespace nitrokey::log;
 

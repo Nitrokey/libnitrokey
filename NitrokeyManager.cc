@@ -239,10 +239,33 @@ namespace nitrokey{
         ChangeUserPin::CommandTransaction::run(*device, p);
     }
     void NitrokeyManager::change_admin_PIN(char *current_PIN, char *new_PIN) {
-        auto p = get_payload<ChangeAdminPin>();
-        strcpyT(p.old_pin, current_PIN);
-        strcpyT(p.new_pin, new_PIN);
-        ChangeAdminPin::CommandTransaction::run(*device, p);
+        switch (device->get_device_model()){
+            case DeviceModel::PRO:
+            {
+                auto p = get_payload<ChangeAdminPin>();
+                strcpyT(p.old_pin, current_PIN);
+                strcpyT(p.new_pin, new_PIN);
+                ChangeAdminPin::CommandTransaction::run(*device, p);
+            }
+                break;
+            //in Storage change admin pin is divided to two commands with 20 chars field len
+            case DeviceModel::STORAGE:
+            {
+                auto p = get_payload<ChangeAdminPin20Current>();
+                strcpyT(p.old_pin, current_PIN);
+                p.kind = 'A';
+                p.set_kind(PasswordKind::Admin);
+                ChangeAdminPin20Current::CommandTransaction::run(*device, p);
+
+                auto p2 = get_payload<ChangeAdminPin20New>();
+                strcpyT(p2.new_pin, new_PIN);
+                p2.kind = 'A';
+                p2.set_kind(PasswordKind::Admin);
+                ChangeAdminPin20New::CommandTransaction::run(*device, p2);
+            }
+                break;
+        }
+
     }
 
     void NitrokeyManager::enable_password_safe(const char *user_pin) {

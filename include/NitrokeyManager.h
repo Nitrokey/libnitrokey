@@ -91,6 +91,8 @@ namespace nitrokey {
         bool erase_slot(uint8_t slot_number, const char *temporary_password);
         uint8_t *get_slot_name(uint8_t slot_number) const;
 
+        template <typename ProCommand, PasswordKind StoKind>
+        void change_PIN_general(char *current_PIN, char *new_PIN);
     };
 }
 

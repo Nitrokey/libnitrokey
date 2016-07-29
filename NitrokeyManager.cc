@@ -233,35 +233,36 @@ namespace nitrokey{
     }
 
     void NitrokeyManager::change_user_PIN(char *current_PIN, char *new_PIN) {
-        auto p = get_payload<ChangeUserPin>();
-        strcpyT(p.old_pin, current_PIN);
-        strcpyT(p.new_pin, new_PIN);
-        ChangeUserPin::CommandTransaction::run(*device, p);
+        change_PIN_general<ChangeUserPin, PasswordKind::User>(current_PIN, new_PIN);
     }
+
     void NitrokeyManager::change_admin_PIN(char *current_PIN, char *new_PIN) {
+        change_PIN_general<ChangeAdminPin, PasswordKind::Admin>(current_PIN, new_PIN);
+    }
+
+    template <typename ProCommand, PasswordKind StoKind>
+    void NitrokeyManager::change_PIN_general(char *current_PIN, char *new_PIN) {
         switch (device->get_device_model()){
             case DeviceModel::PRO:
             {
-                auto p = get_payload<ChangeAdminPin>();
+                auto p = get_payload<ProCommand>();
                 strcpyT(p.old_pin, current_PIN);
                 strcpyT(p.new_pin, new_PIN);
-                ChangeAdminPin::CommandTransaction::run(*device, p);
+                ProCommand::CommandTransaction::run(*device, p);
             }
                 break;
-            //in Storage change admin pin is divided to two commands with 20 chars field len
+            //in Storage change admin/user pin is divided to two commands with 20 chars field len
             case DeviceModel::STORAGE:
             {
-                auto p = get_payload<ChangeAdminPin20Current>();
+                auto p = get_payload<ChangeAdminUserPin20Current>();
                 strcpyT(p.old_pin, current_PIN);
-                p.kind = 'A';
-                p.set_kind(PasswordKind::Admin);
-                ChangeAdminPin20Current::CommandTransaction::run(*device, p);
+                p.set_kind(StoKind);
+                ChangeAdminUserPin20Current::CommandTransaction::run(*device, p);
 
-                auto p2 = get_payload<ChangeAdminPin20New>();
+                auto p2 = get_payload<ChangeAdminUserPin20New>();
                 strcpyT(p2.new_pin, new_PIN);
-                p2.kind = 'A';
-                p2.set_kind(PasswordKind::Admin);
-                ChangeAdminPin20New::CommandTransaction::run(*device, p2);
+                p2.set_kind(StoKind);
+                ChangeAdminUserPin20New::CommandTransaction::run(*device, p2);
             }
                 break;
         }

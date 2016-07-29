@@ -7,7 +7,7 @@ INCLUDE = -Iinclude/
 LIB = -lhidapi-libusb
 BUILD = build
 
-CXXFLAGS = -std=c++14 -fPIC 
+CXXFLAGS = -std=c++14 -fPIC -Wno-gnu-variable-sized-type-not-at-end
 SOFLAGS = -shared
 
 CXXSOURCES = $(wildcard *.cc)

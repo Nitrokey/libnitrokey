@@ -5,6 +5,9 @@
 namespace nitrokey {
 namespace proto {
 
+#define STICK20_CMD_START_VALUE 0x20
+
+
 enum class CommandID : uint8_t {
   GET_STATUS = 0x00,
   WRITE_TO_SLOT = 0x01,
@@ -28,6 +31,9 @@ enum class CommandID : uint8_t {
   FACTORY_RESET = 0x13,
   CHANGE_USER_PIN = 0x14,
   CHANGE_ADMIN_PIN = 0x15,
+
+  STICK20_CMD_SEND_PASSWORD = STICK20_CMD_START_VALUE + 18,
+  STICK20_CMD_SEND_NEW_PASSWORD = STICK20_CMD_START_VALUE + 19,
 
   ENABLE_CRYPTED_PARI = 0x20,
   DISABLE_CRYPTED_PARI,

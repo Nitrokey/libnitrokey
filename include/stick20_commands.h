@@ -1,15 +1,67 @@
 #ifndef STICK20_COMMANDS_H
 #define STICK20_COMMANDS_H
 #include "inttypes.h"
+#include "command.h"
+//#include <string>
+//#include <sstream>
+#include "device_proto.h"
+
 
 namespace nitrokey {
 namespace proto {
 
 /*
 *	STICK20 protocol command ids
-*	a superset of STICK10
+*	a superset (almost) of STICK10
 */
 namespace stick20 {
+
+    enum class PasswordKind : uint8_t {
+        User = 'P',
+        Admin = 'A'
+    };
+
+    class ChangeAdminPin20Current : Command<CommandID::STICK20_CMD_SEND_PASSWORD> {
+  public:
+      struct CommandPayload {
+          uint8_t kind;
+          uint8_t old_pin[20];
+          std::string dissect() const {
+            std::stringstream ss;
+            ss << " old_pin:\t" <<  old_pin<< std::endl;
+            return ss.str();
+          }
+          void set_kind(PasswordKind k){
+            kind = (uint8_t)k;
+          }
+      } __packed;
+
+      typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+              CommandTransaction;
+  };
+
+
+    class ChangeAdminPin20New : Command<CommandID::STICK20_CMD_SEND_NEW_PASSWORD> {
+    public:
+
+        struct CommandPayload {
+            uint8_t kind;
+            uint8_t new_pin[20];
+            std::string dissect() const {
+              std::stringstream ss;
+              ss << " new_pin:\t" << new_pin<< std::endl;
+              return ss.str();
+            }
+            void set_kind(PasswordKind k){
+              kind = (uint8_t)k;
+            }
+
+        } __packed;
+
+        typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+                CommandTransaction;
+    };
+
 class EnableEncryptedPartition : semantics::non_constructible {
  public:
   struct CommandPayload {

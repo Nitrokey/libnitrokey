@@ -15,8 +15,8 @@ cd libnitrokey
 git submodule update --init --recursive
 ```
 ## Documentation
-There is no documentation yet, but it is meant to be included in the sources (and generated with doxygen like application if requested).
-Please check NK_C_API.h for high level commands and include/NitrokeyManager.h for lower level. All devices' commands are listed along with packet format in include/stick10_commands.h and include/stick20_commands.h respectively for Nitrokey Pro and Nitrokey Storage products.
+The documentation of C API is included in the sources (could be  generated with doxygen if requested).
+Please check NK_C_API.h (C API) for high level commands and include/NitrokeyManager.h (C++ API). All devices' commands are listed along with packet format in include/stick10_commands.h and include/stick20_commands.h respectively for Nitrokey Pro and Nitrokey Storage products.
 
 #Tests
 Warning! Before you run unittests please either change both your Admin and User PINs on your Nitrostick to defaults (12345678 and 123456 respectively) or change the values in tests source code. If you do not change them the tests might lock your device. If its too late, you can always reset your Nitrokey using instructions from [homepage](https://www.nitrokey.com/de/documentation/how-reset-nitrokey).
@@ -48,3 +48,11 @@ To peek/debug communication with device running nitrokey-app in debug mode [-d s
 firmware code should show how things works:
 [report_protocol.c](https://github.com/Nitrokey/nitrokey-pro-firmware/blob/master/src/keyboard/report_protocol.c)
 [for Nitrokey Pro, for Storage similarly].
+
+# Known issues / tasks
+* C++ API needs some reorganization to C++ objects (instead of pointers to arrays). This will be also preparing for integration with Pybind11,
+* PIN protected OTP is currently not working,
+* Factory reset and generating AES key commands are not yet tested neither covered in unittest,
+* The library is not supporting Nitrokey Storage stick but it should be done in nearest future. The only working function for now (looking by Python unit tests) is getting HOTP code.
+
+Other tasks might be listed either in `TODO` file or on project's issues page.

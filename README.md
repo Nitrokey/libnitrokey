@@ -50,6 +50,9 @@ def get_hotp_code(lib, i):
     lib.NK_get_hotp_code(i)
 
 libnitrokey = get_library()
+libnitrokey.NK_set_debug(False) # do not show debug messages
+libnitrokey.NK_login('P') # connect to Nitrokey Pro device
+
 hotp_slot_1_code = get_hotp_code(libnitrokey, 1)
 print (hotp_slot_1_code)
 

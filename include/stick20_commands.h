@@ -2,8 +2,8 @@
 #define STICK20_COMMANDS_H
 #include "inttypes.h"
 #include "command.h"
-//#include <string>
-//#include <sstream>
+#include <string>
+#include <sstream>
 #include "device_proto.h"
 
 
@@ -182,11 +182,39 @@ class SendPasswordMatrixSetup : semantics::non_constructible {
                       struct EmptyPayload> CommandTransaction;
 };
 
-class GetDeviceStatus : semantics::non_constructible {
- public:
-  typedef Transaction<CommandID::GET_DEVICE_STATUS, struct EmptyPayload,
-                      struct EmptyPayload> CommandTransaction;
-};
+#define d(x) ss << #x":\t" << x << std::endl;
+
+    class GetDeviceStatus : Command<CommandID::GET_DEVICE_STATUS> {
+    public:
+        static const int OUTPUT_CMD_RESULT_STICK20_STATUS_START = 20 +1;
+        static const int payload_absolute_begin = 8;
+        static const int padding_size = OUTPUT_CMD_RESULT_STICK20_STATUS_START - payload_absolute_begin;
+        struct ResponsePayload {
+            uint8_t _padding[padding_size];
+            //data starts from 21st byte of packet -> 13th byte of payload
+            uint8_t command_counter;
+            uint8_t last_command;
+            uint8_t status;
+            uint8_t progress_bar_value;
+            bool isValid() const { return true; }
+
+            std::string dissect() const {
+              std::stringstream ss;
+                d(command_counter);
+                d(last_command);
+                d(status);
+                d(progress_bar_value);
+              ss << "_padding:\t"
+                 << ::nitrokey::misc::hexdump((const char *)(_padding),
+                                              sizeof _padding);
+              return ss.str();
+            }
+        } __packed;
+
+        typedef Transaction<command_id(), struct EmptyPayload, struct ResponsePayload>
+                CommandTransaction;
+    };
+
 
 class SendPassword : semantics::non_constructible {
  public:

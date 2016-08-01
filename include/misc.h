@@ -6,7 +6,16 @@
 namespace nitrokey {
 namespace misc {
 
-std::string hexdump(const char *p, size_t size);
+template <typename T>
+typename T::CommandPayload get_payload(){
+    //Create, initialize and return by value command payload
+    typename T::CommandPayload st;
+    bzero(&st, sizeof(st));
+    return st;
+}
+
+
+    std::string hexdump(const char *p, size_t size);
 uint32_t stm_crc32(const uint8_t *data, size_t size);
 }
 }

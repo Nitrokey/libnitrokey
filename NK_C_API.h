@@ -18,7 +18,7 @@ extern void NK_set_debug(bool state);
 
 /**
  * Connect to device of given model. Currently library can be connected only to one device at once.
- * @param device_model 'S': Nitrokey Storage, 'P': Nitrokey Pro
+ * @param device_model char 'S': Nitrokey Storage, 'P': Nitrokey Pro
  * @return command processing error code
  */
 extern int NK_login(const char *device_model);
@@ -50,37 +50,37 @@ extern int NK_lock_device();
 
 /**
  * Authenticates the user on USER privilages with user_password and sets user's temporary password on device to user_temporary_password.
- * @param user_password current user password
- * @param user_temporary_password user temporary password to be set on device for further communication (authentication command)
+ * @param user_password char[25](Pro) current user password
+ * @param user_temporary_password char[25](Pro) user temporary password to be set on device for further communication (authentication command)
  * @return command processing error code
  */
 extern int NK_user_authenticate(const char* user_password, const char* user_temporary_password);
 
 /**
  * Authenticates the user on ADMIN privilages with admin_password and sets user's temporary password on device to admin_temporary_password.
- * @param admin_password current administrator PIN
- * @param admin_temporary_password admin temporary password to be set on device for further communication (authentication command)
+ * @param admin_password char[25](Pro) current administrator PIN
+ * @param admin_temporary_password char[25](Pro) admin temporary password to be set on device for further communication (authentication command)
  * @return command processing error code
  */
 extern int NK_first_authenticate(const char* admin_password, const char* admin_temporary_password);
 
 /**
  * Execute a factory reset.
- * @param admin_password current administrator PIN
+ * @param admin_password char[20](Pro) current administrator PIN
  * @return command processing error code
  */
 extern int NK_factory_reset(const char* admin_password);
 
 /**
  * Generates AES key on the device
- * @param admin_password current administrator PIN
+ * @param admin_password char[20](Pro) current administrator PIN
  * @return command processing error code
  */
 extern int NK_build_aes_key(const char* admin_password);
 
 /**
  * Unlock user PIN locked after 3 incorrect codes tries.
- * @param admin_password current administrator PIN
+ * @param admin_password char[20](Pro) current administrator PIN
  * @return command processing error code
  */
 extern int NK_unlock_user_password(const char* admin_password);
@@ -93,7 +93,7 @@ extern int NK_unlock_user_password(const char* admin_password);
  * @param enable_user_password set True to enable OTP PIN protection (request PIN each OTP code request)
  * @param delete_user_password set True to disable OTP PIN protection (request PIN each OTP code request)
  * @param admin_temporary_password current admin temporary password
- * @return
+ * @return command processing error code
  */
 extern int NK_write_config(bool numlock, bool capslock, bool scrolllock, bool enable_user_password, bool delete_user_password, const char *admin_temporary_password);
 
@@ -114,14 +114,14 @@ extern uint8_t* NK_read_config();
 /**
  * Get name of given TOTP slot
  * @param slot_number TOTP slot number, slot_number<15
- * @return the name of the slot
+ * @return char[20](Pro) the name of the slot
  */
 extern const char * NK_get_totp_slot_name(uint8_t slot_number);
 
 /**
  *
  * @param slot_number HOTP slot number, slot_number<3
- * @return the name of the slot
+ * @return char[20](Pro) the name of the slot
  */
 extern const char * NK_get_hotp_slot_name(uint8_t slot_number);
 
@@ -144,11 +144,11 @@ extern int NK_erase_totp_slot(uint8_t slot_number, const char *temporary_passwor
 /**
  * Write HOTP slot data to the device
  * @param slot_number HOTP slot number, slot_number<3
- * @param slot_name desired slot name
- * @param secret 160-bit (20 characters) secret
- * @param hotp_counter starting value of HOTP counter
+ * @param slot_name char[15](Pro) desired slot name
+ * @param secret char[20](Pro) 160-bit secret
+ * @param hotp_counter uint32_t starting value of HOTP counter
  * @param use_8_digits should returned codes be 6 (false) or 8 digits (true)
- * @param temporary_password admin temporary password
+ * @param temporary_password char[25](Pro) admin temporary password
  * @return command processing error code
  */
 extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter, bool use_8_digits, const char *temporary_password);
@@ -156,11 +156,11 @@ extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const 
 /**
  * Write TOTP slot data to the device
  * @param slot_number TOTP slot number, slot_number<15
- * @param slot_name desired slot name
- * @param secret 160-bit (20 characters) secret
- * @param time_window time window for this TOTP
+ * @param slot_name char[15](Pro) desired slot name
+ * @param secret char[20](Pro) 160-bit secret
+ * @param time_window uint16_t time window for this TOTP
  * @param use_8_digits should returned codes be 6 (false) or 8 digits (true)
- * @param temporary_password admin temporary password
+ * @param temporary_password char[20](Pro) admin temporary password
  * @return command processing error code
  */
 extern int NK_write_totp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint16_t time_window, bool use_8_digits, const char *temporary_password);
@@ -175,7 +175,7 @@ extern uint32_t NK_get_hotp_code(uint8_t slot_number);
 /**
  * Get HOTP code from the device (PIN protected)
  * @param slot_number HOTP slot number, slot_number<3
- * @param user_temporary_password user temporary password if PIN protected OTP codes are enabled,
+ * @param user_temporary_password char[25](Pro) user temporary password if PIN protected OTP codes are enabled,
  * otherwise should be set to empty string - ''
  * @return HOTP code
  */
@@ -197,7 +197,8 @@ extern uint32_t NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64
  * @param challenge TOTP challenge
  * @param last_totp_time last time
  * @param last_interval last interval
- * @param user_temporary_password
+ * @param user_temporary_password char[25](Pro) user temporary password if PIN protected OTP codes are enabled,
+ * otherwise should be set to empty string - ''
  * @return TOTP code
  */
 extern uint32_t NK_get_totp_code_PIN(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time, uint8_t last_interval, const char* user_temporary_password);
@@ -213,16 +214,16 @@ extern int NK_totp_get_time();
 //passwords
 /**
  * Change administrator PIN
- * @param current_PIN current PIN
- * @param new_PIN new PIN
+ * @param current_PIN char[25](Pro) current PIN
+ * @param new_PIN char[25](Pro) new PIN
  * @return command processing error code
  */
 extern int NK_change_admin_PIN(char *current_PIN, char *new_PIN);
 
 /**
  * Change user PIN
- * @param current_PIN current PIN
- * @param new_PIN new PIN
+ * @param current_PIN char[25](Pro) current PIN
+ * @param new_PIN char[25](Pro) new PIN
  * @return command processing error code
 */
 extern int NK_change_user_PIN(char *current_PIN, char *new_PIN);
@@ -243,7 +244,7 @@ extern uint8_t NK_get_admin_retry_count();
 
 /**
  * Enable password safe access
- * @param user_pin current user PIN
+ * @param user_pin char[30](Pro) current user PIN
  * @return command processing error code
  */
 extern int NK_enable_password_safe(const char *user_pin);
@@ -278,9 +279,9 @@ extern const char *NK_get_password_safe_slot_password(uint8_t slot_number);
 /**
  * Write password safe data to the slot
  * @param slot_number password safe slot number, slot_number<16
- * @param slot_name name of the slot
- * @param slot_login login string
- * @param slot_password password string
+ * @param slot_name char[11](Pro) name of the slot
+ * @param slot_login char[32](Pro) login string
+ * @param slot_password char[20](Pro) password string
  * @return command processing error code
  */
 extern int NK_write_password_safe_slot(uint8_t slot_number, const char *slot_name, const char *slot_login, const char *slot_password);

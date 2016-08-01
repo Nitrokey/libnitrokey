@@ -1,6 +1,7 @@
 # libnitrokey
 Libnitrokey is a project to communicate with Nitrokey stick devices in clean and easy manner. Written in C++14, testable with `Catch` framework, with C API, Python access (through CFFI and C API, in future with Pybind11).
 The development of this project is aimed to make it itself a living documentation of communication protocol between host and the Nitrokey stick device.
+A C++14 complying compiler is required.
 
 ## Getting sources
 This repository uses `git submodules`.
@@ -14,6 +15,47 @@ git clone https://github.com/Nitrokey/libnitrokey.git
 cd libnitrokey
 git submodule update --init --recursive
 ```
+
+## Compilation
+To compile library using clang please run `make`. If you have GCC and would like to use it instead you can run:
+```bash
+ make CXX=g++
+```
+This should create a library file under path build/libnitrokey.so and compile C++ tests in unittest/ directory.
+
+## Using with Python
+To use libnitrokey with Python a [CFFI](http://cffi.readthedocs.io/en/latest/using.html) library is required (either 2.7+ or 3.0+).
+Just import it and read the C API header and it is done! You have access to the library. Example code printing HOTP code:
+```python
+ffi = cffi.FFI()
+get_string = ffi.string
+
+def get_library():
+    fp = 'NK_C_API.h' # path to C API header
+
+    declarations = []
+    with open(fp, 'r') as f:
+        declarations = f.readlines()
+
+    for declaration in declarations:
+        if 'extern' in declaration and not '"C"' in declaration:
+            declaration = declaration.replace('extern', '').strip()
+            print(declaration)
+            ffi.cdef(declaration)
+
+    C = ffi.dlopen("build/libnitrokey.so") # path to built library
+    return C
+
+def get_hotp_code(lib, i):
+    lib.NK_get_hotp_code(i)
+
+libnitrokey = get_library()
+hotp_slot_1_code = get_hotp_code(libnitrokey, 1)
+print (hotp_slot_1_code)
+
+```
+All available functions for Python are listed in NK_C_API.h.
+
 ## Documentation
 The documentation of C API is included in the sources (could be  generated with doxygen if requested).
 Please check NK_C_API.h (C API) for high level commands and include/NitrokeyManager.h (C++ API). All devices' commands are listed along with packet format in include/stick10_commands.h and include/stick20_commands.h respectively for Nitrokey Pro and Nitrokey Storage products.
@@ -50,6 +92,7 @@ firmware code should show how things works:
 [for Nitrokey Pro, for Storage similarly].
 
 # Known issues / tasks
+* Currently only one device can be connected at a time
 * C++ API needs some reorganization to C++ objects (instead of pointers to arrays). This will be also preparing for integration with Pybind11,
 * PIN protected OTP is currently not working,
 * Factory reset and generating AES key commands are not yet tested neither covered in unittest,

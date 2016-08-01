@@ -9,44 +9,287 @@
 extern "C"
 {
 //Make sure each function's declaration is in one line (for automatic python declaration processing)
+
+/**
+ * Set debug level of messages written on stderr
+ * @param state state=True - all messages, state=False - only errors level
+ */
 extern void NK_set_debug(bool state);
+
+/**
+ * Connect to device of given model. Currently library can be connected only to one device at once.
+ * @param device_model 'S': Nitrokey Storage, 'P': Nitrokey Pro
+ * @return command processing error code
+ */
 extern int NK_login(const char *device_model);
+
+/**
+ * Disconnect from the device.
+ * @return command processing error code
+ */
 extern int NK_logout();
+
+/**
+ * Return the debug status string. Debug purposes.
+ * @return command processing error code
+ */
 extern const char * NK_status();
+
+/**
+ * Get last command processing status. Useful for commands which returns the results of their own and could not return
+ * an error code.
+ * @return previous command processing error code
+ */
 extern uint8_t NK_get_last_command_status();
+
+/**
+ * Lock device - cancel any user device unlocking.
+ * @return command processing error code
+ */
 extern int NK_lock_device();
+
+/**
+ * Authenticates the user on USER privilages with user_password and sets user's temporary password on device to user_temporary_password.
+ * @param user_password current user password
+ * @param user_temporary_password user temporary password to be set on device for further communication (authentication command)
+ * @return command processing error code
+ */
 extern int NK_user_authenticate(const char* user_password, const char* user_temporary_password);
+
+/**
+ * Authenticates the user on ADMIN privilages with admin_password and sets user's temporary password on device to admin_temporary_password.
+ * @param admin_password current administrator PIN
+ * @param admin_temporary_password admin temporary password to be set on device for further communication (authentication command)
+ * @return command processing error code
+ */
 extern int NK_first_authenticate(const char* admin_password, const char* admin_temporary_password);
+
+/**
+ * Execute a factory reset.
+ * @param admin_password current administrator PIN
+ * @return command processing error code
+ */
 extern int NK_factory_reset(const char* admin_password);
+
+/**
+ * Generates AES key on the device
+ * @param admin_password current administrator PIN
+ * @return command processing error code
+ */
 extern int NK_build_aes_key(const char* admin_password);
+
+/**
+ * Unlock user PIN locked after 3 incorrect codes tries.
+ * @param admin_password current administrator PIN
+ * @return command processing error code
+ */
 extern int NK_unlock_user_password(const char* admin_password);
+
+/**
+ * Write general config to the device
+ * @param numlock set True to send OTP code after double pressing numlock
+ * @param capslock set True to send OTP code after double pressing capslock
+ * @param scrolllock set True to send OTP code after double pressing scrolllock
+ * @param enable_user_password set True to enable OTP PIN protection (request PIN each OTP code request)
+ * @param delete_user_password set True to disable OTP PIN protection (request PIN each OTP code request)
+ * @param admin_temporary_password current admin temporary password
+ * @return
+ */
 extern int NK_write_config(bool numlock, bool capslock, bool scrolllock, bool enable_user_password, bool delete_user_password, const char *admin_temporary_password);
+
+/**
+ * Get currently set config - status of function Numlock/Capslock/Scrollock OTP sending and PIN protected OTP
+ * @return  uint8_t general_config[5]:
+ *            uint8_t numlock;
+              uint8_t capslock;
+              uint8_t scrolllock;
+              uint8_t enable_user_password;
+              uint8_t delete_user_password;
+
+ */
 extern uint8_t* NK_read_config();
-//otp
+
+//OTP
+
+/**
+ * Get name of given TOTP slot
+ * @param slot_number TOTP slot number, slot_number<15
+ * @return the name of the slot
+ */
 extern const char * NK_get_totp_slot_name(uint8_t slot_number);
+
+/**
+ *
+ * @param slot_number HOTP slot number, slot_number<3
+ * @return the name of the slot
+ */
 extern const char * NK_get_hotp_slot_name(uint8_t slot_number);
+
+/**
+ * Erase HOTP slot data from the device
+ * @param slot_number HOTP slot number, slot_number<3
+ * @param temporary_password admin temporary password
+ * @return command processing error code
+ */
 extern int NK_erase_hotp_slot(uint8_t slot_number, const char *temporary_password);
+
+/**
+ * Erase TOTP slot data from the device
+ * @param slot_number TOTP slot number, slot_number<15
+ * @param temporary_password admin temporary password
+ * @return command processing error code
+ */
 extern int NK_erase_totp_slot(uint8_t slot_number, const char *temporary_password);
+
+/**
+ * Write HOTP slot data to the device
+ * @param slot_number HOTP slot number, slot_number<3
+ * @param slot_name desired slot name
+ * @param secret 160-bit (20 characters) secret
+ * @param hotp_counter starting value of HOTP counter
+ * @param use_8_digits should returned codes be 6 (false) or 8 digits (true)
+ * @param temporary_password admin temporary password
+ * @return command processing error code
+ */
 extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter, bool use_8_digits, const char *temporary_password);
+
+/**
+ * Write TOTP slot data to the device
+ * @param slot_number TOTP slot number, slot_number<15
+ * @param slot_name desired slot name
+ * @param secret 160-bit (20 characters) secret
+ * @param time_window time window for this TOTP
+ * @param use_8_digits should returned codes be 6 (false) or 8 digits (true)
+ * @param temporary_password admin temporary password
+ * @return command processing error code
+ */
 extern int NK_write_totp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint16_t time_window, bool use_8_digits, const char *temporary_password);
+
+/**
+ * Get HOTP code from the device
+ * @param slot_number HOTP slot number, slot_number<3
+ * @return HOTP code
+ */
 extern uint32_t NK_get_hotp_code(uint8_t slot_number);
+
+/**
+ * Get HOTP code from the device (PIN protected)
+ * @param slot_number HOTP slot number, slot_number<3
+ * @param user_temporary_password user temporary password if PIN protected OTP codes are enabled,
+ * otherwise should be set to empty string - ''
+ * @return HOTP code
+ */
 extern uint32_t NK_get_hotp_code_PIN(uint8_t slot_number, const char* user_temporary_password);
+
+/**
+ * Get TOTP code from the device
+ * @param slot_number TOTP slot number, slot_number<15
+ * @param challenge TOTP challenge
+ * @param last_totp_time last time
+ * @param last_interval last interval
+ * @return TOTP code
+ */
 extern uint32_t NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time, uint8_t last_interval);
+
+/**
+ * Get TOTP code from the device (PIN protected)
+ * @param slot_number TOTP slot number, slot_number<15
+ * @param challenge TOTP challenge
+ * @param last_totp_time last time
+ * @param last_interval last interval
+ * @param user_temporary_password
+ * @return TOTP code
+ */
 extern uint32_t NK_get_totp_code_PIN(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time, uint8_t last_interval, const char* user_temporary_password);
+
+/**
+ * Set time on the device (for TOTP requests)
+ * @param time seconds in unix epoch (from 01.01.1970)
+ * @return command processing error code
+ */
 extern int NK_totp_set_time(uint64_t time);
+
 extern int NK_totp_get_time();
 //passwords
+/**
+ * Change administrator PIN
+ * @param current_PIN current PIN
+ * @param new_PIN new PIN
+ * @return command processing error code
+ */
 extern int NK_change_admin_PIN(char *current_PIN, char *new_PIN);
+
+/**
+ * Change user PIN
+ * @param current_PIN current PIN
+ * @param new_PIN new PIN
+ * @return command processing error code
+*/
 extern int NK_change_user_PIN(char *current_PIN, char *new_PIN);
+
+
+/**
+ * Get retry count of user PIN
+ * @return user PIN retry count
+ */
 extern uint8_t NK_get_user_retry_count();
+
+/**
+ * Get retry count of admin PIN
+ * @return admin PIN retry count
+ */
 extern uint8_t NK_get_admin_retry_count();
 //password safe
+
+/**
+ * Enable password safe access
+ * @param user_pin current user PIN
+ * @return command processing error code
+ */
 extern int NK_enable_password_safe(const char *user_pin);
+
+/**
+ * Get password safe slots' status
+ * @return uint8_t[16] slot statuses - each byte represents one slot with 0 (not programmed) and 1 (programmed)
+ */
 extern uint8_t * NK_get_password_safe_slot_status();
+
+/**
+ * Get password safe slot name
+ * @param slot_number password safe slot number, slot_number<16
+ * @return slot name
+ */
 extern const char *NK_get_password_safe_slot_name(uint8_t slot_number);
+
+/**
+ * Get password safe slot login
+ * @param slot_number password safe slot number, slot_number<16
+ * @return login from the PWS slot
+ */
 extern const char *NK_get_password_safe_slot_login(uint8_t slot_number);
+
+/**
+ * Get the password safe slot password
+ * @param slot_number password safe slot number, slot_number<16
+ * @return password from the PWS slot
+ */
 extern const char *NK_get_password_safe_slot_password(uint8_t slot_number);
+
+/**
+ * Write password safe data to the slot
+ * @param slot_number password safe slot number, slot_number<16
+ * @param slot_name name of the slot
+ * @param slot_login login string
+ * @param slot_password password string
+ * @return command processing error code
+ */
 extern int NK_write_password_safe_slot(uint8_t slot_number, const char *slot_name, const char *slot_login, const char *slot_password);
+
+/**
+ * Erase the password safe slot from the device
+ * @param slot_number password safe slot number, slot_number<16
+ * @return command processing error code
+ */
 extern int NK_erase_password_safe_slot(uint8_t slot_number);
 }
 

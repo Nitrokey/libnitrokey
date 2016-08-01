@@ -24,7 +24,7 @@ To compile library using clang please run `make`. If you have GCC and would like
 This should create a library file under path build/libnitrokey.so and compile C++ tests in unittest/ directory.
 
 ## Using with Python
-To use libnitrokey with Python a [CFFI](http://cffi.readthedocs.io/en/latest/using.html) library is required (either 2.7+ or 3.0+).
+To use libnitrokey with Python a [CFFI](http://cffi.readthedocs.io/en/latest/overview.html) library is required (either 2.7+ or 3.0+).
 Just import it and read the C API header and it is done! You have access to the library. Example code printing HOTP code:
 ```python
 ffi = cffi.FFI()

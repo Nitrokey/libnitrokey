@@ -11,9 +11,11 @@ using namespace std;
 using namespace nitrokey::device;
 using namespace nitrokey::proto::stick10;
 using namespace nitrokey::log;
+using namespace nitrokey::misc;
+
 
 std::string getSlotName(Stick10 &stick, int slotNo) {
-  ReadSlot::CommandTransaction::CommandPayload slot_req;
+  auto slot_req = get_payload<ReadSlot>();
   slot_req.slot_number = slotNo;
   auto slot = ReadSlot::CommandTransaction::run(stick, slot_req);
   std::string sName(reinterpret_cast<char *>(slot.slot_name));
@@ -29,16 +31,17 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
 
   auto resp = GetStatus::CommandTransaction::run(stick);
 
-  FirstAuthenticate::CommandTransaction::CommandPayload authreq;
+  auto authreq = get_payload<FirstAuthenticate>();
   strcpy((char *)(authreq.card_password), "12345678");
   FirstAuthenticate::CommandTransaction::run(stick, authreq);
 
   {
-    EnablePasswordSafe::CommandTransaction::CommandPayload authreq;
-    strcpy((char *)(authreq.password), "123456");
+    auto authreq = get_payload<EnablePasswordSafe>();
+    strcpy((char *)(authreq.user_password), "123456");
     EnablePasswordSafe::CommandTransaction::run(stick, authreq);
   }
 
+  //assuming these values were set earlier, thus failing on normal use
   REQUIRE(getSlotName(stick, 0x20) == std::string("1"));
   REQUIRE(getSlotName(stick, 0x21) == std::string("slot2"));
 
@@ -52,7 +55,7 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
   }
 
   {
-    GetPasswordSafeSlotName::CommandTransaction::CommandPayload slot;
+    auto slot = get_payload<GetPasswordSafeSlotName>();
     slot.slot_number = 0;
     auto resp2 = GetPasswordSafeSlotName::CommandTransaction::run(stick, slot);
     std::string sName(reinterpret_cast<char *>(resp2.slot_name));
@@ -60,7 +63,7 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
   }
 
   {
-    GetPasswordSafeSlotPassword::CommandTransaction::CommandPayload slot;
+    auto slot = get_payload<GetPasswordSafeSlotPassword>();
     slot.slot_number = 0;
     auto resp2 =
         GetPasswordSafeSlotPassword::CommandTransaction::run(stick, slot);
@@ -69,7 +72,7 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
   }
 
   {
-    GetPasswordSafeSlotLogin::CommandTransaction::CommandPayload slot;
+    auto slot = get_payload<GetPasswordSafeSlotLogin>();
     slot.slot_number = 0;
     auto resp2 = GetPasswordSafeSlotLogin::CommandTransaction::run(stick, slot);
     std::string sName(reinterpret_cast<char *>(resp2.slot_login));

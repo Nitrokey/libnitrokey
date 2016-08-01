@@ -5,11 +5,13 @@
 #include "log.h"
 #include "stick10_commands.h"
 #include <cstdlib>
+#include "misc.h"
 
 using namespace std;
 using namespace nitrokey::device;
 using namespace nitrokey::proto::stick10;
 using namespace nitrokey::log;
+using namespace nitrokey::misc;
 
 void hexStringToByte(uint8_t data[], const char* hexString){
     assert(strlen(hexString)%2==0);
@@ -43,7 +45,7 @@ TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
 
   const char * temporary_password = "123456789012345678901234";
   {
-      FirstAuthenticate::CommandTransaction::CommandPayload authreq;
+      auto authreq = get_payload<FirstAuthenticate>();
       strcpy((char *)(authreq.card_password), "12345678");
       strcpy((char *)(authreq.temporary_password), temporary_password);
       FirstAuthenticate::CommandTransaction::run(stick, authreq);
@@ -51,21 +53,20 @@ TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
 
   //test according to https://tools.ietf.org/html/rfc4226#page-32
   {
-    WriteToHOTPSlot::CommandTransaction::CommandPayload hwrite;
+    auto hwrite = get_payload<WriteToHOTPSlot>();
     hwrite.slot_number = 0x10;
     strcpy(reinterpret_cast<char *>(hwrite.slot_name), "rfc4226_lib");
     //strcpy(reinterpret_cast<char *>(hwrite.slot_secret), "");
     const char* secretHex = "3132333435363738393031323334353637383930";
     hexStringToByte(hwrite.slot_secret, secretHex);
-    // reset the HOTP counter
-//    memset(hwrite.slot_counter, 0, 8);
+
     //hwrite.slot_config; //TODO check various configs in separate test cases
     //strcpy(reinterpret_cast<char *>(hwrite.slot_token_id), "");
     //strcpy(reinterpret_cast<char *>(hwrite.slot_counter), "");
 
     //authorize writehotp first
     {
-        Authorize::CommandTransaction::CommandPayload auth;
+        auto auth = get_payload<Authorize>();
         strcpy((char *)(auth.temporary_password), temporary_password);
         auth.crc_to_authorize = WriteToHOTPSlot::CommandTransaction::getCRC(hwrite);
         Authorize::CommandTransaction::run(stick, auth);
@@ -80,7 +81,7 @@ TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
     };
 
     for( auto code: codes){
-        GetHOTP::CommandTransaction::CommandPayload gh;
+        auto gh = get_payload<GetHOTP>();
         gh.slot_number =  0x10;
         auto resp = GetHOTP::CommandTransaction::run(stick, gh);
         REQUIRE( resp.code == code);

@@ -14,7 +14,7 @@ Device::Device()
     : m_vid(0),
       m_pid(0),
       m_retry_count(40),
-      m_retry_timeout(50),
+      m_retry_timeout(100),
       mp_devhandle(NULL),
       last_command_status(0){}
 
@@ -85,7 +85,8 @@ Stick10::Stick10() {
   m_vid = 0x20a0;
   m_pid = 0x4108;
   m_model = DeviceModel::PRO;
-    m_send_receive_delay = 10ms;
+    m_send_receive_delay = 100ms;
+  m_retry_count = 100;
 }
 
 Stick20::Stick20() {

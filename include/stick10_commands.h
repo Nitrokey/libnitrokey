@@ -557,13 +557,18 @@ class EnablePasswordSafe : Command<CommandID::PW_SAFE_ENABLE> {
 };
 
 class PasswordSafeInitKey : Command<CommandID::PW_SAFE_INIT_KEY> {
+    /**
+     * never used in Nitrokey App
+     */
  public:
   typedef Transaction<command_id(), struct EmptyPayload, struct EmptyPayload>
       CommandTransaction;
 };
 
-// TODO naming screwed up, see above
 class PasswordSafeSendSlotViaHID : Command<CommandID::PW_SAFE_SEND_DATA> {
+    /**
+     * never used in Nitrokey App
+     */
  public:
   struct CommandPayload {
     uint8_t slot_number;

@@ -118,13 +118,13 @@ firmware code should show how things works:
 # Known issues / tasks
 * Currently only one device can be connected at a time
 * C++ API needs some reorganization to C++ objects (instead of pointers to arrays). This will be also preparing for integration with Pybind11,
-* PIN protected OTP is currently not working,
-* Factory reset and generating AES key commands are not yet tested neither covered in unittest,
 * The library is not supporting Nitrokey Storage stick but it should be done in nearest future. The only working function for now (looking by Python unit tests) is getting HOTP code.
 * Fix compilation warnings
-* Show friendly message when no device is connected and do not abort
 
-Other tasks might be listed either in `TODO` file or on project's issues page.
+Other tasks might be listed either in [TODO](TODO) file or on project's issues page.
 
 # License
 This project is licensed under LGPL version 3. License text could be found under [LICENSE](LICENSE) file.
+
+# Roadmap
+To check what issues will be fixed and when please check [milestones](https://github.com/Nitrokey/libnitrokey/milestones) page.

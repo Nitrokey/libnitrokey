@@ -714,11 +714,15 @@ class ChangeUserPin : Command<CommandID::CHANGE_USER_PIN> {
       CommandTransaction;
 };
 
-// TODO why is it needed?
 class IsAESSupported : Command<CommandID::DETECT_SC_AES> {
  public:
   struct CommandPayload {
-    uint8_t password[20];
+    uint8_t user_password[20];
+      std::string dissect() const {
+          std::stringstream ss;
+          ss << " user_password:\t" <<  user_password<< std::endl;
+          return ss.str();
+      }
   } __packed;
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>

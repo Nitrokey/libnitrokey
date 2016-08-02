@@ -121,6 +121,7 @@ def test_issue_device_locks_on_second_key_generation_in_sequence(C):
 
 def test_regenerate_aes_key(C):
     C.NK_set_debug(True)
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
@@ -156,6 +157,11 @@ def test_destroy_password_safe(C):
     is_slot_programmed = list(ffi.cast("uint8_t [16]", safe_slot_status)[0:16])
     assert is_slot_programmed[0] == 0
 
+
+def test_is_AES_supported(C):
+    aes_supported = C.NK_is_AES_supported(DefaultPasswords.USER)
+    assert aes_supported == 1
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
 
 def test_admin_PIN_change(C):

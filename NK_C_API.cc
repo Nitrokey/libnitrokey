@@ -415,5 +415,13 @@ extern int NK_erase_password_safe_slot(uint8_t slot_number) {
     });
 }
 
+extern int NK_is_AES_supported(const char *user_password) {
+    auto m = NitrokeyManager::instance();
+    return get_with_result([&](){
+       return (uint8_t) m->is_AES_supported(user_password);
+    });
+}
+
+
 }
 

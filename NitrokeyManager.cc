@@ -270,6 +270,11 @@ namespace nitrokey{
     }
 
     void NitrokeyManager::enable_password_safe(const char *user_pin) {
+        //The following command will cancel enabling PWS if it is not supported
+        auto a = get_payload<IsAESSupported>();
+        strcpyT(a.user_password, user_pin);
+        IsAESSupported::CommandTransaction::run(*device, a);
+
         auto p = get_payload<EnablePasswordSafe>();
         strcpyT(p.user_password, user_pin);
         EnablePasswordSafe::CommandTransaction::run(*device, p);
@@ -388,6 +393,16 @@ namespace nitrokey{
         vector<uint8_t> v = vector<uint8_t>(responsePayload.general_config,
                                             responsePayload.general_config+sizeof(responsePayload.general_config));
         return v;
+    }
+
+    bool NitrokeyManager::is_AES_supported(const char *user_password) {
+        try {
+            auto a = get_payload<IsAESSupported>();
+            strcpyT(a.user_password, user_password);
+                IsAESSupported::CommandTransaction::run(*device, a);
+            }
+        catch (CommandFailedException &ex) {};
+        return device->get_last_command_status() == 0;
     }
 
 }

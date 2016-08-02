@@ -75,6 +75,8 @@ namespace nitrokey {
 
         vector<uint8_t> read_config();
 
+        bool is_AES_supported(const char *user_password);
+
     private:
         NitrokeyManager();
         ~NitrokeyManager();

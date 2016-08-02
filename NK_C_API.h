@@ -292,6 +292,12 @@ extern int NK_write_password_safe_slot(uint8_t slot_number, const char *slot_nam
  * @return command processing error code
  */
 extern int NK_erase_password_safe_slot(uint8_t slot_number);
+
+/**
+ * Check whether AES is supported by the device
+ * @return 0 for no and 1 for yes
+ */
+extern int NK_is_AES_supported(const char *user_password);
 }
 
 

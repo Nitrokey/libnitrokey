@@ -107,9 +107,54 @@ def test_password_safe_slot_status(C):
     safe_slot_status = C.NK_get_password_safe_slot_status()
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     is_slot_programmed = list(ffi.cast("uint8_t [16]", safe_slot_status)[0:16])
-    print ((is_slot_programmed, len(is_slot_programmed)))
+    print((is_slot_programmed, len(is_slot_programmed)))
     assert is_slot_programmed[0] == 0
     assert is_slot_programmed[1] == 1
+
+
+@pytest.mark.skip(reason="issue to register, skipping for now")
+def test_issue_device_locks_on_second_key_generation_in_sequence(C):
+    assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+    assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+
+
+def test_regenerate_aes_key(C):
+    C.NK_set_debug(True)
+    assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+
+
+def test_destroy_password_safe(C):
+    """
+    Sometimes fails on NK Pro - slot name is not cleared ergo key generation has not succeed despite the success result
+    returned from the device
+    """
+    C.NK_set_debug(True)
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    # write password safe slot
+    assert C.NK_write_password_safe_slot(0, 'slotname1', 'login1', 'pass1') == DeviceErrorCode.STATUS_OK
+    # read slot
+    assert gs(C.NK_get_password_safe_slot_name(0)) == 'slotname1'
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+    slot_login = C.NK_get_password_safe_slot_login(0)
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+    assert gs(slot_login) == 'login1'
+    # destroy password safe by regenerating aes key
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+
+    assert gs(C.NK_get_password_safe_slot_name(0)) != 'slotname1'
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+
+    # check was slot status cleared
+    safe_slot_status = C.NK_get_password_safe_slot_status()
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+    is_slot_programmed = list(ffi.cast("uint8_t [16]", safe_slot_status)[0:16])
+    assert is_slot_programmed[0] == 0
+
 
 
 def test_admin_PIN_change(C):

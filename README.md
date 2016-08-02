@@ -125,3 +125,6 @@ firmware code should show how things works:
 * Show friendly message when no device is connected and do not abort
 
 Other tasks might be listed either in `TODO` file or on project's issues page.
+
+# License
+This project is licensed under LGPL version 3. License text could be found under [LICENSE](LICENSE) file.

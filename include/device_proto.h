@@ -215,11 +215,14 @@ class Transaction : semantics::non_constructible {
 
     Log::instance()("Incoming HID packet:", Loglevel::DEBUG);
     Log::instance()((std::string)(resp), Loglevel::DEBUG);
+    Log::instance()(std::string("Retry count: ") + std::to_string(retry), Loglevel::DEBUG);
 
     if (!resp.isValid()) throw std::runtime_error("Invalid incoming packet");
+    if (retry <= 0) throw std::runtime_error("Maximum retry count reached for receiving response from the device!");
     if (resp.last_command_status!=0) throw CommandFailedException(resp.command_id, resp.last_command_status);
 
-    // See: DeviceResponse
+
+      // See: DeviceResponse
     return resp.payload;
   }
 

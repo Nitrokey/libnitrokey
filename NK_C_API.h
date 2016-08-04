@@ -8,8 +8,6 @@
 
 extern "C"
 {
-//Make sure each function's declaration is in one line (for automatic python declaration processing)
-
 /**
  * Set debug level of messages written on stderr
  * @param state state=True - all messages, state=False - only errors level

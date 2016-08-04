@@ -186,11 +186,8 @@ namespace nitrokey{
         strcpyT(auth.temporary_password, temporary_password);
         auth.crc_to_authorize = WriteToTOTPSlot::CommandTransaction::getCRC(payload);
         Authorize::CommandTransaction::run(*device, auth);
-//        auto auth_successful = device->last_command_sucessfull();
 
         auto resp = WriteToTOTPSlot::CommandTransaction::run(*device, payload);
-//        auto write_successful = device->last_command_sucessfull();
-//        return auth_successful && write_successful; //left to show alternative approach
         return true;
     }
 

@@ -95,7 +95,8 @@ extern int NK_unlock_user_password(const char* admin_password);
  * @param admin_temporary_password current admin temporary password
  * @return command processing error code
  */
-extern int NK_write_config(bool numlock, bool capslock, bool scrolllock, bool enable_user_password, bool delete_user_password, const char *admin_temporary_password);
+extern int NK_write_config(bool numlock, bool capslock, bool scrolllock,
+                           bool enable_user_password, bool delete_user_password, const char *admin_temporary_password);
 
 /**
  * Get currently set config - status of function Numlock/Capslock/Scrollock OTP sending and PIN protected OTP
@@ -151,7 +152,8 @@ extern int NK_erase_totp_slot(uint8_t slot_number, const char *temporary_passwor
  * @param temporary_password char[25](Pro) admin temporary password
  * @return command processing error code
  */
-extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter, bool use_8_digits, const char *temporary_password);
+extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter,
+                              bool use_8_digits, bool use_enter, bool use_tokenID, const char *temporary_password);
 
 /**
  * Write TOTP slot data to the device
@@ -163,7 +165,8 @@ extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const 
  * @param temporary_password char[20](Pro) admin temporary password
  * @return command processing error code
  */
-extern int NK_write_totp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint16_t time_window, bool use_8_digits, const char *temporary_password);
+extern int NK_write_totp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint16_t time_window,
+                              bool use_8_digits, bool use_enter, bool use_tokenID, const char *temporary_password);
 
 /**
  * Get HOTP code from the device
@@ -201,7 +204,8 @@ extern uint32_t NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64
  * otherwise should be set to empty string - ''
  * @return TOTP code
  */
-extern uint32_t NK_get_totp_code_PIN(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time, uint8_t last_interval, const char* user_temporary_password);
+extern uint32_t NK_get_totp_code_PIN(uint8_t slot_number, uint64_t challenge,
+                                     uint64_t last_totp_time, uint8_t last_interval, const char* user_temporary_password);
 
 /**
  * Set time on the device (for TOTP requests)
@@ -284,7 +288,8 @@ extern const char *NK_get_password_safe_slot_password(uint8_t slot_number);
  * @param slot_password char[20](Pro) password string
  * @return command processing error code
  */
-extern int NK_write_password_safe_slot(uint8_t slot_number, const char *slot_name, const char *slot_login, const char *slot_password);
+extern int NK_write_password_safe_slot(uint8_t slot_number, const char *slot_name,
+                                       const char *slot_login, const char *slot_password);
 
 /**
  * Erase the password safe slot from the device

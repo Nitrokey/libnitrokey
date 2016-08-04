@@ -224,10 +224,11 @@ extern int NK_erase_totp_slot(uint8_t slot_number, const char *temporary_passwor
 }
 
 extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter,
-                              bool use_8_digits, const char *temporary_password) {
+                              bool use_8_digits, bool use_enter, bool use_tokenID, const char *temporary_password) {
     auto m = NitrokeyManager::instance();
     try {
-        m->write_HOTP_slot(slot_number, slot_name, secret, hotp_counter, use_8_digits, temporary_password);
+        m->write_HOTP_slot(slot_number, slot_name, secret, hotp_counter, use_8_digits, use_enter, use_tokenID,
+                           temporary_password);
         NK_last_command_status = 0;
     }
     catch (CommandFailedException & commandFailedException){
@@ -238,10 +239,11 @@ extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const 
 }
 
 extern int NK_write_totp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint16_t time_window,
-                              bool use_8_digits, const char *temporary_password) {
+                              bool use_8_digits, bool use_enter, bool use_tokenID, const char *temporary_password) {
     auto m = NitrokeyManager::instance();
     try {
-        m->write_TOTP_slot(slot_number, slot_name, secret, time_window, use_8_digits, temporary_password);
+        m->write_TOTP_slot(slot_number, slot_name, secret, time_window, use_8_digits, use_enter, use_tokenID,
+                           temporary_password);
         NK_last_command_status = 0;
     }
     catch (CommandFailedException & commandFailedException){

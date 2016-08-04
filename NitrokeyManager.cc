@@ -138,8 +138,9 @@ namespace nitrokey{
     }
 
 
-    bool NitrokeyManager::write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint64_t hotp_counter,
-                                              bool use_8_digits, const char *temporary_password) {
+    bool NitrokeyManager::write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret,
+                                          uint8_t hotp_counter, bool use_8_digits,
+                                          bool use_enter, bool use_tokenID, const char *temporary_password) {
         assert(is_valid_hotp_slot_number(slot_number));
         assert(strlen(secret)==20); //160 bits
         assert(strlen(slot_name)<=15);
@@ -151,6 +152,8 @@ namespace nitrokey{
         strcpyT(payload.slot_name, slot_name);
         payload.slot_counter = hotp_counter;
         payload.use_8_digits = use_8_digits;
+        payload.use_enter = use_enter;
+        payload.use_tokenID = use_tokenID;
 
         auto auth = get_payload<Authorize>();
         strcpyT(auth.temporary_password, temporary_password);
@@ -162,7 +165,8 @@ namespace nitrokey{
     }
 
     bool NitrokeyManager::write_TOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret,
-                                          uint16_t time_window, bool use_8_digits, const char *temporary_password) {
+                                          uint16_t time_window, bool use_8_digits,
+                                          bool use_enter, bool use_tokenID, const char *temporary_password) {
         auto payload = get_payload<WriteToTOTPSlot>();
         assert(is_valid_totp_slot_number(slot_number));
         assert(strlen(secret) == sizeof payload.slot_secret); //160 bits
@@ -174,6 +178,9 @@ namespace nitrokey{
         strcpyT(payload.slot_name, slot_name);
         payload.slot_interval = time_window; //FIXME naming
         payload.use_8_digits = use_8_digits;
+        payload.use_enter = use_enter;
+        payload.use_tokenID = use_tokenID;
+        payload.slot_token_id
 
         auto auth = get_payload<Authorize>();
         strcpyT(auth.temporary_password, temporary_password);

@@ -21,10 +21,12 @@ namespace nitrokey {
         static NitrokeyManager *instance();
 
         bool first_authenticate(const char *pin, const char *temporary_password);
-        bool write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint64_t hotp_counter,
-                                     bool use_8_digits, const char *temporary_password);
-        bool write_TOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret,
-                             uint16_t time_window, bool use_8_digits, const char *temporary_password);
+        bool write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter,
+                             bool use_8_digits,
+                             bool use_enter, bool use_tokenID, const char *temporary_password);
+        bool write_TOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint16_t time_window,
+                             bool use_8_digits,
+                             bool use_enter, bool use_tokenID, const char *temporary_password);
         uint32_t get_HOTP_code(uint8_t slot_number, const char *user_temporary_password);
         uint32_t get_TOTP_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time, uint8_t last_interval,
                                const char *user_temporary_password);

@@ -81,7 +81,6 @@ class SetTime : Command<CommandID::SET_TIME> {
 };
 
 
-// TODO duplicate TOTP
 class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
  public:
   struct CommandPayload {
@@ -160,27 +159,6 @@ class WriteToTOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
       CommandTransaction;
 };
 
-class GetCode : Command<CommandID::GET_CODE> {
- public:
-  struct CommandPayload {
-    uint8_t slot_number;
-    uint64_t challenge;
-    uint64_t last_totp_time;
-    uint8_t last_interval;
-
-    bool isValid() const { return !(slot_number & 0xF0); }
-  } __packed;
-
-  struct ResponsePayload {
-    uint8_t code[18];
-
-    bool isValid() const { return true; }
-  } __packed;
-
-  typedef Transaction<command_id(), struct CommandPayload,
-                      struct ResponsePayload> CommandTransaction;
-};
-
 class GetTOTP : Command<CommandID::GET_CODE> {
  public:
   struct CommandPayload {
@@ -202,18 +180,28 @@ class GetTOTP : Command<CommandID::GET_CODE> {
 
   struct ResponsePayload {
       union {
-          uint8_t whole_response[18]; //TODO remove if not needed
+          uint8_t whole_response[18]; //14 bytes reserved for config, but used only 1
           struct {
               uint32_t code;
-              uint8_t config;
-          } __packed;
-      } __packed;
+              union{
+                  uint8_t _slot_config;
+                  struct{
+                      bool use_8_digits   : 1;
+                      bool use_enter      : 1;
+                      bool use_tokenID    : 1;
+                  };
+              };
+          } __packed ;
+      } __packed ;
 
     bool isValid() const { return true; }
     std::string dissect() const {
       std::stringstream ss;
       ss << "code:\t" << (code) << std::endl;
-      ss << "config:\t" << "TODO" /*(config) */<< std::endl; //TODO show byte field options
+        ss << "slot_config:\t" << std::bitset<8>((int)_slot_config) << std::endl;
+        ss << "\tuse_8_digits(0):\t" << use_8_digits << std::endl;
+        ss << "\tuse_enter(1):\t" << use_enter << std::endl;
+        ss << "\tuse_tokenID(2):\t" << use_tokenID << std::endl;
       return ss.str();
     }
   } __packed;
@@ -237,10 +225,17 @@ class GetHOTP : Command<CommandID::GET_CODE> {
 
   struct ResponsePayload {
       union {
-          uint8_t whole_response[18]; //TODO remove if not needed
+          uint8_t whole_response[18]; //14 bytes reserved for config, but used only 1
           struct {
               uint32_t code;
-              uint8_t config;
+              union{
+                  uint8_t _slot_config;
+                  struct{
+                      bool use_8_digits   : 1;
+                      bool use_enter      : 1;
+                      bool use_tokenID    : 1;
+                  };
+              };
           } __packed;
       } __packed;
 
@@ -248,7 +243,10 @@ class GetHOTP : Command<CommandID::GET_CODE> {
     std::string dissect() const {
       std::stringstream ss;
       ss << "code:\t" << (code) << std::endl;
-      ss << "config:\t" << "TODO" /*(config) */<< std::endl; //TODO show byte field options
+        ss << "slot_config:\t" << std::bitset<8>((int)_slot_config) << std::endl;
+        ss << "\tuse_8_digits(0):\t" << use_8_digits << std::endl;
+        ss << "\tuse_enter(1):\t" << use_enter << std::endl;
+        ss << "\tuse_tokenID(2):\t" << use_tokenID << std::endl;
       return ss.str();
     }
   } __packed;

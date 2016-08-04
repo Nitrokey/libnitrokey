@@ -30,10 +30,13 @@ def C(request):
     with open(fp, 'r') as f:
         declarations = f.readlines()
 
-    for declaration in declarations:
+    a = iter(declarations)
+    for declaration in a:
         # extern int NK_write_totp_slot(int slot_number, char* secret, int time_window);
-        if 'extern' in declaration and not '"C"' in declaration:
+        if declaration.startswith('extern') and not '"C"' in declaration:
             declaration = declaration.replace('extern', '').strip()
+            while not ';' in declaration:
+                declaration += (next(a)).strip()
             print(declaration)
             ffi.cdef(declaration)
 

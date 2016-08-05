@@ -79,6 +79,10 @@ extern int NK_login(const char *device_model) {
         NK_last_command_status = commandFailedException.last_command_status;
         return commandFailedException.last_command_status;
     }
+    catch (std::runtime_error &e){
+        cerr << e.what() << endl;
+        return 0;
+    }
     return 0;
 }
 

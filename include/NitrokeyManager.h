@@ -35,6 +35,7 @@ namespace nitrokey {
         bool erase_totp_slot(uint8_t slot_number, const char *temporary_password);
         bool erase_hotp_slot(uint8_t slot_number, const char *temporary_password);
         bool connect(const char *device_model);
+        bool connect();
         bool disconnect();
         void set_debug(bool state);
         string get_status();
@@ -97,6 +98,8 @@ namespace nitrokey {
 
         template <typename ProCommand, PasswordKind StoKind>
         void change_PIN_general(char *current_PIN, char *new_PIN);
+
+
     };
 }
 

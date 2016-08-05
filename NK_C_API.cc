@@ -73,7 +73,7 @@ extern int NK_login(const char *device_model) {
     auto m = NitrokeyManager::instance();
     try {
         NK_last_command_status = 0;
-        m->connect(device_model);
+        return m->connect(device_model);
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
@@ -432,6 +432,12 @@ extern int NK_is_AES_supported(const char *user_password) {
     });
 }
 
+extern int NK_login_auto() {
+    auto m = NitrokeyManager::instance();
+    return get_with_result([&](){
+        return (uint8_t) m->connect();
+    });
+}
 
 }
 

@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cstring>
+#include <iostream>
 #include "include/NitrokeyManager.h"
 
 namespace nitrokey{
@@ -35,7 +36,24 @@ namespace nitrokey{
     NitrokeyManager::NitrokeyManager(): device(nullptr) {
         set_debug(true);
     }
-    NitrokeyManager::~NitrokeyManager() {delete _instance; delete device;}
+    NitrokeyManager::~NitrokeyManager() {
+        delete device;
+    }
+
+    bool NitrokeyManager::connect() {
+        device = nullptr;
+        vector<Device*> devices = { new Stick10(), new Stick20() };
+        for( auto d : devices ){
+            if (device != nullptr){
+                delete d;
+            }
+            if (device == nullptr && d->connect()){
+                device = d;
+            }
+        }
+        return device != nullptr;
+    }
+
 
     bool NitrokeyManager::connect(const char *device_model) {
         switch (device_model[0]){

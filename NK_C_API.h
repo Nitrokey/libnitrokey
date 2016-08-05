@@ -17,9 +17,15 @@ extern void NK_set_debug(bool state);
 /**
  * Connect to device of given model. Currently library can be connected only to one device at once.
  * @param device_model char 'S': Nitrokey Storage, 'P': Nitrokey Pro
- * @return command processing error code
+ * @return 1 if connected, 0 if wrong model or cannot connect
  */
 extern int NK_login(const char *device_model);
+
+/**
+ * Connect to first available device, starting checking from Pro 1st to Storage 2nd.
+ * @return 1 if connected, 0 if wrong model or cannot connect
+ */
+extern int NK_login_auto();
 
 /**
  * Disconnect from the device.
@@ -311,6 +317,7 @@ extern int NK_erase_password_safe_slot(uint8_t slot_number);
  * @return 0 for no and 1 for yes
  */
 extern int NK_is_AES_supported(const char *user_password);
+
 }
 
 

@@ -250,7 +250,7 @@ def check_HOTP_RFC_codes(C, func, prep=None, use_8_digits=False):
 
 @pytest.mark.parametrize("use_8_digits", [False, True, ])
 @pytest.mark.parametrize("use_pin_protection", [False, True, ])
-def test_HOTP_RFC_8digits_pin(C, use_8_digits, use_pin_protection):
+def test_HOTP_RFC_use8digits_usepin(C, use_8_digits, use_pin_protection):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, use_pin_protection, not use_pin_protection,
                              DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -266,7 +266,7 @@ def test_HOTP_RFC_8digits_pin(C, use_8_digits, use_pin_protection):
 @pytest.mark.xfail(reason="firmware bug: set time command not always changes the time on stick thus failing this test, "
                           "this does not influence normal use since setting time is not done every TOTP code request")
 @pytest.mark.parametrize("PIN_protection", [False, True, ])
-def test_TOTP_RFC(C, PIN_protection):
+def test_TOTP_RFC_usepin(C, PIN_protection):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
                              DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK

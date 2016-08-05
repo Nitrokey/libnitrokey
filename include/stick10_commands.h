@@ -317,9 +317,9 @@ class GetStatus : Command<CommandID::GET_STATUS> {
       ss << "general_config:\t"
          << ::nitrokey::misc::hexdump((const char *)(general_config),
                                       sizeof general_config);
-        ss << "numlock:\t" << (uint8_t)numlock << std::endl;
-        ss << "capslock:\t" << (uint8_t)capslock << std::endl;
-        ss << "scrolllock:\t" << (uint8_t)scrolllock << std::endl;
+        ss << "numlock:\t" << (int)numlock << std::endl;
+        ss << "capslock:\t" << (int)capslock << std::endl;
+        ss << "scrolllock:\t" << (int)scrolllock << std::endl;
         ss << "enable_user_password:\t" << (bool) enable_user_password << std::endl;
         ss << "delete_user_password:\t" << (bool) delete_user_password << std::endl;
 
@@ -596,9 +596,9 @@ class WriteGeneralConfig : Command<CommandID::WRITE_CONFIG> {
     };
       std::string dissect() const {
           std::stringstream ss;
-          ss << "numlock:\t" << (uint8_t)numlock << std::endl;
-          ss << "capslock:\t" << (uint8_t)capslock << std::endl;
-          ss << "scrolllock:\t" << (uint8_t)scrolllock << std::endl;
+          ss << "numlock:\t" << (int)numlock << std::endl;
+          ss << "capslock:\t" << (int)capslock << std::endl;
+          ss << "scrolllock:\t" << (int)scrolllock << std::endl;
           ss << "enable_user_password:\t" << (bool) enable_user_password << std::endl;
           ss << "delete_user_password:\t" << (bool) delete_user_password << std::endl;
           return ss.str();

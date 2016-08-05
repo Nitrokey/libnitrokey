@@ -116,7 +116,7 @@ def test_password_safe_slot_status(C):
     assert is_slot_programmed[1] == 1
 
 
-@pytest.mark.xfail(run=False, reason="issue to register, skipping for now")
+@pytest.mark.xfail(run=False, reason="issue to register: device locks up after below commands sequence (reinsertion fixes), skipping for now")
 def test_issue_device_locks_on_second_key_generation_in_sequence(C):
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK

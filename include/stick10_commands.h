@@ -95,7 +95,15 @@ class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
             bool use_tokenID    : 1;
         };
     };
-    uint8_t slot_token_id[13];
+      union{
+        uint8_t slot_token_id[13]; /** OATH Token Identifier */
+          struct{ /** @see https://openauthentication.org/token-specs/ */
+              uint8_t omp[2];
+              uint8_t tt[2];
+              uint8_t mui[8];
+              uint8_t keyboard_layout; //disabled feature in nitroapp as of 20160805
+          } slot_token_fields;
+      };
       uint64_t slot_counter;
 
     bool isValid() const { return !(slot_number & 0xF0); }
@@ -136,7 +144,15 @@ class WriteToTOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
               bool use_tokenID    : 1;
           };
       };
-    uint8_t slot_token_id[13];
+      union{
+          uint8_t slot_token_id[13]; /** OATH Token Identifier */
+          struct{ /** @see https://openauthentication.org/token-specs/ */
+              uint8_t omp[2];
+              uint8_t tt[2];
+              uint8_t mui[8];
+              uint8_t keyboard_layout; //disabled feature in nitroapp as of 20160805
+          } slot_token_fields;
+      };
     uint16_t slot_interval;
 
     bool isValid() const { return !(slot_number & 0xF0); } //TODO check

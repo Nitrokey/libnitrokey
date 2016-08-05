@@ -150,8 +150,8 @@ extern int NK_erase_totp_slot(uint8_t slot_number, const char *temporary_passwor
  * @param hotp_counter uint32_t starting value of HOTP counter
  * @param use_8_digits should returned codes be 6 (false) or 8 digits (true)
  * @param use_enter press ENTER key after sending OTP code using double-pressed scroll/num/capslock
- * @param use_tokenID FIXME add documentation
- * @param token_ID FIXME add documentation
+ * @param use_tokenID @see token_ID
+ * @param token_ID @see https://openauthentication.org/token-specs/, 'Class A' section
  * @param temporary_password char[25](Pro) admin temporary password
  * @return command processing error code
  */
@@ -167,8 +167,8 @@ extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const 
  * @param time_window uint16_t time window for this TOTP
  * @param use_8_digits should returned codes be 6 (false) or 8 digits (true)
  * @param use_enter press ENTER key after sending OTP code using double-pressed scroll/num/capslock
- * @param use_tokenID FIXME add documentation
- * @param token_ID FIXME add documentation
+ * @param use_tokenID @see token_ID
+ * @param token_ID @see https://openauthentication.org/token-specs/, 'Class A' section
  * @param temporary_password char[20](Pro) admin temporary password
  * @return command processing error code
  */

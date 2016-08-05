@@ -162,8 +162,9 @@ def test_destroy_password_safe(C):
 
 
 def test_is_AES_supported(C):
-    aes_supported = C.NK_is_AES_supported(DefaultPasswords.USER)
-    assert aes_supported == 1
+    assert C.NK_is_AES_supported('wrong password') != 1
+    assert C.NK_get_last_command_status() == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_is_AES_supported(DefaultPasswords.USER) == 1
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
 

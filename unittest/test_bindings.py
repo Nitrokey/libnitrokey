@@ -286,7 +286,7 @@ def test_TOTP_RFC_no_pin_protection(C):
         (1234567890, 0x000000000273EF07, 89005924),
     ]
     for t, T, code in test_data:
-        C.NK_totp_set_time(t)
+        assert C.NK_totp_set_time(t) == DeviceErrorCode.STATUS_OK
         r = C.NK_get_totp_code(1, T, 0, 30)  # FIXME T is not changing the outcome
         assert code == r
 

@@ -12,9 +12,12 @@ def get_library():
     with open(fp, 'r') as f:
         declarations = f.readlines()
 
-    for declaration in declarations:
-        if 'extern' in declaration and not '"C"' in declaration:
+    a = iter(declarations)
+    for declaration in a:
+        if declaration.startswith('extern') and not '"C"' in declaration:
             declaration = declaration.replace('extern', '').strip()
+            while not ';' in declaration:
+                declaration += (next(a)).strip()
             # print(declaration)
             ffi.cdef(declaration)
 

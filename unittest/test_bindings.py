@@ -265,13 +265,25 @@ def test_HOTP_RFC_no_pin_protection(C):
     check_RFC_codes(C, C.NK_get_hotp_code)
 
 
-def test_TOTP_RFC_no_pin_protection(C):
+@pytest.mark.parametrize("PIN_protection", [
+    False,
+    True,
+])
+def test_TOTP_RFC(C, PIN_protection):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_config(True, True, True, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(True, True, True, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # test according to https://tools.ietf.org/html/rfc6238#appendix-B
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_totp_slot(1, 'python_test', RFC_SECRET, 30, True, False, False, "",
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+
+    get_func = None
+    if PIN_protection:
+        get_func = lambda x, y, z, r: C.NK_get_totp_code_PIN(x, y, z, r, DefaultPasswords.USER_TEMP)
+    else:
+        get_func = C.NK_get_totp_code
+
     test_data = [
         (59, 1, 94287082),
         (1111111109, 0x00000000023523EC, 7081804),
@@ -279,8 +291,17 @@ def test_TOTP_RFC_no_pin_protection(C):
         (1234567890, 0x000000000273EF07, 89005924),
     ]
     for t, T, code in test_data:
-        assert C.NK_totp_set_time(t) == DeviceErrorCode.STATUS_OK
-        r = C.NK_get_totp_code(1, T, 0, 30)  # FIXME T is not changing the outcome
+        """
+        FIXME without the delay 50% of tests fails, with it only 12%, higher delay removes fails
+        -> set_time function not always works, to investigate why
+        """
+        import time
+        time.sleep(3)
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        if PIN_protection:
+            C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP)
+        assert C.NK_totp_set_time(t) == DeviceErrorCode.STATUS_OK  # FIXME needs admin authentication
+        r = get_func(1, T, 0, 30)  # FIXME T is not changing the outcome
         assert code == r
 
 

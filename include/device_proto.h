@@ -133,6 +133,24 @@ struct EmptyPayload {
   std::string dissect() const { return std::string("Empty Payload."); }
 } __packed;
 
+template <typename command_payload>
+class ClearingProxy{
+public:
+    ClearingProxy(command_payload &p){
+        payload = p;
+        bzero(&p, sizeof(p));
+    }
+    ~ClearingProxy(){
+        bzero(&payload, sizeof(payload));
+    }
+
+    command_payload & data(){
+        return payload;
+    }
+
+    command_payload payload;
+};
+
 template <CommandID cmd_id, typename command_payload, typename response_payload>
 class Transaction : semantics::non_constructible {
  public:
@@ -167,11 +185,11 @@ class Transaction : semantics::non_constructible {
     }
 
 
-    static response_payload run(device::Device &dev,
+    static ClearingProxy<response_payload> run(device::Device &dev,
                               const command_payload &payload) {
     using namespace ::nitrokey::device;
     using namespace ::nitrokey::log;
-      using namespace std::chrono_literals;
+     using namespace std::chrono_literals;
 
     Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
@@ -234,7 +252,7 @@ class Transaction : semantics::non_constructible {
     return resp.payload;
   }
 
-  static response_payload run(device::Device &dev) {
+  static ClearingProxy<response_payload> run(device::Device &dev) {
     command_payload empty_payload;
     return run(dev, empty_payload);
   }

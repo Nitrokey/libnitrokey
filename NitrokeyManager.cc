@@ -8,7 +8,7 @@ namespace nitrokey{
     template <typename T>
     void strcpyT(T& dest, const char* src){
         assert(src != nullptr);
-        const int s = sizeof dest;
+        const size_t s = sizeof dest;
         assert(strlen(src) <= s);
         strncpy((char*) &dest, src, s);
     }
@@ -90,7 +90,7 @@ namespace nitrokey{
 
     string NitrokeyManager::get_status() {
         auto response = GetStatus::CommandTransaction::run(*device);
-        return response.dissect();
+        return response.data().dissect();
     }
 
     uint32_t NitrokeyManager::get_HOTP_code(uint8_t slot_number, const char *user_temporary_password) {
@@ -104,7 +104,7 @@ namespace nitrokey{
         }
 
         auto resp = GetHOTP::CommandTransaction::run(*device, gh);
-        return resp.code;
+        return resp.data().code;
     }
 
 
@@ -128,7 +128,7 @@ namespace nitrokey{
             auth_package<GetTOTP, UserAuthorize>(gt, user_temporary_password, device);
         }
         auto resp = GetTOTP::CommandTransaction::run(*device, gt);
-        return resp.code;
+        return resp.data().code;
     }
 
     bool NitrokeyManager::erase_slot(uint8_t slot_number, const char *temporary_password) {
@@ -226,7 +226,7 @@ namespace nitrokey{
         auto payload = get_payload<GetSlotName>();
         payload.slot_number = slot_number;
         auto resp = GetSlotName::CommandTransaction::run(*device, payload);
-        return (uint8_t *) strdup((const char *) resp.slot_name);
+        return (uint8_t *) strdup((const char *) resp.data().slot_name);
     }
 
     bool NitrokeyManager::first_authenticate(const char *pin, const char *temporary_password) {
@@ -307,18 +307,18 @@ namespace nitrokey{
     uint8_t * NitrokeyManager::get_password_safe_slot_status() {
         auto responsePayload = GetPasswordSafeSlotStatus::CommandTransaction::run(*device); //TODO FIXME
         auto res = new uint8_t[16];
-        memcpy(res, responsePayload.password_safe_status, 16*sizeof (uint8_t));
+        memcpy(res, responsePayload.data().password_safe_status, 16*sizeof (uint8_t));
         //FIXME return vector<uint8_t> and do copy on C_API side
         return res;
     }
 
     uint8_t NitrokeyManager::get_user_retry_count() {
         auto response = GetUserPasswordRetryCount::CommandTransaction::run(*device);
-        return response.password_retry_count;
+        return response.data().password_retry_count;
     }
     uint8_t NitrokeyManager::get_admin_retry_count() {
         auto response = GetPasswordRetryCount::CommandTransaction::run(*device);
-        return response.password_retry_count;
+        return response.data().password_retry_count;
     }
 
     void NitrokeyManager::lock_device() {
@@ -330,7 +330,7 @@ namespace nitrokey{
         auto p = get_payload<GetPasswordSafeSlotName>();
         p.slot_number = slot_number;
         auto response = GetPasswordSafeSlotName::CommandTransaction::run(*device, p);
-        return strdup((const char *) response.slot_name);
+        return strdup((const char *) response.data().slot_name);
     }
 
     bool NitrokeyManager::is_valid_password_safe_slot_number(uint8_t slot_number) const { return slot_number < 16; }
@@ -340,7 +340,7 @@ namespace nitrokey{
         auto p = get_payload<GetPasswordSafeSlotLogin>();
         p.slot_number = slot_number;
         auto response = GetPasswordSafeSlotLogin::CommandTransaction::run(*device, p);
-        return strdup((const char *) response.slot_login);
+        return strdup((const char *) response.data().slot_login);
     }
 
     const char *NitrokeyManager::get_password_safe_slot_password(uint8_t slot_number) {
@@ -348,7 +348,7 @@ namespace nitrokey{
         auto p = get_payload<GetPasswordSafeSlotPassword>();
         p.slot_number = slot_number;
         auto response = GetPasswordSafeSlotPassword::CommandTransaction::run(*device, p);
-        return strdup((const char *) response.slot_password);
+        return strdup((const char *) response.data().slot_password);
     }
 
     void NitrokeyManager::write_password_safe_slot(uint8_t slot_number, const char *slot_name, const char *slot_login,
@@ -416,8 +416,8 @@ namespace nitrokey{
 
     vector<uint8_t> NitrokeyManager::read_config() {
         auto responsePayload = GetStatus::CommandTransaction::run(*device);
-        vector<uint8_t> v = vector<uint8_t>(responsePayload.general_config,
-                                            responsePayload.general_config+sizeof(responsePayload.general_config));
+        vector<uint8_t> v = vector<uint8_t>(responsePayload.data().general_config,
+                                            responsePayload.data().general_config+sizeof(responsePayload.data().general_config));
         return v;
     }
 

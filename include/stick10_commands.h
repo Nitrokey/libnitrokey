@@ -669,7 +669,7 @@ class Authorize : Command<CommandID::AUTHORIZE> {
 class UserAuthorize : Command<CommandID::USER_AUTHORIZE> {
  public:
   struct CommandPayload {
-    uint64_t crc_to_authorize;
+    uint32_t crc_to_authorize;
     uint8_t temporary_password[25];
     std::string dissect() const {
       std::stringstream ss;

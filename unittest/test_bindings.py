@@ -199,6 +199,25 @@ def test_user_retry_counts(C):
     assert C.NK_get_user_retry_count() == default_user_retry_count
 
 
+def test_unlock_user_password(C):
+    C.NK_set_debug(True)
+    default_user_retry_count = 3
+    default_admin_retry_count = 3
+    new_password = '123123123'
+    assert C.NK_get_user_retry_count() == default_user_retry_count
+    assert C.NK_change_user_PIN('wrong_password', new_password) == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_change_user_PIN('wrong_password', new_password) == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_change_user_PIN('wrong_password', new_password) == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_get_user_retry_count() == default_user_retry_count - 3
+    assert C.NK_get_admin_retry_count() == default_admin_retry_count
+
+    assert C.NK_unlock_user_password('wrong password', DefaultPasswords.USER) == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_get_admin_retry_count() == default_admin_retry_count - 1
+    assert C.NK_unlock_user_password(DefaultPasswords.ADMIN, DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    assert C.NK_get_user_retry_count() == default_user_retry_count
+    assert C.NK_get_admin_retry_count() == default_admin_retry_count
+
+
 def test_admin_auth(C):
     assert C.NK_first_authenticate('wrong_password', DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK

@@ -151,7 +151,8 @@ extern int NK_erase_totp_slot(uint8_t slot_number, const char *temporary_passwor
  * @return command processing error code
  */
 extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter,
-                              bool use_8_digits, bool use_enter, bool use_tokenID, const char *temporary_password);
+                              bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
+                              const char *temporary_password);
 
 /**
  * Write TOTP slot data to the device
@@ -164,7 +165,8 @@ extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const 
  * @return command processing error code
  */
 extern int NK_write_totp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint16_t time_window,
-                              bool use_8_digits, bool use_enter, bool use_tokenID, const char *temporary_password);
+                              bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
+                              const char *temporary_password);
 
 /**
  * Get HOTP code from the device

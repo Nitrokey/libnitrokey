@@ -228,47 +228,41 @@ def test_user_auth(C):
     assert C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP) == DeviceErrorCode.STATUS_OK
 
 
-def check_RFC_codes(C, func, prep=None):
+def check_HOTP_RFC_codes(C, func, prep=None, use_8_digits=False):
+    """
+    # https://tools.ietf.org/html/rfc4226#page-32
+    """
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, False, False, False, "",
+    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, use_8_digits, False, False, "",
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     test_data = [
-        755224, 287082, 359152, 969429, 338314, 254676, 287922, 162583, 399871, 520489,
-    ]
+            1284755224, 1094287082, 137359152, 1726969429, 1640338314, 868254676, 1918287922, 82162583, 673399871,
+            645520489,
+        ]
     for code in test_data:
         if prep:
             prep()
         r = func(1)
-        assert code == r
+        code = str(code)[-8:] if use_8_digits else str(code)[-6:]
+        assert int(code) == r
 
 
-def test_HOTP_RFC_pin_protection(C):
-    C.NK_set_debug(True)
+@pytest.mark.parametrize("use_8_digits", [False, True, ])
+@pytest.mark.parametrize("use_pin_protection", [False, True, ])
+def test_HOTP_RFC_8digits_pin(C, use_8_digits, use_pin_protection):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_config(True, True, True, True, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    check_RFC_codes(C, lambda x: C.NK_get_hotp_code_PIN(x, DefaultPasswords.USER_TEMP),
-                    lambda: C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP))
+    assert C.NK_write_config(True, True, True, use_pin_protection, not use_pin_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    if use_pin_protection:
+        check_HOTP_RFC_codes(C,
+                             lambda x: C.NK_get_hotp_code_PIN(x, DefaultPasswords.USER_TEMP),
+                             lambda: C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP),
+                             use_8_digits=use_8_digits)
+    else:
+        check_HOTP_RFC_codes(C, C.NK_get_hotp_code, use_8_digits=use_8_digits)
 
 
-@pytest.mark.skip(reason="not implemented yet")
-def test_HOTP_RFC_no_pin_protection_8digits(C):
-    assert False  # TODO to write
-
-
-def test_HOTP_RFC_no_pin_protection(C):
-    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, False, False, False, "",
-                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_config(True, True, True, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    # https://tools.ietf.org/html/rfc4226#page-32
-    check_RFC_codes(C, C.NK_get_hotp_code)
-
-
-@pytest.mark.parametrize("PIN_protection", [
-    False,
-    True,
-])
+@pytest.mark.parametrize("PIN_protection", [False, True, ])
 def test_TOTP_RFC(C, PIN_protection):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(True, True, True, PIN_protection, not PIN_protection,
@@ -295,8 +289,8 @@ def test_TOTP_RFC(C, PIN_protection):
         FIXME without the delay 50% of tests fails, with it only 12%, higher delay removes fails
         -> set_time function not always works, to investigate why
         """
-        import time
-        time.sleep(3)
+        # import time
+        # time.sleep(2)
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         if PIN_protection:
             C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP)

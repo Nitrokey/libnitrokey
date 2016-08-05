@@ -299,14 +299,14 @@ class GetStatus : Command<CommandID::GET_STATUS> {
       union {
           uint8_t general_config[5];
           struct{
-              uint8_t numlock;
-              uint8_t capslock;
-              uint8_t scrolllock;
+              uint8_t numlock;     /** 0-1: HOTP slot number from which the code will be get on double press, other value - function disabled */
+              uint8_t capslock;    /** same as numlock */
+              uint8_t scrolllock;  /** same as numlock */
               uint8_t enable_user_password;
               uint8_t delete_user_password;
           };
       };
-    bool isValid() const { return true; }
+    bool isValid() const { return enable_user_password!=delete_user_password; }
 
     std::string dissect() const {
       std::stringstream ss;
@@ -317,9 +317,9 @@ class GetStatus : Command<CommandID::GET_STATUS> {
       ss << "general_config:\t"
          << ::nitrokey::misc::hexdump((const char *)(general_config),
                                       sizeof general_config);
-        ss << "numlock:\t" << (bool)numlock << std::endl;
-        ss << "capslock:\t" << (bool)capslock << std::endl;
-        ss << "scrolllock:\t" << (bool)scrolllock << std::endl;
+        ss << "numlock:\t" << (uint8_t)numlock << std::endl;
+        ss << "capslock:\t" << (uint8_t)capslock << std::endl;
+        ss << "scrolllock:\t" << (uint8_t)scrolllock << std::endl;
         ss << "enable_user_password:\t" << (bool) enable_user_password << std::endl;
         ss << "delete_user_password:\t" << (bool) delete_user_password << std::endl;
 
@@ -587,18 +587,18 @@ class WriteGeneralConfig : Command<CommandID::WRITE_CONFIG> {
     union{
         uint8_t config[5];
         struct{
-            uint8_t numlock;
-            uint8_t capslock;
-            uint8_t scrolllock;
+            uint8_t numlock;     /** 0-1: HOTP slot number from which the code will be get on double press, other value - function disabled */
+            uint8_t capslock;    /** same as numlock */
+            uint8_t scrolllock;  /** same as numlock */
             uint8_t enable_user_password;
             uint8_t delete_user_password;
         };
     };
       std::string dissect() const {
           std::stringstream ss;
-          ss << "numlock:\t" << (bool)numlock << std::endl;
-          ss << "capslock:\t" << (bool)capslock << std::endl;
-          ss << "scrolllock:\t" << (bool)scrolllock << std::endl;
+          ss << "numlock:\t" << (uint8_t)numlock << std::endl;
+          ss << "capslock:\t" << (uint8_t)capslock << std::endl;
+          ss << "scrolllock:\t" << (uint8_t)scrolllock << std::endl;
           ss << "enable_user_password:\t" << (bool) enable_user_password << std::endl;
           ss << "delete_user_password:\t" << (bool) delete_user_password << std::endl;
           return ss.str();

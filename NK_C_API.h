@@ -85,19 +85,21 @@ extern int NK_unlock_user_password(const char *admin_password, const char *new_u
 
 /**
  * Write general config to the device
- * @param numlock set True to send OTP code after double pressing numlock
- * @param capslock set True to send OTP code after double pressing capslock
- * @param scrolllock set True to send OTP code after double pressing scrolllock
+ * @param numlock set value in range [0-1] to send HOTP code from slot 'numlock' after double pressing numlock
+ * or outside the range to disable this function
+ * @param capslock similar to numlock but with capslock
+ * @param scrolllock similar to numlock but with scrolllock
  * @param enable_user_password set True to enable OTP PIN protection (request PIN each OTP code request)
  * @param delete_user_password set True to disable OTP PIN protection (request PIN each OTP code request)
  * @param admin_temporary_password current admin temporary password
  * @return command processing error code
  */
-extern int NK_write_config(bool numlock, bool capslock, bool scrolllock,
+extern int NK_write_config(uint8_t numlock, uint8_t capslock, uint8_t scrolllock,
                            bool enable_user_password, bool delete_user_password, const char *admin_temporary_password);
 
 /**
- * Get currently set config - status of function Numlock/Capslock/Scrollock OTP sending and PIN protected OTP
+ * Get currently set config - status of function Numlock/Capslock/Scrollock OTP sending and is enabled PIN protected OTP
+ * @see NK_write_config
  * @return  uint8_t general_config[5]:
  *            uint8_t numlock;
               uint8_t capslock;

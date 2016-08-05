@@ -382,7 +382,8 @@ namespace nitrokey{
     }
 
 
-    void NitrokeyManager::write_config(bool numlock, bool capslock, bool scrolllock, bool enable_user_password, bool delete_user_password, const char *admin_temporary_password) {
+    void NitrokeyManager::write_config(uint8_t numlock, uint8_t capslock, uint8_t scrolllock, bool enable_user_password,
+                                       bool delete_user_password, const char *admin_temporary_password) {
         auto p = get_payload<WriteGeneralConfig>();
         p.numlock = (uint8_t) numlock;
         p.capslock = (uint8_t) capslock;

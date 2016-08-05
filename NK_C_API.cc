@@ -130,7 +130,8 @@ extern int NK_unlock_user_password(const char *admin_password, const char *new_u
     });
 }
 
-extern int NK_write_config(bool numlock, bool capslock, bool scrolllock, bool enable_user_password, bool delete_user_password,
+extern int NK_write_config(uint8_t numlock, uint8_t capslock, uint8_t scrolllock, bool enable_user_password,
+                           bool delete_user_password,
                            const char *admin_temporary_password) {
     auto m = NitrokeyManager::instance();
     return get_without_result( [&](){

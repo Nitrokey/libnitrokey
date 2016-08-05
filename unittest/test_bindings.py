@@ -115,7 +115,7 @@ def test_password_safe_slot_status(C):
     assert is_slot_programmed[1] == 1
 
 
-@pytest.mark.skip(reason="issue to register, skipping for now")
+@pytest.mark.xfail(run=False, reason="issue to register, skipping for now")
 def test_issue_device_locks_on_second_key_generation_in_sequence(C):
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
@@ -251,7 +251,7 @@ def check_HOTP_RFC_codes(C, func, prep=None, use_8_digits=False):
 @pytest.mark.parametrize("use_pin_protection", [False, True, ])
 def test_HOTP_RFC_8digits_pin(C, use_8_digits, use_pin_protection):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_config(True, True, True, use_pin_protection, not use_pin_protection,
+    assert C.NK_write_config(255, 255, 255, use_pin_protection, not use_pin_protection,
                              DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     if use_pin_protection:
         check_HOTP_RFC_codes(C,
@@ -265,7 +265,7 @@ def test_HOTP_RFC_8digits_pin(C, use_8_digits, use_pin_protection):
 @pytest.mark.parametrize("PIN_protection", [False, True, ])
 def test_TOTP_RFC(C, PIN_protection):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_config(True, True, True, PIN_protection, not PIN_protection,
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
                              DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # test according to https://tools.ietf.org/html/rfc6238#appendix-B
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -318,7 +318,8 @@ def test_get_slot_names(C):
 
 
 def test_get_OTP_codes(C):
-    C.NK_set_debug(True)
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_erase_hotp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -342,13 +343,13 @@ def test_get_code_user_authorize(C):
     # enable PIN protection of OTP codes with write_config
     # TODO create convinience function on C API side to enable/disable OTP USER_PIN protection
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_config(True, True, True, True, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, True, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     code = C.NK_get_totp_code(0, 0, 0, 0)
     assert code == 0
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_NOT_AUTHORIZED
     # disable PIN protection with write_config
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_config(True, True, True, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     code = C.NK_get_totp_code(0, 0, 0, 0)
     assert code != 0
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
@@ -363,18 +364,18 @@ def cast_pointer_to_tuple(obj, typen, len):
 def test_read_write_config(C):
     C.NK_set_debug(True)
 
-    # let's set sample config with pin protection and disabled capslock
+    # let's set sample config with pin protection and disabled scrolllock
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_config(True, False, True, True, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(0, 1, 2, True, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     config_raw_data = C.NK_read_config()
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     config = cast_pointer_to_tuple(config_raw_data, 'uint8_t', 5)
-    assert config == (True, False, True, True, False)
+    assert config == (0, 1, 2, True, False)
 
     # restore defaults and check
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_config(True, True, True, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     config_raw_data = C.NK_read_config()
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     config = cast_pointer_to_tuple(config_raw_data, 'uint8_t', 5)
-    assert config == (True, True, True, False, True)
+    assert config == (255, 255, 255, False, True)

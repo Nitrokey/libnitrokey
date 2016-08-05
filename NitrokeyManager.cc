@@ -401,13 +401,10 @@ namespace nitrokey{
     }
 
     bool NitrokeyManager::is_AES_supported(const char *user_password) {
-        try {
-            auto a = get_payload<IsAESSupported>();
-            strcpyT(a.user_password, user_password);
-                IsAESSupported::CommandTransaction::run(*device, a);
-            }
-        catch (CommandFailedException &ex) {};
-        return device->get_last_command_status() == 0;
+        auto a = get_payload<IsAESSupported>();
+        strcpyT(a.user_password, user_password);
+        IsAESSupported::CommandTransaction::run(*device, a);
+        return true;
     }
 
 }

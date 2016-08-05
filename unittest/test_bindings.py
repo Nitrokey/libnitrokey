@@ -42,7 +42,10 @@ def C(request):
 
     C = ffi.dlopen("../build/libnitrokey.so")
     C.NK_set_debug(False)
-    C.NK_login('P')
+    nk_login = C.NK_login_auto()
+    if nk_login != 1:
+        print ('No devices detected!')
+    assert nk_login == 1  # returns 0 if not connected or wrong model or 1 when connected
 
     # assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # assert C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP) == DeviceErrorCode.STATUS_OK
@@ -116,7 +119,8 @@ def test_password_safe_slot_status(C):
     assert is_slot_programmed[1] == 1
 
 
-@pytest.mark.xfail(run=False, reason="issue to register: device locks up after below commands sequence (reinsertion fixes), skipping for now")
+@pytest.mark.xfail(run=False, reason="issue to register: device locks up "
+                                     "after below commands sequence (reinsertion fixes), skipping for now")
 def test_issue_device_locks_on_second_key_generation_in_sequence(C):
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK

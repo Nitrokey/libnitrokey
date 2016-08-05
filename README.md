@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/Nitrokey/libnitrokey.png?label=ready&title=Ready)](https://waffle.io/Nitrokey/libnitrokey)
 # libnitrokey
 Libnitrokey is a project to communicate with Nitrokey stick devices in clean and easy manner. Written in C++14, testable with `Catch` framework, with C API, Python access (through CFFI and C API, in future with Pybind11).
 

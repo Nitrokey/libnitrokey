@@ -32,7 +32,6 @@ def C(request):
 
     a = iter(declarations)
     for declaration in a:
-        # extern int NK_write_totp_slot(int slot_number, char* secret, int time_window);
         if declaration.startswith('extern') and not '"C"' in declaration:
             declaration = declaration.replace('extern', '').strip()
             while not ';' in declaration:

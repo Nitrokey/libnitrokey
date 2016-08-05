@@ -695,8 +695,6 @@ class UnlockUserPassword : Command<CommandID::UNLOCK_USER_PASSWORD> {
       }
   } __packed;
 
-  // TODO could we get the stick to return the retry count?
-
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
       CommandTransaction;
 };

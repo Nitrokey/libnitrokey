@@ -50,7 +50,7 @@ public:
   std::chrono::milliseconds get_retry_timeout() const { return m_retry_timeout; };
     std::chrono::milliseconds get_send_receive_delay() const {return m_send_receive_delay;}
 
-    int get_last_command_status() const {return last_command_status;};
+    int get_last_command_status() {auto a = last_command_status; last_command_status = 0; return a;};
     void set_last_command_status(uint8_t _err) { last_command_status = _err;} ;
     bool last_command_sucessfull() const {return last_command_status == 0;};
     DeviceModel get_device_model() const {return m_model;}

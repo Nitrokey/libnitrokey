@@ -372,9 +372,10 @@ namespace nitrokey{
         FactoryReset::CommandTransaction::run(*device, p);
     }
 
-    void NitrokeyManager::unlock_user_password(const char *admin_password) {
+    void NitrokeyManager::unlock_user_password(const char *admin_password, const char *new_user_password) {
         auto p = get_payload<UnlockUserPassword>();
         strcpyT(p.admin_password, admin_password);
+        strcpyT(p.user_new_password, new_user_password);
         UnlockUserPassword::CommandTransaction::run(*device, p);
     }
 

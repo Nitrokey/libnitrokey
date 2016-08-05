@@ -81,7 +81,7 @@ extern int NK_build_aes_key(const char* admin_password);
  * @param admin_password char[20](Pro) current administrator PIN
  * @return command processing error code
  */
-extern int NK_unlock_user_password(const char* admin_password);
+extern int NK_unlock_user_password(const char *admin_password, const char *new_user_password);
 
 /**
  * Write general config to the device

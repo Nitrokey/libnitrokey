@@ -70,7 +70,7 @@ namespace nitrokey {
 
         void build_aes_key(const char *admin_password);
 
-        void unlock_user_password(const char *admin_password);
+        void unlock_user_password(const char *admin_password, const char *new_user_password);
 
         void write_config(bool numlock, bool capslock, bool scrolllock, bool enable_user_password,
                           bool delete_user_password, const char *admin_temporary_password);

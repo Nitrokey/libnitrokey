@@ -123,10 +123,10 @@ extern int NK_build_aes_key(const char* admin_password){
     });
 }
 
-extern int NK_unlock_user_password(const char* admin_password){
+extern int NK_unlock_user_password(const char *admin_password, const char *new_user_password) {
     auto m = NitrokeyManager::instance();
     return get_without_result( [&](){
-        return m->unlock_user_password(admin_password);
+        m->unlock_user_password(admin_password, new_user_password);
     });
 }
 

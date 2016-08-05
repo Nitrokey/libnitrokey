@@ -686,7 +686,8 @@ class UserAuthorize : Command<CommandID::USER_AUTHORIZE> {
 class UnlockUserPassword : Command<CommandID::UNLOCK_USER_PASSWORD> {
  public:
   struct CommandPayload {
-    uint8_t admin_password[20];
+    uint8_t admin_password[25];
+    uint8_t user_new_password[25];
       std::string dissect() const {
           std::stringstream ss;
           ss << " admin_password:\t" <<  admin_password<< std::endl;

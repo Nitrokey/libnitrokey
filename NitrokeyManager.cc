@@ -180,7 +180,7 @@ namespace nitrokey{
         payload.use_8_digits = use_8_digits;
         payload.use_enter = use_enter;
         payload.use_tokenID = use_tokenID;
-        payload.slot_token_id
+        payload.slot_token_id; //FIXME add slot token id to function headers
 
         auto auth = get_payload<Authorize>();
         strcpyT(auth.temporary_password, temporary_password);

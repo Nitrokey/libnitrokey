@@ -161,7 +161,13 @@ class Transaction : semantics::non_constructible {
     return outp.crc;
   }
 
-  static response_payload run(device::Device &dev,
+    template <typename T>
+    static void clear_packet(T &st){
+        bzero(&st, sizeof(st));
+    }
+
+
+    static response_payload run(device::Device &dev,
                               const command_payload &payload) {
     using namespace ::nitrokey::device;
     using namespace ::nitrokey::log;
@@ -208,6 +214,8 @@ class Transaction : semantics::non_constructible {
       std::this_thread::sleep_for(dev.get_retry_timeout());
       continue;
     }
+    clear_packet(outp);
+
     if (status <= 0)
       throw std::runtime_error(
           std::string("Device error while executing command ") +

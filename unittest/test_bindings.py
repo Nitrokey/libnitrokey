@@ -264,6 +264,24 @@ def test_HOTP_RFC_use8digits_usepin(C, use_8_digits, use_pin_protection):
         check_HOTP_RFC_codes(C, C.NK_get_hotp_code, use_8_digits=use_8_digits)
 
 
+def test_HOTP_token(C):
+    """
+    Check HOTP routine with written token ID to slot.
+    """
+    use_pin_protection = False
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, use_pin_protection, not use_pin_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    token_ID = "AAV100000022"
+    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, False, False, True, token_ID,
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    for i in range(5):
+        hotp_code = C.NK_get_hotp_code(1)
+        assert hotp_code != 0
+        assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+
+
 @pytest.mark.xfail(reason="firmware bug: set time command not always changes the time on stick thus failing this test, "
                           "this does not influence normal use since setting time is not done every TOTP code request")
 @pytest.mark.parametrize("PIN_protection", [False, True, ])

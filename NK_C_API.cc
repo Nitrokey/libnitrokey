@@ -106,20 +106,20 @@ extern int NK_first_authenticate(const char* admin_password, const char* admin_t
 extern int NK_user_authenticate(const char* user_password, const char* user_temporary_password){
     auto m = NitrokeyManager::instance();
     return get_without_result( [&](){
-        return m->user_authenticate(user_password, user_temporary_password);
+        m->user_authenticate(user_password, user_temporary_password);
     });
 }
 
 extern int NK_factory_reset(const char* admin_password){
     auto m = NitrokeyManager::instance();
     return get_without_result( [&](){
-        return m->factory_reset(admin_password);
+        m->factory_reset(admin_password);
     });
 }
 extern int NK_build_aes_key(const char* admin_password){
     auto m = NitrokeyManager::instance();
     return get_without_result( [&](){
-        return m->build_aes_key(admin_password);
+        m->build_aes_key(admin_password);
     });
 }
 

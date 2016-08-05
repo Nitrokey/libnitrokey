@@ -128,6 +128,7 @@ def test_regenerate_aes_key(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.xfail(reason="firmware bug: regenerating AES key command not always results in cleared slot data")
 def test_destroy_password_safe(C):
     """
     Sometimes fails on NK Pro - slot name is not cleared ergo key generation has not succeed despite the success result
@@ -236,9 +237,9 @@ def check_HOTP_RFC_codes(C, func, prep=None, use_8_digits=False):
     assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, use_8_digits, False, False, "",
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     test_data = [
-            1284755224, 1094287082, 137359152, 1726969429, 1640338314, 868254676, 1918287922, 82162583, 673399871,
-            645520489,
-        ]
+        1284755224, 1094287082, 137359152, 1726969429, 1640338314, 868254676, 1918287922, 82162583, 673399871,
+        645520489,
+    ]
     for code in test_data:
         if prep:
             prep()
@@ -262,6 +263,8 @@ def test_HOTP_RFC_8digits_pin(C, use_8_digits, use_pin_protection):
         check_HOTP_RFC_codes(C, C.NK_get_hotp_code, use_8_digits=use_8_digits)
 
 
+@pytest.mark.xfail(reason="firmware bug: set time command not always changes the time on stick thus failing this test, "
+                          "this does not influence normal use since setting time is not done every TOTP code request")
 @pytest.mark.parametrize("PIN_protection", [False, True, ])
 def test_TOTP_RFC(C, PIN_protection):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK

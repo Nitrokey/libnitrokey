@@ -211,7 +211,7 @@ def test_user_auth(C):
 
 def check_RFC_codes(C, func, prep=None):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, False,
+    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, False, False, False,
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     test_data = [
         755224, 287082, 359152, 969429, 338314, 254676, 287922, 162583, 399871, 520489,
@@ -229,7 +229,7 @@ def test_HOTP_RFC_pin_protection(C):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(True, True, True, True, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, False,
+    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, False, False, False,
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # check_RFC_codes(C, lambda x: C.NK_get_hotp_code_PIN(x, DefaultPasswords.USER_TEMP), lambda: C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP))
     assert C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP) == DeviceErrorCode.STATUS_OK
@@ -244,7 +244,7 @@ def test_HOTP_RFC_no_pin_protection_8digits(C):
 
 def test_HOTP_RFC_no_pin_protection(C):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, False,
+    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, False, False, False,
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(True, True, True, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -257,7 +257,7 @@ def test_TOTP_RFC_no_pin_protection(C):
     assert C.NK_write_config(True, True, True, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # test according to https://tools.ietf.org/html/rfc6238#appendix-B
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_totp_slot(1, 'python_test', RFC_SECRET, 30, True,
+    assert C.NK_write_totp_slot(1, 'python_test', RFC_SECRET, 30, True, False, False,
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     test_data = [
         (59, 1, 94287082),
@@ -309,7 +309,7 @@ def test_get_OTP_codes(C):
 def test_get_code_user_authorize(C):
     C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_totp_slot(0, 'python_otp_auth', RFC_SECRET, 30, True,
+    assert C.NK_write_totp_slot(0, 'python_otp_auth', RFC_SECRET, 30, True, False, False,
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # enable PIN protection of OTP codes with write_config
     # TODO create convinience function on C API side to enable/disable OTP USER_PIN protection

@@ -20,6 +20,7 @@ class DeviceErrorCode(Enum):
     NOT_PROGRAMMED = 3
     WRONG_PASSWORD = 4
     STATUS_NOT_AUTHORIZED = 5
+    STATUS_AES_DEC_FAILED = 0xa
 
 
 @pytest.fixture(scope="module")
@@ -382,3 +383,30 @@ def test_read_write_config(C):
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     config = cast_pointer_to_tuple(config_raw_data, 'uint8_t', 5)
     assert config == (255, 255, 255, False, True)
+
+
+def wait(t):
+    import time
+    msg = 'Waiting for %d seconds' % t
+    print(msg.center(40, '='))
+    time.sleep(t)
+
+
+# @pytest.mark.skip()
+def test_factory_reset(C):
+    C.NK_set_debug(True)
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, False, False, False, "",
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_get_hotp_code(1) == 755224
+    assert C.NK_factory_reset(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+    wait(10)
+    assert C.NK_get_hotp_code(1) != 287082
+    assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
+    # restore AES key
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK

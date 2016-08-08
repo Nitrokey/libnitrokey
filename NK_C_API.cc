@@ -358,8 +358,8 @@ extern int NK_enable_password_safe(const char *user_pin){
 extern uint8_t * NK_get_password_safe_slot_status(){
     NK_last_command_status = 0;
     auto m = NitrokeyManager::instance();
-    auto res = new uint8_t[16];
-    memset(res, 0, 16);
+    auto null_result = new uint8_t[16];
+    memset(null_result, 0, 16);
     try {
         const auto slot_status = m->get_password_safe_slot_status();
         return slot_status; //TODO FIXME
@@ -367,7 +367,7 @@ extern uint8_t * NK_get_password_safe_slot_status(){
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
     }
-    return res;
+    return null_result;
 }
 
 extern uint8_t NK_get_user_retry_count(){

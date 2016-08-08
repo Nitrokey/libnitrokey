@@ -43,8 +43,7 @@ auto get_with_result(T func){
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
-        return commandFailedException.last_command_status;
-//        return (uint8_t) 0;
+        return static_cast<decltype(func())>(0);
     }
 }
 
@@ -88,15 +87,9 @@ extern int NK_login(const char *device_model) {
 
 extern int NK_logout() {
     auto m = NitrokeyManager::instance();
-    try {
-        NK_last_command_status = 0;
+    return get_without_result( [&](){
         m->disconnect();
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-        return commandFailedException.last_command_status;
-    }
-    return 0;
+    });
 }
 
 extern int NK_first_authenticate(const char* admin_password, const char* admin_temporary_password){
@@ -154,16 +147,11 @@ extern uint8_t* NK_read_config(){
 
 
 extern const char * NK_status() {
-    NK_last_command_status = 0;
     auto m = NitrokeyManager::instance();
-    try {
-        string s = m->get_status();
-        return strdup(s.c_str()); //FIXME leak?
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-    }
-    return "";
+    return get_with_string_result([&](){
+        string s = m->get_status(); //FIXME string without clearing
+        return strdup(s.c_str());
+    });
 }
 
 
@@ -172,16 +160,10 @@ extern uint32_t NK_get_hotp_code(uint8_t slot_number) {
 }
 
 extern uint32_t NK_get_hotp_code_PIN(uint8_t slot_number, const char* user_temporary_password){
-    NK_last_command_status = 0;
     auto m = NitrokeyManager::instance();
-    try {
-        const auto code = m->get_HOTP_code(slot_number, user_temporary_password);
-        return code;
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-    }
-    return 0;
+    return get_with_result([&](){
+        return m->get_HOTP_code(slot_number, user_temporary_password);
+    });
 }
 
 extern uint32_t NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
@@ -191,99 +173,59 @@ extern uint32_t NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64
 
 extern uint32_t NK_get_totp_code_PIN(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
                                  uint8_t last_interval, const char* user_temporary_password){
-    NK_last_command_status = 0;
     auto m = NitrokeyManager::instance();
-    try {
-        const auto totp_code = m->get_TOTP_code(slot_number, challenge, last_totp_time, last_interval, user_temporary_password);
-        return totp_code;
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-    }
-    return 0;
+    return get_with_result([&](){
+        return m->get_TOTP_code(slot_number, challenge, last_totp_time, last_interval, user_temporary_password);
+    });
 }
 
 extern int NK_erase_hotp_slot(uint8_t slot_number, const char *temporary_password) {
-    NK_last_command_status = 0;
     auto m = NitrokeyManager::instance();
-    try {
+    return get_without_result([&]{
         m->erase_hotp_slot(slot_number, temporary_password);
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-        return commandFailedException.last_command_status;
-    }
-    return 0;
+    });
 }
 
 extern int NK_erase_totp_slot(uint8_t slot_number, const char *temporary_password) {
-    NK_last_command_status = 0;
     auto m = NitrokeyManager::instance();
-    try {
+    return get_without_result([&]{
         m->erase_totp_slot(slot_number, temporary_password);
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-        return commandFailedException.last_command_status;
-    }
-    return 0;
+    });
 }
 
 extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter,
                               bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
                               const char *temporary_password) {
-    NK_last_command_status = 0;
     auto m = NitrokeyManager::instance();
-    try {
+    return get_without_result([&]{
         m->write_HOTP_slot(slot_number, slot_name, secret, hotp_counter, use_8_digits, use_enter, use_tokenID, token_ID,
                            temporary_password);
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-        return commandFailedException.last_command_status;
-    }
-    return 0;
+    });
 }
 
 extern int NK_write_totp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint16_t time_window,
                               bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
                               const char *temporary_password) {
-    NK_last_command_status = 0;
     auto m = NitrokeyManager::instance();
-    try {
+    return get_without_result([&]{
         m->write_TOTP_slot(slot_number, slot_name, secret, time_window, use_8_digits, use_enter, use_tokenID, token_ID,
                            temporary_password);
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-        return commandFailedException.last_command_status;
-    }
-    return 0;
+    });
 }
 
 extern const char* NK_get_totp_slot_name(uint8_t slot_number){
-    NK_last_command_status = 0;
     auto m = NitrokeyManager::instance();
-    try {
+    return get_with_string_result([&]() {
         const auto slot_name = m->get_totp_slot_name(slot_number);
         return slot_name;
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-        return "";
-    }
+    });
 }
 extern const char* NK_get_hotp_slot_name(uint8_t slot_number){
-    NK_last_command_status = 0;
     auto m = NitrokeyManager::instance();
-    try {
+    return get_with_string_result([&]() {
         const auto slot_name = m->get_hotp_slot_name(slot_number);
         return slot_name;
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-        return "";
-    }
+    });
 }
 
 extern void NK_set_debug(bool state){
@@ -292,68 +234,38 @@ extern void NK_set_debug(bool state){
 }
 
 extern int NK_totp_set_time(uint64_t time){
-    NK_last_command_status = 0;
     auto m = NitrokeyManager::instance();
-    try {
+    return get_without_result([&](){
         m->set_time(time);
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-        return commandFailedException.last_command_status;
-    }
-    return 0;
+    });
 }
 
 extern int NK_totp_get_time(){
-    NK_last_command_status = 0;
     auto m = NitrokeyManager::instance();
-    try {
-        m->get_time();
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-        return commandFailedException.last_command_status;
-    }
-    return 0;
+    return get_without_result([&](){
+        m->get_time(); // FIXME check how that should work
+    });
 }
 
 extern int NK_change_admin_PIN(char *current_PIN, char *new_PIN){
-    NK_last_command_status = 0;
     auto m = NitrokeyManager::instance();
-    try {
+    return get_without_result([&](){
         m->change_admin_PIN(current_PIN, new_PIN);
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-        return commandFailedException.last_command_status;
-    }
-    return 0;
+    });
 }
 
 extern int NK_change_user_PIN(char *current_PIN, char *new_PIN){
-    NK_last_command_status = 0;
     auto m = NitrokeyManager::instance();
-    try {
+    return get_without_result([&](){
         m->change_user_PIN(current_PIN, new_PIN);
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-        return commandFailedException.last_command_status;
-    }
-    return 0;
+    });
 }
 
 extern int NK_enable_password_safe(const char *user_pin){
-    NK_last_command_status = 0;
     auto m = NitrokeyManager::instance();
-    try {
+    return get_without_result([&](){
         m->enable_password_safe(user_pin);
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-        return commandFailedException.last_command_status;
-    }
-    return 0;
+    });
 }
 extern uint8_t * NK_get_password_safe_slot_status(){
     NK_last_command_status = 0;

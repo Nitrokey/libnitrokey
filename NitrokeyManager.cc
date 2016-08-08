@@ -31,7 +31,7 @@ namespace nitrokey{
         A::CommandTransaction::run(*device, auth);
     }
 
-    NitrokeyManager * NitrokeyManager::_instance = nullptr;
+    shared_ptr <NitrokeyManager> NitrokeyManager::_instance = nullptr;
 
     NitrokeyManager::NitrokeyManager() {
         set_debug(true);
@@ -65,9 +65,9 @@ namespace nitrokey{
         return device->connect();
     }
 
-    NitrokeyManager *NitrokeyManager::instance() {
+    shared_ptr<NitrokeyManager> NitrokeyManager::instance() {
         if (_instance == nullptr){
-            _instance = new NitrokeyManager();
+            _instance = shared_ptr<NitrokeyManager>(new NitrokeyManager());
         }
         return _instance;
     }

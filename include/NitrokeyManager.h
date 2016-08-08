@@ -19,7 +19,7 @@ namespace nitrokey {
 
     class NitrokeyManager {
     public:
-        static NitrokeyManager *instance();
+        static shared_ptr <NitrokeyManager> instance();
 
         bool first_authenticate(const char *pin, const char *temporary_password);
         bool write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter,
@@ -81,11 +81,11 @@ namespace nitrokey {
 
         bool is_AES_supported(const char *user_password);
 
+        ~NitrokeyManager();
     private:
         NitrokeyManager();
-        ~NitrokeyManager();
 
-        static NitrokeyManager *_instance;
+        static shared_ptr <NitrokeyManager> _instance;
         bool connected;
         std::shared_ptr<Device> device;
 

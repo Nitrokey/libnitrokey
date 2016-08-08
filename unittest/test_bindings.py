@@ -44,7 +44,7 @@ def C(request):
     C.NK_set_debug(False)
     nk_login = C.NK_login_auto()
     if nk_login != 1:
-        print ('No devices detected!')
+        print('No devices detected!')
     assert nk_login == 1  # returns 0 if not connected or wrong model or 1 when connected
 
     # assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -346,10 +346,6 @@ def test_get_slot_names(C):
 def test_get_OTP_codes(C):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_erase_hotp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_erase_totp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     for i in range(15):
         code = C.NK_get_totp_code(i, 0, 0, 0)
         if code == 0:
@@ -359,6 +355,20 @@ def test_get_OTP_codes(C):
         code = C.NK_get_hotp_code(i)
         if code == 0:
             assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
+
+def test_get_OTP_code_from_not_programmed_slot(C):
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_erase_hotp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_erase_totp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+
+    code = C.NK_get_hotp_code(0)
+    assert code == 0
+    assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
+
+    code = C.NK_get_totp_code(0, 0, 0, 0)
+    assert code == 0
+    assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
 
 
 def test_get_code_user_authorize(C):
@@ -432,3 +442,10 @@ def test_factory_reset(C):
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+
+
+def test_clear(C):
+    d = 'asdasdasd'
+    print(d)
+    C.clear_password(d)
+    print(d)

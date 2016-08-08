@@ -24,7 +24,7 @@ namespace nitrokey{
 
     // package type to auth, auth type [Authorize,UserAuthorize]
     template <typename S, typename A, typename T>
-    void auth_package(T& package, const char* admin_temporary_password, Device * device){
+    void auth_package(T& package, const char* admin_temporary_password, shared_ptr<Device> device){
         auto auth = get_payload<A>();
         strcpyT(auth.temporary_password, admin_temporary_password);
         auth.crc_to_authorize = S::CommandTransaction::getCRC(package);
@@ -33,22 +33,18 @@ namespace nitrokey{
 
     NitrokeyManager * NitrokeyManager::_instance = nullptr;
 
-    NitrokeyManager::NitrokeyManager(): device(nullptr) {
+    NitrokeyManager::NitrokeyManager() {
         set_debug(true);
     }
     NitrokeyManager::~NitrokeyManager() {
-        delete device;
     }
 
     bool NitrokeyManager::connect() {
         device = nullptr;
-        vector<Device*> devices = { new Stick10(), new Stick20() };
+        vector< shared_ptr<Device> > devices = { make_shared<Stick10>(), make_shared<Stick20>() };
         for( auto d : devices ){
-            if (device != nullptr){
-                delete d;
-            }
-            if (device == nullptr && d->connect()){
-                device = d;
+            if (d->connect()){
+                device = std::shared_ptr<Device>(d);
             }
         }
         return device != nullptr;
@@ -58,10 +54,10 @@ namespace nitrokey{
     bool NitrokeyManager::connect(const char *device_model) {
         switch (device_model[0]){
             case 'P':
-                device = new Stick10();
+                device = make_shared<Stick10>();
                 break;
             case 'S':
-                device = new Stick20();
+                device = make_shared<Stick20>();
                 break;
             default:
                 throw std::runtime_error("Unknown model");

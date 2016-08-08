@@ -7,6 +7,7 @@
 #include "stick10_commands.h"
 #include "stick20_commands.h"
 #include <vector>
+#include <memory>
 
 namespace nitrokey {
     using namespace nitrokey::device;
@@ -86,7 +87,7 @@ namespace nitrokey {
 
         static NitrokeyManager *_instance;
         bool connected;
-        Device *device;
+        std::shared_ptr<Device> device;
 
         bool is_valid_hotp_slot_number(uint8_t slot_number) const;
         bool is_valid_totp_slot_number(uint8_t slot_number) const;

@@ -144,7 +144,7 @@ public:
         bzero(&packet, sizeof(packet));
     }
 
-    response_payload & data(){
+    response_payload & data() {
         return packet.payload;
     }
 

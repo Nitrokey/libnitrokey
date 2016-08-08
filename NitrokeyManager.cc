@@ -24,7 +24,7 @@ namespace nitrokey{
 
     // package type to auth, auth type [Authorize,UserAuthorize]
     template <typename S, typename A, typename T>
-    void auth_package(T& package, const char* admin_temporary_password, shared_ptr<Device> device){
+    void authorize_packet(T &package, const char *admin_temporary_password, shared_ptr<Device> device){
         auto auth = get_payload<A>();
         strcpyT(auth.temporary_password, admin_temporary_password);
         auth.crc_to_authorize = S::CommandTransaction::getCRC(package);
@@ -95,7 +95,7 @@ namespace nitrokey{
         gh.slot_number = get_internal_slot_number_for_hotp(slot_number);
 
         if(user_temporary_password != nullptr && strlen(user_temporary_password)!=0){ //FIXME use string instead of strlen
-            auth_package<GetHOTP, UserAuthorize>(gh, user_temporary_password, device);
+            authorize_packet<GetHOTP, UserAuthorize>(gh, user_temporary_password, device);
         }
 
         auto resp = GetHOTP::CommandTransaction::run(*device, gh);
@@ -120,7 +120,7 @@ namespace nitrokey{
         gt.last_totp_time = last_totp_time;
 
         if(user_temporary_password != nullptr && strlen(user_temporary_password)!=0){ //FIXME use string instead of strlen
-            auth_package<GetTOTP, UserAuthorize>(gt, user_temporary_password, device);
+            authorize_packet<GetTOTP, UserAuthorize>(gt, user_temporary_password, device);
         }
         auto resp = GetTOTP::CommandTransaction::run(*device, gt);
         return resp.data().code;
@@ -130,7 +130,7 @@ namespace nitrokey{
         auto p = get_payload<EraseSlot>();
         p.slot_number = slot_number;
 
-        auth_package<EraseSlot, Authorize>(p, temporary_password, device);
+        authorize_packet<EraseSlot, Authorize>(p, temporary_password, device);
 
         auto resp = EraseSlot::CommandTransaction::run(*device,p);
         return true;
@@ -167,7 +167,7 @@ namespace nitrokey{
         payload.use_enter = use_enter;
         payload.use_tokenID = use_tokenID;
 
-        auth_package<WriteToHOTPSlot, Authorize>(payload, temporary_password, device);
+        authorize_packet<WriteToHOTPSlot, Authorize>(payload, temporary_password, device);
 
         auto resp = WriteToHOTPSlot::CommandTransaction::run(*device, payload);
         return true;
@@ -191,7 +191,7 @@ namespace nitrokey{
         payload.use_enter = use_enter;
         payload.use_tokenID = use_tokenID;
 
-        auth_package<WriteToTOTPSlot, Authorize>(payload, temporary_password, device);
+        authorize_packet<WriteToTOTPSlot, Authorize>(payload, temporary_password, device);
 
         auto resp = WriteToTOTPSlot::CommandTransaction::run(*device, payload);
         return true;
@@ -395,7 +395,7 @@ namespace nitrokey{
         p.enable_user_password = (uint8_t) enable_user_password;
         p.delete_user_password = (uint8_t) delete_user_password;
 
-        auth_package<WriteGeneralConfig, Authorize>(p, admin_temporary_password, device);
+        authorize_packet<WriteGeneralConfig, Authorize>(p, admin_temporary_password, device);
 
         WriteGeneralConfig::CommandTransaction::run(*device, p);
     }

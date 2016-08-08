@@ -98,7 +98,6 @@ namespace nitrokey{
         auto gh = get_payload<GetHOTP>();
         gh.slot_number = get_internal_slot_number_for_hotp(slot_number);
 
-        //TODO handle user authorization requests (taken from config)
         if(user_temporary_password != nullptr && strlen(user_temporary_password)!=0){ //FIXME use string instead of strlen
             auth_package<GetHOTP, UserAuthorize>(gh, user_temporary_password, device);
         }
@@ -123,7 +122,7 @@ namespace nitrokey{
         gt.challenge = challenge;
         gt.last_interval = last_interval;
         gt.last_totp_time = last_totp_time;
-        //TODO handle user authorization requests (taken from config)
+
         if(user_temporary_password != nullptr && strlen(user_temporary_password)!=0){ //FIXME use string instead of strlen
             auth_package<GetTOTP, UserAuthorize>(gt, user_temporary_password, device);
         }

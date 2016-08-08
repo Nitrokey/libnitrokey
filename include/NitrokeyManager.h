@@ -95,7 +95,7 @@ namespace nitrokey {
         uint8_t get_internal_slot_number_for_hotp(uint8_t slot_number) const;
         uint8_t get_internal_slot_number_for_totp(uint8_t slot_number) const;
         bool erase_slot(uint8_t slot_number, const char *temporary_password);
-        uint8_t *get_slot_name(uint8_t slot_number) const;
+        uint8_t *get_slot_name(uint8_t slot_number);
 
         template <typename ProCommand, PasswordKind StoKind>
         void change_PIN_general(char *current_PIN, char *new_PIN);

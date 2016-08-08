@@ -134,10 +134,7 @@ namespace nitrokey{
         auto p = get_payload<EraseSlot>();
         p.slot_number = slot_number;
 
-        auto auth = get_payload<Authorize>();
-        strcpyT(auth.temporary_password, temporary_password);
-        auth.crc_to_authorize = EraseSlot::CommandTransaction::getCRC(p);
-        Authorize::CommandTransaction::run(*device, auth);
+        auth_package<EraseSlot, Authorize>(p, temporary_password, device);
 
         auto resp = EraseSlot::CommandTransaction::run(*device,p);
         return true;
@@ -174,10 +171,7 @@ namespace nitrokey{
         payload.use_enter = use_enter;
         payload.use_tokenID = use_tokenID;
 
-        auto auth = get_payload<Authorize>();
-        strcpyT(auth.temporary_password, temporary_password);
-        auth.crc_to_authorize = WriteToHOTPSlot::CommandTransaction::getCRC(payload);
-        Authorize::CommandTransaction::run(*device, auth);
+        auth_package<WriteToHOTPSlot, Authorize>(payload, temporary_password, device);
 
         auto resp = WriteToHOTPSlot::CommandTransaction::run(*device, payload);
         return true;
@@ -201,10 +195,7 @@ namespace nitrokey{
         payload.use_enter = use_enter;
         payload.use_tokenID = use_tokenID;
 
-        auto auth = get_payload<Authorize>();
-        strcpyT(auth.temporary_password, temporary_password);
-        auth.crc_to_authorize = WriteToTOTPSlot::CommandTransaction::getCRC(payload);
-        Authorize::CommandTransaction::run(*device, auth);
+        auth_package<WriteToTOTPSlot, Authorize>(payload, temporary_password, device);
 
         auto resp = WriteToTOTPSlot::CommandTransaction::run(*device, payload);
         return true;

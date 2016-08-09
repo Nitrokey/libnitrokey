@@ -5,9 +5,10 @@ using namespace nitrokey;
 static uint8_t NK_last_command_status = 0;
 
 template <typename T>
-T* array_dup(std::vector<T>& v){
+T* duplicate_vector_and_clear(std::vector<T> &v){
     auto d = new T[v.size()];
     std::copy(v.begin(), v.end(), d);
+    std::fill(v.begin(), v.end(), 0);
     return d;
 }
 
@@ -141,7 +142,7 @@ extern uint8_t* NK_read_config(){
     auto m = NitrokeyManager::instance();
     return get_with_array_result( [&](){
         auto v = m->read_config();
-        return array_dup(v);
+        return duplicate_vector_and_clear(v);
     });
 }
 
@@ -274,18 +275,12 @@ extern int NK_enable_password_safe(const char *user_pin){
     });
 }
 extern uint8_t * NK_get_password_safe_slot_status(){
-    NK_last_command_status = 0;
     auto m = NitrokeyManager::instance();
-    auto null_result = new uint8_t[16];
-    memset(null_result, 0, 16);
-    try {
-        const auto slot_status = m->get_password_safe_slot_status();
-        return slot_status; //TODO FIXME
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-    }
-    return null_result;
+    return get_with_array_result( [&](){
+        auto slot_status = m->get_password_safe_slot_status();
+        return duplicate_vector_and_clear(slot_status);
+    });
+
 }
 
 extern uint8_t NK_get_user_retry_count(){

@@ -282,12 +282,12 @@ namespace nitrokey{
         EnablePasswordSafe::CommandTransaction::run(*device, p);
     }
 
-    uint8_t * NitrokeyManager::get_password_safe_slot_status() {
-        auto responsePayload = GetPasswordSafeSlotStatus::CommandTransaction::run(*device); //TODO FIXME
-        auto res = new uint8_t[16];
-        memcpy(res, responsePayload.data().password_safe_status, 16*sizeof (uint8_t));
-        //FIXME return vector<uint8_t> and do copy on C_API side
-        return res;
+    vector <uint8_t> NitrokeyManager::get_password_safe_slot_status() {
+        auto responsePayload = GetPasswordSafeSlotStatus::CommandTransaction::run(*device);
+        vector<uint8_t> v = vector<uint8_t>(responsePayload.data().password_safe_status,
+                                            responsePayload.data().password_safe_status
+                                            + sizeof(responsePayload.data().password_safe_status));
+        return v;
     }
 
     uint8_t NitrokeyManager::get_user_retry_count() {

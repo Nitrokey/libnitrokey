@@ -397,6 +397,8 @@ def test_get_OTP_codes(C):
 
 def test_get_OTP_code_from_not_programmed_slot(C):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_erase_hotp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_erase_totp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -463,7 +465,6 @@ def wait(t):
     time.sleep(t)
 
 
-# @pytest.mark.skip()
 def test_factory_reset(C):
     C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -483,6 +484,7 @@ def test_factory_reset(C):
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.skip(reason='Experimental')
 def test_clear(C):
     d = 'asdasdasd'
     print(d)

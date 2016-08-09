@@ -187,6 +187,11 @@ def test_user_PIN_change(C):
     assert C.NK_change_user_PIN(new_password, DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
 
+def test_too_long_PIN(C):
+    new_password = '123123123'
+    assert C.NK_change_user_PIN('a' * 100, new_password) == DeviceErrorCode.WRONG_PASSWORD
+
+
 def test_admin_retry_counts(C):
     default_admin_retry_count = 3
     assert C.NK_get_admin_retry_count() == default_admin_retry_count
@@ -355,6 +360,7 @@ def test_get_OTP_codes(C):
         code = C.NK_get_hotp_code(i)
         if code == 0:
             assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
+
 
 def test_get_OTP_code_from_not_programmed_slot(C):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK

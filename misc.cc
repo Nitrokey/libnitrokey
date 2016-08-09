@@ -12,7 +12,7 @@ std::string hexdump(const char *p, size_t size) {
   const char *pstart = p;
 
   for (const char *pend = p + size; p < pend;) {
-    snprintf(formatbuf, 128, "%04x\t", p - pstart);
+    snprintf(formatbuf, 128, "%04lx\t", p - pstart);
     out << formatbuf;
 
     for (const char *le = p + 16; p < le && p < pend; p++) {

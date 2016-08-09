@@ -355,10 +355,10 @@ def test_TOTP_RFC_usepin(C, PIN_protection):
         """
         # import time
         # time.sleep(2)
-        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         if PIN_protection:
             C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP)
-        assert C.NK_totp_set_time(t) == DeviceErrorCode.STATUS_OK  # FIXME needs admin authentication
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_totp_set_time(t) == DeviceErrorCode.STATUS_OK
         r = get_func(1, T, 0, 30)  # FIXME T is not changing the outcome
         assert code == r
 

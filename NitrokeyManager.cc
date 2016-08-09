@@ -196,12 +196,12 @@ namespace nitrokey{
     const char * NitrokeyManager::get_totp_slot_name(uint8_t slot_number) {
         assert(is_valid_totp_slot_number(slot_number));
         slot_number = get_internal_slot_number_for_totp(slot_number);
-        return (const char *) get_slot_name(slot_number);
+        return get_slot_name(slot_number);
     }
     const char * NitrokeyManager::get_hotp_slot_name(uint8_t slot_number) {
         assert(is_valid_hotp_slot_number(slot_number));
         slot_number = get_internal_slot_number_for_hotp(slot_number);
-        return (const char *) get_slot_name(slot_number);
+        return get_slot_name(slot_number);
     }
 
     const char * NitrokeyManager::get_slot_name(uint8_t slot_number)  {

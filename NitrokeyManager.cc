@@ -1,8 +1,7 @@
 #include <cstring>
 #include <iostream>
 #include "include/NitrokeyManager.h"
-#include "include/TooLongStringException.h"
-#include "include/InvalidSlotException.h"
+#include "include/LibraryException.h"
 
 namespace nitrokey{
 

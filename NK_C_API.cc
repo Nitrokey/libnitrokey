@@ -1,6 +1,6 @@
 #include <cstring>
 #include "NK_C_API.h"
-#include "include/TooLongStringException.h"
+#include "include/LibraryException.h"
 
 using namespace nitrokey;
 

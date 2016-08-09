@@ -22,6 +22,6 @@ set(SOURCE_FILES
     log.cc
     misc.cc
     NitrokeyManager.cc
-        NK_C_API.cc CommandFailedException.cpp include/CommandFailedException.h TooLongStringException.cpp include/TooLongStringException.h include/InvalidSlotException.h include/LibraryException.h)
+        NK_C_API.cc include/CommandFailedException.h include/LibraryException.h)
 
 add_executable(libnitrokey ${SOURCE_FILES})

@@ -2,15 +2,18 @@
 #include <cstring>
 #include <iostream>
 #include "include/NitrokeyManager.h"
+#include "include/TooLongStringException.h"
 
 namespace nitrokey{
 
     template <typename T>
     void strcpyT(T& dest, const char* src){
         assert(src != nullptr);
-        const size_t s = sizeof dest;
-        assert(strlen(src) <= s); // FIXME should throw an exception to abort when too long string appears
-        strncpy((char*) &dest, src, s);
+        const size_t s_dest = sizeof dest;
+        if (strlen(src) > s_dest){
+            throw TooLongStringException(strlen(src), s_dest, src);
+        }
+        strncpy((char*) &dest, src, s_dest);
     }
 
     template <typename T>

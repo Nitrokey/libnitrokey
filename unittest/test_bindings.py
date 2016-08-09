@@ -23,6 +23,11 @@ class DeviceErrorCode(Enum):
     STATUS_AES_DEC_FAILED = 0xa
 
 
+class LibraryErrors(Enum):
+    TOO_LONG_STRING = 200
+    INVALID_SLOT = 201
+
+
 @pytest.fixture(scope="module")
 def C(request):
     fp = '../NK_C_API.h'
@@ -187,9 +192,27 @@ def test_user_PIN_change(C):
     assert C.NK_change_user_PIN(new_password, DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
 
-def test_too_long_PIN(C):
+def test_too_long_strings(C):
     new_password = '123123123'
-    assert C.NK_change_user_PIN('a' * 100, new_password) == DeviceErrorCode.WRONG_PASSWORD
+    long_string = 'a' * 100
+    assert C.NK_change_user_PIN(long_string, new_password) == LibraryErrors.TOO_LONG_STRING
+    assert C.NK_change_user_PIN(new_password, long_string) == LibraryErrors.TOO_LONG_STRING
+    assert C.NK_change_admin_PIN(long_string, new_password) == LibraryErrors.TOO_LONG_STRING
+    assert C.NK_change_admin_PIN(new_password, long_string) == LibraryErrors.TOO_LONG_STRING
+    assert C.NK_first_authenticate(long_string, DefaultPasswords.ADMIN_TEMP) == LibraryErrors.TOO_LONG_STRING
+    assert C.NK_erase_totp_slot(0, long_string) == LibraryErrors.TOO_LONG_STRING
+    digits = False
+    assert C.NK_write_hotp_slot(1, long_string, RFC_SECRET, 0, digits, False, False, "",
+                                DefaultPasswords.ADMIN_TEMP) == LibraryErrors.TOO_LONG_STRING
+    assert C.NK_write_hotp_slot(1, 'long_test', RFC_SECRET, 0, digits, False, False, "",
+                                long_string) == LibraryErrors.TOO_LONG_STRING
+    assert C.NK_get_hotp_code_PIN(0, long_string) == 0
+    assert C.NK_get_last_command_status() == LibraryErrors.TOO_LONG_STRING
+
+
+# def test_invalid_slot(C):
+#     invalid_slot = 255
+#     assert C.NK_erase_totp_slot(invalid_slot, 'some password') == LibraryErrors.INVALID_SLOT
 
 
 def test_admin_retry_counts(C):

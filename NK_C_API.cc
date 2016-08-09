@@ -1,5 +1,7 @@
 #include <cstring>
 #include "NK_C_API.h"
+#include "include/TooLongStringException.h"
+
 using namespace nitrokey;
 
 static uint8_t NK_last_command_status = 0;
@@ -20,8 +22,11 @@ uint8_t * get_with_array_result(T func){
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
-        return nullptr;
     }
+    catch (TooLongStringException & longStringException){
+        NK_last_command_status = TooLongStringException::exception_id;
+    }
+    return nullptr;
 }
 
 template <typename T>
@@ -32,8 +37,11 @@ const char* get_with_string_result(T func){
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
-        return "";
     }
+    catch (TooLongStringException & longStringException){
+        NK_last_command_status = TooLongStringException::exception_id;
+    }
+    return "";
 }
 
 template <typename T>
@@ -44,8 +52,11 @@ auto get_with_result(T func){
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
-        return static_cast<decltype(func())>(0);
     }
+    catch (TooLongStringException & longStringException){
+        NK_last_command_status = TooLongStringException::exception_id;
+    }
+    return static_cast<decltype(func())>(0);
 }
 
 template <typename T>
@@ -58,6 +69,10 @@ uint8_t get_without_result(T func){
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
         return commandFailedException.last_command_status;
+    }
+    catch (TooLongStringException & longStringException){
+        NK_last_command_status = TooLongStringException::exception_id;
+        return NK_last_command_status;
     }
 }
 

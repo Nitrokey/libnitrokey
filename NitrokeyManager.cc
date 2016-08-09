@@ -9,7 +9,7 @@ namespace nitrokey{
     void strcpyT(T& dest, const char* src){
         assert(src != nullptr);
         const size_t s = sizeof dest;
-        assert(strlen(src) <= s);
+        assert(strlen(src) <= s); // FIXME should throw an exception to abort when too long string appears
         strncpy((char*) &dest, src, s);
     }
 
@@ -42,7 +42,7 @@ namespace nitrokey{
     bool NitrokeyManager::connect() {
         device = nullptr;
         vector< shared_ptr<Device> > devices = { make_shared<Stick10>(), make_shared<Stick20>() };
-        for( auto d : devices ){
+        for( auto & d : devices ){
             if (d->connect()){
                 device = std::shared_ptr<Device>(d);
             }

@@ -204,11 +204,11 @@ namespace nitrokey{
         return (const char *) get_slot_name(slot_number);
     }
 
-    uint8_t *NitrokeyManager::get_slot_name(uint8_t slot_number)  { //FIXME -const s/uint/char:string
+    const char * NitrokeyManager::get_slot_name(uint8_t slot_number)  {
         auto payload = get_payload<GetSlotName>();
         payload.slot_number = slot_number;
         auto resp = GetSlotName::CommandTransaction::run(*device, payload);
-        return (uint8_t *) strdup((const char *) resp.data().slot_name);
+        return strdup((const char *) resp.data().slot_name);
     }
 
     bool NitrokeyManager::first_authenticate(const char *pin, const char *temporary_password) {

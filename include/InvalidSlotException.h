@@ -8,17 +8,21 @@
 
 #include <cstdint>
 #include <string>
-#include <exception>
+#include "LibraryException.h"
 
-class InvalidSlotException : public std::exception {
+
+class InvalidSlotException : public LibraryException {
 public:
-    static const std::uint8_t exception_id = 201;
+    virtual uint8_t exception_id() override {
+        return 201;
+    }
 
+public:
     uint8_t slot_selected;
 
     InvalidSlotException(uint8_t slot_selected) : slot_selected(slot_selected) {}
 
-    virtual const char *what() const throw() {
+    virtual const char *what() const throw() override {
         return "Wrong slot selected";
     }
 

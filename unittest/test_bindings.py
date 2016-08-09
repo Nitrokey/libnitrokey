@@ -210,9 +210,19 @@ def test_too_long_strings(C):
     assert C.NK_get_last_command_status() == LibraryErrors.TOO_LONG_STRING
 
 
-# def test_invalid_slot(C):
-#     invalid_slot = 255
-#     assert C.NK_erase_totp_slot(invalid_slot, 'some password') == LibraryErrors.INVALID_SLOT
+def test_invalid_slot(C):
+    invalid_slot = 255
+    assert C.NK_erase_totp_slot(invalid_slot, 'some password') == LibraryErrors.INVALID_SLOT
+    assert C.NK_write_hotp_slot(invalid_slot, 'long_test', RFC_SECRET, 0, False, False, False, "",
+                            'aaa') == LibraryErrors.INVALID_SLOT
+    assert C.NK_get_hotp_code_PIN(invalid_slot, 'some password') == 0
+    assert C.NK_get_last_command_status() == LibraryErrors.INVALID_SLOT
+    assert C.NK_erase_password_safe_slot(invalid_slot) == LibraryErrors.INVALID_SLOT
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    assert gs(C.NK_get_password_safe_slot_name(invalid_slot)) == ''
+    assert C.NK_get_last_command_status() == LibraryErrors.INVALID_SLOT
+    assert gs(C.NK_get_password_safe_slot_login(invalid_slot)) == ''
+    assert C.NK_get_last_command_status() == LibraryErrors.INVALID_SLOT
 
 
 def test_admin_retry_counts(C):

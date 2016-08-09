@@ -1,14 +1,16 @@
-#include <cassert>
 #include <cstring>
 #include <iostream>
 #include "include/NitrokeyManager.h"
 #include "include/TooLongStringException.h"
+#include "include/InvalidSlotException.h"
 
 namespace nitrokey{
 
     template <typename T>
     void strcpyT(T& dest, const char* src){
-        assert(src != nullptr);
+        if (src == nullptr)
+//            throw EmptySourceStringException(slot_number);
+            return;
         const size_t s_dest = sizeof dest;
         if (strlen(src) > s_dest){
             throw TooLongStringException(strlen(src), s_dest, src);
@@ -93,7 +95,7 @@ namespace nitrokey{
     }
 
     uint32_t NitrokeyManager::get_HOTP_code(uint8_t slot_number, const char *user_temporary_password) {
-        assert(is_valid_hotp_slot_number(slot_number));
+        if (!is_valid_hotp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         auto gh = get_payload<GetHOTP>();
         gh.slot_number = get_internal_slot_number_for_hotp(slot_number);
 
@@ -114,7 +116,7 @@ namespace nitrokey{
     uint32_t NitrokeyManager::get_TOTP_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
                                             uint8_t last_interval,
                                             const char *user_temporary_password) {
-        assert(is_valid_totp_slot_number(slot_number));
+        if(!is_valid_totp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         slot_number = get_internal_slot_number_for_totp(slot_number);
         auto gt = get_payload<GetTOTP>();
         gt.slot_number = slot_number;
@@ -140,13 +142,13 @@ namespace nitrokey{
     }
 
     bool NitrokeyManager::erase_hotp_slot(uint8_t slot_number, const char *temporary_password) {
-        assert(is_valid_hotp_slot_number(slot_number));
+        if (!is_valid_hotp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         slot_number = get_internal_slot_number_for_hotp(slot_number);
         return erase_slot(slot_number, temporary_password);
     }
 
     bool NitrokeyManager::erase_totp_slot(uint8_t slot_number, const char *temporary_password) {
-        assert(is_valid_totp_slot_number(slot_number));
+        if (!is_valid_totp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         slot_number = get_internal_slot_number_for_totp(slot_number);
         return erase_slot(slot_number, temporary_password);
     }
@@ -155,7 +157,7 @@ namespace nitrokey{
     bool NitrokeyManager::write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter,
                                               bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
                                               const char *temporary_password) {
-        assert(is_valid_hotp_slot_number(slot_number));
+        if (!is_valid_hotp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
 
         slot_number = get_internal_slot_number_for_hotp(slot_number);
         auto payload = get_payload<WriteToHOTPSlot>();
@@ -178,7 +180,7 @@ namespace nitrokey{
                                               bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
                                               const char *temporary_password) {
         auto payload = get_payload<WriteToTOTPSlot>();
-        assert(is_valid_totp_slot_number(slot_number));
+        if (!is_valid_totp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
 
         slot_number = get_internal_slot_number_for_totp(slot_number);
         payload.slot_number = slot_number;
@@ -197,12 +199,12 @@ namespace nitrokey{
     }
 
     const char * NitrokeyManager::get_totp_slot_name(uint8_t slot_number) {
-        assert(is_valid_totp_slot_number(slot_number));
+        if (!is_valid_totp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         slot_number = get_internal_slot_number_for_totp(slot_number);
         return get_slot_name(slot_number);
     }
     const char * NitrokeyManager::get_hotp_slot_name(uint8_t slot_number) {
-        assert(is_valid_hotp_slot_number(slot_number));
+        if (!is_valid_hotp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         slot_number = get_internal_slot_number_for_hotp(slot_number);
         return get_slot_name(slot_number);
     }
@@ -307,7 +309,7 @@ namespace nitrokey{
     }
 
     const char *NitrokeyManager::get_password_safe_slot_name(uint8_t slot_number) {
-        assert (is_valid_password_safe_slot_number(slot_number));
+        if (!is_valid_password_safe_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         auto p = get_payload<GetPasswordSafeSlotName>();
         p.slot_number = slot_number;
         auto response = GetPasswordSafeSlotName::CommandTransaction::run(*device, p);
@@ -317,7 +319,7 @@ namespace nitrokey{
     bool NitrokeyManager::is_valid_password_safe_slot_number(uint8_t slot_number) const { return slot_number < 16; }
 
     const char *NitrokeyManager::get_password_safe_slot_login(uint8_t slot_number) {
-        assert (is_valid_password_safe_slot_number(slot_number));
+        if (!is_valid_password_safe_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         auto p = get_payload<GetPasswordSafeSlotLogin>();
         p.slot_number = slot_number;
         auto response = GetPasswordSafeSlotLogin::CommandTransaction::run(*device, p);
@@ -325,7 +327,7 @@ namespace nitrokey{
     }
 
     const char *NitrokeyManager::get_password_safe_slot_password(uint8_t slot_number) {
-        assert (is_valid_password_safe_slot_number(slot_number));
+        if (!is_valid_password_safe_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         auto p = get_payload<GetPasswordSafeSlotPassword>();
         p.slot_number = slot_number;
         auto response = GetPasswordSafeSlotPassword::CommandTransaction::run(*device, p);
@@ -334,7 +336,7 @@ namespace nitrokey{
 
     void NitrokeyManager::write_password_safe_slot(uint8_t slot_number, const char *slot_name, const char *slot_login,
                                                        const char *slot_password) {
-        assert (is_valid_password_safe_slot_number(slot_number));
+        if (!is_valid_password_safe_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         auto p = get_payload<SetPasswordSafeSlotData>();
         p.slot_number = slot_number;
         strcpyT(p.slot_name, slot_name);
@@ -348,7 +350,7 @@ namespace nitrokey{
     }
 
     void NitrokeyManager::erase_password_safe_slot(uint8_t slot_number) {
-        assert (is_valid_password_safe_slot_number(slot_number));
+        if (!is_valid_password_safe_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         auto p = get_payload<ErasePasswordSafeSlot>();
         p.slot_number = slot_number;
         ErasePasswordSafeSlot::CommandTransaction::run(*device, p);

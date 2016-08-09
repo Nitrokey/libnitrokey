@@ -23,8 +23,8 @@ uint8_t * get_with_array_result(T func){
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
     }
-    catch (TooLongStringException & longStringException){
-        NK_last_command_status = TooLongStringException::exception_id;
+    catch (LibraryException & libraryException){
+        NK_last_command_status = libraryException.exception_id();
     }
     return nullptr;
 }
@@ -38,8 +38,8 @@ const char* get_with_string_result(T func){
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
     }
-    catch (TooLongStringException & longStringException){
-        NK_last_command_status = TooLongStringException::exception_id;
+    catch (LibraryException & libraryException){
+        NK_last_command_status = libraryException.exception_id();
     }
     return "";
 }
@@ -53,8 +53,8 @@ auto get_with_result(T func){
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
     }
-    catch (TooLongStringException & longStringException){
-        NK_last_command_status = TooLongStringException::exception_id;
+    catch (LibraryException & libraryException){
+        NK_last_command_status = libraryException.exception_id();
     }
     return static_cast<decltype(func())>(0);
 }
@@ -68,12 +68,11 @@ uint8_t get_without_result(T func){
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
-        return commandFailedException.last_command_status;
     }
-    catch (TooLongStringException & longStringException){
-        NK_last_command_status = TooLongStringException::exception_id;
-        return NK_last_command_status;
+    catch (LibraryException & libraryException){
+        NK_last_command_status = libraryException.exception_id();
     }
+    return NK_last_command_status;
 }
 
 extern "C"

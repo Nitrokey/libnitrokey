@@ -449,3 +449,9 @@ def test_clear(C):
     print(d)
     C.clear_password(d)
     print(d)
+
+
+def test_get_status(C):
+    status = C.NK_status()
+    s = gs(status)
+    assert len(s) > 0

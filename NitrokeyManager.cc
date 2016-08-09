@@ -153,8 +153,6 @@ namespace nitrokey{
                                               bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
                                               const char *temporary_password) {
         assert(is_valid_hotp_slot_number(slot_number));
-        assert(strlen(secret)==20); //160 bits
-        assert(strlen(slot_name)<=15);
 
         slot_number = get_internal_slot_number_for_hotp(slot_number);
         auto payload = get_payload<WriteToHOTPSlot>();
@@ -178,8 +176,6 @@ namespace nitrokey{
                                               const char *temporary_password) {
         auto payload = get_payload<WriteToTOTPSlot>();
         assert(is_valid_totp_slot_number(slot_number));
-        assert(strlen(secret) == sizeof payload.slot_secret); //160 bits
-        assert(strlen(slot_name) <= sizeof payload.slot_name);
 
         slot_number = get_internal_slot_number_for_totp(slot_number);
         payload.slot_number = slot_number;
@@ -217,10 +213,6 @@ namespace nitrokey{
 
     bool NitrokeyManager::first_authenticate(const char *pin, const char *temporary_password) {
         auto authreq = get_payload<FirstAuthenticate>();
-
-        assert(strlen(pin) < sizeof authreq.card_password);
-        assert(strlen(temporary_password) < sizeof authreq.temporary_password);
-
         strcpyT(authreq.card_password, pin);
         strcpyT(authreq.temporary_password, temporary_password);
         FirstAuthenticate::CommandTransaction::run(*device, authreq);

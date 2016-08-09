@@ -12,14 +12,6 @@ namespace nitrokey {
 namespace device {
     using namespace std::chrono_literals;
 
-enum class CommError {
-  ERR_NO_ERROR = 0,
-  ERR_NOT_CONNECTED = -1,
-  ERR_WRONG_RESPONSE_CRC = -2,
-  ERR_SENDING = -3,
-  ERR_STATUS_NOT_OK = -4
-};
-
 enum class DeviceModel{
     PRO,
     STORAGE

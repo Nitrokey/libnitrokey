@@ -146,11 +146,17 @@ extern uint8_t* NK_read_config(){
 }
 
 
+void clear_string(std::string &s){
+    std::fill(s.begin(), s.end(), ' ');
+}
+
 extern const char * NK_status() {
     auto m = NitrokeyManager::instance();
     return get_with_string_result([&](){
-        string s = m->get_status(); //FIXME string without clearing
-        return strdup(s.c_str());
+        string && s = m->get_status();
+        char * rs = strdup(s.c_str());
+        clear_string(s);
+        return rs;
     });
 }
 

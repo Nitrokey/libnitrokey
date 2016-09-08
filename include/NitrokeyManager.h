@@ -40,6 +40,7 @@ namespace nitrokey {
         bool disconnect();
         void set_debug(bool state);
         string get_status();
+        string get_serial_number();
 
         const char * get_totp_slot_name(uint8_t slot_number);
         const char * get_hotp_slot_name(uint8_t slot_number);

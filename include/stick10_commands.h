@@ -324,15 +324,20 @@ class GetStatus : Command<CommandID::GET_STATUS> {
       };
     bool isValid() const { return enable_user_password!=delete_user_password; }
 
+    std::string get_card_serial_hex() const {
+        return ::nitrokey::misc::hexdump((const char *)(card_serial),
+                sizeof card_serial, false);
+    }
+
     std::string dissect() const {
       std::stringstream ss;
       ss << "firmware_version:\t" << firmware_version << std::endl;
       ss << "card_serial:\t"
          << ::nitrokey::misc::hexdump((const char *)(card_serial),
-                                      sizeof card_serial);
+                                      sizeof card_serial, false);
       ss << "general_config:\t"
          << ::nitrokey::misc::hexdump((const char *)(general_config),
-                                      sizeof general_config);
+                                      sizeof general_config, false);
         ss << "numlock:\t" << (int)numlock << std::endl;
         ss << "capslock:\t" << (int)capslock << std::endl;
         ss << "scrolllock:\t" << (int)scrolllock << std::endl;

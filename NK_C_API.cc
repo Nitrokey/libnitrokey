@@ -175,6 +175,15 @@ extern const char * NK_status() {
     });
 }
 
+extern const char * NK_device_serial_number(){
+    auto m = NitrokeyManager::instance();
+    return get_with_string_result([&](){
+        string && s = m->get_serial_number();
+        char * rs = strdup(s.c_str());
+        clear_string(s);
+        return rs;
+    });
+}
 
 extern uint32_t NK_get_hotp_code(uint8_t slot_number) {
     return NK_get_hotp_code_PIN(slot_number, "");

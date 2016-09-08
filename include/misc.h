@@ -15,7 +15,7 @@ typename T::CommandPayload get_payload(){
 }
 
 
-    std::string hexdump(const char *p, size_t size);
+    std::string hexdump(const char *p, size_t size, bool print_header=true);
 uint32_t stm_crc32(const uint8_t *data, size_t size);
 }
 }

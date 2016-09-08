@@ -40,6 +40,12 @@ extern int NK_logout();
 extern const char * NK_status();
 
 /**
+ * Return the device's serial number string in hex.
+ * @return string device's serial number in hex
+ */
+extern const char * NK_device_serial_number();
+
+/**
  * Get last command processing status. Useful for commands which returns the results of their own and could not return
  * an error code.
  * @return previous command processing error code

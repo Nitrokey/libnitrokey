@@ -6,14 +6,16 @@
 namespace nitrokey {
 namespace misc {
 
-std::string hexdump(const char *p, size_t size) {
+std::string hexdump(const char *p, size_t size, bool print_header) {
   std::stringstream out;
   char formatbuf[128];
   const char *pstart = p;
 
   for (const char *pend = p + size; p < pend;) {
-    snprintf(formatbuf, 128, "%04lx\t", p - pstart);
-    out << formatbuf;
+      if (print_header){
+          snprintf(formatbuf, 128, "%04lx\t", p - pstart);
+          out << formatbuf;
+      }
 
     for (const char *le = p + 16; p < le && p < pend; p++) {
       snprintf(formatbuf, 128, "%02x ", uint8_t(*p));

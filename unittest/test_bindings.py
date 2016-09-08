@@ -496,3 +496,10 @@ def test_get_status(C):
     status = C.NK_status()
     s = gs(status)
     assert len(s) > 0
+
+
+def test_get_serial_number(C):
+    sn = C.NK_device_serial_number()
+    sn = gs(sn)
+    assert len(sn) > 0
+    print(('Serial number of the device: ', sn))

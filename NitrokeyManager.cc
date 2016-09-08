@@ -88,6 +88,11 @@ namespace nitrokey{
         }
     }
 
+    string NitrokeyManager::get_serial_number() {
+        auto response = GetStatus::CommandTransaction::run(*device);
+        return response.data().get_card_serial_hex();
+    }
+
     string NitrokeyManager::get_status() {
         auto response = GetStatus::CommandTransaction::run(*device);
         return response.data().dissect();

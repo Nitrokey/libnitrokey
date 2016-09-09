@@ -2,6 +2,7 @@
 #include <iostream>
 #include "include/NitrokeyManager.h"
 #include "include/LibraryException.h"
+#include <algorithm>
 
 namespace nitrokey{
 
@@ -157,10 +158,13 @@ namespace nitrokey{
         return erase_slot(slot_number, temporary_password);
     }
 
-    #include <cassert>
     template <typename T, typename U>
-    void vector_copy(T& dest, std::vector<U> vec){
-        assert(sizeof(dest)>=vec.size());
+    void vector_copy(T& dest, std::vector<U> &vec){
+        const size_t d_size = sizeof(dest);
+        if(d_size < vec.size()){
+            throw TargetBufferSmallerThanSource(vec.size(), d_size);
+        }
+        std::fill(dest, dest+d_size, 0);
         std::copy(vec.begin(), vec.end(), dest);
     }
 

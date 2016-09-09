@@ -2,9 +2,35 @@
 #include <string>
 #include "misc.h"
 #include "inttypes.h"
+#include <cstdlib>
+#include <cstring>
+#include <cassert>
 
 namespace nitrokey {
 namespace misc {
+
+std::vector<uint8_t> hex_string_to_byte(const char* hexString){
+    const size_t s_size = strlen(hexString);
+    const size_t d_size = (s_size+1)/2; // add 1 for odd, ignore for even
+    assert(s_size%2==0);
+    assert(s_size<256); //arbitrary 'big' number
+    auto data = std::vector<uint8_t>(d_size, 0);
+
+    char buf[2];
+    for(int i=0; i<s_size; i++){
+
+        char c = hexString[i];
+        bool char_from_range = ('0' <= c && c <='9' || 'A' <= c && c <= 'F' || 'a' <= c && c<= 'f');
+        if (!char_from_range){
+            return {};
+        }
+        buf[i%2] = c;
+        if (i%2==1){
+            data[i/2] = strtoul(buf, NULL, 16) & 0xFF;
+        }
+    }
+    return data;
+};
 
 std::string hexdump(const char *p, size_t size, bool print_header) {
   std::stringstream out;

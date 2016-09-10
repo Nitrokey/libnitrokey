@@ -12,6 +12,47 @@ public:
 
 
 
+class TargetBufferSmallerThanSource: public LibraryException {
+public:
+    virtual uint8_t exception_id() override {
+        return 203;
+    }
+
+public:
+    size_t source_size;
+    size_t target_size;
+
+    TargetBufferSmallerThanSource(
+            size_t source_size, size_t target_size
+            ) : source_size(source_size),  target_size(target_size) {}
+
+    virtual const char *what() const throw() override {
+        std::string s = " ";
+        auto ts = [](int x){ return std::to_string(x); };
+        std::string msg = std::string("Target buffer size is smaller than source: [source size, buffer size]")
+            +s+ ts(source_size) +s+ ts(target_size);
+        return msg.c_str();
+    }
+
+};
+
+class InvalidHexString : public LibraryException {
+public:
+    virtual uint8_t exception_id() override {
+        return 202;
+    }
+
+public:
+    uint8_t invalid_char;
+
+    InvalidHexString (uint8_t invalid_char) : invalid_char( invalid_char) {}
+
+    virtual const char *what() const throw() override {
+        return "Invalid character in hex string";
+    }
+
+};
+
 class InvalidSlotException : public LibraryException {
 public:
     virtual uint8_t exception_id() override {

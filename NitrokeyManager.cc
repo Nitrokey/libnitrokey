@@ -2,6 +2,7 @@
 #include <iostream>
 #include "include/NitrokeyManager.h"
 #include "include/LibraryException.h"
+#include <algorithm>
 
 namespace nitrokey{
 
@@ -157,6 +158,15 @@ namespace nitrokey{
         return erase_slot(slot_number, temporary_password);
     }
 
+    template <typename T, typename U>
+    void vector_copy(T& dest, std::vector<U> &vec){
+        const size_t d_size = sizeof(dest);
+        if(d_size < vec.size()){
+            throw TargetBufferSmallerThanSource(vec.size(), d_size);
+        }
+        std::fill(dest, dest+d_size, 0);
+        std::copy(vec.begin(), vec.end(), dest);
+    }
 
     bool NitrokeyManager::write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter,
                                               bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
@@ -166,7 +176,8 @@ namespace nitrokey{
         slot_number = get_internal_slot_number_for_hotp(slot_number);
         auto payload = get_payload<WriteToHOTPSlot>();
         payload.slot_number = slot_number;
-        strcpyT(payload.slot_secret, secret);
+        auto secret_bin = misc::hex_string_to_byte(secret);
+        vector_copy(payload.slot_secret, secret_bin);
         strcpyT(payload.slot_name, slot_name);
         strcpyT(payload.slot_token_id, token_ID);
         payload.slot_counter = hotp_counter;
@@ -188,7 +199,8 @@ namespace nitrokey{
 
         slot_number = get_internal_slot_number_for_totp(slot_number);
         payload.slot_number = slot_number;
-        strcpyT(payload.slot_secret, secret);
+        auto secret_bin = misc::hex_string_to_byte(secret);
+        vector_copy(payload.slot_secret, secret_bin);
         strcpyT(payload.slot_name, slot_name);
         strcpyT(payload.slot_token_id, token_ID);
         payload.slot_interval = time_window; //FIXME naming

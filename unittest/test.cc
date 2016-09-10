@@ -18,7 +18,7 @@ std::string getSlotName(Stick10 &stick, int slotNo) {
   auto slot_req = get_payload<ReadSlot>();
   slot_req.slot_number = slotNo;
   auto slot = ReadSlot::CommandTransaction::run(stick, slot_req);
-  std::string sName(reinterpret_cast<char *>(slot.slot_name));
+  std::string sName(reinterpret_cast<char *>(slot.data().slot_name));
   return sName;
 }
 
@@ -47,18 +47,18 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
 
   {
     auto resp = GetPasswordRetryCount::CommandTransaction::run(stick);
-    REQUIRE(resp.password_retry_count == 3);
+    REQUIRE(resp.data().password_retry_count == 3);
   }
   {
     auto resp = GetUserPasswordRetryCount::CommandTransaction::run(stick);
-    REQUIRE(resp.password_retry_count == 3);
+    REQUIRE(resp.data().password_retry_count == 3);
   }
 
   {
     auto slot = get_payload<GetPasswordSafeSlotName>();
     slot.slot_number = 0;
     auto resp2 = GetPasswordSafeSlotName::CommandTransaction::run(stick, slot);
-    std::string sName(reinterpret_cast<char *>(resp2.slot_name));
+    std::string sName(reinterpret_cast<char *>(resp2.data().slot_name));
     REQUIRE(sName == std::string("web1"));
   }
 
@@ -67,7 +67,7 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
     slot.slot_number = 0;
     auto resp2 =
         GetPasswordSafeSlotPassword::CommandTransaction::run(stick, slot);
-    std::string sName(reinterpret_cast<char *>(resp2.slot_password));
+    std::string sName(reinterpret_cast<char *>(resp2.data().slot_password));
     REQUIRE(sName == std::string("pass1"));
   }
 
@@ -75,7 +75,7 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
     auto slot = get_payload<GetPasswordSafeSlotLogin>();
     slot.slot_number = 0;
     auto resp2 = GetPasswordSafeSlotLogin::CommandTransaction::run(stick, slot);
-    std::string sName(reinterpret_cast<char *>(resp2.slot_login));
+    std::string sName(reinterpret_cast<char *>(resp2.data().slot_login));
     REQUIRE(sName == std::string("login1"));
   }
 

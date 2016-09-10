@@ -5,8 +5,16 @@ from enum import Enum
 ffi = cffi.FFI()
 gs = ffi.string
 
-RFC_SECRET = '12345678901234567890'
 
+def to_hex(s):
+    return "".join("{:02x}".format(ord(c)) for c in s)
+
+
+RFC_SECRET_HR = '12345678901234567890'
+RFC_SECRET = to_hex(RFC_SECRET_HR)  # '12345678901234567890'
+
+
+# print( repr((RFC_SECRET, RFC_SECRET_, len(RFC_SECRET))) )
 
 class DefaultPasswords(Enum):
     ADMIN = '12345678'
@@ -26,6 +34,8 @@ class DeviceErrorCode(Enum):
 class LibraryErrors(Enum):
     TOO_LONG_STRING = 200
     INVALID_SLOT = 201
+    INVALID_HEX_STRING = 202
+    TARGET_BUFFER_SIZE_SMALLER_THAN_SOURCE = 203
 
 
 @pytest.fixture(scope="module")
@@ -214,7 +224,7 @@ def test_invalid_slot(C):
     invalid_slot = 255
     assert C.NK_erase_totp_slot(invalid_slot, 'some password') == LibraryErrors.INVALID_SLOT
     assert C.NK_write_hotp_slot(invalid_slot, 'long_test', RFC_SECRET, 0, False, False, False, "",
-                            'aaa') == LibraryErrors.INVALID_SLOT
+                                'aaa') == LibraryErrors.INVALID_SLOT
     assert C.NK_get_hotp_code_PIN(invalid_slot, 'some password') == 0
     assert C.NK_get_last_command_status() == LibraryErrors.INVALID_SLOT
     assert C.NK_erase_password_safe_slot(invalid_slot) == LibraryErrors.INVALID_SLOT
@@ -503,3 +513,22 @@ def test_get_serial_number(C):
     sn = gs(sn)
     assert len(sn) > 0
     print(('Serial number of the device: ', sn))
+
+
+@pytest.mark.parametrize("invalid_hex_string",
+                         ['text', '00  ', '0xff', 'zzzzzzzzzzzz', 'fff', '', 'f' * 257, 'f' * 258])
+def test_invalid_secret_hex_string_for_OTP_write(C, invalid_hex_string):
+    """
+    Tests for invalid secret hex string during writing to OTP slot. Invalid strings are not hexadecimal number,
+    empty or longer than 255 characters.
+    """
+    assert C.NK_write_hotp_slot(1, 'slot_name', invalid_hex_string, 0, True, False, False, '',
+                                DefaultPasswords.ADMIN_TEMP) == LibraryErrors.INVALID_HEX_STRING
+    assert C.NK_write_totp_slot(1, 'python_test', invalid_hex_string, 30, True, False, False, "",
+                                DefaultPasswords.ADMIN_TEMP) == LibraryErrors.INVALID_HEX_STRING
+
+
+def test_warning_binary_bigger_than_secret_buffer(C):
+    invalid_hex_string = to_hex('1234567890') * 3
+    assert C.NK_write_hotp_slot(1, 'slot_name', invalid_hex_string, 0, True, False, False, '',
+                                DefaultPasswords.ADMIN_TEMP) == LibraryErrors.TARGET_BUFFER_SIZE_SMALLER_THAN_SOURCE

@@ -84,7 +84,7 @@ TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
         auto gh = get_payload<GetHOTP>();
         gh.slot_number =  0x10;
         auto resp = GetHOTP::CommandTransaction::run(stick, gh);
-        REQUIRE( resp.code == code);
+        REQUIRE( resp.data().code == code);
     }
     //checking slot programmed before with nitro-app
     /*

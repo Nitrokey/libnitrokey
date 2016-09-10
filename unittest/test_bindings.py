@@ -5,8 +5,15 @@ from enum import Enum
 ffi = cffi.FFI()
 gs = ffi.string
 
-RFC_SECRET = '12345678901234567890'
 
+def to_hex(s):
+    return "".join("{:02x}".format(ord(c)) for c in s)
+
+
+RFC_SECRET_HR = '12345678901234567890'
+RFC_SECRET = to_hex(RFC_SECRET_HR) #'12345678901234567890'
+
+# print( repr((RFC_SECRET, RFC_SECRET_, len(RFC_SECRET))) )
 
 class DefaultPasswords(Enum):
     ADMIN = '12345678'
@@ -214,7 +221,7 @@ def test_invalid_slot(C):
     invalid_slot = 255
     assert C.NK_erase_totp_slot(invalid_slot, 'some password') == LibraryErrors.INVALID_SLOT
     assert C.NK_write_hotp_slot(invalid_slot, 'long_test', RFC_SECRET, 0, False, False, False, "",
-                            'aaa') == LibraryErrors.INVALID_SLOT
+                                'aaa') == LibraryErrors.INVALID_SLOT
     assert C.NK_get_hotp_code_PIN(invalid_slot, 'some password') == 0
     assert C.NK_get_last_command_status() == LibraryErrors.INVALID_SLOT
     assert C.NK_erase_password_safe_slot(invalid_slot) == LibraryErrors.INVALID_SLOT

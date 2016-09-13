@@ -247,8 +247,8 @@ using nitrokey::misc::strcpyT;
       return "";
     }
 
-    bool NitrokeyManager::is_valid_hotp_slot_number(uint8_t slot_number) const { return slot_number < 3; }
-    bool NitrokeyManager::is_valid_totp_slot_number(uint8_t slot_number) const { return slot_number < 0x10-1; } //15
+    bool NitrokeyManager::is_valid_hotp_slot_number(uint8_t slot_number) const { return true || slot_number < 3; }
+    bool NitrokeyManager::is_valid_totp_slot_number(uint8_t slot_number) const { return true || slot_number < 0x10-1; } //15
     uint8_t NitrokeyManager::get_internal_slot_number_for_totp(uint8_t slot_number) const { return (uint8_t) (0x20 + slot_number); }
     uint8_t NitrokeyManager::get_internal_slot_number_for_hotp(uint8_t slot_number) const { return (uint8_t) (0x10 + slot_number); }
 

@@ -2,13 +2,15 @@
 # libnitrokey
 Libnitrokey is a project to communicate with Nitrokey stick devices in clean and easy manner. Written in C++14, testable with `Catch` framework, with C API, Python access (through CFFI and C API, in future with Pybind11).
 
-The development of this project is aimed to make it itself a living documentation of communication protocol between host and the Nitrokey stick device.
+The development of this project is aimed to make it itself a living documentation of communication protocol between host and the Nitrokey stick devices.
 
-A C++14 complying compiler is required.
+A C++14 complying compiler is required. For feature support tables please check [table 1](https://gcc.gnu.org/projects/cxx-status.html#cxx14) or [table 2](http://en.cppreference.com/w/cpp/compiler_support).
+
+Libnitrokey is developed with the latest compilers: g++ 5.4+, clang 3.8+
 
 ## Getting sources
 This repository uses `git submodules`.
-To clone please use git's --recursive option like in:
+To clone please use git's `--recursive` option like in:
 ```bash
 git clone --recursive https://github.com/Nitrokey/libnitrokey.git
 ```
@@ -18,6 +20,11 @@ git clone https://github.com/Nitrokey/libnitrokey.git
 cd libnitrokey
 git submodule update --init --recursive
 ```
+
+## Dependencies
+Following packages are needed to use libnitrokey (Debian/Ubuntu):
+- libhidapi-dev [(HID API)](http://www.signal11.us/oss/hidapi/)
+
 
 ## Compilation
 To compile library using Clang please run `make`. If you have GCC and would like to use it instead you can run:
@@ -81,14 +88,14 @@ print(hotp_slot_1_code_nitrokey_storage)
 libnitrokey.NK_logout()  # disconnect device
 ```
 In case one of the devices or no devices are connected, unfriendly message will be printed.
-All available functions for Python are listed in NK_C_API.h.
+All available functions for C and Python are listed in NK_C_API.h. Please check `Documentation` section below.
 
 ## Documentation
 The documentation of C API is included in the sources (could be  generated with doxygen if requested).
 Please check NK_C_API.h (C API) for high level commands and include/NitrokeyManager.h (C++ API). All devices' commands are listed along with packet format in include/stick10_commands.h and include/stick20_commands.h respectively for Nitrokey Pro and Nitrokey Storage products.
 
 #Tests
-Warning! Before you run unittests please either change both your Admin and User PINs on your Nitrostick to defaults (12345678 and 123456 respectively) or change the values in tests source code. If you do not change them the tests might lock your device. If its too late, you can always reset your Nitrokey using instructions from [homepage](https://www.nitrokey.com/de/documentation/how-reset-nitrokey).
+Warning! Before you run unittests please either change both your Admin and User PINs on your Nitrostick to defaults (`12345678` and `123456` respectively) or change the values in tests source code. If you do not change them the tests might lock your device. If its too late, you can always reset your Nitrokey using instructions from [homepage](https://www.nitrokey.com/de/documentation/how-reset-nitrokey).
 
 ## Python tests
 Libnitrokey has a couple of tests written in Python under the path: `unittest/test_bindings.py`. The tests themselves show how to handle common requests to device.

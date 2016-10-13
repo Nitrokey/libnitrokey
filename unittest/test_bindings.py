@@ -181,6 +181,7 @@ def test_destroy_password_safe(C):
     assert is_slot_programmed[0] == 0
 
 
+@pytest.mark.xfail
 def test_is_AES_supported(C):
     assert C.NK_is_AES_supported('wrong password') != 1
     assert C.NK_get_last_command_status() == DeviceErrorCode.WRONG_PASSWORD

@@ -182,7 +182,7 @@ class SendPasswordMatrixSetup : semantics::non_constructible {
                       struct EmptyPayload> CommandTransaction;
 };
 
-#define d(x) ss << #x":\t" << x << std::endl;
+#define d(x) ss << " "#x":\t" << (int)x << std::endl;
 
     class GetDeviceStatus : Command<CommandID::GET_DEVICE_STATUS> {
     public:

@@ -312,10 +312,16 @@ namespace nitrokey{
     }
 
     uint8_t NitrokeyManager::get_user_retry_count() {
+        if(device->get_device_model() == DeviceModel::STORAGE){
+          stick20::GetDeviceStatus::CommandTransaction::run(*device);
+        }
         auto response = GetUserPasswordRetryCount::CommandTransaction::run(*device);
         return response.data().password_retry_count;
     }
     uint8_t NitrokeyManager::get_admin_retry_count() {
+        if(device->get_device_model() == DeviceModel::STORAGE){
+          stick20::GetDeviceStatus::CommandTransaction::run(*device);
+        }
         auto response = GetPasswordRetryCount::CommandTransaction::run(*device);
         return response.data().password_retry_count;
     }

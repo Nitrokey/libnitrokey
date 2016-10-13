@@ -190,7 +190,7 @@ class SendPasswordMatrixSetup : semantics::non_constructible {
         static const int payload_absolute_begin = 8;
         static const int padding_size = OUTPUT_CMD_RESULT_STICK20_STATUS_START - payload_absolute_begin;
         struct ResponsePayload {
-            uint8_t _padding[padding_size];
+            uint8_t _padding[padding_size]; //TODO confirm padding in Storage firmware
             //data starts from 21st byte of packet -> 13th byte of payload
             uint8_t command_counter;
             uint8_t last_command;

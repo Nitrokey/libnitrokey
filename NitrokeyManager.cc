@@ -280,11 +280,10 @@ namespace nitrokey{
                 auto p = get_payload<ChangeAdminUserPin20Current>();
                 strcpyT(p.old_pin, current_PIN);
                 p.set_kind(StoKind);
-                ChangeAdminUserPin20Current::CommandTransaction::run(*device, p);
-
                 auto p2 = get_payload<ChangeAdminUserPin20New>();
                 strcpyT(p2.new_pin, new_PIN);
                 p2.set_kind(StoKind);
+                ChangeAdminUserPin20Current::CommandTransaction::run(*device, p);
                 ChangeAdminUserPin20New::CommandTransaction::run(*device, p2);
             }
                 break;

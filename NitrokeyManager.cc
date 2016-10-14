@@ -45,7 +45,7 @@ namespace nitrokey{
     }
 
     bool NitrokeyManager::connect() {
-        device = nullptr;
+        this->disconnect();
         vector< shared_ptr<Device> > devices = { make_shared<Stick10>(), make_shared<Stick20>() };
         for( auto & d : devices ){
             if (d->connect()){
@@ -57,7 +57,8 @@ namespace nitrokey{
 
 
     bool NitrokeyManager::connect(const char *device_model) {
-        switch (device_model[0]){
+      this->disconnect();
+      switch (device_model[0]){
             case 'P':
                 device = make_shared<Stick10>();
                 break;
@@ -78,7 +79,12 @@ namespace nitrokey{
     }
 
     bool NitrokeyManager::disconnect() {
-        return device->disconnect();
+      if (device == nullptr){
+        return false;
+      }
+      const auto res = device->disconnect();
+      device = nullptr;
+      return res;
     }
 
     void NitrokeyManager::set_debug(bool state) {

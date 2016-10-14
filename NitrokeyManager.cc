@@ -8,10 +8,15 @@ namespace nitrokey{
 
     template <typename T>
     void strcpyT(T& dest, const char* src){
-        if (src == nullptr)
+
+      if (src == nullptr)
 //            throw EmptySourceStringException(slot_number);
             return;
         const size_t s_dest = sizeof dest;
+      nitrokey::log::Log::instance()(std::string("strcpyT sizes ")
+                                     +std::to_string(s_dest)+ " "
+                                     +std::to_string(strlen(src))+ " "
+          ,nitrokey::log::Loglevel::DEBUG);
         if (strlen(src) > s_dest){
             throw TooLongStringException(strlen(src), s_dest, src);
         }

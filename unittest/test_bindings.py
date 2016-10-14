@@ -238,6 +238,7 @@ def test_invalid_slot(C):
 
 def test_admin_retry_counts(C):
     default_admin_retry_count = 3
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_get_admin_retry_count() == default_admin_retry_count
     assert C.NK_change_admin_PIN('wrong_password', DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_get_admin_retry_count() == default_admin_retry_count - 1
@@ -245,8 +246,20 @@ def test_admin_retry_counts(C):
     assert C.NK_get_admin_retry_count() == default_admin_retry_count
 
 
-def test_user_retry_counts(C):
+def test_user_retry_counts_change_PIN(C):
+    assert C.NK_change_user_PIN(DefaultPasswords.USER, DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    wrong_password = 'wrong_password'
     default_user_retry_count = 3
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_get_user_retry_count() == default_user_retry_count
+    assert C.NK_change_user_PIN(wrong_password, wrong_password) == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_get_user_retry_count() == default_user_retry_count - 1
+    assert C.NK_change_user_PIN(DefaultPasswords.USER, DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    assert C.NK_get_user_retry_count() == default_user_retry_count
+
+def test_user_retry_counts_PWSafe(C):
+    default_user_retry_count = 3
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_get_user_retry_count() == default_user_retry_count
     assert C.NK_enable_password_safe('wrong_password') == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_get_user_retry_count() == default_user_retry_count - 1

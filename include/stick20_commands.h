@@ -62,6 +62,26 @@ namespace stick20 {
                 CommandTransaction;
     };
 
+
+    class UnlockUserPassword : Command<CommandID::UNLOCK_USER_PASSWORD> {
+    public:
+        struct CommandPayload {
+            uint8_t kind;
+            uint8_t user_new_password[20];
+            std::string dissect() const {
+              std::stringstream ss;
+              ss << " user_new_password:\t" <<  user_new_password<< std::endl;
+              return ss.str();
+            }
+            void set_kind(PasswordKind k){
+              kind = (uint8_t)k;
+            }
+        } __packed;
+
+        typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+            CommandTransaction;
+    };
+
 class EnableEncryptedPartition : semantics::non_constructible {
  public:
   struct CommandPayload {

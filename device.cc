@@ -21,8 +21,10 @@ Device::Device()
 bool Device::disconnect() {
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
-  hid_exit();
+  if(mp_devhandle== nullptr) return false;
+  hid_close(mp_devhandle);
   mp_devhandle = NULL;
+  hid_exit();
   return true;
 }
 bool Device::connect() {

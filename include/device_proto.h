@@ -99,6 +99,13 @@ namespace nitrokey {
             union {
                 uint8_t _padding[HID_REPORT_SIZE - 12];
                 ResponsePayload payload;
+                struct{
+                    uint8_t _storageStatusPadding[20-8+1]; //starts on 20th byte minus already 8 used + zero byte
+                    uint8_t CommandCounter_u8;
+                    uint8_t LastCommand_u8;
+                    uint8_t Status_u8; //general status - idle0/ok1/busy2/wrongpassword3
+                    uint8_t ProgressBarValue_u8;
+                } StorageStatus __packed;
             } __packed;
             uint32_t crc;
 
@@ -224,9 +231,40 @@ namespace nitrokey {
               while (retry-- > 0) {
                 status = dev.recv(&resp);
 
+                if (dev.get_device_model() == DeviceModel::STORAGE &&
+                    resp.command_id >= 0x20 &&
+//                    resp.command_id <= 0x20 + 26
+                    resp.command_id < 0x60
+                    ){
+                    Log::instance()(std::string("Detected storage device cmd, status: ") +
+                                        std::to_string(resp.StorageStatus.Status_u8), Loglevel::DEBUG_L2);
+
+                  resp.last_command_status = 0;
+                  switch(resp.StorageStatus.Status_u8){
+                    case 0:
+                    case 1:
+                      resp.last_command_status = 0;
+                      resp.device_status = 0;
+                      break;
+                    case 2:
+                      resp.last_command_status = 0;
+                      resp.device_status = 1; //pro busy
+                      break;
+                    case 3:
+                    case 4:
+                      resp.last_command_status = 4;
+                      resp.device_status = 0;
+                      break;
+                  };
+                }
+
                 dev.set_last_command_status(resp.last_command_status); // FIXME should be handled on device.recv
 
                 if (resp.device_status == 0 && resp.last_command_crc == outp.crc) break;
+                Log::instance()(std::string("Retry status: ")
+                                + std::to_string(resp.device_status) + " " +
+                    std::to_string(resp.last_command_crc==outp.crc), Loglevel::DEBUG_L2);
+
                 Log::instance()(
                     "Device is not ready or received packet's last CRC is not equal to sent CRC packet, retrying...",
                     Loglevel::DEBUG);

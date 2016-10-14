@@ -396,9 +396,21 @@ namespace nitrokey{
     }
 
     void NitrokeyManager::build_aes_key(const char *admin_password) {
-        auto p = get_payload<BuildAESKey>();
-        strcpyT(p.admin_password, admin_password);
-        BuildAESKey::CommandTransaction::run(*device, p);
+        switch (device->get_device_model()) {
+            case DeviceModel::PRO: {
+                auto p = get_payload<BuildAESKey>();
+                strcpyT(p.admin_password, admin_password);
+                BuildAESKey::CommandTransaction::run(*device, p);
+                break;
+            }
+            case DeviceModel::STORAGE : {
+                auto p = get_payload<stick20::CreateNewKeys>();
+                strcpyT(p.admin_password, admin_password);
+                p.setKindPrefixed();
+                stick20::CreateNewKeys::CommandTransaction::run(*device, p);
+                break;
+            }
+        }
     }
 
     void NitrokeyManager::factory_reset(const char *admin_password) {

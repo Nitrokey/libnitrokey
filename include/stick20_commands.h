@@ -146,15 +146,25 @@ class ExportFirmware : semantics::non_constructible {
                       struct EmptyPayload> CommandTransaction;
 };
 
-class CreateNewKeys : semantics::non_constructible {
- public:
-  struct CommandPayload {
-    uint8_t password[30];
-  };
+    class CreateNewKeys : Command<CommandID::GENERATE_NEW_KEYS> {
+    public:
+        struct CommandPayload {
+            uint8_t kind;
+            uint8_t admin_password[30]; //CS20_MAX_PASSWORD_LEN
+            std::string dissect() const {
+              std::stringstream ss;
+              ss << " admin_password:\t" <<  admin_password<< std::endl;
+              return ss.str();
+            }
+            void setKindPrefixed(){
+              kind = 'P';
+            }
+        } __packed;
 
-  typedef Transaction<CommandID::GENERATE_NEW_KEYS, struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
-};
+        typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+            CommandTransaction;
+    };
+
 
 class FillSDCardWithRandomChars : semantics::non_constructible {
  public:

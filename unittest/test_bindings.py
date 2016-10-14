@@ -348,16 +348,17 @@ def test_HOTP_token(C):
         assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
 
-@pytest.mark.xfail(reason="firmware bug: set time command not always changes the time on stick thus failing this test, "
+@pytest.mark.xfail(reason="possible firmware bug or communication issue: set time command not always changes the time on stick thus failing this test, "
                           "this does not influence normal use since setting time is not done every TOTP code request")
 @pytest.mark.parametrize("PIN_protection", [False, True, ])
 def test_TOTP_RFC_usepin(C, PIN_protection):
+    slot_number = 1
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
                              DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # test according to https://tools.ietf.org/html/rfc6238#appendix-B
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_totp_slot(1, 'python_test', RFC_SECRET, 30, True, False, False, "",
+    assert C.NK_write_totp_slot(slot_number, 'python_test', RFC_SECRET, 30, True, False, False, "",
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
 
     get_func = None
@@ -366,26 +367,29 @@ def test_TOTP_RFC_usepin(C, PIN_protection):
     else:
         get_func = C.NK_get_totp_code
 
+    # Mode: Sha1, time step X=30
     test_data = [
-        (59, 1, 94287082),
-        (1111111109, 0x00000000023523EC, 7081804),
-        (1111111111, 0x00000000023523ED, 14050471),
-        (1234567890, 0x000000000273EF07, 89005924),
+        #Time         T (hex)               TOTP
+        (59,          0x1,                94287082),
+        (1111111109,  0x00000000023523EC, 7081804),
+        (1111111111,  0x00000000023523ED, 14050471),
+        (1234567890,  0x000000000273EF07, 89005924),
+        (2000000000,  0x0000000003F940AA, 69279037),
+        (20000000000, 0x0000000027BC86AA, 65353130),
     ]
-    for t, T, code in test_data:
-        """
-        FIXME without the delay 50% of tests fails, with it only 12%, higher delay removes fails
-        -> set_time function not always works, to investigate why
-        """
-        # import time
-        # time.sleep(2)
+    responses = []
+    data = []
+    correct = 0
+    for t, T, expected_code in test_data:
         if PIN_protection:
             C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP)
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         assert C.NK_totp_set_time(t) == DeviceErrorCode.STATUS_OK
-        r = get_func(1, T, 0, 30)  # FIXME T is not changing the outcome
-        assert code == r
-
+        code_from_device = get_func(slot_number, T, 0, 30)  # FIXME T is not changing the outcome
+        data += [ (t, expected_code) ]
+        responses += [ (t, code_from_device) ]
+        correct += expected_code == code_from_device
+    assert data == responses or correct == len(test_data)
 
 def test_get_slot_names(C):
     C.NK_set_debug(True)

@@ -30,7 +30,7 @@ bool Device::disconnect() {
 bool Device::connect() {
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
-  // hid_init();
+//   hid_init();
   mp_devhandle = hid_open(m_vid, m_pid, NULL);
   // hid_init();
   return mp_devhandle != NULL;
@@ -94,7 +94,8 @@ Stick10::Stick10() {
 Stick20::Stick20() {
   m_vid = 0x20a0;
   m_pid = 0x4109;
-  m_retry_timeout = std::chrono::milliseconds(500);
+  m_retry_timeout = 1000ms;
   m_model = DeviceModel::STORAGE;
     m_send_receive_delay = 1000ms;
+  m_retry_count = 50;
 }

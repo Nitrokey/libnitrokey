@@ -403,10 +403,26 @@ namespace nitrokey{
     }
 
     void NitrokeyManager::unlock_user_password(const char *admin_password, const char *new_user_password) {
-        auto p = get_payload<UnlockUserPassword>();
-        strcpyT(p.admin_password, admin_password);
-        strcpyT(p.user_new_password, new_user_password);
-        UnlockUserPassword::CommandTransaction::run(*device, p);
+      switch (device->get_device_model()){
+        case DeviceModel::PRO: {
+          auto p = get_payload<stick10::UnlockUserPassword>();
+          strcpyT(p.admin_password, admin_password);
+          strcpyT(p.user_new_password, new_user_password);
+          stick10::UnlockUserPassword::CommandTransaction::run(*device, p);
+          break;
+        }
+        case DeviceModel::STORAGE : {
+          auto p2 = get_payload<ChangeAdminUserPin20Current>();
+          p2.set_kind(PasswordKind::Admin);
+          strcpyT(p2.old_pin, admin_password);
+          ChangeAdminUserPin20Current::CommandTransaction::run(*device, p2);
+          auto p3 = get_payload<stick20::UnlockUserPassword>();
+          p3.set_kind(PasswordKind::Admin);
+          strcpyT(p3.user_new_password, new_user_password);
+          stick20::UnlockUserPassword::CommandTransaction::run(*device, p3);
+          break;
+        }
+      }
     }
 
 

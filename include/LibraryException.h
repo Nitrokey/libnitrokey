@@ -4,6 +4,7 @@
 #include <exception>
 #include <cstdint>
 #include <string>
+#include "log.h"
 
 class LibraryException: std::exception {
 public:
@@ -83,7 +84,10 @@ public:
     std::string message;
 
     TooLongStringException(size_t size_source, size_t size_destination, const std::string &message = "") : size_source(
-            size_source), size_destination(size_destination), message(message) {}
+            size_source), size_destination(size_destination), message(message) {
+      nitrokey::log::Log::instance()(std::string("TooLongStringException, size diff: ")+ std::to_string(size_source-size_destination), nitrokey::log::Loglevel::DEBUG);
+
+    }
 
     virtual const char *what() const throw() override {
         //TODO add sizes and message data to final message

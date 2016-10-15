@@ -493,6 +493,7 @@ def wait(t):
     time.sleep(t)
 
 
+@pytest.mark.skip(reason='Recover not implemented for NK Storage')
 def test_factory_reset(C):
     C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK

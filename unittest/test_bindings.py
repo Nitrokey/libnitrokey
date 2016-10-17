@@ -10,6 +10,13 @@ def to_hex(s):
     return "".join("{:02x}".format(ord(c)) for c in s)
 
 
+def wait(t):
+    import time
+    msg = 'Waiting for %d seconds' % t
+    print(msg.center(40, '='))
+    time.sleep(t)
+
+
 RFC_SECRET_HR = '12345678901234567890'
 RFC_SECRET = to_hex(RFC_SECRET_HR)  # '12345678901234567890'
 
@@ -484,13 +491,6 @@ def test_read_write_config(C):
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     config = cast_pointer_to_tuple(config_raw_data, 'uint8_t', 5)
     assert config == (255, 255, 255, False, True)
-
-
-def wait(t):
-    import time
-    msg = 'Waiting for %d seconds' % t
-    print(msg.center(40, '='))
-    time.sleep(t)
 
 
 @pytest.mark.skip(reason='Recover not implemented for NK Storage')

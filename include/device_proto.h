@@ -125,7 +125,7 @@ namespace nitrokey {
             bool isValid() const {
               //		return !_zero && payload.isValid() && isCRCcorrect() &&
               //				command_id == (uint8_t)(cmd_id);
-              return true;
+              return crc != 0;
             }
 
             operator std::string() const {

@@ -354,7 +354,33 @@ def test_HOTP_token(C):
         assert hotp_code != 0
         assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
+# todo skip / xfail only for nk storage
+@pytest.mark.xfail(reason="bug in NK Storage TOTP firmware")
+def test_TOTP_64bit_time(C):
+    oath = pytest.importorskip("oath")
+    T = 1
+    lib_at = lambda t: oath.totp(RFC_SECRET, t=t)
+    PIN_protection = False
+    int32_max = 2 ** 31 - 1
+    slot_number = 1
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_totp_slot(slot_number, 'python_test', RFC_SECRET, 30, False, False, False, "",
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    dev_res = []
+    lib_res = []
+    for t in range(int32_max - 5, int32_max + 5, 1):
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_totp_set_time(t) == DeviceErrorCode.STATUS_OK
+        code_device = str((C.NK_get_totp_code(slot_number, T, 0, 30)))
+        dev_res += (t, code_device)
+        lib_res += (t, lib_at(t))
+    assert dev_res == lib_res
 
+
+# todo skip / xfail only for nk pro
 @pytest.mark.xfail(reason="possible firmware bug or communication issue: set time command not always changes the time on stick thus failing this test, "
                           "this does not influence normal use since setting time is not done every TOTP code request")
 @pytest.mark.parametrize("PIN_protection", [False, True, ])
@@ -382,7 +408,7 @@ def test_TOTP_RFC_usepin(C, PIN_protection):
         (1111111111,  0x00000000023523ED, 14050471),
         (1234567890,  0x000000000273EF07, 89005924),
         (2000000000,  0x0000000003F940AA, 69279037),
-        (20000000000, 0x0000000027BC86AA, 65353130),
+        (20000000000, 0x0000000027BC86AA, 65353130), # 64bit is also checked in other test
     ]
     responses = []
     data = []

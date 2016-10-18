@@ -13,7 +13,8 @@ using namespace nitrokey::log;
 Device::Device()
     : m_vid(0),
       m_pid(0),
-      m_retry_count(40),
+      m_retry_sending_count(3),
+      m_retry_receiving_count(40),
       m_retry_timeout(100),
       mp_devhandle(NULL),
       last_command_status(0){}
@@ -69,7 +70,7 @@ int Device::recv(void *packet) {
                     Loglevel::DEBUG_L2);
 
     if (status > 0) break;  // success
-    if (retry_count++ >= m_retry_count) {
+    if (retry_count++ >= m_retry_receiving_count) {
       Log::instance()(
           "Maximum retry count reached" + std::to_string(retry_count),
           Loglevel::WARNING);
@@ -88,7 +89,7 @@ Stick10::Stick10() {
   m_pid = 0x4108;
   m_model = DeviceModel::PRO;
     m_send_receive_delay = 100ms;
-  m_retry_count = 100;
+  m_retry_receiving_count = 100;
 }
 
 Stick20::Stick20() {
@@ -97,5 +98,5 @@ Stick20::Stick20() {
   m_retry_timeout = 20ms;
   m_model = DeviceModel::STORAGE;
   m_send_receive_delay = 20ms;
-  m_retry_count = 40;
+  m_retry_receiving_count = 40;
 }

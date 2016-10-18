@@ -219,7 +219,7 @@ namespace nitrokey {
               if (!outp.isValid()) throw std::runtime_error("Invalid outgoing packet");
 
               int receiving_retry_counter = 0;
-              int sending_retry_counter = 3;
+              int sending_retry_counter = dev.get_retry_sending_count();
               while (sending_retry_counter-- > 0) {
                 status = dev.send(&outp);
                 if (status <= 0)
@@ -230,7 +230,7 @@ namespace nitrokey {
                 std::this_thread::sleep_for(dev.get_send_receive_delay());
 
                 // FIXME make checks done in device:recv here
-                receiving_retry_counter = dev.get_retry_count();
+                receiving_retry_counter = dev.get_retry_receiving_count();
                 while (receiving_retry_counter-- > 0) {
                   status = dev.recv(&resp);
 

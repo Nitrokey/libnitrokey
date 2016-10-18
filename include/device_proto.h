@@ -264,8 +264,9 @@ namespace nitrokey {
 
                   //SENDPASSWORD gives wrong CRC , for now rely on !=0 (TODO report)
 //                  if (resp.device_status == 0 && resp.last_command_crc == outp.crc && resp.isCRCcorrect()) break;
-                  if (resp.device_status == 0 && resp.last_command_crc == outp.crc && resp.isValid()) break;
-                  if (resp.device_status == 1) {
+                  if (resp.device_status == static_cast<uint8_t>(stick10::device_status::ok) &&
+                      resp.last_command_crc == outp.crc && resp.isValid()) break;
+                  if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy)) {
                     receiving_retry_counter++;
                     Log::instance()("Status busy, not decresing receiving_retry_counter counter: " +
                                     std::to_string(receiving_retry_counter), Loglevel::DEBUG_L2);
@@ -307,7 +308,7 @@ namespace nitrokey {
               if (receiving_retry_counter <= 0)
                 throw std::runtime_error(
                     "Maximum receiving_retry_counter count reached for receiving response from the device!");
-              if (resp.last_command_status != 0)
+              if (resp.last_command_status != static_cast<uint8_t>(stick10::command_status::ok))
                 throw CommandFailedException(resp.command_id, resp.last_command_status);
 
 

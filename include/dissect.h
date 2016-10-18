@@ -80,10 +80,10 @@ class ResponseDissector : semantics::non_constructible {
       out << "Storage stick status:" << std::endl;
 #define d(x) out << " "#x": \t"<< std::hex << std::setw(2) \
     << std::setfill('0')<< static_cast<int>(x) << std::endl;
-    d(pod.StorageStatus.CommandCounter_u8);
-    d(pod.StorageStatus.LastCommand_u8);
-    d(pod.StorageStatus.Status_u8);
-    d(pod.StorageStatus.ProgressBarValue_u8);
+    d(pod.storage_status.command_counter);
+    d(pod.storage_status.command_id);
+    d(pod.storage_status.device_status);
+    d(pod.storage_status.progress_bar_value);
 #undef d
 
     out << "Payload:" << std::endl;

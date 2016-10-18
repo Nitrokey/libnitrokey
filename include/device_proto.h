@@ -100,12 +100,12 @@ namespace nitrokey {
                 uint8_t _padding[HID_REPORT_SIZE - 12];
                 ResponsePayload payload;
                 struct {
-                    uint8_t _storageStatusPadding[20 - 8 + 1]; //starts on 20th byte minus already 8 used + zero byte
-                    uint8_t CommandCounter_u8;
-                    uint8_t LastCommand_u8;
-                    uint8_t Status_u8; //general status - idle0/ok1/busy2/wrongpassword3
-                    uint8_t ProgressBarValue_u8;
-                } StorageStatus __packed;
+                    uint8_t _storage_status_padding[20 - 8 + 1]; //starts on 20th byte minus already 8 used + zero byte
+                    uint8_t command_counter;
+                    uint8_t command_id;
+                    uint8_t device_status; //@see stick20::device_status
+                    uint8_t progress_bar_value;
+                } storage_status __packed;
             } __packed;
             uint32_t crc;
 
@@ -238,10 +238,10 @@ namespace nitrokey {
                       resp.command_id >= stick20::CMD_START_VALUE &&
                       resp.command_id < stick20::CMD_END_VALUE ) {
                     Log::instance()(std::string("Detected storage device cmd, status: ") +
-                                    std::to_string(resp.StorageStatus.Status_u8), Loglevel::DEBUG_L2);
+                                    std::to_string(resp.storage_status.device_status), Loglevel::DEBUG_L2);
 
                     resp.last_command_status = static_cast<uint8_t>(stick10::command_status::ok);
-                    switch (static_cast<stick20::device_status>(resp.StorageStatus.Status_u8)) {
+                    switch (static_cast<stick20::device_status>(resp.storage_status.device_status)) {
                       case stick20::device_status::idle :
                       case stick20::device_status::ok:
                         resp.device_status = static_cast<uint8_t>(stick10::device_status::ok);
@@ -256,8 +256,8 @@ namespace nitrokey {
                         break;
                       default:
                         Log::instance()(std::string("Unknown storage device status, cannot translate: ") +
-                                        std::to_string(resp.StorageStatus.Status_u8), Loglevel::DEBUG);
-                        resp.device_status = resp.StorageStatus.Status_u8;
+                                        std::to_string(resp.storage_status.device_status), Loglevel::DEBUG);
+                        resp.device_status = resp.storage_status.device_status;
                         break;
                     };
                   }

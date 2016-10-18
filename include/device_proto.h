@@ -99,8 +99,8 @@ namespace nitrokey {
             union {
                 uint8_t _padding[HID_REPORT_SIZE - 12];
                 ResponsePayload payload;
-                struct{
-                    uint8_t _storageStatusPadding[20-8+1]; //starts on 20th byte minus already 8 used + zero byte
+                struct {
+                    uint8_t _storageStatusPadding[20 - 8 + 1]; //starts on 20th byte minus already 8 used + zero byte
                     uint8_t CommandCounter_u8;
                     uint8_t LastCommand_u8;
                     uint8_t Status_u8; //general status - idle0/ok1/busy2/wrongpassword3
@@ -220,7 +220,7 @@ namespace nitrokey {
 
               int receiving_retry_counter = 0;
               int sending_retry_counter = 3;
-              while (sending_retry_counter-->0) {
+              while (sending_retry_counter-- > 0) {
                 status = dev.send(&outp);
                 if (status <= 0)
                   throw std::runtime_error(
@@ -236,7 +236,6 @@ namespace nitrokey {
 
                   if (dev.get_device_model() == DeviceModel::STORAGE &&
                       resp.command_id >= 0x20 &&
-                      //                    resp.command_id <= 0x20 + 26
                       resp.command_id < 0x60
                       ) {
                     Log::instance()(std::string("Detected storage device cmd, status: ") +
@@ -264,14 +263,15 @@ namespace nitrokey {
                   //SENDPASSWORD gives wrong CRC , for now rely on !=0 (TODO report)
 //                  if (resp.device_status == 0 && resp.last_command_crc == outp.crc && resp.isCRCcorrect()) break;
                   if (resp.device_status == 0 && resp.last_command_crc == outp.crc && resp.isValid()) break;
-                  if (resp.device_status == 1 ) {
+                  if (resp.device_status == 1) {
                     receiving_retry_counter++;
-                    Log::instance()("Status busy, not decresing receiving_retry_counter counter: " + std::to_string(receiving_retry_counter), Loglevel::DEBUG_L2);
+                    Log::instance()("Status busy, not decresing receiving_retry_counter counter: " +
+                                    std::to_string(receiving_retry_counter), Loglevel::DEBUG_L2);
                   }
                   Log::instance()(std::string("Retry status - dev status, equal crc, correct CRC: ")
                                   + std::to_string(resp.device_status) + " " +
                                   std::to_string(resp.last_command_crc == outp.crc) +
-                      " " + std::to_string(resp.isCRCcorrect()), Loglevel::DEBUG_L2);
+                                  " " + std::to_string(resp.isCRCcorrect()), Loglevel::DEBUG_L2);
 
                   Log::instance()(
                       "Device is not ready or received packet's last CRC is not equal to sent CRC packet, retrying...",
@@ -283,7 +283,8 @@ namespace nitrokey {
                 }
                 if (resp.device_status == 0 && resp.last_command_crc == outp.crc) break;
                 Log::instance()(std::string("Resending (outer loop) "), Loglevel::DEBUG_L2);
-                Log::instance()(std::string("sending_retry_counter count: ") + std::to_string(sending_retry_counter), Loglevel::DEBUG);
+                Log::instance()(std::string("sending_retry_counter count: ") + std::to_string(sending_retry_counter),
+                                Loglevel::DEBUG);
               }
 
               dev.set_last_command_status(resp.last_command_status); // FIXME should be handled on device.recv
@@ -297,11 +298,13 @@ namespace nitrokey {
 
               Log::instance()("Incoming HID packet:", Loglevel::DEBUG);
               Log::instance()((std::string) (resp), Loglevel::DEBUG);
-              Log::instance()(std::string("receiving_retry_counter count: ") + std::to_string(receiving_retry_counter), Loglevel::DEBUG);
+              Log::instance()(std::string("receiving_retry_counter count: ") + std::to_string(receiving_retry_counter),
+                              Loglevel::DEBUG);
 
               if (!resp.isValid()) throw std::runtime_error("Invalid incoming packet");
               if (receiving_retry_counter <= 0)
-                throw std::runtime_error("Maximum receiving_retry_counter count reached for receiving response from the device!");
+                throw std::runtime_error(
+                    "Maximum receiving_retry_counter count reached for receiving response from the device!");
               if (resp.last_command_status != 0)
                 throw CommandFailedException(resp.command_id, resp.last_command_status);
 

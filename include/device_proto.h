@@ -235,27 +235,29 @@ namespace nitrokey {
                   status = dev.recv(&resp);
 
                   if (dev.get_device_model() == DeviceModel::STORAGE &&
-                      resp.command_id >= 0x20 &&
-                      resp.command_id < 0x60
-                      ) {
+                      resp.command_id >= stick20::CMD_START_VALUE &&
+                      resp.command_id < stick20::CMD_END_VALUE ) {
                     Log::instance()(std::string("Detected storage device cmd, status: ") +
                                     std::to_string(resp.StorageStatus.Status_u8), Loglevel::DEBUG_L2);
 
-                    resp.last_command_status = 0;
-                    switch (resp.StorageStatus.Status_u8) {
-                      case 0:
-                      case 1:
-                        resp.last_command_status = 0;
-                        resp.device_status = 0;
+                    resp.last_command_status = static_cast<uint8_t>(stick10::command_status::ok);
+                    switch (static_cast<stick20::device_status>(resp.StorageStatus.Status_u8)) {
+                      case stick20::device_status::idle :
+                      case stick20::device_status::ok:
+                        resp.device_status = static_cast<uint8_t>(stick10::device_status::ok);
                         break;
-                      case 2:
-                        resp.last_command_status = 0;
-                        resp.device_status = 1; //pro busy
+                      case stick20::device_status::busy:
+                      case stick20::device_status::busy_progressbar: //TODO this will be modified later for getting progressbar status
+                        resp.device_status = static_cast<uint8_t>(stick10::device_status::busy);
                         break;
-                      case 3:
-                      case 4:
-                        resp.last_command_status = 4;
-                        resp.device_status = 0;
+                      case stick20::device_status::wrong_password:
+                        resp.last_command_status = static_cast<uint8_t>(stick10::device_status::wrong_password);
+                        resp.device_status = static_cast<uint8_t>(stick10::device_status::ok);
+                        break;
+                      default:
+                        Log::instance()(std::string("Unknown storage device status, cannot translate: ") +
+                                        std::to_string(resp.StorageStatus.Status_u8), Loglevel::DEBUG);
+                        resp.device_status = resp.StorageStatus.Status_u8;
                         break;
                     };
                   }

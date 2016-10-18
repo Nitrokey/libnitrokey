@@ -4,18 +4,31 @@
 
 namespace nitrokey {
 namespace proto {
-
-#define OUTPUT_CMD_STICK20_STATUS_IDLE                      0
-#define OUTPUT_CMD_STICK20_STATUS_OK                        1
-#define OUTPUT_CMD_STICK20_STATUS_BUSY                      2
-#define OUTPUT_CMD_STICK20_STATUS_WRONG_PASSWORD            3
-#define OUTPUT_CMD_STICK20_STATUS_BUSY_PROGRESSBAR          4
-#define OUTPUT_CMD_STICK20_STATUS_PASSWORD_MATRIX_READY     5
-#define OUTPUT_CMD_STICK20_STATUS_NO_USER_PASSWORD_UNLOCK   6
-#define OUTPUT_CMD_STICK20_STATUS_SMARTCARD_ERROR           7
-#define OUTPUT_CMD_STICK20_STATUS_SECURITY_BIT_ACTIVE       8
-
-#define STICK20_CMD_START_VALUE 0x20
+    namespace stick20 {
+      enum class device_status : uint8_t {
+        idle = 0,
+        ok,
+        busy,
+        wrong_password,
+        busy_progressbar,
+        password_matrix_ready,
+        no_user_password_unlock,
+        smartcard_error,
+        security_bit_active
+      };
+      const int CMD_START_VALUE = 0x20;
+      const int CMD_END_VALUE = 0x60;
+    }
+    namespace stick10 {
+      enum class command_status : uint8_t {
+          ok = 0,
+      };
+      enum class device_status : uint8_t {
+        ok = 0,
+        busy = 1,
+        wrong_password  = 4,
+      };
+    }
 
 
 enum class CommandID : uint8_t {
@@ -42,8 +55,8 @@ enum class CommandID : uint8_t {
   CHANGE_USER_PIN = 0x14,
   CHANGE_ADMIN_PIN = 0x15,
 
-  STICK20_CMD_SEND_PASSWORD = STICK20_CMD_START_VALUE + 18,
-  STICK20_CMD_SEND_NEW_PASSWORD = STICK20_CMD_START_VALUE + 19,
+  STICK20_CMD_SEND_PASSWORD = stick20::CMD_START_VALUE + 18,
+  STICK20_CMD_SEND_NEW_PASSWORD = stick20::CMD_START_VALUE + 19,
 
   ENABLE_CRYPTED_PARI = 0x20,
   DISABLE_CRYPTED_PARI,

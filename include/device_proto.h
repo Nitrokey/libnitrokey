@@ -214,7 +214,7 @@ namespace nitrokey {
               outp.update_CRC();
 
               Log::instance()("Outgoing HID packet:", Loglevel::DEBUG);
-              Log::instance()((std::string) (outp), Loglevel::DEBUG);
+              Log::instance()(static_cast<std::string>(outp), Loglevel::DEBUG);
 
               if (!outp.isValid()) throw std::runtime_error("Invalid outgoing packet");
 
@@ -225,7 +225,7 @@ namespace nitrokey {
                 if (status <= 0)
                   throw std::runtime_error(
                       std::string("Device error while sending command ") +
-                      std::to_string((int) (status)));
+                      std::to_string(status));
 
                 std::this_thread::sleep_for(dev.get_send_receive_delay());
 
@@ -277,7 +277,7 @@ namespace nitrokey {
                       "Device is not ready or received packet's last CRC is not equal to sent CRC packet, retrying...",
                       Loglevel::DEBUG);
                   Log::instance()("Invalid incoming HID packet:", Loglevel::DEBUG_L2);
-                  Log::instance()((std::string) (resp), Loglevel::DEBUG_L2);
+                  Log::instance()(static_cast<std::string>(resp), Loglevel::DEBUG_L2);
                   std::this_thread::sleep_for(dev.get_retry_timeout());
                   continue;
                 }
@@ -297,7 +297,7 @@ namespace nitrokey {
                     std::to_string(status));
 
               Log::instance()("Incoming HID packet:", Loglevel::DEBUG);
-              Log::instance()((std::string) (resp), Loglevel::DEBUG);
+              Log::instance()(static_cast<std::string>(resp), Loglevel::DEBUG);
               Log::instance()(std::string("receiving_retry_counter count: ") + std::to_string(receiving_retry_counter),
                               Loglevel::DEBUG);
 

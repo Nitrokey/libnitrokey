@@ -375,9 +375,9 @@ def test_HOTP_token(C):
         assert hotp_code != 0
         assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
-# todo skip / xfail only for nk storage
-@pytest.mark.xfail(reason="bug in NK Storage TOTP firmware")
 def test_TOTP_64bit_time(C):
+    if is_storage(C):
+        pytest.xfail('bug in NK Storage TOTP firmware')
     oath = pytest.importorskip("oath")
     T = 1
     lib_at = lambda t: oath.totp(RFC_SECRET, t=t)

@@ -375,6 +375,29 @@ def test_HOTP_token(C):
         assert hotp_code != 0
         assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
+def test_HOTP_counters(C):
+    """
+    # https://tools.ietf.org/html/rfc4226#page-32
+    """
+    use_pin_protection = False
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, use_pin_protection, not use_pin_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    use_8_digits = True
+    HOTP_test_data = [
+        1284755224, 1094287082, 137359152, 1726969429, 1640338314,
+        868254676, 1918287922, 82162583, 673399871, 645520489,
+    ]
+    slot_number = 1
+    for counter, code in enumerate(HOTP_test_data):
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_write_hotp_slot(slot_number, 'python_test', RFC_SECRET, counter, use_8_digits, False, False, "",
+                                    DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        r = C.NK_get_hotp_code(slot_number)
+        code = str(code)[-8:] if use_8_digits else str(code)[-6:]
+        assert int(code) == r
+
+
 def test_TOTP_64bit_time(C):
     if is_storage(C):
         pytest.xfail('bug in NK Storage TOTP firmware')

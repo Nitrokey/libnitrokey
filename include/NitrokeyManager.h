@@ -22,9 +22,9 @@ namespace nitrokey {
         static shared_ptr <NitrokeyManager> instance();
 
         bool first_authenticate(const char *pin, const char *temporary_password);
-        bool write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter,
-                                     bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
-                                     const char *temporary_password);
+        bool write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint64_t hotp_counter,
+                             bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
+                             const char *temporary_password);
         bool write_TOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint16_t time_window,
                                      bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
                                      const char *temporary_password);

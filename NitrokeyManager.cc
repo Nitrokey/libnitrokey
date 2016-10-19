@@ -179,9 +179,9 @@ namespace nitrokey{
         std::copy(vec.begin(), vec.end(), dest);
     }
 
-    bool NitrokeyManager::write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter,
-                                              bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
-                                              const char *temporary_password) {
+    bool NitrokeyManager::write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint64_t hotp_counter,
+                                          bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
+                                          const char *temporary_password) {
         if (!is_valid_hotp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
 
         slot_number = get_internal_slot_number_for_hotp(slot_number);

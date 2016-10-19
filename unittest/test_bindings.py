@@ -85,6 +85,26 @@ def C(request):
     return C
 
 
+def get_firmware_version_from_status(C):
+    status = gs(C.NK_status())
+    status = [s if 'firmware_version' in s else '' for s in status.split('\n')]
+    firmware = status[0].split(':')[1]
+    return firmware
+
+
+def is_pro_rtm_07(C):
+    firmware = get_firmware_version_from_status(C)
+    return '07 00' in firmware
+
+
+def is_storage(C):
+    """
+    exact firmware storage is sent by other function
+    """
+    firmware = get_firmware_version_from_status(C)
+    return '01 00' in firmware
+
+
 def test_enable_password_safe(C):
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe('wrong_password') == DeviceErrorCode.WRONG_PASSWORD
@@ -188,8 +208,9 @@ def test_destroy_password_safe(C):
     assert is_slot_programmed[0] == 0
 
 
-@pytest.mark.xfail
 def test_is_AES_supported(C):
+    if is_storage(C):
+        pytest.skip("Storage does not implement this command")
     assert C.NK_is_AES_supported('wrong password') != 1
     assert C.NK_get_last_command_status() == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_is_AES_supported(DefaultPasswords.USER) == 1

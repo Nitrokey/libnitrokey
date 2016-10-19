@@ -331,7 +331,10 @@ class GetStatus : Command<CommandID::GET_STATUS> {
 
     std::string dissect() const {
       std::stringstream ss;
-      ss << "firmware_version:\t" << firmware_version << std::endl;
+      ss  << "firmware_version:\t"
+          << "[" << firmware_version << "]" << "\t"
+          << ::nitrokey::misc::hexdump(
+          (const char *)(&firmware_version), 2, false);
       ss << "card_serial:\t"
          << ::nitrokey::misc::hexdump((const char *)(card_serial),
                                       sizeof card_serial, false);

@@ -644,3 +644,8 @@ def test_warning_binary_bigger_than_secret_buffer(C):
     invalid_hex_string = to_hex('1234567890') * 3
     assert C.NK_write_hotp_slot(1, 'slot_name', invalid_hex_string, 0, True, False, False, '',
                                 DefaultPasswords.ADMIN_TEMP) == LibraryErrors.TARGET_BUFFER_SIZE_SMALLER_THAN_SOURCE
+
+
+@pytest.mark.xfail(reason="TODO")
+def test_OTP_secret_started_from_null(C):
+    assert False

@@ -10,6 +10,13 @@ def to_hex(s):
     return "".join("{:02x}".format(ord(c)) for c in s)
 
 
+def wait(t):
+    import time
+    msg = 'Waiting for %d seconds' % t
+    print(msg.center(40, '='))
+    time.sleep(t)
+
+
 RFC_SECRET_HR = '12345678901234567890'
 RFC_SECRET = to_hex(RFC_SECRET_HR)  # '12345678901234567890'
 
@@ -78,6 +85,26 @@ def C(request):
     return C
 
 
+def get_firmware_version_from_status(C):
+    status = gs(C.NK_status())
+    status = [s if 'firmware_version' in s else '' for s in status.split('\n')]
+    firmware = status[0].split(':')[1]
+    return firmware
+
+
+def is_pro_rtm_07(C):
+    firmware = get_firmware_version_from_status(C)
+    return '07 00' in firmware
+
+
+def is_storage(C):
+    """
+    exact firmware storage is sent by other function
+    """
+    firmware = get_firmware_version_from_status(C)
+    return '01 00' in firmware
+
+
 def test_enable_password_safe(C):
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe('wrong_password') == DeviceErrorCode.WRONG_PASSWORD
@@ -134,9 +161,10 @@ def test_password_safe_slot_status(C):
     assert is_slot_programmed[1] == 1
 
 
-@pytest.mark.xfail(run=False, reason="issue to register: device locks up "
-                                     "after below commands sequence (reinsertion fixes), skipping for now")
 def test_issue_device_locks_on_second_key_generation_in_sequence(C):
+    if is_pro_rtm_07(C):
+        pytest.skip("issue to register: device locks up "
+                     "after below commands sequence (reinsertion fixes), skipping for now")
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
 
@@ -148,7 +176,7 @@ def test_regenerate_aes_key(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
 
-@pytest.mark.xfail(reason="firmware bug: regenerating AES key command not always results in cleared slot data")
+@pytest.mark.xfail(reason="NK Pro firmware bug: regenerating AES key command not always results in cleared slot data")
 def test_destroy_password_safe(C):
     """
     Sometimes fails on NK Pro - slot name is not cleared ergo key generation has not succeed despite the success result
@@ -182,6 +210,8 @@ def test_destroy_password_safe(C):
 
 
 def test_is_AES_supported(C):
+    if is_storage(C):
+        pytest.skip("Storage does not implement this command")
     assert C.NK_is_AES_supported('wrong password') != 1
     assert C.NK_get_last_command_status() == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_is_AES_supported(DefaultPasswords.USER) == 1
@@ -237,6 +267,7 @@ def test_invalid_slot(C):
 
 def test_admin_retry_counts(C):
     default_admin_retry_count = 3
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_get_admin_retry_count() == default_admin_retry_count
     assert C.NK_change_admin_PIN('wrong_password', DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_get_admin_retry_count() == default_admin_retry_count - 1
@@ -244,8 +275,20 @@ def test_admin_retry_counts(C):
     assert C.NK_get_admin_retry_count() == default_admin_retry_count
 
 
-def test_user_retry_counts(C):
+def test_user_retry_counts_change_PIN(C):
+    assert C.NK_change_user_PIN(DefaultPasswords.USER, DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    wrong_password = 'wrong_password'
     default_user_retry_count = 3
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_get_user_retry_count() == default_user_retry_count
+    assert C.NK_change_user_PIN(wrong_password, wrong_password) == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_get_user_retry_count() == default_user_retry_count - 1
+    assert C.NK_change_user_PIN(DefaultPasswords.USER, DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    assert C.NK_get_user_retry_count() == default_user_retry_count
+
+def test_user_retry_counts_PWSafe(C):
+    default_user_retry_count = 3
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_get_user_retry_count() == default_user_retry_count
     assert C.NK_enable_password_safe('wrong_password') == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_get_user_retry_count() == default_user_retry_count - 1
@@ -333,17 +376,91 @@ def test_HOTP_token(C):
         assert hotp_code != 0
         assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
+def test_HOTP_counters(C):
+    """
+    # https://tools.ietf.org/html/rfc4226#page-32
+    """
+    use_pin_protection = False
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, use_pin_protection, not use_pin_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    use_8_digits = True
+    HOTP_test_data = [
+        1284755224, 1094287082, 137359152, 1726969429, 1640338314,
+        868254676, 1918287922, 82162583, 673399871, 645520489,
+    ]
+    slot_number = 1
+    for counter, code in enumerate(HOTP_test_data):
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_write_hotp_slot(slot_number, 'python_test', RFC_SECRET, counter, use_8_digits, False, False, "",
+                                    DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        r = C.NK_get_hotp_code(slot_number)
+        code = str(code)[-8:] if use_8_digits else str(code)[-6:]
+        assert int(code) == r
 
-@pytest.mark.xfail(reason="firmware bug: set time command not always changes the time on stick thus failing this test, "
-                          "this does not influence normal use since setting time is not done every TOTP code request")
+
+INT32_MAX = 2 ** 31 - 1
+def test_HOTP_64bit_counter(C):
+    if is_storage(C):
+        pytest.xfail('bug in NK Storage HOTP firmware - counter is set with a 8 digits string, '
+                     'however int32max takes 10 digits to be written')
+    oath = pytest.importorskip("oath")
+    lib_at = lambda t: oath.hotp(RFC_SECRET, t, format='dec6')
+    PIN_protection = False
+    use_8_digits = False
+    slot_number = 1
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    dev_res = []
+    lib_res = []
+    for t in range(INT32_MAX - 5, INT32_MAX + 5, 1):
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_write_hotp_slot(slot_number, 'python_test', RFC_SECRET, t, use_8_digits, False, False, "",
+                                    DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        code_device = str(C.NK_get_hotp_code(slot_number))
+        dev_res += (t, code_device)
+        lib_res += (t, lib_at(t))
+    assert dev_res == lib_res
+
+
+def test_TOTP_64bit_time(C):
+    if is_storage(C):
+        pytest.xfail('bug in NK Storage TOTP firmware')
+    oath = pytest.importorskip("oath")
+    T = 1
+    lib_at = lambda t: oath.totp(RFC_SECRET, t=t)
+    PIN_protection = False
+    slot_number = 1
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_totp_slot(slot_number, 'python_test', RFC_SECRET, 30, False, False, False, "",
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    dev_res = []
+    lib_res = []
+    for t in range(INT32_MAX - 5, INT32_MAX + 5, 1):
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_totp_set_time(t) == DeviceErrorCode.STATUS_OK
+        code_device = str((C.NK_get_totp_code(slot_number, T, 0, 30)))
+        dev_res += (t, code_device)
+        lib_res += (t, lib_at(t))
+    assert dev_res == lib_res
+
+
+@pytest.mark.xfail(reason="NK Pro: possible firmware bug or communication issue: set time command not always changes the time on stick thus failing this test, "
+                          "this does not influence normal use since setting time is not done every TOTP code request"
+                          "Rarely fail occurs on NK Storage")
 @pytest.mark.parametrize("PIN_protection", [False, True, ])
 def test_TOTP_RFC_usepin(C, PIN_protection):
+    slot_number = 1
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
                              DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # test according to https://tools.ietf.org/html/rfc6238#appendix-B
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_totp_slot(1, 'python_test', RFC_SECRET, 30, True, False, False, "",
+    assert C.NK_write_totp_slot(slot_number, 'python_test', RFC_SECRET, 30, True, False, False, "",
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
 
     get_func = None
@@ -352,26 +469,29 @@ def test_TOTP_RFC_usepin(C, PIN_protection):
     else:
         get_func = C.NK_get_totp_code
 
+    # Mode: Sha1, time step X=30
     test_data = [
-        (59, 1, 94287082),
-        (1111111109, 0x00000000023523EC, 7081804),
-        (1111111111, 0x00000000023523ED, 14050471),
-        (1234567890, 0x000000000273EF07, 89005924),
+        #Time         T (hex)               TOTP
+        (59,          0x1,                94287082),
+        (1111111109,  0x00000000023523EC, 7081804),
+        (1111111111,  0x00000000023523ED, 14050471),
+        (1234567890,  0x000000000273EF07, 89005924),
+        (2000000000,  0x0000000003F940AA, 69279037),
+        # (20000000000, 0x0000000027BC86AA, 65353130), # 64bit is also checked in other test
     ]
-    for t, T, code in test_data:
-        """
-        FIXME without the delay 50% of tests fails, with it only 12%, higher delay removes fails
-        -> set_time function not always works, to investigate why
-        """
-        # import time
-        # time.sleep(2)
+    responses = []
+    data = []
+    correct = 0
+    for t, T, expected_code in test_data:
         if PIN_protection:
             C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP)
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         assert C.NK_totp_set_time(t) == DeviceErrorCode.STATUS_OK
-        r = get_func(1, T, 0, 30)  # FIXME T is not changing the outcome
-        assert code == r
-
+        code_from_device = get_func(slot_number, T, 0, 30)  # FIXME T is not changing the outcome
+        data += [ (t, expected_code) ]
+        responses += [ (t, code_from_device) ]
+        correct += expected_code == code_from_device
+    assert data == responses or correct == len(test_data)
 
 def test_get_slot_names(C):
     C.NK_set_debug(True)
@@ -468,14 +588,9 @@ def test_read_write_config(C):
     assert config == (255, 255, 255, False, True)
 
 
-def wait(t):
-    import time
-    msg = 'Waiting for %d seconds' % t
-    print(msg.center(40, '='))
-    time.sleep(t)
-
-
 def test_factory_reset(C):
+    if is_storage(C):
+        pytest.skip('Recovery not implemented for NK Storage')
     C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -532,3 +647,8 @@ def test_warning_binary_bigger_than_secret_buffer(C):
     invalid_hex_string = to_hex('1234567890') * 3
     assert C.NK_write_hotp_slot(1, 'slot_name', invalid_hex_string, 0, True, False, False, '',
                                 DefaultPasswords.ADMIN_TEMP) == LibraryErrors.TARGET_BUFFER_SIZE_SMALLER_THAN_SOURCE
+
+
+@pytest.mark.xfail(reason="TODO")
+def test_OTP_secret_started_from_null(C):
+    assert False

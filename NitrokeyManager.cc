@@ -8,10 +8,15 @@ namespace nitrokey{
 
     template <typename T>
     void strcpyT(T& dest, const char* src){
-        if (src == nullptr)
+
+      if (src == nullptr)
 //            throw EmptySourceStringException(slot_number);
             return;
         const size_t s_dest = sizeof dest;
+      nitrokey::log::Log::instance()(std::string("strcpyT sizes dest src ")
+                                     +std::to_string(s_dest)+ " "
+                                     +std::to_string(strlen(src))+ " "
+          ,nitrokey::log::Loglevel::DEBUG);
         if (strlen(src) > s_dest){
             throw TooLongStringException(strlen(src), s_dest, src);
         }
@@ -45,7 +50,7 @@ namespace nitrokey{
     }
 
     bool NitrokeyManager::connect() {
-        device = nullptr;
+        this->disconnect();
         vector< shared_ptr<Device> > devices = { make_shared<Stick10>(), make_shared<Stick20>() };
         for( auto & d : devices ){
             if (d->connect()){
@@ -57,7 +62,8 @@ namespace nitrokey{
 
 
     bool NitrokeyManager::connect(const char *device_model) {
-        switch (device_model[0]){
+      this->disconnect();
+      switch (device_model[0]){
             case 'P':
                 device = make_shared<Stick10>();
                 break;
@@ -78,7 +84,12 @@ namespace nitrokey{
     }
 
     bool NitrokeyManager::disconnect() {
-        return device->disconnect();
+      if (device == nullptr){
+        return false;
+      }
+      const auto res = device->disconnect();
+      device = nullptr;
+      return res;
     }
 
     void NitrokeyManager::set_debug(bool state) {
@@ -168,9 +179,9 @@ namespace nitrokey{
         std::copy(vec.begin(), vec.end(), dest);
     }
 
-    bool NitrokeyManager::write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter,
-                                              bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
-                                              const char *temporary_password) {
+    bool NitrokeyManager::write_HOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint64_t hotp_counter,
+                                          bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
+                                          const char *temporary_password) {
         if (!is_valid_hotp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
 
         slot_number = get_internal_slot_number_for_hotp(slot_number);
@@ -180,7 +191,22 @@ namespace nitrokey{
         vector_copy(payload.slot_secret, secret_bin);
         strcpyT(payload.slot_name, slot_name);
         strcpyT(payload.slot_token_id, token_ID);
-        payload.slot_counter = hotp_counter;
+      switch (device->get_device_model() ){
+        case DeviceModel::PRO: {
+          payload.slot_counter = hotp_counter;
+          break;
+        }
+        case DeviceModel::STORAGE: {
+          std::string counter = std::to_string(hotp_counter);
+          strcpyT(payload.slot_counter, counter.c_str());
+          break;
+        }
+        default:
+          nitrokey::log::Log::instance()(  std::string(__FILE__) + std::to_string(__LINE__) +
+                   std::string(__FUNCTION__) + std::string(" Unhandled device model for HOTP")
+              , nitrokey::log::Loglevel::DEBUG);
+          break;
+      }
         payload.use_8_digits = use_8_digits;
         payload.use_enter = use_enter;
         payload.use_tokenID = use_tokenID;
@@ -280,11 +306,10 @@ namespace nitrokey{
                 auto p = get_payload<ChangeAdminUserPin20Current>();
                 strcpyT(p.old_pin, current_PIN);
                 p.set_kind(StoKind);
-                ChangeAdminUserPin20Current::CommandTransaction::run(*device, p);
-
                 auto p2 = get_payload<ChangeAdminUserPin20New>();
                 strcpyT(p2.new_pin, new_PIN);
                 p2.set_kind(StoKind);
+                ChangeAdminUserPin20Current::CommandTransaction::run(*device, p);
                 ChangeAdminUserPin20New::CommandTransaction::run(*device, p2);
             }
                 break;
@@ -312,10 +337,16 @@ namespace nitrokey{
     }
 
     uint8_t NitrokeyManager::get_user_retry_count() {
+        if(device->get_device_model() == DeviceModel::STORAGE){
+          stick20::GetDeviceStatus::CommandTransaction::run(*device);
+        }
         auto response = GetUserPasswordRetryCount::CommandTransaction::run(*device);
         return response.data().password_retry_count;
     }
     uint8_t NitrokeyManager::get_admin_retry_count() {
+        if(device->get_device_model() == DeviceModel::STORAGE){
+          stick20::GetDeviceStatus::CommandTransaction::run(*device);
+        }
         auto response = GetPasswordRetryCount::CommandTransaction::run(*device);
         return response.data().password_retry_count;
     }
@@ -380,9 +411,21 @@ namespace nitrokey{
     }
 
     void NitrokeyManager::build_aes_key(const char *admin_password) {
-        auto p = get_payload<BuildAESKey>();
-        strcpyT(p.admin_password, admin_password);
-        BuildAESKey::CommandTransaction::run(*device, p);
+        switch (device->get_device_model()) {
+            case DeviceModel::PRO: {
+                auto p = get_payload<BuildAESKey>();
+                strcpyT(p.admin_password, admin_password);
+                BuildAESKey::CommandTransaction::run(*device, p);
+                break;
+            }
+            case DeviceModel::STORAGE : {
+                auto p = get_payload<stick20::CreateNewKeys>();
+                strcpyT(p.admin_password, admin_password);
+                p.setKindPrefixed();
+                stick20::CreateNewKeys::CommandTransaction::run(*device, p);
+                break;
+            }
+        }
     }
 
     void NitrokeyManager::factory_reset(const char *admin_password) {
@@ -392,10 +435,26 @@ namespace nitrokey{
     }
 
     void NitrokeyManager::unlock_user_password(const char *admin_password, const char *new_user_password) {
-        auto p = get_payload<UnlockUserPassword>();
-        strcpyT(p.admin_password, admin_password);
-        strcpyT(p.user_new_password, new_user_password);
-        UnlockUserPassword::CommandTransaction::run(*device, p);
+      switch (device->get_device_model()){
+        case DeviceModel::PRO: {
+          auto p = get_payload<stick10::UnlockUserPassword>();
+          strcpyT(p.admin_password, admin_password);
+          strcpyT(p.user_new_password, new_user_password);
+          stick10::UnlockUserPassword::CommandTransaction::run(*device, p);
+          break;
+        }
+        case DeviceModel::STORAGE : {
+          auto p2 = get_payload<ChangeAdminUserPin20Current>();
+          p2.set_kind(PasswordKind::Admin);
+          strcpyT(p2.old_pin, admin_password);
+          ChangeAdminUserPin20Current::CommandTransaction::run(*device, p2);
+          auto p3 = get_payload<stick20::UnlockUserPassword>();
+          p3.set_kind(PasswordKind::Admin);
+          strcpyT(p3.user_new_password, new_user_password);
+          stick20::UnlockUserPassword::CommandTransaction::run(*device, p3);
+          break;
+        }
+      }
     }
 
 

@@ -38,7 +38,8 @@ public:
    */
   virtual int recv(void *packet);
 
-  int get_retry_count() const { return m_retry_count; };
+  int get_retry_receiving_count() const { return m_retry_receiving_count; };
+  int get_retry_sending_count() const { return m_retry_sending_count; };
   std::chrono::milliseconds get_retry_timeout() const { return m_retry_timeout; };
     std::chrono::milliseconds get_send_receive_delay() const {return m_send_receive_delay;}
 
@@ -59,7 +60,8 @@ private:
    *	library, there's no way of doing it asynchronously,
    *	hence polling.
    */
-  int m_retry_count;
+  int m_retry_sending_count;
+  int m_retry_receiving_count;
   std::chrono::milliseconds m_retry_timeout;
   std::chrono::milliseconds m_send_receive_delay;
 

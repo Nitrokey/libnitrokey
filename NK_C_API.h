@@ -167,7 +167,7 @@ extern int NK_erase_totp_slot(uint8_t slot_number, const char *temporary_passwor
  * @param temporary_password char[25](Pro) admin temporary password
  * @return command processing error code
  */
-extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint8_t hotp_counter,
+extern int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint64_t hotp_counter,
                               bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
                               const char *temporary_password);
 

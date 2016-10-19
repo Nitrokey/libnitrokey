@@ -1,5 +1,6 @@
 #ifndef DEVICE_PROTO_H
 #define DEVICE_PROTO_H
+
 #include <utility>
 #include <thread>
 #include <type_traits>
@@ -31,7 +32,7 @@
 #define PWS_SEND_CR 3
 
 namespace nitrokey {
-namespace proto {
+    namespace proto {
 /*
  *	POD types for HID proto commands
  *	Instances are meant to be __packed.
@@ -42,45 +43,45 @@ namespace proto {
 /*
  *	Every packet is a USB HID report (check USB spec)
  */
-template <CommandID cmd_id, typename Payload>
-struct HIDReport {
-  uint8_t _zero;
-  CommandID command_id;  // uint8_t
-  union {
-    uint8_t _padding[HID_REPORT_SIZE - 6];
-    Payload payload;
-  } __packed;
-  uint32_t crc;
+        template<CommandID cmd_id, typename Payload>
+        struct HIDReport {
+            uint8_t _zero;
+            CommandID command_id;  // uint8_t
+            union {
+                uint8_t _padding[HID_REPORT_SIZE - 6];
+                Payload payload;
+            } __packed;
+            uint32_t crc;
 
-  // POD types can't have non-default constructors
-  // used in Transaction<>::run()
-  void initialize() {
-    bzero(this, sizeof *this);
-    command_id = cmd_id;
-  }
+            // POD types can't have non-default constructors
+            // used in Transaction<>::run()
+            void initialize() {
+              bzero(this, sizeof *this);
+              command_id = cmd_id;
+            }
 
-  uint32_t calculate_CRC() const {
-    // w/o leading zero, a part of each HID packet
-    // w/o 4-byte crc
-    return misc::stm_crc32((const uint8_t *)(this) + 1,
-                           (size_t)(HID_REPORT_SIZE - 5));
-  }
+            uint32_t calculate_CRC() const {
+              // w/o leading zero, a part of each HID packet
+              // w/o 4-byte crc
+              return misc::stm_crc32((const uint8_t *) (this) + 1,
+                                     (size_t) (HID_REPORT_SIZE - 5));
+            }
 
-  void update_CRC() { crc = calculate_CRC(); }
+            void update_CRC() { crc = calculate_CRC(); }
 
-  bool isCRCcorrect() const { return crc == calculate_CRC(); }
+            bool isCRCcorrect() const { return crc == calculate_CRC(); }
 
-  bool isValid() const {
-    return true;
-    //		return !_zero && payload.isValid() && isCRCcorrect();
-  }
+            bool isValid() const {
+              return true;
+              //		return !_zero && payload.isValid() && isCRCcorrect();
+            }
 
-  operator std::string() const {
-    // Packet type is known upfront in normal operation.
-    // Can't be used to dissect random packets.
-    return QueryDissector<cmd_id, decltype(*this)>::dissect(*this);
-  }
-} __packed;
+            operator std::string() const {
+              // Packet type is known upfront in normal operation.
+              // Can't be used to dissect random packets.
+              return QueryDissector<cmd_id, decltype(*this)>::dissect(*this);
+            }
+        } __packed;
 
 /*
  *	Response payload (the parametrized type inside struct HIDReport)
@@ -88,175 +89,238 @@ struct HIDReport {
  *	command_id member in incoming HIDReport structure carries the command
  *	type last used.
  */
-template <CommandID cmd_id, typename ResponsePayload>
-struct DeviceResponse {
-  uint8_t _zero;
-  uint8_t device_status;
-  uint8_t command_id;  // originally last_command_type
-  uint32_t last_command_crc;
-  uint8_t last_command_status;
-  union {
-    uint8_t _padding[HID_REPORT_SIZE - 12];
-    ResponsePayload payload;
-  } __packed;
-  uint32_t crc;
+        template<CommandID cmd_id, typename ResponsePayload>
+        struct DeviceResponse {
+            uint8_t _zero;
+            uint8_t device_status;
+            uint8_t command_id;  // originally last_command_type
+            uint32_t last_command_crc;
+            uint8_t last_command_status;
+            union {
+                uint8_t _padding[HID_REPORT_SIZE - 12];
+                ResponsePayload payload;
+                struct {
+                    uint8_t _storage_status_padding[20 - 8 + 1]; //starts on 20th byte minus already 8 used + zero byte
+                    uint8_t command_counter;
+                    uint8_t command_id;
+                    uint8_t device_status; //@see stick20::device_status
+                    uint8_t progress_bar_value;
+                } storage_status __packed;
+            } __packed;
+            uint32_t crc;
 
-  void initialize() { bzero(this, sizeof *this); }
+            void initialize() { bzero(this, sizeof *this); }
 
-  uint32_t calculate_CRC() const {
-    // w/o leading zero, a part of each HID packet
-    // w/o 4-byte crc
-    return misc::stm_crc32((const uint8_t *)(this) + 1,
-                           (size_t)(HID_REPORT_SIZE - 5));
-  }
+            uint32_t calculate_CRC() const {
+              // w/o leading zero, a part of each HID packet
+              // w/o 4-byte crc
+              return misc::stm_crc32((const uint8_t *) (this) + 1,
+                                     (size_t) (HID_REPORT_SIZE - 5));
+            }
 
-  void update_CRC() { crc = calculate_CRC(); }
+            void update_CRC() { crc = calculate_CRC(); }
 
-  bool isCRCcorrect() const { return crc == calculate_CRC(); }
+            bool isCRCcorrect() const { return crc == calculate_CRC(); }
 
-  bool isValid() const {
-    //		return !_zero && payload.isValid() && isCRCcorrect() &&
-    //				command_id == (uint8_t)(cmd_id);
-    return true;
-  }
+            bool isValid() const {
+              //		return !_zero && payload.isValid() && isCRCcorrect() &&
+              //				command_id == (uint8_t)(cmd_id);
+              return crc != 0;
+            }
 
-  operator std::string() const {
-    return ResponseDissector<cmd_id, decltype(*this)>::dissect(*this);
-  }
-} __packed;
+            operator std::string() const {
+              return ResponseDissector<cmd_id, decltype(*this)>::dissect(*this);
+            }
+        } __packed;
 
-struct EmptyPayload {
-  uint8_t _data[];
+        struct EmptyPayload {
+            uint8_t _data[];
 
-  bool isValid() const { return true; }
+            bool isValid() const { return true; }
 
-  std::string dissect() const { return std::string("Empty Payload."); }
-} __packed;
+            std::string dissect() const { return std::string("Empty Payload."); }
+        } __packed;
 
-template <typename command_packet, typename response_payload>
-class ClearingProxy{
-public:
-    ClearingProxy(command_packet &p){
-        packet = p;
-        bzero(&p, sizeof(p));
-    }
-    ~ClearingProxy(){
-        bzero(&packet, sizeof(packet));
-    }
+        template<typename command_packet, typename response_payload>
+        class ClearingProxy {
+        public:
+            ClearingProxy(command_packet &p) {
+              packet = p;
+              bzero(&p, sizeof(p));
+            }
 
-    response_payload & data() {
-        return packet.payload;
-    }
+            ~ClearingProxy() {
+              bzero(&packet, sizeof(packet));
+            }
 
-    command_packet packet;
-};
+            response_payload &data() {
+              return packet.payload;
+            }
 
-template <CommandID cmd_id, typename command_payload, typename response_payload>
-class Transaction : semantics::non_constructible {
- public:
-  // Types declared in command class scope can't be reached from there.
-  typedef command_payload CommandPayload;
-  typedef response_payload ResponsePayload;
+            command_packet packet;
+        };
 
-  typedef struct HIDReport<cmd_id, CommandPayload> OutgoingPacket;
-  typedef struct DeviceResponse<cmd_id, ResponsePayload> ResponsePacket;
+        template<CommandID cmd_id, typename command_payload, typename response_payload>
+        class Transaction : semantics::non_constructible {
+        public:
+            // Types declared in command class scope can't be reached from there.
+            typedef command_payload CommandPayload;
+            typedef response_payload ResponsePayload;
 
-  static_assert(std::is_pod<OutgoingPacket>::value,
-                "outgoingpacket must be a pod type");
-  static_assert(std::is_pod<ResponsePacket>::value,
-                "ResponsePacket must be a POD type");
-  static_assert(sizeof(OutgoingPacket) == HID_REPORT_SIZE,
-                "OutgoingPacket type is not the right size");
-  static_assert(sizeof(ResponsePacket) == HID_REPORT_SIZE,
-                "ResponsePacket type is not the right size");
+            typedef struct HIDReport<cmd_id, CommandPayload> OutgoingPacket;
+            typedef struct DeviceResponse<cmd_id, ResponsePayload> ResponsePacket;
 
-  static uint32_t getCRC(
-          const command_payload &payload) {
-    OutgoingPacket outp;
-    outp.initialize();
-    outp.payload = payload;
-    outp.update_CRC();
-    return outp.crc;
-  }
+            static_assert(std::is_pod<OutgoingPacket>::value,
+                          "outgoingpacket must be a pod type");
+            static_assert(std::is_pod<ResponsePacket>::value,
+                          "ResponsePacket must be a POD type");
+            static_assert(sizeof(OutgoingPacket) == HID_REPORT_SIZE,
+                          "OutgoingPacket type is not the right size");
+            static_assert(sizeof(ResponsePacket) == HID_REPORT_SIZE,
+                          "ResponsePacket type is not the right size");
 
-    template <typename T>
-    static void clear_packet(T &st){
-        bzero(&st, sizeof(st));
-    }
+            static uint32_t getCRC(
+                const command_payload &payload) {
+              OutgoingPacket outp;
+              outp.initialize();
+              outp.payload = payload;
+              outp.update_CRC();
+              return outp.crc;
+            }
+
+            template<typename T>
+            static void clear_packet(T &st) {
+              bzero(&st, sizeof(st));
+            }
 
 
-    static ClearingProxy<ResponsePacket, response_payload> run(device::Device &dev,
-                              const command_payload &payload) {
-    using namespace ::nitrokey::device;
-    using namespace ::nitrokey::log;
-     using namespace std::chrono_literals;
+            static ClearingProxy<ResponsePacket, response_payload> run(device::Device &dev,
+                                                                       const command_payload &payload) {
+              using namespace ::nitrokey::device;
+              using namespace ::nitrokey::log;
+              using namespace std::chrono_literals;
 
-    Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
+              Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
-    int status;
-    OutgoingPacket outp;
-    ResponsePacket resp;
+              int status;
+              OutgoingPacket outp;
+              ResponsePacket resp;
 
-    // POD types can't have non-default constructors
-    outp.initialize();
-    resp.initialize();
+              // POD types can't have non-default constructors
+              outp.initialize();
+              resp.initialize();
 
-    outp.payload = payload;
-    outp.update_CRC();
+              outp.payload = payload;
+              outp.update_CRC();
 
-    Log::instance()("Outgoing HID packet:", Loglevel::DEBUG);
-    Log::instance()((std::string)(outp), Loglevel::DEBUG);
+              Log::instance()("Outgoing HID packet:", Loglevel::DEBUG);
+              Log::instance()(static_cast<std::string>(outp), Loglevel::DEBUG);
 
-    if (!outp.isValid()) throw std::runtime_error("Invalid outgoing packet");
+              if (!outp.isValid()) throw std::runtime_error("Invalid outgoing packet");
 
-    status = dev.send(&outp);
-    if (status <= 0)
-      throw std::runtime_error(
-          std::string("Device error while sending command ") +
-          std::to_string((int)(status)));
+              int receiving_retry_counter = 0;
+              int sending_retry_counter = dev.get_retry_sending_count();
+              while (sending_retry_counter-- > 0) {
+                status = dev.send(&outp);
+                if (status <= 0)
+                  throw std::runtime_error(
+                      std::string("Device error while sending command ") +
+                      std::to_string(status));
 
-      std::this_thread::sleep_for(dev.get_send_receive_delay());
+                std::this_thread::sleep_for(dev.get_send_receive_delay());
 
-      // FIXME make checks done in device:recv here
-    int retry = dev.get_retry_count();
-    while (retry-- > 0) {
-      status = dev.recv(&resp);
+                // FIXME make checks done in device:recv here
+                receiving_retry_counter = dev.get_retry_receiving_count();
+                while (receiving_retry_counter-- > 0) {
+                  status = dev.recv(&resp);
 
-      dev.set_last_command_status(resp.last_command_status); // FIXME should be handled on device.recv
+                  if (dev.get_device_model() == DeviceModel::STORAGE &&
+                      resp.command_id >= stick20::CMD_START_VALUE &&
+                      resp.command_id < stick20::CMD_END_VALUE ) {
+                    Log::instance()(std::string("Detected storage device cmd, status: ") +
+                                    std::to_string(resp.storage_status.device_status), Loglevel::DEBUG_L2);
 
-      if (resp.device_status == 0 && resp.last_command_crc == outp.crc) break;
-      Log::instance()("Device is not ready or received packet's last CRC is not equal to sent CRC packet, retrying...",
+                    resp.last_command_status = static_cast<uint8_t>(stick10::command_status::ok);
+                    switch (static_cast<stick20::device_status>(resp.storage_status.device_status)) {
+                      case stick20::device_status::idle :
+                      case stick20::device_status::ok:
+                        resp.device_status = static_cast<uint8_t>(stick10::device_status::ok);
+                        break;
+                      case stick20::device_status::busy:
+                      case stick20::device_status::busy_progressbar: //TODO this will be modified later for getting progressbar status
+                        resp.device_status = static_cast<uint8_t>(stick10::device_status::busy);
+                        break;
+                      case stick20::device_status::wrong_password:
+                        resp.last_command_status = static_cast<uint8_t>(stick10::command_status::wrong_password);
+                        resp.device_status = static_cast<uint8_t>(stick10::device_status::ok);
+                        break;
+                      default:
+                        Log::instance()(std::string("Unknown storage device status, cannot translate: ") +
+                                        std::to_string(resp.storage_status.device_status), Loglevel::DEBUG);
+                        resp.device_status = resp.storage_status.device_status;
+                        break;
+                    };
+                  }
+
+                  //SENDPASSWORD gives wrong CRC , for now rely on !=0 (TODO report)
+//                  if (resp.device_status == 0 && resp.last_command_crc == outp.crc && resp.isCRCcorrect()) break;
+                  if (resp.device_status == static_cast<uint8_t>(stick10::device_status::ok) &&
+                      resp.last_command_crc == outp.crc && resp.isValid()) break;
+                  if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy)) {
+                    receiving_retry_counter++;
+                    Log::instance()("Status busy, not decresing receiving_retry_counter counter: " +
+                                    std::to_string(receiving_retry_counter), Loglevel::DEBUG_L2);
+                  }
+                  Log::instance()(std::string("Retry status - dev status, equal crc, correct CRC: ")
+                                  + std::to_string(resp.device_status) + " " +
+                                  std::to_string(resp.last_command_crc == outp.crc) +
+                                  " " + std::to_string(resp.isCRCcorrect()), Loglevel::DEBUG_L2);
+
+                  Log::instance()(
+                      "Device is not ready or received packet's last CRC is not equal to sent CRC packet, retrying...",
                       Loglevel::DEBUG);
-      Log::instance()("Invalid incoming HID packet:", Loglevel::DEBUG_L2);
-      Log::instance()((std::string)(resp), Loglevel::DEBUG_L2);
-      std::this_thread::sleep_for(dev.get_retry_timeout());
-      continue;
+                  Log::instance()("Invalid incoming HID packet:", Loglevel::DEBUG_L2);
+                  Log::instance()(static_cast<std::string>(resp), Loglevel::DEBUG_L2);
+                  std::this_thread::sleep_for(dev.get_retry_timeout());
+                  continue;
+                }
+                if (resp.device_status == 0 && resp.last_command_crc == outp.crc) break;
+                Log::instance()(std::string("Resending (outer loop) "), Loglevel::DEBUG_L2);
+                Log::instance()(std::string("sending_retry_counter count: ") + std::to_string(sending_retry_counter),
+                                Loglevel::DEBUG);
+              }
+
+              dev.set_last_command_status(resp.last_command_status); // FIXME should be handled on device.recv
+
+              clear_packet(outp);
+
+              if (status <= 0)
+                throw std::runtime_error(
+                    std::string("Device error while executing command ") +
+                    std::to_string(status));
+
+              Log::instance()("Incoming HID packet:", Loglevel::DEBUG);
+              Log::instance()(static_cast<std::string>(resp), Loglevel::DEBUG);
+              Log::instance()(std::string("receiving_retry_counter count: ") + std::to_string(receiving_retry_counter),
+                              Loglevel::DEBUG);
+
+              if (!resp.isValid()) throw std::runtime_error("Invalid incoming packet");
+              if (receiving_retry_counter <= 0)
+                throw std::runtime_error(
+                    "Maximum receiving_retry_counter count reached for receiving response from the device!");
+              if (resp.last_command_status != static_cast<uint8_t>(stick10::command_status::ok))
+                throw CommandFailedException(resp.command_id, resp.last_command_status);
+
+
+              // See: DeviceResponse
+              return resp;
+            }
+
+            static ClearingProxy<ResponsePacket, response_payload> run(device::Device &dev) {
+              command_payload empty_payload;
+              return run(dev, empty_payload);
+            }
+        };
     }
-    clear_packet(outp);
-
-    if (status <= 0)
-      throw std::runtime_error(
-          std::string("Device error while executing command ") +
-          std::to_string(status));
-
-    Log::instance()("Incoming HID packet:", Loglevel::DEBUG);
-    Log::instance()((std::string)(resp), Loglevel::DEBUG);
-    Log::instance()(std::string("Retry count: ") + std::to_string(retry), Loglevel::DEBUG);
-
-    if (!resp.isValid()) throw std::runtime_error("Invalid incoming packet");
-    if (retry <= 0) throw std::runtime_error("Maximum retry count reached for receiving response from the device!");
-    if (resp.last_command_status!=0) throw CommandFailedException(resp.command_id, resp.last_command_status);
-
-
-      // See: DeviceResponse
-    return resp;
-  }
-
-  static ClearingProxy<ResponsePacket, response_payload> run(device::Device &dev) {
-    command_payload empty_payload;
-    return run(dev, empty_payload);
-  }
-};
-}
 }
 #endif

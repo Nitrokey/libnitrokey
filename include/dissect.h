@@ -67,7 +67,7 @@ class ResponseDissector : semantics::non_constructible {
 
     out << "Device status:\t" << pod.device_status + 0 << " "
         << status[pod.device_status] << std::endl;
-    out << "Command ID:\t" << commandid_to_string((CommandID)(pod.command_id))
+    out << "Command ID:\t" << commandid_to_string((CommandID)(pod.command_id)) << " hex: " << std::hex << (int)pod.command_id
         << std::endl;
     out << "Last command CRC:\t"
             << std::hex << std::setw(2) << std::setfill('0')
@@ -77,6 +77,14 @@ class ResponseDissector : semantics::non_constructible {
     out << "CRC:\t"
             << std::hex << std::setw(2) << std::setfill('0')
             << pod.crc << std::endl;
+      out << "Storage stick status:" << std::endl;
+#define d(x) out << " "#x": \t"<< std::hex << std::setw(2) \
+    << std::setfill('0')<< static_cast<int>(x) << std::endl;
+    d(pod.storage_status.command_counter);
+    d(pod.storage_status.command_id);
+    d(pod.storage_status.device_status);
+    d(pod.storage_status.progress_bar_value);
+#undef d
 
     out << "Payload:" << std::endl;
     out << pod.payload.dissect();

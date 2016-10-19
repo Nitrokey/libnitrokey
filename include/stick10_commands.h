@@ -111,7 +111,8 @@ class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
         std::stringstream ss;
         ss << "slot_number:\t" << (int)(slot_number) << std::endl;
         ss << "slot_name:\t" << slot_name << std::endl;
-        ss << "slot_secret:\t" << slot_secret << std::endl;
+        ss << "slot_secret:" << std::endl
+           << ::nitrokey::misc::hexdump((const char *)(&slot_secret), sizeof slot_secret);
         ss << "slot_config:\t" << std::bitset<8>((int)_slot_config) << std::endl;
         ss << "\tuse_8_digits(0):\t" << use_8_digits << std::endl;
         ss << "\tuse_enter(1):\t" << use_enter << std::endl;
@@ -121,8 +122,10 @@ class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
         for (auto i : slot_token_id)
             ss << std::hex << std::setw(2) << std::setfill('0')<< (int) i << " " ;
         ss << std::endl;
-        ss << "slot_counter:\t" << (int)slot_counter << std::endl;
-        return ss.str();
+        ss << "slot_counter:\t[" << (int)slot_counter << "]\t"
+         << ::nitrokey::misc::hexdump((const char *)(&slot_counter), sizeof slot_counter, false);
+
+      return ss.str();
     }
   } __packed;
 
@@ -331,7 +334,10 @@ class GetStatus : Command<CommandID::GET_STATUS> {
 
     std::string dissect() const {
       std::stringstream ss;
-      ss << "firmware_version:\t" << firmware_version << std::endl;
+      ss  << "firmware_version:\t"
+          << "[" << firmware_version << "]" << "\t"
+          << ::nitrokey::misc::hexdump(
+          (const char *)(&firmware_version), sizeof firmware_version, false);
       ss << "card_serial:\t"
          << ::nitrokey::misc::hexdump((const char *)(card_serial),
                                       sizeof card_serial, false);

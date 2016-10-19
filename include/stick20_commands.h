@@ -62,6 +62,26 @@ namespace stick20 {
                 CommandTransaction;
     };
 
+
+    class UnlockUserPassword : Command<CommandID::UNLOCK_USER_PASSWORD> {
+    public:
+        struct CommandPayload {
+            uint8_t kind;
+            uint8_t user_new_password[20];
+            std::string dissect() const {
+              std::stringstream ss;
+              ss << " user_new_password:\t" <<  user_new_password<< std::endl;
+              return ss.str();
+            }
+            void set_kind(PasswordKind k){
+              kind = (uint8_t)k;
+            }
+        } __packed;
+
+        typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+            CommandTransaction;
+    };
+
 class EnableEncryptedPartition : semantics::non_constructible {
  public:
   struct CommandPayload {
@@ -126,15 +146,25 @@ class ExportFirmware : semantics::non_constructible {
                       struct EmptyPayload> CommandTransaction;
 };
 
-class CreateNewKeys : semantics::non_constructible {
- public:
-  struct CommandPayload {
-    uint8_t password[30];
-  };
+    class CreateNewKeys : Command<CommandID::GENERATE_NEW_KEYS> {
+    public:
+        struct CommandPayload {
+            uint8_t kind;
+            uint8_t admin_password[30]; //CS20_MAX_PASSWORD_LEN
+            std::string dissect() const {
+              std::stringstream ss;
+              ss << " admin_password:\t" <<  admin_password<< std::endl;
+              return ss.str();
+            }
+            void setKindPrefixed(){
+              kind = 'P';
+            }
+        } __packed;
 
-  typedef Transaction<CommandID::GENERATE_NEW_KEYS, struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
-};
+        typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+            CommandTransaction;
+    };
+
 
 class FillSDCardWithRandomChars : semantics::non_constructible {
  public:
@@ -182,7 +212,7 @@ class SendPasswordMatrixSetup : semantics::non_constructible {
                       struct EmptyPayload> CommandTransaction;
 };
 
-#define d(x) ss << #x":\t" << x << std::endl;
+#define d(x) ss << " "#x":\t" << (int)x << std::endl;
 
     class GetDeviceStatus : Command<CommandID::GET_DEVICE_STATUS> {
     public:
@@ -190,7 +220,7 @@ class SendPasswordMatrixSetup : semantics::non_constructible {
         static const int payload_absolute_begin = 8;
         static const int padding_size = OUTPUT_CMD_RESULT_STICK20_STATUS_START - payload_absolute_begin;
         struct ResponsePayload {
-            uint8_t _padding[padding_size];
+            uint8_t _padding[padding_size]; //TODO confirm padding in Storage firmware
             //data starts from 21st byte of packet -> 13th byte of payload
             uint8_t command_counter;
             uint8_t last_command;

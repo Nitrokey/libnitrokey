@@ -22,11 +22,22 @@ namespace proto {
     namespace stick10 {
       enum class command_status : uint8_t {
           ok = 0,
+          wrong_CRC,
+          wrong_slot,
+          slot_not_programmed,
+          wrong_password  = 4,
+          not_authorized,
+          timestamp_warning,
+          no_name_error,
+          not_supported,
+          unknown_command,
+          AES_dec_failed
       };
       enum class device_status : uint8_t {
         ok = 0,
         busy = 1,
-        wrong_password  = 4,
+        error,
+        received_report,
       };
     }
 

@@ -251,7 +251,7 @@ namespace nitrokey {
                         resp.device_status = static_cast<uint8_t>(stick10::device_status::busy);
                         break;
                       case stick20::device_status::wrong_password:
-                        resp.last_command_status = static_cast<uint8_t>(stick10::device_status::wrong_password);
+                        resp.last_command_status = static_cast<uint8_t>(stick10::command_status::wrong_password);
                         resp.device_status = static_cast<uint8_t>(stick10::device_status::ok);
                         break;
                       default:

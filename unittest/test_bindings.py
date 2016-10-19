@@ -448,8 +448,7 @@ def test_TOTP_64bit_time(C):
     assert dev_res == lib_res
 
 
-# todo skip / xfail only for nk pro
-@pytest.mark.xfail(reason="possible firmware bug or communication issue: set time command not always changes the time on stick thus failing this test, "
+@pytest.mark.xfail(reason="NK Pro: possible firmware bug or communication issue: set time command not always changes the time on stick thus failing this test, "
                           "this does not influence normal use since setting time is not done every TOTP code request")
 @pytest.mark.parametrize("PIN_protection", [False, True, ])
 def test_TOTP_RFC_usepin(C, PIN_protection):
@@ -476,7 +475,7 @@ def test_TOTP_RFC_usepin(C, PIN_protection):
         (1111111111,  0x00000000023523ED, 14050471),
         (1234567890,  0x000000000273EF07, 89005924),
         (2000000000,  0x0000000003F940AA, 69279037),
-        (20000000000, 0x0000000027BC86AA, 65353130), # 64bit is also checked in other test
+        # (20000000000, 0x0000000027BC86AA, 65353130), # 64bit is also checked in other test
     ]
     responses = []
     data = []

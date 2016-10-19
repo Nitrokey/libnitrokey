@@ -13,7 +13,7 @@ namespace nitrokey{
 //            throw EmptySourceStringException(slot_number);
             return;
         const size_t s_dest = sizeof dest;
-      nitrokey::log::Log::instance()(std::string("strcpyT sizes ")
+      nitrokey::log::Log::instance()(std::string("strcpyT sizes dest src ")
                                      +std::to_string(s_dest)+ " "
                                      +std::to_string(strlen(src))+ " "
           ,nitrokey::log::Loglevel::DEBUG);
@@ -191,7 +191,22 @@ namespace nitrokey{
         vector_copy(payload.slot_secret, secret_bin);
         strcpyT(payload.slot_name, slot_name);
         strcpyT(payload.slot_token_id, token_ID);
-        payload.slot_counter = hotp_counter;
+      switch (device->get_device_model() ){
+        case DeviceModel::PRO: {
+          payload.slot_counter = hotp_counter;
+          break;
+        }
+        case DeviceModel::STORAGE: {
+          std::string counter = std::to_string(hotp_counter);
+          strcpyT(payload.slot_counter, counter.c_str());
+          break;
+        }
+        default:
+          nitrokey::log::Log::instance()(  std::string(__FILE__) + std::to_string(__LINE__) +
+                   std::string(__FUNCTION__) + std::string(" Unhandled device model for HOTP")
+              , nitrokey::log::Loglevel::DEBUG);
+          break;
+      }
         payload.use_8_digits = use_8_digits;
         payload.use_enter = use_enter;
         payload.use_tokenID = use_tokenID;

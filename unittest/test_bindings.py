@@ -161,9 +161,10 @@ def test_password_safe_slot_status(C):
     assert is_slot_programmed[1] == 1
 
 
-@pytest.mark.xfail(run=False, reason="issue to register: device locks up "
-                                     "after below commands sequence (reinsertion fixes), skipping for now")
 def test_issue_device_locks_on_second_key_generation_in_sequence(C):
+    if is_pro_rtm_07(C):
+        pytest.skip("issue to register: device locks up "
+                     "after below commands sequence (reinsertion fixes), skipping for now")
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
 
@@ -175,7 +176,7 @@ def test_regenerate_aes_key(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
 
-@pytest.mark.xfail(reason="firmware bug: regenerating AES key command not always results in cleared slot data")
+@pytest.mark.xfail(reason="NK Pro firmware bug: regenerating AES key command not always results in cleared slot data")
 def test_destroy_password_safe(C):
     """
     Sometimes fails on NK Pro - slot name is not cleared ergo key generation has not succeed despite the success result
@@ -449,7 +450,8 @@ def test_TOTP_64bit_time(C):
 
 
 @pytest.mark.xfail(reason="NK Pro: possible firmware bug or communication issue: set time command not always changes the time on stick thus failing this test, "
-                          "this does not influence normal use since setting time is not done every TOTP code request")
+                          "this does not influence normal use since setting time is not done every TOTP code request"
+                          "Rarely fail occurs on NK Storage")
 @pytest.mark.parametrize("PIN_protection", [False, True, ])
 def test_TOTP_RFC_usepin(C, PIN_protection):
     slot_number = 1
@@ -586,8 +588,9 @@ def test_read_write_config(C):
     assert config == (255, 255, 255, False, True)
 
 
-@pytest.mark.skip(reason='Recover not implemented for NK Storage')
 def test_factory_reset(C):
+    if is_storage(C):
+        pytest.skip('Recovery not implemented for NK Storage')
     C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK

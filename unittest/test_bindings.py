@@ -398,6 +398,31 @@ def test_HOTP_counters(C):
         assert int(code) == r
 
 
+INT32_MAX = 2 ** 31 - 1
+def test_HOTP_64bit_counter(C):
+    if is_storage(C):
+        pytest.xfail('bug in NK Storage HOTP firmware - counter is set with a 8 digits string, '
+                     'however int32max takes 10 digits to be written')
+    oath = pytest.importorskip("oath")
+    lib_at = lambda t: oath.hotp(RFC_SECRET, t, format='dec6')
+    PIN_protection = False
+    use_8_digits = False
+    slot_number = 1
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    dev_res = []
+    lib_res = []
+    for t in range(INT32_MAX - 5, INT32_MAX + 5, 1):
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_write_hotp_slot(slot_number, 'python_test', RFC_SECRET, t, use_8_digits, False, False, "",
+                                    DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        code_device = str(C.NK_get_hotp_code(slot_number))
+        dev_res += (t, code_device)
+        lib_res += (t, lib_at(t))
+    assert dev_res == lib_res
+
+
 def test_TOTP_64bit_time(C):
     if is_storage(C):
         pytest.xfail('bug in NK Storage TOTP firmware')
@@ -405,7 +430,6 @@ def test_TOTP_64bit_time(C):
     T = 1
     lib_at = lambda t: oath.totp(RFC_SECRET, t=t)
     PIN_protection = False
-    int32_max = 2 ** 31 - 1
     slot_number = 1
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
@@ -415,7 +439,7 @@ def test_TOTP_64bit_time(C):
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     dev_res = []
     lib_res = []
-    for t in range(int32_max - 5, int32_max + 5, 1):
+    for t in range(INT32_MAX - 5, INT32_MAX + 5, 1):
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         assert C.NK_totp_set_time(t) == DeviceErrorCode.STATUS_OK
         code_device = str((C.NK_get_totp_code(slot_number, T, 0, 30)))

@@ -198,7 +198,7 @@ namespace nitrokey{
         }
         case DeviceModel::STORAGE: {
           std::string counter = std::to_string(hotp_counter);
-          strcpyT(payload.slot_counter, counter.c_str());
+          strcpyT(payload.slot_counter_s, counter.c_str());
           break;
         }
         default:

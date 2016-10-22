@@ -104,7 +104,10 @@ class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
               uint8_t keyboard_layout; //disabled feature in nitroapp as of 20160805
           } slot_token_fields;
       };
-      uint64_t slot_counter;
+      union{
+        uint64_t slot_counter;
+        uint8_t slot_counter_s[8];
+      } __packed;
 
     bool isValid() const { return !(slot_number & 0xF0); }
     std::string dissect() const {

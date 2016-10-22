@@ -105,7 +105,7 @@ namespace nitrokey {
                     uint8_t command_id;
                     uint8_t device_status; //@see stick20::device_status
                     uint8_t progress_bar_value;
-                } storage_status __packed;
+                } __packed storage_status;
             } __packed;
             uint32_t crc;
 

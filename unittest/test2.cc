@@ -11,6 +11,7 @@
 
 using namespace std;
 using namespace nitrokey::device;
+using namespace nitrokey::proto;
 using namespace nitrokey::proto::stick20;
 using namespace nitrokey::log;
 using namespace nitrokey::misc;
@@ -23,17 +24,31 @@ TEST_CASE("test", "[test]") {
 
   Log::instance().set_loglevel(Loglevel::DEBUG_L2);
 
+  stick10::LockDevice::CommandTransaction::run(stick);
+//  {
+//    auto p = get_payload<EnableEncryptedPartition>();
+//    p.set_kind_user();
+//    strcpyT(p.password, "123456");
+//    EnableEncryptedPartition::CommandTransaction::run(stick, p);
+//  }
+// {
+//    auto p = get_payload<DisableEncryptedPartition>();
+//    p.set_kind_user();
+//    strcpyT(p.password, "123456");
+//    DisableEncryptedPartition::CommandTransaction::run(stick, p);
+//  }
+
   {
     auto p = get_payload<EnableEncryptedPartition>();
     p.set_kind_user();
     strcpyT(p.password, "123456");
     EnableEncryptedPartition::CommandTransaction::run(stick, p);
   }
- {
-    auto p = get_payload<DisableEncryptedPartition>();
+  {
+    auto p = get_payload<EnableHiddenEncryptedPartition>();
     p.set_kind_user();
-    strcpyT(p.password, "123456");
-    DisableEncryptedPartition::CommandTransaction::run(stick, p);
+    strcpyT(p.password, "123123123");
+    EnableHiddenEncryptedPartition::CommandTransaction::run(stick, p);
   }
 
   stick.disconnect();

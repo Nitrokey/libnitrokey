@@ -93,6 +93,11 @@ namespace nitrokey {
             public:
                 struct CommandPayload {
                     uint8_t password[30];  // TODO check w/ firmware
+                    std::string dissect() const {
+                      std::stringstream ss;
+//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      return ss.str();
+                    }
                 };
 
                 typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -109,6 +114,11 @@ namespace nitrokey {
             public:
                 struct CommandPayload {
                     uint8_t password[30];  // TODO check w/ firmware
+                    std::string dissect() const {
+                      std::stringstream ss;
+//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      return ss.str();
+                    }
                 };
 
                 typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -125,6 +135,11 @@ namespace nitrokey {
             public:
                 struct CommandPayload {
                     uint8_t password[30];  // TODO check w/ firmware
+                    std::string dissect() const {
+                      std::stringstream ss;
+//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      return ss.str();
+                    }
                 };
 
                 typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -136,6 +151,11 @@ namespace nitrokey {
                 struct CommandPayload {
                     uint8_t old_password[15];
                     uint8_t new_password[15];
+                    std::string dissect() const {
+                      std::stringstream ss;
+//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      return ss.str();
+                    }
                 };
 
                 typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -146,6 +166,11 @@ namespace nitrokey {
             public:
                 struct CommandPayload {
                     uint8_t password[30];
+                    std::string dissect() const {
+                      std::stringstream ss;
+//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      return ss.str();
+                    }
                 };
 
                 typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -178,6 +203,11 @@ namespace nitrokey {
                 struct CommandPayload {
                     uint8_t volume_flag;
                     uint8_t password[30];
+                    std::string dissect() const {
+                      std::stringstream ss;
+//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      return ss.str();
+                    }
                 };
 
                 typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -231,6 +261,11 @@ namespace nitrokey {
             public:
                 struct CommandPayload {
                     uint8_t password[30];
+                    std::string dissect() const {
+                      std::stringstream ss;
+//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      return ss.str();
+                    }
                 };
 
                 typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -241,6 +276,11 @@ namespace nitrokey {
             public:
                 struct CommandPayload {
                     uint8_t password[30];
+                    std::string dissect() const {
+                      std::stringstream ss;
+//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      return ss.str();
+                    }
                 };
 
                 typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -251,6 +291,11 @@ namespace nitrokey {
             public:
                 struct CommandPayload {
                     uint8_t password[30];
+                    std::string dissect() const {
+                      std::stringstream ss;
+//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      return ss.str();
+                    }
                 };
 
                 typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -261,6 +306,11 @@ namespace nitrokey {
             public:
                 struct CommandPayload {
                     uint64_t localtime;  // POSIX
+                    std::string dissect() const {
+                      std::stringstream ss;
+//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      return ss.str();
+                    }
                 };
 
                 typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -271,6 +321,11 @@ namespace nitrokey {
             public:
                 struct CommandPayload {
                     // TODO HiddenVolumeSetup_tst type
+                    std::string dissect() const {
+                      std::stringstream ss;
+//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      return ss.str();
+                    }
                 };
 
                 typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
@@ -281,6 +336,11 @@ namespace nitrokey {
             public:
                 struct CommandPayload {
                     uint8_t password[30];
+                    std::string dissect() const {
+                      std::stringstream ss;
+//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      return ss.str();
+                    }
                 };
 
                 typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>

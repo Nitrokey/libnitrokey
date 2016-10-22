@@ -190,32 +190,6 @@ namespace nitrokey {
                     CommandTransaction;
             };
 
-            class SendPasswordMatrix : Command<CommandID::SEND_PASSWORD_MATRIX> {
-            public:
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
-
-            class SendPasswordMatrixPinData : Command<CommandID::SEND_PASSWORD_MATRIX_PINDATA> {
-            public:
-                struct CommandPayload {
-                    uint8_t pin_data[30];  // TODO how long actually can it be?
-                };
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
-
-            class SendPasswordMatrixSetup : Command<CommandID::SEND_PASSWORD_MATRIX_SETUP> {
-            public:
-                struct CommandPayload {
-                    uint8_t setup_data[30];  // TODO how long actually can it be?
-                };
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
-
 #define d(x) ss << " "#x":\t" << (int)x << std::endl;
 
             class GetDeviceStatus : Command<CommandID::GET_DEVICE_STATUS> {

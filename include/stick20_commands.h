@@ -226,26 +226,6 @@ namespace nitrokey {
             };
 
 
-            class SendPassword : Command<CommandID::SEND_PASSWORD> {
-            public:
-                struct CommandPayload {
-                    uint8_t password[30];
-                };
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
-
-            class SendNewPassword : Command<CommandID::SEND_NEW_PASSWORD> {
-            public:
-                struct CommandPayload {
-                    uint8_t password[30];
-                };
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
-
 // TODO fix original nomenclature
             class SendSetReadonlyToUncryptedVolume : Command<CommandID::ENABLE_READWRITE_UNCRYPTED_LUN> {
             public:

@@ -15,6 +15,7 @@ namespace nitrokey {
 *	STICK20 protocol command ids
 *	a superset (almost) of STICK10
 */
+#define print_to_ss(x) ( ss << " #x:\t" << (x) << std::endl );
         namespace stick20 {
 
             enum class PasswordKind : uint8_t {
@@ -30,6 +31,7 @@ namespace nitrokey {
 
                     std::string dissect() const {
                       std::stringstream ss;
+                      print_to_ss( kind );
                       ss << " old_pin:\t" << old_pin << std::endl;
                       return ss.str();
                     }
@@ -53,6 +55,7 @@ namespace nitrokey {
 
                     std::string dissect() const {
                       std::stringstream ss;
+                      print_to_ss( kind );
                       ss << " new_pin:\t" << new_pin << std::endl;
                       return ss.str();
                     }
@@ -76,6 +79,7 @@ namespace nitrokey {
 
                     std::string dissect() const {
                       std::stringstream ss;
+                      print_to_ss( kind );
                       ss << " user_new_password:\t" << user_new_password << std::endl;
                       return ss.str();
                     }
@@ -89,26 +93,8 @@ namespace nitrokey {
                     CommandTransaction;
             };
 
-            class EnableEncryptedPartition : Command<CommandID::ENABLE_CRYPTED_PARI> {
-            public:
-                struct CommandPayload {
-                    uint8_t password[30];  // TODO check w/ firmware
-                    std::string dissect() const {
-                      std::stringstream ss;
-//                      ss << " admin_password:\t" << admin_password << std::endl;
-                      return ss.str();
-                    }
-                };
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
-
-            class DisableEncryptedPartition : Command<CommandID::DISABLE_CRYPTED_PARI> {
-            public:
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
+            class EnableEncryptedPartition : public PasswordCommand<CommandID::ENABLE_CRYPTED_PARI> {};
+            class DisableEncryptedPartition : public PasswordCommand<CommandID::DISABLE_CRYPTED_PARI> {};
 
             class EnableHiddenEncryptedPartition : Command<CommandID::ENABLE_HIDDEN_CRYPTED_PARI> {
             public:
@@ -116,7 +102,7 @@ namespace nitrokey {
                     uint8_t password[30];  // TODO check w/ firmware
                     std::string dissect() const {
                       std::stringstream ss;
-//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      print_to_ss( password );
                       return ss.str();
                     }
                 };
@@ -137,7 +123,7 @@ namespace nitrokey {
                     uint8_t password[30];  // TODO check w/ firmware
                     std::string dissect() const {
                       std::stringstream ss;
-//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      print_to_ss( password );
                       return ss.str();
                     }
                 };
@@ -153,7 +139,8 @@ namespace nitrokey {
                     uint8_t new_password[15];
                     std::string dissect() const {
                       std::stringstream ss;
-//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      print_to_ss( old_password );
+                      print_to_ss( new_password );
                       return ss.str();
                     }
                 };
@@ -168,7 +155,7 @@ namespace nitrokey {
                     uint8_t password[30];
                     std::string dissect() const {
                       std::stringstream ss;
-//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      print_to_ss( password );
                       return ss.str();
                     }
                 };
@@ -184,6 +171,7 @@ namespace nitrokey {
                     uint8_t admin_password[30]; //CS20_MAX_PASSWORD_LEN
                     std::string dissect() const {
                       std::stringstream ss;
+                      print_to_ss( kind );
                       ss << " admin_password:\t" << admin_password << std::endl;
                       return ss.str();
                     }
@@ -205,7 +193,8 @@ namespace nitrokey {
                     uint8_t password[30];
                     std::string dissect() const {
                       std::stringstream ss;
-//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      print_to_ss( (int)volume_flag );
+                      print_to_ss( password );
                       return ss.str();
                     }
                 };
@@ -255,6 +244,8 @@ namespace nitrokey {
                     CommandTransaction;
             };
 
+#undef d
+
 
 // TODO fix original nomenclature
             class SendSetReadonlyToUncryptedVolume : Command<CommandID::ENABLE_READWRITE_UNCRYPTED_LUN> {
@@ -263,7 +254,7 @@ namespace nitrokey {
                     uint8_t password[30];
                     std::string dissect() const {
                       std::stringstream ss;
-//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      print_to_ss( password );
                       return ss.str();
                     }
                 };
@@ -278,7 +269,7 @@ namespace nitrokey {
                     uint8_t password[30];
                     std::string dissect() const {
                       std::stringstream ss;
-//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      print_to_ss( password );
                       return ss.str();
                     }
                 };
@@ -293,7 +284,7 @@ namespace nitrokey {
                     uint8_t password[30];
                     std::string dissect() const {
                       std::stringstream ss;
-//                      ss << " admin_password:\t" << admin_password << std::endl;
+                      print_to_ss( password );
                       return ss.str();
                     }
                 };
@@ -355,5 +346,7 @@ namespace nitrokey {
         }
     }
 }
+
+#undef print_to_ss
 
 #endif

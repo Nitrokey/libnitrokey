@@ -50,6 +50,8 @@ TEST_CASE("test", "[test]") {
     strcpyT(p.password, "123123123");
     EnableHiddenEncryptedPartition::CommandTransaction::run(stick, p);
   }
+  this_thread::sleep_for(1000ms);
+  stick10::LockDevice::CommandTransaction::run(stick);
 
   stick.disconnect();
 }

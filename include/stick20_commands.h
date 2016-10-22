@@ -82,68 +82,67 @@ namespace stick20 {
             CommandTransaction;
     };
 
-class EnableEncryptedPartition : semantics::non_constructible {
+class EnableEncryptedPartition : Command<CommandID::ENABLE_CRYPTED_PARI>{
  public:
   struct CommandPayload {
     uint8_t password[30];  // TODO check w/ firmware
   };
 
-  typedef Transaction<CommandID::ENABLE_CRYPTED_PARI, struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
-class DisableEncryptedPartition : semantics::non_constructible {
+class DisableEncryptedPartition : Command<CommandID::DISABLE_CRYPTED_PARI>{
  public:
-  typedef Transaction<CommandID::DISABLE_CRYPTED_PARI, struct EmptyPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
-class EnableHiddenEncryptedPartition : semantics::non_constructible {
- public:
-  struct CommandPayload {
-    uint8_t password[30];  // TODO check w/ firmware
-  };
-
-  typedef Transaction<CommandID::ENABLE_HIDDEN_CRYPTED_PARI,
-                      struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
-};
-
-class DisableHiddenEncryptedPartition : semantics::non_constructible {
- public:
-  typedef Transaction<CommandID::DISABLE_CRYPTED_PARI, struct EmptyPayload,
-                      struct EmptyPayload> CommandTransaction;
-};
-
-class EnableFirmwareUpdate : semantics::non_constructible {
+class EnableHiddenEncryptedPartition :Command<CommandID::ENABLE_HIDDEN_CRYPTED_PARI>{
  public:
   struct CommandPayload {
     uint8_t password[30];  // TODO check w/ firmware
   };
 
-  typedef Transaction<CommandID::ENABLE_FIRMWARE_UPDATE, struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
-class UpdatePassword : semantics::non_constructible {
+class DisableHiddenEncryptedPartition :Command<CommandID::DISABLE_CRYPTED_PARI>{
+ public:
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
+};
+
+class EnableFirmwareUpdate :Command<CommandID::ENABLE_FIRMWARE_UPDATE>{
+ public:
+  struct CommandPayload {
+    uint8_t password[30];  // TODO check w/ firmware
+  };
+
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
+};
+
+class UpdatePassword :Command<CommandID::CHANGE_UPDATE_PIN>{
  public:
   struct CommandPayload {
     uint8_t old_password[15];
     uint8_t new_password[15];
   };
 
-  typedef Transaction<CommandID::CHANGE_UPDATE_PIN, struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
-class ExportFirmware : semantics::non_constructible {
+class ExportFirmware :Command<CommandID::EXPORT_FIRMWARE_TO_FILE>{
  public:
   struct CommandPayload {
     uint8_t password[30];
   };
 
-  typedef Transaction<CommandID::EXPORT_FIRMWARE_TO_FILE, struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
     class CreateNewKeys : Command<CommandID::GENERATE_NEW_KEYS> {
@@ -166,50 +165,47 @@ class ExportFirmware : semantics::non_constructible {
     };
 
 
-class FillSDCardWithRandomChars : semantics::non_constructible {
+class FillSDCardWithRandomChars :Command<CommandID::FILL_SD_CARD_WITH_RANDOM_CHARS>{
  public:
   struct CommandPayload {
     uint8_t volume_flag;
     uint8_t password[30];
   };
 
-  typedef Transaction<CommandID::FILL_SD_CARD_WITH_RANDOM_CHARS,
-                      struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
-class SetupHiddenVolume : semantics::non_constructible {
+class SetupHiddenVolume :Command<CommandID::SEND_HIDDEN_VOLUME_SETUP>{
  public:
-  typedef Transaction<CommandID::SEND_HIDDEN_VOLUME_SETUP, struct EmptyPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
-class SendPasswordMatrix : semantics::non_constructible {
+class SendPasswordMatrix :Command<CommandID::SEND_PASSWORD_MATRIX>{
  public:
-  typedef Transaction<CommandID::SEND_PASSWORD_MATRIX, struct EmptyPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
-class SendPasswordMatrixPinData : semantics::non_constructible {
+class SendPasswordMatrixPinData :Command<CommandID::SEND_PASSWORD_MATRIX_PINDATA>{
  public:
   struct CommandPayload {
     uint8_t pin_data[30];  // TODO how long actually can it be?
   };
 
-  typedef Transaction<CommandID::SEND_PASSWORD_MATRIX_PINDATA,
-                      struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
-class SendPasswordMatrixSetup : semantics::non_constructible {
+class SendPasswordMatrixSetup :Command<CommandID::SEND_PASSWORD_MATRIX_SETUP>{
  public:
   struct CommandPayload {
     uint8_t setup_data[30];  // TODO how long actually can it be?
   };
 
-  typedef Transaction<CommandID::SEND_PASSWORD_MATRIX_SETUP,
-                      struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
 #define d(x) ss << " "#x":\t" << (int)x << std::endl;
@@ -246,95 +242,91 @@ class SendPasswordMatrixSetup : semantics::non_constructible {
     };
 
 
-class SendPassword : semantics::non_constructible {
+class SendPassword :Command<CommandID::SEND_PASSWORD>{
  public:
   struct CommandPayload {
     uint8_t password[30];
   };
 
-  typedef Transaction<CommandID::SEND_PASSWORD, struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
-class SendNewPassword : semantics::non_constructible {
+class SendNewPassword :Command<CommandID::SEND_NEW_PASSWORD>{
  public:
   struct CommandPayload {
     uint8_t password[30];
   };
 
-  typedef Transaction<CommandID::SEND_NEW_PASSWORD, struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
 // TODO fix original nomenclature
-class SendSetReadonlyToUncryptedVolume : semantics::non_constructible {
+class SendSetReadonlyToUncryptedVolume :Command<CommandID::ENABLE_READWRITE_UNCRYPTED_LUN>{
  public:
   struct CommandPayload {
     uint8_t password[30];
   };
 
-  typedef Transaction<CommandID::ENABLE_READWRITE_UNCRYPTED_LUN,
-                      struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
-class SendSetReadwriteToUncryptedVolume : semantics::non_constructible {
+class SendSetReadwriteToUncryptedVolume :Command<CommandID::ENABLE_READWRITE_UNCRYPTED_LUN>{
  public:
   struct CommandPayload {
     uint8_t password[30];
   };
 
-  typedef Transaction<CommandID::ENABLE_READWRITE_UNCRYPTED_LUN,
-                      struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
-class SendClearNewSdCardFound : semantics::non_constructible {
+class SendClearNewSdCardFound :Command<CommandID::CLEAR_NEW_SD_CARD_FOUND>{
  public:
   struct CommandPayload {
     uint8_t password[30];
   };
 
-  typedef Transaction<CommandID::CLEAR_NEW_SD_CARD_FOUND, struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
-class SendStartup : semantics::non_constructible {
+class SendStartup :Command<CommandID::SEND_STARTUP>{
  public:
   struct CommandPayload {
     uint64_t localtime;  // POSIX
   };
 
-  typedef Transaction<CommandID::SEND_STARTUP, struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
-class SendHiddenVolumeSetup : semantics::non_constructible {
+class SendHiddenVolumeSetup :Command<CommandID::SEND_HIDDEN_VOLUME_SETUP>{
  public:
   struct CommandPayload {
     // TODO HiddenVolumeSetup_tst type
   };
 
-  typedef Transaction<CommandID::SEND_HIDDEN_VOLUME_SETUP,
-                      struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
-class LockFirmware : semantics::non_constructible {
+class LockFirmware :Command<CommandID::SEND_LOCK_STICK_HARDWARE>{
  public:
   struct CommandPayload {
     uint8_t password[30];
   };
 
-  typedef Transaction<CommandID::SEND_LOCK_STICK_HARDWARE,
-                      struct CommandPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 
-class ProductionTest : semantics::non_constructible {
+class ProductionTest :Command<CommandID::PRODUCTION_TEST>{
  public:
-  typedef Transaction<CommandID::PRODUCTION_TEST, struct EmptyPayload,
-                      struct EmptyPayload> CommandTransaction;
+    typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+        CommandTransaction;
 };
 }
 }

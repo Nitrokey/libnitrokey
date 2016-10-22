@@ -95,21 +95,7 @@ namespace nitrokey {
 
             class EnableEncryptedPartition : public PasswordCommand<CommandID::ENABLE_CRYPTED_PARI> {};
             class DisableEncryptedPartition : public PasswordCommand<CommandID::DISABLE_CRYPTED_PARI> {};
-
-            class EnableHiddenEncryptedPartition : Command<CommandID::ENABLE_HIDDEN_CRYPTED_PARI> {
-            public:
-                struct CommandPayload {
-                    uint8_t password[30];  // TODO check w/ firmware
-                    std::string dissect() const {
-                      std::stringstream ss;
-                      print_to_ss( password );
-                      return ss.str();
-                    }
-                };
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
+            class EnableHiddenEncryptedPartition : public PasswordCommand<CommandID::ENABLE_HIDDEN_CRYPTED_PARI> {};
 
             class DisableHiddenEncryptedPartition : Command<CommandID::DISABLE_CRYPTED_PARI> {
             public:

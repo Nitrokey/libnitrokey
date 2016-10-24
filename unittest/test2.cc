@@ -17,6 +17,15 @@ using namespace nitrokey::log;
 using namespace nitrokey::misc;
 
 
+template<typename CMDTYPE>
+void execute_password_command(Device &stick, const char *password) {
+  auto p = get_payload<CMDTYPE>();
+  p.set_kind_user();
+  strcpyT(p.password, password);
+  CMDTYPE::CommandTransaction::run(stick, p);
+}
+
+
 TEST_CASE("test", "[test]") {
   Stick20 stick;
   bool connected = stick.connect();
@@ -25,32 +34,11 @@ TEST_CASE("test", "[test]") {
   Log::instance().set_loglevel(Loglevel::DEBUG_L2);
 
   stick10::LockDevice::CommandTransaction::run(stick);
-//  {
-//    auto p = get_payload<EnableEncryptedPartition>();
-//    p.set_kind_user();
-//    strcpyT(p.password, "123456");
-//    EnableEncryptedPartition::CommandTransaction::run(stick, p);
-//  }
-// {
-//    auto p = get_payload<DisableEncryptedPartition>();
-//    p.set_kind_user();
-//    strcpyT(p.password, "123456");
-//    DisableEncryptedPartition::CommandTransaction::run(stick, p);
-//  }
-
-  {
-    auto p = get_payload<EnableEncryptedPartition>();
-    p.set_kind_user();
-    strcpyT(p.password, "123456");
-    EnableEncryptedPartition::CommandTransaction::run(stick, p);
-  }
+//  execute_password_command<EnableEncryptedPartition>(stick, "123456");
+//  execute_password_command<DisableEncryptedPartition>(stick, "123456");
+  execute_password_command<EnableEncryptedPartition>(stick, "123456");
   this_thread::sleep_for(1000ms);
-  {
-    auto p = get_payload<EnableHiddenEncryptedPartition>();
-    p.set_kind_user();
-    strcpyT(p.password, "123123123");
-    EnableHiddenEncryptedPartition::CommandTransaction::run(stick, p);
-  }
+  execute_password_command<EnableHiddenEncryptedPartition>(stick, "123123123");
   this_thread::sleep_for(1000ms);
   stick10::LockDevice::CommandTransaction::run(stick);
 

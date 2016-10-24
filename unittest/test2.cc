@@ -18,11 +18,16 @@ using namespace nitrokey::misc;
 
 
 template<typename CMDTYPE>
-void execute_password_command(Device &stick, const char *password) {
+void execute_password_command(Device &stick, const char *password, const char kind = 'P') {
   auto p = get_payload<CMDTYPE>();
-  p.set_kind_user();
+  if (kind == 'P'){
+    p.set_kind_user();
+  } else {
+    p.set_kind_admin();
+  }
   strcpyT(p.password, password);
   CMDTYPE::CommandTransaction::run(stick, p);
+  this_thread::sleep_for(1000ms);
 }
 
 
@@ -36,10 +41,33 @@ TEST_CASE("test", "[test]") {
   stick10::LockDevice::CommandTransaction::run(stick);
 //  execute_password_command<EnableEncryptedPartition>(stick, "123456");
 //  execute_password_command<DisableEncryptedPartition>(stick, "123456");
+  this_thread::sleep_for(1000ms);
   execute_password_command<EnableEncryptedPartition>(stick, "123456");
+  this_thread::sleep_for(4000ms);
+  bool passed = false;
+  for(int i=0; i<5; i++){
+    try {
+      execute_password_command<EnableHiddenEncryptedPartition>(stick, "123123123");
+      CHECK(true);
+      passed=true;
+      break;
+    }
+    catch (CommandFailedException &e){
+      this_thread::sleep_for(2000ms);
+    }
+  }
+  if(!passed){
+    CHECK(false);
+  }
+
+  execute_password_command<DisableHiddenEncryptedPartition>(stick, "123123123");
+  execute_password_command<SendSetReadonlyToUncryptedVolume>(stick, "123456");
+  execute_password_command<SendSetReadwriteToUncryptedVolume>(stick, "123456");
+  execute_password_command<SendClearNewSdCardFound>(stick, "12345678", 'A');
   this_thread::sleep_for(1000ms);
-  execute_password_command<EnableHiddenEncryptedPartition>(stick, "123123123");
-  this_thread::sleep_for(1000ms);
+//  execute_password_command<LockFirmware>(stick, "123123123");
+//  execute_password_command<EnableFirmwareUpdate>(stick, "123123123"); //FIRMWARE PIN
+
   stick10::LockDevice::CommandTransaction::run(stick);
 
   stick.disconnect();

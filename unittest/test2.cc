@@ -64,6 +64,7 @@ TEST_CASE("test", "[test]") {
   execute_password_command<SendSetReadonlyToUncryptedVolume>(stick, "123456");
   execute_password_command<SendSetReadwriteToUncryptedVolume>(stick, "123456");
   execute_password_command<SendClearNewSdCardFound>(stick, "12345678", 'A');
+  stick20::GetDeviceStatus::CommandTransaction::run(stick);
   this_thread::sleep_for(1000ms);
 //  execute_password_command<LockFirmware>(stick, "123123123"); //CAUTION
 //  execute_password_command<EnableFirmwareUpdate>(stick, "123123123"); //CAUTION FIRMWARE PIN
@@ -71,8 +72,5 @@ TEST_CASE("test", "[test]") {
   execute_password_command<ExportFirmware>(stick, "12345678", 'A');
 //  execute_password_command<FillSDCardWithRandomChars>(stick, "12345678", 'A');
 
-
   stick10::LockDevice::CommandTransaction::run(stick);
-
-  stick.disconnect();
 }

@@ -96,27 +96,8 @@ namespace nitrokey {
             class EnableEncryptedPartition : public PasswordCommand<CommandID::ENABLE_CRYPTED_PARI> {};
             class DisableEncryptedPartition : public PasswordCommand<CommandID::DISABLE_CRYPTED_PARI> {};
             class EnableHiddenEncryptedPartition : public PasswordCommand<CommandID::ENABLE_HIDDEN_CRYPTED_PARI> {};
-
-            class DisableHiddenEncryptedPartition : Command<CommandID::DISABLE_CRYPTED_PARI> {
-            public:
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
-
-            class EnableFirmwareUpdate : Command<CommandID::ENABLE_FIRMWARE_UPDATE> {
-            public:
-                struct CommandPayload {
-                    uint8_t password[30];  // TODO check w/ firmware
-                    std::string dissect() const {
-                      std::stringstream ss;
-                      print_to_ss( password );
-                      return ss.str();
-                    }
-                };
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
+            class DisableHiddenEncryptedPartition : public PasswordCommand<CommandID::DISABLE_CRYPTED_PARI> {};
+            class EnableFirmwareUpdate : public PasswordCommand<CommandID::ENABLE_FIRMWARE_UPDATE> {};
 
             class UpdatePassword : Command<CommandID::CHANGE_UPDATE_PIN> {
             public:
@@ -135,20 +116,7 @@ namespace nitrokey {
                     CommandTransaction;
             };
 
-            class ExportFirmware : Command<CommandID::EXPORT_FIRMWARE_TO_FILE> {
-            public:
-                struct CommandPayload {
-                    uint8_t password[30];
-                    std::string dissect() const {
-                      std::stringstream ss;
-                      print_to_ss( password );
-                      return ss.str();
-                    }
-                };
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
+            class ExportFirmware : public PasswordCommand<CommandID::EXPORT_FIRMWARE_TO_FILE> {};
 
             class CreateNewKeys : Command<CommandID::GENERATE_NEW_KEYS> {
             public:
@@ -171,23 +139,7 @@ namespace nitrokey {
                     CommandTransaction;
             };
 
-
-            class FillSDCardWithRandomChars : Command<CommandID::FILL_SD_CARD_WITH_RANDOM_CHARS> {
-            public:
-                struct CommandPayload {
-                    uint8_t volume_flag;
-                    uint8_t password[30];
-                    std::string dissect() const {
-                      std::stringstream ss;
-                      print_to_ss( (int)volume_flag );
-                      print_to_ss( password );
-                      return ss.str();
-                    }
-                };
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
+            class FillSDCardWithRandomChars : public PasswordCommand<CommandID::FILL_SD_CARD_WITH_RANDOM_CHARS> {};
 
             class SetupHiddenVolume : Command<CommandID::SEND_HIDDEN_VOLUME_SETUP> {
             public:
@@ -234,50 +186,9 @@ namespace nitrokey {
 
 
 // TODO fix original nomenclature
-            class SendSetReadonlyToUncryptedVolume : Command<CommandID::ENABLE_READWRITE_UNCRYPTED_LUN> {
-            public:
-                struct CommandPayload {
-                    uint8_t password[30];
-                    std::string dissect() const {
-                      std::stringstream ss;
-                      print_to_ss( password );
-                      return ss.str();
-                    }
-                };
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
-
-            class SendSetReadwriteToUncryptedVolume : Command<CommandID::ENABLE_READWRITE_UNCRYPTED_LUN> {
-            public:
-                struct CommandPayload {
-                    uint8_t password[30];
-                    std::string dissect() const {
-                      std::stringstream ss;
-                      print_to_ss( password );
-                      return ss.str();
-                    }
-                };
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
-
-            class SendClearNewSdCardFound : Command<CommandID::CLEAR_NEW_SD_CARD_FOUND> {
-            public:
-                struct CommandPayload {
-                    uint8_t password[30];
-                    std::string dissect() const {
-                      std::stringstream ss;
-                      print_to_ss( password );
-                      return ss.str();
-                    }
-                };
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
+            class SendSetReadonlyToUncryptedVolume : public PasswordCommand<CommandID::ENABLE_READONLY_UNCRYPTED_LUN> {};
+            class SendSetReadwriteToUncryptedVolume : public PasswordCommand<CommandID::ENABLE_READWRITE_UNCRYPTED_LUN> {};
+            class SendClearNewSdCardFound : public PasswordCommand<CommandID::CLEAR_NEW_SD_CARD_FOUND> {};
 
             class SendStartup : Command<CommandID::SEND_STARTUP> {
             public:
@@ -309,20 +220,7 @@ namespace nitrokey {
                     CommandTransaction;
             };
 
-            class LockFirmware : Command<CommandID::SEND_LOCK_STICK_HARDWARE> {
-            public:
-                struct CommandPayload {
-                    uint8_t password[30];
-                    std::string dissect() const {
-                      std::stringstream ss;
-//                      ss << " admin_password:\t" << admin_password << std::endl;
-                      return ss.str();
-                    }
-                };
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
+            class LockFirmware : public PasswordCommand<CommandID::SEND_LOCK_STICK_HARDWARE> {};
 
             class ProductionTest : Command<CommandID::PRODUCTION_TEST> {
             public:

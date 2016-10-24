@@ -21,6 +21,7 @@ class Device {
 
 public:
   Device();
+  virtual ~Device(){disconnect();}
 
   // lack of device is not actually an error,
   // so it doesn't throw

@@ -18,7 +18,7 @@ namespace nitrokey {
             }
         };
 
-#define print_to_ss(x) ( ss << " #x:\t" << (x) << std::endl );
+#define print_to_ss(x) ( ss << " " << (#x) <<":\t" << (x) << std::endl );
 
         template<CommandID cmd_id>
         class PasswordCommand : public Command<cmd_id> {
@@ -48,5 +48,6 @@ namespace nitrokey {
         };
     }
 }
+#undef print_to_ss
 
 #endif

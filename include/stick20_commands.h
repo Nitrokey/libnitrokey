@@ -15,7 +15,7 @@ namespace nitrokey {
 *	STICK20 protocol command ids
 *	a superset (almost) of STICK10
 */
-#define print_to_ss(x) ( ss << " #x:\t" << (x) << std::endl );
+#define print_to_ss(x) ( ss << " " << (#x) <<":\t" << (x) << std::endl );
         namespace stick20 {
 
             enum class PasswordKind : uint8_t {

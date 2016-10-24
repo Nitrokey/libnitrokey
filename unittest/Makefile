@@ -8,7 +8,7 @@ LIB = -L../build
 LDLIBS = -lnitrokey
 BUILD = build
 
-CXXFLAGS = -std=c++14 -fPIC
+CXXFLAGS = -std=c++14 -fPIC -Wno-gnu-variable-sized-type-not-at-end
 
 CXXSOURCES = $(wildcard *.cc)
 TARGETS = $(CXXSOURCES:%.cc=$(BUILD)/%)

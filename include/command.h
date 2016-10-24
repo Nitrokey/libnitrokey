@@ -13,7 +13,7 @@ namespace nitrokey {
             constexpr static CommandID command_id() { return cmd_id; }
 
             template<typename T>
-            static std::string dissect(const T &) {
+            std::string dissect(const T &) {
               return std::string("Payload dissection is unavailable");
             }
         };

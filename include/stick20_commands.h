@@ -147,7 +147,6 @@ namespace nitrokey {
                     CommandTransaction;
             };
 
-#define d(x) ss << " "#x":\t" << (int)x << std::endl;
 
             class GetDeviceStatus : Command<CommandID::GET_DEVICE_STATUS> {
             public:
@@ -167,10 +166,10 @@ namespace nitrokey {
 
                     std::string dissect() const {
                       std::stringstream ss;
-                      d(command_counter);
-                      d(last_command);
-                      d(status);
-                      d(progress_bar_value);
+                      print_to_ss((int)command_counter);
+                      print_to_ss((int)last_command);
+                      print_to_ss((int)status);
+                      print_to_ss((int)progress_bar_value);
                       ss << "_padding:\t"
                          << ::nitrokey::misc::hexdump((const char *) (_padding),
                                                       sizeof _padding);
@@ -181,8 +180,6 @@ namespace nitrokey {
                 typedef Transaction<command_id(), struct EmptyPayload, struct ResponsePayload>
                     CommandTransaction;
             };
-
-#undef d
 
 
 // TODO fix original nomenclature

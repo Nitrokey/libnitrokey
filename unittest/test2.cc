@@ -44,6 +44,7 @@ TEST_CASE("test", "[test]") {
     strcpyT(p.password, "123456");
     EnableEncryptedPartition::CommandTransaction::run(stick, p);
   }
+  this_thread::sleep_for(1000ms);
   {
     auto p = get_payload<EnableHiddenEncryptedPartition>();
     p.set_kind_user();

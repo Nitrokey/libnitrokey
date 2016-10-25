@@ -32,6 +32,7 @@ set(SOURCE_FILES
         unittest/test_C_API.cpp
         unittest/catch_main.cpp
         unittest/test2.cc
+        include/LongOperationInProgressException.h
         )
 
 add_executable(libnitrokey ${SOURCE_FILES})

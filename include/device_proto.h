@@ -16,6 +16,7 @@
 #include "command_id.h"
 #include "dissect.h"
 #include "CommandFailedException.h"
+#include "LongOperationInProgressException.h"
 
 #define STICK20_UPDATE_MODE_VID 0x03EB
 #define STICK20_UPDATE_MODE_PID 0x2FF1
@@ -216,6 +217,7 @@ namespace nitrokey {
 
               if (!outp.isValid()) throw std::runtime_error("Invalid outgoing packet");
 
+              bool successful_communication = false;
               int receiving_retry_counter = 0;
               int sending_retry_counter = dev.get_retry_sending_count();
               while (sending_retry_counter-- > 0) {
@@ -263,11 +265,20 @@ namespace nitrokey {
                   //SENDPASSWORD gives wrong CRC , for now rely on !=0 (TODO report)
 //                  if (resp.device_status == 0 && resp.last_command_crc == outp.crc && resp.isCRCcorrect()) break;
                   if (resp.device_status == static_cast<uint8_t>(stick10::device_status::ok) &&
-                      resp.last_command_crc == outp.crc && resp.isValid()) break;
+                      resp.last_command_crc == outp.crc && resp.isValid()){
+                    successful_communication = true;
+                    break;
+                  }
                   if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy)) {
                     receiving_retry_counter++;
                     Log::instance()("Status busy, not decresing receiving_retry_counter counter: " +
                                     std::to_string(receiving_retry_counter), Loglevel::DEBUG_L2);
+                  }
+                  if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy) &&
+                      static_cast<stick20::device_status>(resp.storage_status.device_status)
+                      == stick20::device_status::busy_progressbar){
+                    successful_communication = true;
+                    break;
                   }
                   Log::instance()(std::string("Retry status - dev status, equal crc, correct CRC: ")
                                   + std::to_string(resp.device_status) + " " +
@@ -282,7 +293,7 @@ namespace nitrokey {
                   std::this_thread::sleep_for(dev.get_retry_timeout());
                   continue;
                 }
-                if (resp.device_status == 0 && resp.last_command_crc == outp.crc) break;
+                if (successful_communication) break;
                 Log::instance()(std::string("Resending (outer loop) "), Loglevel::DEBUG_L2);
                 Log::instance()(std::string("sending_retry_counter count: ") + std::to_string(sending_retry_counter),
                                 Loglevel::DEBUG);
@@ -296,6 +307,12 @@ namespace nitrokey {
                 throw std::runtime_error(
                     std::string("Device error while executing command ") +
                     std::to_string(status));
+
+              if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy) &&
+                  static_cast<stick20::device_status>(resp.storage_status.device_status)
+                  == stick20::device_status::busy_progressbar){
+                throw LongOperationInProgressException(resp.command_id, resp.storage_status.progress_bar_value);
+              }
 
               Log::instance()("Incoming HID packet:", Loglevel::DEBUG);
               Log::instance()(static_cast<std::string>(resp), Loglevel::DEBUG);

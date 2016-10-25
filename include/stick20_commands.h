@@ -139,7 +139,43 @@ namespace nitrokey {
                     CommandTransaction;
             };
 
-            class FillSDCardWithRandomChars : public PasswordCommand<CommandID::FILL_SD_CARD_WITH_RANDOM_CHARS> {};
+//            class FillSDCardWithRandomChars : public PasswordCommand<CommandID::FILL_SD_CARD_WITH_RANDOM_CHARS> {};
+
+
+            class FillSDCardWithRandomChars : Command<CommandID::FILL_SD_CARD_WITH_RANDOM_CHARS> {
+            public:
+                enum class ChosenVolumes : uint8_t {
+                    all_volumes = 0,
+                    encrypted_volume = 1
+                };
+
+                struct CommandPayload {
+                    uint8_t volume_flag;
+                    uint8_t kind;
+                    uint8_t password[20];
+
+                    std::string dissect() const {
+                      std::stringstream ss;
+                      print_to_ss( (int) volume_flag );
+                      print_to_ss( kind );
+                      print_to_ss(password);
+                      return ss.str();
+                    }
+                    void set_kind_user() {
+                      kind = (uint8_t) 'P';
+                    }
+                    void set_defaults(){
+                      set_kind_user();
+                      volume_flag = static_cast<uint8_t>(ChosenVolumes::encrypted_volume);
+                    }
+
+                } __packed;
+
+                typedef Transaction<Command<CommandID::FILL_SD_CARD_WITH_RANDOM_CHARS>::command_id(),
+                    struct CommandPayload, struct EmptyPayload>
+                    CommandTransaction;
+            };
+
 
             class SetupHiddenVolume : Command<CommandID::SEND_HIDDEN_VOLUME_SETUP> {
             public:

@@ -31,6 +31,40 @@ void execute_password_command(Device &stick, const char *password, const char ki
 }
 
 
+TEST_CASE("long operation test", "[test_long]") {
+  Stick20 stick;
+  bool connected = stick.connect();
+  REQUIRE(connected == true);
+  Log::instance().set_loglevel(Loglevel::DEBUG_L2);
+  try{
+//    execute_password_command<FillSDCardWithRandomChars>(stick, "12345678", 'P');
+    auto p = get_payload<FillSDCardWithRandomChars>();
+    p.set_defaults();
+    strcpyT(p.password, "12345678");
+    FillSDCardWithRandomChars::CommandTransaction::run(stick, p);
+    this_thread::sleep_for(1000ms);
+
+    CHECK(false);
+  }
+  catch (LongOperationInProgressException &progressException){
+    CHECK(true);
+  }
+
+
+  for (int i = 0; i < 30; ++i) {
+    try {
+      stick10::GetStatus::CommandTransaction::run(stick);
+    }
+    catch (LongOperationInProgressException &progressException){
+      CHECK((int)progressException.progress_bar_value>=0);
+      CAPTURE((int)progressException.progress_bar_value);
+      this_thread::sleep_for(2000ms);
+    }
+
+  }
+
+}
+
 TEST_CASE("test", "[test]") {
   Stick20 stick;
   bool connected = stick.connect();

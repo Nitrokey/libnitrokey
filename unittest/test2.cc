@@ -126,6 +126,26 @@ TEST_CASE("test device internal status with various commands", "[fast]") {
   REQUIRE(production_status.data().SD_CardID_u32 != 0);
 }
 
+TEST_CASE("setup hidden volume test", "[hidden]") {
+  Stick20 stick;
+  bool connected = stick.connect();
+  REQUIRE(connected == true);
+  Log::instance().set_loglevel(Loglevel::DEBUG_L2);
+  stick10::LockDevice::CommandTransaction::run(stick);
+  this_thread::sleep_for(2000ms);
+
+  execute_password_command<EnableEncryptedPartition>(stick, "123456");
+
+  auto p = get_payload<stick20::SetupHiddenVolume>();
+  p.set_defaults();
+  auto hidden_volume_password = "123123123";
+  strcpyT(p.HiddenVolumePassword_au8, hidden_volume_password);
+  stick20::SetupHiddenVolume::CommandTransaction::run(stick, p);
+  this_thread::sleep_for(2000ms);
+
+  execute_password_command<EnableHiddenEncryptedPartition>(stick, hidden_volume_password);
+}
+
 TEST_CASE("general test", "[test]") {
   Stick20 stick;
   bool connected = stick.connect();

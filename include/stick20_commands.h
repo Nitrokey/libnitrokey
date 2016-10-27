@@ -282,8 +282,23 @@ namespace nitrokey {
                     uint8_t SlotNr_u8;
                     uint8_t StartBlockPercent_u8;
                     uint8_t EndBlockPercent_u8;
-                    uint8_t HiddenVolumePassword_au8[MAX_HIDDEN_VOLUME_PASSOWORD_SIZE + 1];
-                }__packed;
+                    uint8_t HiddenVolumePassword_au8[MAX_HIDDEN_VOLUME_PASSOWORD_SIZE + 1]; //last char is a null terminator TODO check if it's needed
+                    std::string dissect() const {
+                      std::stringstream ss;
+                      print_to_ss((int) SlotNr_u8);
+                      print_to_ss((int) StartBlockPercent_u8);
+                      print_to_ss((int) EndBlockPercent_u8);
+                      ss << " HiddenVolumePassword_au8:\t"
+                         << HiddenVolumePassword_au8 << std::endl;
+                      return ss.str();
+                    }
+
+                    void set_defaults(){
+                      SlotNr_u8 = 0;
+                      StartBlockPercent_u8 = 70;
+                      EndBlockPercent_u8 = 90;
+                    }
+                } __packed;
 
                 typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
                     CommandTransaction;

@@ -23,7 +23,7 @@ namespace nitrokey {
                 Admin = 'A'
             };
 
-            class ChangeAdminUserPin20Current : Command<CommandID::STICK20_CMD_SEND_PASSWORD> {
+            class ChangeAdminUserPin20Current : Command<CommandID::SEND_PASSWORD> {
             public:
                 struct CommandPayload {
                     uint8_t kind;
@@ -46,7 +46,7 @@ namespace nitrokey {
             };
 
 
-            class ChangeAdminUserPin20New : Command<CommandID::STICK20_CMD_SEND_NEW_PASSWORD> {
+            class ChangeAdminUserPin20New : Command<CommandID::SEND_NEW_PASSWORD> {
             public:
 
                 struct CommandPayload {

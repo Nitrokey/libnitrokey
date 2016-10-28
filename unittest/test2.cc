@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main()
-static const char *const default_admin_pin = "12345678";
 
+static const char *const default_admin_pin = "12345678";
 static const char *const default_user_pin = "123456";
 
 #include "catch.hpp"
@@ -34,8 +34,19 @@ void execute_password_command(Device &stick, const char *password, const char ki
   this_thread::sleep_for(1000ms);
 }
 
+/**
+ *  fail on purpose (will result in failed test)
+ *  disable from running unwillingly
+ */
+void SKIP_TEST() {
+  CAPTURE("Failing current test to SKIP it");
+  REQUIRE(false);
+}
+
 
 TEST_CASE("long operation test", "[test_long]") {
+  SKIP_TEST();
+
   Stick20 stick;
   bool connected = stick.connect();
   REQUIRE(connected == true);
@@ -158,7 +169,7 @@ TEST_CASE("setup hidden volume test", "[hidden]") {
   execute_password_command<EnableHiddenEncryptedPartition>(stick, hidden_volume_password);
 }
 
-TEST_CASE("setup multiple hidden volumes", "[hidden2]") {
+TEST_CASE("setup multiple hidden volumes", "[hidden]") {
   Stick20 stick;
   bool connected = stick.connect();
   REQUIRE(connected == true);
@@ -190,9 +201,12 @@ TEST_CASE("setup multiple hidden volumes", "[hidden2]") {
   }
 }
 
+
 //in case of a bug this could change update PIN to some unexpected value
 // - please save log with packet dump if this test will not pass
 TEST_CASE("update password change", "[dangerous]") {
+  SKIP_TEST();
+
   Stick20 stick;
   bool connected = stick.connect();
   REQUIRE(connected == true);
@@ -213,7 +227,7 @@ TEST_CASE("update password change", "[dangerous]") {
   }
 }
 
-  TEST_CASE("general test", "[test]") {
+TEST_CASE("general test", "[test]") {
   Stick20 stick;
   bool connected = stick.connect();
   REQUIRE(connected == true);
@@ -223,27 +237,7 @@ TEST_CASE("update password change", "[dangerous]") {
   stick10::LockDevice::CommandTransaction::run(stick);
 //  execute_password_command<EnableEncryptedPartition>(stick, "123456");
 //  execute_password_command<DisableEncryptedPartition>(stick, "123456");
-  this_thread::sleep_for(1000ms);
-  execute_password_command<EnableEncryptedPartition>(stick, default_user_pin);
-  this_thread::sleep_for(4000ms);
-  bool passed = false;
-  for(int i=0; i<5; i++){
-    try {
-      execute_password_command<EnableHiddenEncryptedPartition>(stick, "123123123");
-      CHECK(true);
-      passed=true;
-      break;
-    }
-    catch (CommandFailedException &e){
-      this_thread::sleep_for(2000ms);
-    }
-  }
-  if(!passed){
-    CHECK(false);
-  }
-
-  execute_password_command<DisableHiddenEncryptedPartition>(stick, "123123123");
-
+//  execute_password_command<DisableHiddenEncryptedPartition>(stick, "123123123");
 
   execute_password_command<SendSetReadonlyToUncryptedVolume>(stick, default_user_pin);
   execute_password_command<SendSetReadwriteToUncryptedVolume>(stick, default_user_pin);

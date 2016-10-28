@@ -124,6 +124,12 @@ TEST_CASE("test device internal status with various commands", "[fast]") {
   auto production_status = stick20::ProductionTest::CommandTransaction::run(stick);
   REQUIRE(production_status.data().SD_Card_Size_u8 == 8);
   REQUIRE(production_status.data().SD_CardID_u32 != 0);
+
+  auto sdcard_occupancy = stick20::GetSDCardOccupancy::CommandTransaction::run(stick);
+  REQUIRE((int) sdcard_occupancy.data().ReadLevelMin >= 0);
+  REQUIRE((int) sdcard_occupancy.data().ReadLevelMax <= 100);
+  REQUIRE((int) sdcard_occupancy.data().WriteLevelMin >= 0);
+  REQUIRE((int) sdcard_occupancy.data().WriteLevelMax <= 100);
 }
 
 TEST_CASE("setup hidden volume test", "[hidden]") {

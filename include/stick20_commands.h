@@ -273,6 +273,27 @@ namespace nitrokey {
                     CommandTransaction;
             };
 
+            class GetSDCardOccupancy : Command<CommandID::SD_CARD_HIGH_WATERMARK> {
+            public:
+                struct ResponsePayload {
+                    uint8_t WriteLevelMin;
+                    uint8_t WriteLevelMax;
+                    uint8_t ReadLevelMin;
+                    uint8_t ReadLevelMax;
+                    std::string dissect() const {
+                      std::stringstream ss;
+                      print_to_ss((int) WriteLevelMin);
+                      print_to_ss((int) WriteLevelMax);
+                      print_to_ss((int) ReadLevelMin);
+                      print_to_ss((int) ReadLevelMax);
+                      return ss.str();
+                    }
+                } __packed;
+
+                typedef Transaction<command_id(), struct EmptyPayload, struct ResponsePayload>
+                    CommandTransaction;
+            };
+
 
             class SetupHiddenVolume : Command<CommandID::SEND_HIDDEN_VOLUME_SETUP> {
             public:

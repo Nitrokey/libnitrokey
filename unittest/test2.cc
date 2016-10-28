@@ -1,4 +1,8 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main()
+static const char *const default_admin_pin = "12345678";
+
+static const char *const default_user_pin = "123456";
+
 #include "catch.hpp"
 
 #include <iostream>
@@ -37,10 +41,9 @@ TEST_CASE("long operation test", "[test_long]") {
   REQUIRE(connected == true);
   Log::instance().set_loglevel(Loglevel::DEBUG_L2);
   try{
-//    execute_password_command<FillSDCardWithRandomChars>(stick, "12345678", 'P');
     auto p = get_payload<FillSDCardWithRandomChars>();
     p.set_defaults();
-    strcpyT(p.admin_pin, "12345678");
+    strcpyT(p.admin_pin, default_admin_pin);
     FillSDCardWithRandomChars::CommandTransaction::run(stick, p);
     this_thread::sleep_for(1000ms);
 
@@ -140,7 +143,8 @@ TEST_CASE("setup hidden volume test", "[hidden]") {
   stick10::LockDevice::CommandTransaction::run(stick);
   this_thread::sleep_for(2000ms);
 
-  execute_password_command<EnableEncryptedPartition>(stick, "123456");
+  auto user_pin = default_user_pin;
+  execute_password_command<EnableEncryptedPartition>(stick, user_pin);
 
   auto p = get_payload<stick20::SetupHiddenVolume>();
   p.SlotNr_u8 = 0;
@@ -160,7 +164,7 @@ TEST_CASE("setup multiple hidden volumes", "[hidden2]") {
   REQUIRE(connected == true);
   Log::instance().set_loglevel(Loglevel::DEBUG_L2);
 
-  auto user_pin = "123456";
+  auto user_pin = default_user_pin;
   stick10::LockDevice::CommandTransaction::run(stick);
   this_thread::sleep_for(2000ms);
   execute_password_command<EnableEncryptedPartition>(stick, user_pin);
@@ -194,7 +198,7 @@ TEST_CASE("update password change", "[dangerous]") {
   REQUIRE(connected == true);
   Log::instance().set_loglevel(Loglevel::DEBUG_L2);
 
-  auto pass1 = "12345678";
+  auto pass1 = default_admin_pin;
   auto pass2 = "12345678901234567890";
 
   auto data = {
@@ -220,7 +224,7 @@ TEST_CASE("update password change", "[dangerous]") {
 //  execute_password_command<EnableEncryptedPartition>(stick, "123456");
 //  execute_password_command<DisableEncryptedPartition>(stick, "123456");
   this_thread::sleep_for(1000ms);
-  execute_password_command<EnableEncryptedPartition>(stick, "123456");
+  execute_password_command<EnableEncryptedPartition>(stick, default_user_pin);
   this_thread::sleep_for(4000ms);
   bool passed = false;
   for(int i=0; i<5; i++){
@@ -239,9 +243,11 @@ TEST_CASE("update password change", "[dangerous]") {
   }
 
   execute_password_command<DisableHiddenEncryptedPartition>(stick, "123123123");
-  execute_password_command<SendSetReadonlyToUncryptedVolume>(stick, "123456");
-  execute_password_command<SendSetReadwriteToUncryptedVolume>(stick, "123456");
-  execute_password_command<SendClearNewSdCardFound>(stick, "12345678", 'A');
+
+
+  execute_password_command<SendSetReadonlyToUncryptedVolume>(stick, default_user_pin);
+  execute_password_command<SendSetReadwriteToUncryptedVolume>(stick, default_user_pin);
+  execute_password_command<SendClearNewSdCardFound>(stick, default_admin_pin, 'A');
   stick20::GetDeviceStatus::CommandTransaction::run(stick);
   this_thread::sleep_for(1000ms);
 //  execute_password_command<LockFirmware>(stick, "123123123"); //CAUTION

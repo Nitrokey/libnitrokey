@@ -141,8 +141,6 @@ namespace nitrokey {
                     CommandTransaction;
             };
 
-//            class FillSDCardWithRandomChars : public PasswordCommand<CommandID::FILL_SD_CARD_WITH_RANDOM_CHARS> {};
-
 
             class FillSDCardWithRandomChars : Command<CommandID::FILL_SD_CARD_WITH_RANDOM_CHARS> {
             public:
@@ -275,7 +273,6 @@ namespace nitrokey {
                     CommandTransaction;
             };
 
-            class SendHiddenVolumePassword : public PasswordCommand<CommandID::SEND_HIDDEN_VOLUME_PASSWORD> {};
 
             class SetupHiddenVolume : Command<CommandID::SEND_HIDDEN_VOLUME_SETUP> {
             public:

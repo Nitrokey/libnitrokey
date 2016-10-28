@@ -71,7 +71,7 @@ namespace nitrokey {
             };
 
 
-            class UnlockUserPassword : Command<CommandID::UNLOCK_USER_PASSWORD> {
+            class UnlockUserPin : Command<CommandID::UNLOCK_USER_PASSWORD> {
             public:
                 struct CommandPayload {
                     uint8_t kind;
@@ -124,11 +124,11 @@ namespace nitrokey {
             public:
                 struct CommandPayload {
                     uint8_t kind;
-                    uint8_t admin_password[30]; //CS20_MAX_PASSWORD_LEN
+                    uint8_t admin_pin[30]; //CS20_MAX_PASSWORD_LEN
                     std::string dissect() const {
                       std::stringstream ss;
                       print_to_ss( kind );
-                      ss << " admin_password:\t" << admin_password << std::endl;
+                      ss << " admin_pin:\t" << admin_pin << std::endl;
                       return ss.str();
                     }
 
@@ -152,13 +152,13 @@ namespace nitrokey {
                 struct CommandPayload {
                     uint8_t volume_flag;
                     uint8_t kind;
-                    uint8_t password[20];
+                    uint8_t admin_pin[20];
 
                     std::string dissect() const {
                       std::stringstream ss;
                       print_to_ss( (int) volume_flag );
                       print_to_ss( kind );
-                      print_to_ss(password);
+                      print_to_ss(admin_pin);
                       return ss.str();
                     }
                     void set_kind_user() {
@@ -297,26 +297,19 @@ namespace nitrokey {
 
             class SetupHiddenVolume : Command<CommandID::SEND_HIDDEN_VOLUME_SETUP> {
             public:
-                constexpr static int MAX_HIDDEN_VOLUME_PASSOWORD_SIZE = 20;
+                constexpr static int MAX_HIDDEN_VOLUME_PASSWORD_SIZE = 20;
                 struct CommandPayload {
                     uint8_t SlotNr_u8;
                     uint8_t StartBlockPercent_u8;
                     uint8_t EndBlockPercent_u8;
-                    uint8_t HiddenVolumePassword_au8[MAX_HIDDEN_VOLUME_PASSOWORD_SIZE + 1]; //last char is a null terminator TODO check if it's needed
+                    uint8_t HiddenVolumePassword_au8[MAX_HIDDEN_VOLUME_PASSWORD_SIZE];
                     std::string dissect() const {
                       std::stringstream ss;
                       print_to_ss((int) SlotNr_u8);
                       print_to_ss((int) StartBlockPercent_u8);
                       print_to_ss((int) EndBlockPercent_u8);
-                      ss << " HiddenVolumePassword_au8:\t"
-                         << HiddenVolumePassword_au8 << std::endl;
+                      print_to_ss(HiddenVolumePassword_au8);
                       return ss.str();
-                    }
-
-                    void set_defaults(){
-                      SlotNr_u8 = 0;
-                      StartBlockPercent_u8 = 70;
-                      EndBlockPercent_u8 = 90;
                     }
                 } __packed;
 
@@ -329,9 +322,9 @@ namespace nitrokey {
 
             class ProductionTest : Command<CommandID::PRODUCTION_TEST> {
             public:
-                static const int OUTPUT_CMD_RESULT_STICK20_STATUS_START = 25 + 1;
-                static const int payload_absolute_begin = 8;
-                static const int padding_size = OUTPUT_CMD_RESULT_STICK20_STATUS_START - payload_absolute_begin;
+                static constexpr int OUTPUT_CMD_RESULT_STICK20_STATUS_START = 25 + 1;
+                static constexpr int payload_absolute_begin = 8;
+                static constexpr int padding_size = OUTPUT_CMD_RESULT_STICK20_STATUS_START - payload_absolute_begin;
 
                 struct ResponsePayload {
                     uint8_t _padding[padding_size];
@@ -380,7 +373,7 @@ namespace nitrokey {
                       print_to_ss( SD_WriteSpeed_u16);
                       print_to_ss((int) SD_Card_Manufacturer_u8);
 
-                      ss << "_padding:\t"
+                      ss << "_padding:" << std::endl
                          << ::nitrokey::misc::hexdump((const char *) (_padding),
                                                       sizeof _padding);
                       return ss.str();

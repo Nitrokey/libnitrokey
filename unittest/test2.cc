@@ -40,7 +40,7 @@ TEST_CASE("long operation test", "[test_long]") {
 //    execute_password_command<FillSDCardWithRandomChars>(stick, "12345678", 'P');
     auto p = get_payload<FillSDCardWithRandomChars>();
     p.set_defaults();
-    strcpyT(p.password, "12345678");
+    strcpyT(p.admin_pin, "12345678");
     FillSDCardWithRandomChars::CommandTransaction::run(stick, p);
     this_thread::sleep_for(1000ms);
 
@@ -143,7 +143,9 @@ TEST_CASE("setup hidden volume test", "[hidden]") {
   execute_password_command<EnableEncryptedPartition>(stick, "123456");
 
   auto p = get_payload<stick20::SetupHiddenVolume>();
-  p.set_defaults();
+  p.SlotNr_u8 = 0;
+  p.StartBlockPercent_u8 = 70;
+  p.EndBlockPercent_u8 = 90;
   auto hidden_volume_password = "123123123";
   strcpyT(p.HiddenVolumePassword_au8, hidden_volume_password);
   stick20::SetupHiddenVolume::CommandTransaction::run(stick, p);

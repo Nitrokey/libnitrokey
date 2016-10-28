@@ -420,7 +420,7 @@ namespace nitrokey{
             }
             case DeviceModel::STORAGE : {
                 auto p = get_payload<stick20::CreateNewKeys>();
-                strcpyT(p.admin_password, admin_password);
+                strcpyT(p.admin_pin, admin_password);
                 p.setKindPrefixed();
                 stick20::CreateNewKeys::CommandTransaction::run(*device, p);
                 break;
@@ -448,10 +448,10 @@ namespace nitrokey{
           p2.set_kind(PasswordKind::Admin);
           strcpyT(p2.old_pin, admin_password);
           ChangeAdminUserPin20Current::CommandTransaction::run(*device, p2);
-          auto p3 = get_payload<stick20::UnlockUserPassword>();
+          auto p3 = get_payload<stick20::UnlockUserPin>();
           p3.set_kind(PasswordKind::Admin);
           strcpyT(p3.user_new_password, new_user_password);
-          stick20::UnlockUserPassword::CommandTransaction::run(*device, p3);
+          stick20::UnlockUserPin::CommandTransaction::run(*device, p3);
           break;
         }
       }

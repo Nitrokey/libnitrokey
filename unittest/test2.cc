@@ -178,7 +178,30 @@ TEST_CASE("setup multiple hidden volumes", "[hidden2]") {
   }
 }
 
-TEST_CASE("general test", "[test]") {
+//in case of a bug this could change update PIN to some unexpected value
+// - please save log with packet dump if this test will not pass
+TEST_CASE("update password change", "[dangerous]") {
+  Stick20 stick;
+  bool connected = stick.connect();
+  REQUIRE(connected == true);
+  Log::instance().set_loglevel(Loglevel::DEBUG_L2);
+
+  auto pass1 = "12345678";
+  auto pass2 = "12345678901234567890";
+
+  auto data = {
+      make_pair(pass1, pass2),
+      make_pair(pass2, pass1),
+  };
+  for (auto &&  password: data) {
+    auto p = get_payload<stick20::ChangeUpdatePassword>();
+    strcpyT(p.current_update_password, password.first);
+    strcpyT(p.new_update_password, password.second);
+    stick20::ChangeUpdatePassword::CommandTransaction::run(stick, p);
+  }
+}
+
+  TEST_CASE("general test", "[test]") {
   Stick20 stick;
   bool connected = stick.connect();
   REQUIRE(connected == true);

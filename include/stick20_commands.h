@@ -99,15 +99,17 @@ namespace nitrokey {
             class DisableHiddenEncryptedPartition : public PasswordCommand<CommandID::DISABLE_CRYPTED_PARI> {};
             class EnableFirmwareUpdate : public PasswordCommand<CommandID::ENABLE_FIRMWARE_UPDATE> {};
 
-            class UpdatePassword : Command<CommandID::CHANGE_UPDATE_PIN> {
+            class ChangeUpdatePassword : Command<CommandID::CHANGE_UPDATE_PIN> {
             public:
                 struct CommandPayload {
-                    uint8_t old_password[15];
-                    uint8_t new_password[15];
+                    uint8_t __gap;
+                    uint8_t current_update_password[20];
+                    uint8_t __gap2;
+                    uint8_t new_update_password[20];
                     std::string dissect() const {
                       std::stringstream ss;
-                      print_to_ss( old_password );
-                      print_to_ss( new_password );
+                      print_to_ss( current_update_password );
+                      print_to_ss( new_update_password );
                       return ss.str();
                     }
                 };

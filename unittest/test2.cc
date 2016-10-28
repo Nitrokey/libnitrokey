@@ -146,6 +146,38 @@ TEST_CASE("setup hidden volume test", "[hidden]") {
   execute_password_command<EnableHiddenEncryptedPartition>(stick, hidden_volume_password);
 }
 
+TEST_CASE("setup multiple hidden volumes", "[hidden2]") {
+  Stick20 stick;
+  bool connected = stick.connect();
+  REQUIRE(connected == true);
+  Log::instance().set_loglevel(Loglevel::DEBUG_L2);
+
+  auto user_pin = "123456";
+  stick10::LockDevice::CommandTransaction::run(stick);
+  this_thread::sleep_for(2000ms);
+  execute_password_command<EnableEncryptedPartition>(stick, user_pin);
+
+  constexpr int volume_count = 4;
+  for (int i = 0; i < volume_count; ++i) {
+    auto p = get_payload<stick20::SetupHiddenVolume>();
+    p.SlotNr_u8 = i;
+    p.StartBlockPercent_u8 = 20 + 10*i;
+    p.EndBlockPercent_u8 = p.StartBlockPercent_u8+i+1;
+    auto hidden_volume_password = std::string("123123123")+std::to_string(i);
+    strcpyT(p.HiddenVolumePassword_au8, hidden_volume_password.c_str());
+    stick20::SetupHiddenVolume::CommandTransaction::run(stick, p);
+    this_thread::sleep_for(2000ms);
+  }
+
+
+  for (int i = 0; i < volume_count; ++i) {
+    execute_password_command<EnableEncryptedPartition>(stick, user_pin);
+    auto hidden_volume_password = std::string("123123123")+std::to_string(i);
+    execute_password_command<EnableHiddenEncryptedPartition>(stick, hidden_volume_password.c_str());
+    this_thread::sleep_for(2000ms);
+  }
+}
+
 TEST_CASE("general test", "[test]") {
   Stick20 stick;
   bool connected = stick.connect();

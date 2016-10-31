@@ -247,7 +247,8 @@ namespace nitrokey {
             };
 
 
-            class LockFirmware : public PasswordCommand<CommandID::SEND_LOCK_STICK_HARDWARE> {};
+//disable this command for now
+//            class LockFirmware : public PasswordCommand<CommandID::SEND_LOCK_STICK_HARDWARE> {};
 
             class ProductionTest : Command<CommandID::PRODUCTION_TEST> {
             public:

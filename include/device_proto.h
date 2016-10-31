@@ -90,12 +90,19 @@ namespace nitrokey {
  *	command_id member in incoming HIDReport structure carries the command
  *	type last used.
  */
-        template<CommandID cmd_id, typename ResponsePayload>
-        struct DeviceResponse {
-            static constexpr auto storage_status_absolute_address = 21; //magic number from firmware
+        namespace DeviceResponseConstants{
+            //magic numbers from firmware
+            static constexpr auto storage_status_absolute_address = 21;
+            static constexpr auto storage_data_absolute_address = storage_status_absolute_address + 5;
             static constexpr auto header_size = 8; //from _zero to last_command_status inclusive
             static constexpr auto footer_size = 4; //crc
-            static constexpr auto boiler_size = header_size + footer_size;
+            static constexpr auto wrapping_size = header_size + footer_size;
+        }
+
+        template<CommandID cmd_id, typename ResponsePayload>
+        struct DeviceResponse {
+            static constexpr auto storage_status_padding_size =
+                DeviceResponseConstants::storage_status_absolute_address - DeviceResponseConstants::header_size;
 
             uint8_t _zero;
             uint8_t device_status;
@@ -104,10 +111,10 @@ namespace nitrokey {
             uint8_t last_command_status;
 
             union {
-                uint8_t _padding[HID_REPORT_SIZE - boiler_size];
+                uint8_t _padding[HID_REPORT_SIZE - DeviceResponseConstants::wrapping_size];
                 ResponsePayload payload;
                 struct {
-                    uint8_t _storage_status_padding[storage_status_absolute_address - header_size];
+                    uint8_t _storage_status_padding[storage_status_padding_size];
                     uint8_t command_counter;
                     uint8_t command_id;
                     uint8_t device_status; //@see stick20::device_status

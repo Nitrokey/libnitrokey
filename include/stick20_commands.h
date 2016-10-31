@@ -91,9 +91,9 @@ namespace nitrokey {
             };
 
             namespace StorageCommandResponsePayload{
-              static const int OUTPUT_CMD_RESULT_STICK20_STATUS_START = 25 + 1;
-              static const int payload_absolute_begin = 8;
-              static const int padding_size = OUTPUT_CMD_RESULT_STICK20_STATUS_START - payload_absolute_begin;
+                using namespace DeviceResponseConstants;
+              static constexpr auto padding_size =
+                  storage_data_absolute_address - header_size;
               struct TransmissionData{
                   uint8_t _padding[padding_size];
 

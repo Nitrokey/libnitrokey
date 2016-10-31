@@ -178,23 +178,7 @@ namespace nitrokey {
 
 
 
-
-            class SendStartup : Command<CommandID::SEND_STARTUP> {
-            public:
-                struct CommandPayload {
-                    uint64_t localtime;  // POSIX seconds from epoch start, supports until year 2106
-                    std::string dissect() const {
-                      std::stringstream ss;
-                      print_to_ss( localtime );
-                      return ss.str();
-                    }
-                    void set_defaults(){
-                      localtime =
-                          std::chrono::duration_cast<std::chrono::seconds> (
-                              std::chrono::system_clock::now().time_since_epoch()).count();
-                    }
-                }__packed;
-
+            namespace DeviceConfigurationResponsePacket{
                 static const int OUTPUT_CMD_RESULT_STICK20_STATUS_START = 25 + 1;
                 static const int payload_absolute_begin = 8;
                 static const int padding_size = OUTPUT_CMD_RESULT_STICK20_STATUS_START - payload_absolute_begin;
@@ -249,14 +233,33 @@ namespace nitrokey {
                       print_to_ss((int) AdminPwRetryCount );
                       print_to_ss( ActiveSmartCardID_u32 );
                       print_to_ss((int) StickKeysNotInitiated );
-                      ss << "_padding:\t"
+                      ss << "_padding:" << std::endl
                          << ::nitrokey::misc::hexdump((const char *) (_padding),
                                                       sizeof _padding);
                       return ss.str();
                     }
                 } __packed;
+            }
 
-                typedef Transaction<command_id(), struct CommandPayload, struct ResponsePayload>
+            class SendStartup : Command<CommandID::SEND_STARTUP> {
+            public:
+                struct CommandPayload {
+                    uint64_t localtime;  // POSIX seconds from epoch start, supports until year 2106
+                    std::string dissect() const {
+                      std::stringstream ss;
+                      print_to_ss( localtime );
+                      return ss.str();
+                    }
+                    void set_defaults(){
+                      localtime =
+                          std::chrono::duration_cast<std::chrono::seconds> (
+                              std::chrono::system_clock::now().time_since_epoch()).count();
+                    }
+                }__packed;
+
+                using ResponsePayload = DeviceConfigurationResponsePacket::ResponsePayload;
+
+                typedef Transaction<command_id(), struct CommandPayload, ResponsePayload>
                     CommandTransaction;
             };
 
@@ -268,8 +271,9 @@ namespace nitrokey {
 
             class GetDeviceStatus : Command<CommandID::GET_DEVICE_STATUS> {
             public:
+                using ResponsePayload = DeviceConfigurationResponsePacket::ResponsePayload;
 
-                typedef Transaction<command_id(), struct EmptyPayload, struct EmptyPayload>
+                typedef Transaction<command_id(), struct EmptyPayload, ResponsePayload>
                     CommandTransaction;
             };
 

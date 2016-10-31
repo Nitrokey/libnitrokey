@@ -304,10 +304,10 @@ namespace nitrokey{
             case DeviceModel::STORAGE:
             {
                 auto p = get_payload<ChangeAdminUserPin20Current>();
-                strcpyT(p.old_pin, current_PIN);
+                strcpyT(p.password, current_PIN);
                 p.set_kind(StoKind);
                 auto p2 = get_payload<ChangeAdminUserPin20New>();
-                strcpyT(p2.new_pin, new_PIN);
+                strcpyT(p2.password, new_PIN);
                 p2.set_kind(StoKind);
                 ChangeAdminUserPin20Current::CommandTransaction::run(*device, p);
                 ChangeAdminUserPin20New::CommandTransaction::run(*device, p2);
@@ -445,12 +445,12 @@ namespace nitrokey{
         }
         case DeviceModel::STORAGE : {
           auto p2 = get_payload<ChangeAdminUserPin20Current>();
-          p2.set_kind(PasswordKind::Admin);
-          strcpyT(p2.old_pin, admin_password);
+          p2.set_defaults();
+          strcpyT(p2.password, admin_password);
           ChangeAdminUserPin20Current::CommandTransaction::run(*device, p2);
           auto p3 = get_payload<stick20::UnlockUserPin>();
-          p3.set_kind(PasswordKind::Admin);
-          strcpyT(p3.user_new_password, new_user_password);
+          p3.set_defaults();
+          strcpyT(p3.password, new_user_password);
           stick20::UnlockUserPin::CommandTransaction::run(*device, p3);
           break;
         }

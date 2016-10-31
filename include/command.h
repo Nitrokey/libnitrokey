@@ -19,13 +19,18 @@ namespace nitrokey {
         };
 
 #define print_to_ss(x) ( ss << " " << (#x) <<":\t" << (x) << std::endl );
+namespace stick20{
+        enum class PasswordKind : uint8_t {
+            User = 'P',
+            Admin = 'A'
+        };
 
-        template<CommandID cmd_id>
+        template<CommandID cmd_id, PasswordKind Tpassword_kind = PasswordKind::User, int password_length = 20>
         class PasswordCommand : public Command<cmd_id> {
         public:
             struct CommandPayload {
                 uint8_t kind;
-                uint8_t password[20];
+                uint8_t password[password_length];
 
                 std::string dissect() const {
                   std::stringstream ss;
@@ -40,12 +45,28 @@ namespace nitrokey {
                   kind = (uint8_t) 'P';
                 }
 
+                void set_defaults(){
+                  set_kind(Tpassword_kind);
+                }
+
+                void set_kind(PasswordKind password_kind){
+                  switch (password_kind){
+                    case PasswordKind::Admin:
+                      set_kind_admin();
+                    break;
+                    case PasswordKind::User:
+                      set_kind_user();
+                    break;
+                  }
+                };
+
             } __packed;
 
             typedef Transaction<Command<cmd_id>::command_id(), struct CommandPayload, struct EmptyPayload>
                 CommandTransaction;
 
         };
+    }
     }
 }
 #undef print_to_ss

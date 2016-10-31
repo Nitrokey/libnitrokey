@@ -18,80 +18,14 @@ namespace nitrokey {
 #define print_to_ss(x) ( ss << " " << (#x) <<":\t" << (x) << std::endl );
         namespace stick20 {
 
-            enum class PasswordKind : uint8_t {
-                User = 'P',
-                Admin = 'A'
-            };
-
-            class ChangeAdminUserPin20Current : Command<CommandID::SEND_PASSWORD> {
-            public:
-                struct CommandPayload {
-                    uint8_t kind;
-                    uint8_t old_pin[20];
-
-                    std::string dissect() const {
-                      std::stringstream ss;
-                      print_to_ss( kind );
-                      ss << " old_pin:\t" << old_pin << std::endl;
-                      return ss.str();
-                    }
-
-                    void set_kind(PasswordKind k) {
-                      kind = (uint8_t) k;
-                    }
-                } __packed;
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
 
 
-            class ChangeAdminUserPin20New : Command<CommandID::SEND_NEW_PASSWORD> {
-            public:
-
-                struct CommandPayload {
-                    uint8_t kind;
-                    uint8_t new_pin[20];
-
-                    std::string dissect() const {
-                      std::stringstream ss;
-                      print_to_ss( kind );
-                      ss << " new_pin:\t" << new_pin << std::endl;
-                      return ss.str();
-                    }
-
-                    void set_kind(PasswordKind k) {
-                      kind = (uint8_t) k;
-                    }
-
-                } __packed;
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
-
-
-            class UnlockUserPin : Command<CommandID::UNLOCK_USER_PASSWORD> {
-            public:
-                struct CommandPayload {
-                    uint8_t kind;
-                    uint8_t user_new_password[20];
-
-                    std::string dissect() const {
-                      std::stringstream ss;
-                      print_to_ss( kind );
-                      ss << " user_new_password:\t" << user_new_password << std::endl;
-                      return ss.str();
-                    }
-
-                    void set_kind(PasswordKind k) {
-                      kind = (uint8_t) k;
-                    }
-                } __packed;
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
+            class ChangeAdminUserPin20Current :
+                public PasswordCommand<CommandID::SEND_PASSWORD, PasswordKind::Admin> {};
+            class ChangeAdminUserPin20New :
+                public PasswordCommand<CommandID::SEND_NEW_PASSWORD, PasswordKind::Admin> {};
+            class UnlockUserPin :
+                public PasswordCommand<CommandID::UNLOCK_USER_PASSWORD, PasswordKind::Admin> {};
 
             class EnableEncryptedPartition : public PasswordCommand<CommandID::ENABLE_CRYPTED_PARI> {};
             class DisableEncryptedPartition : public PasswordCommand<CommandID::DISABLE_CRYPTED_PARI> {};

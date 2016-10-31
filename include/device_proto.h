@@ -92,22 +92,29 @@ namespace nitrokey {
  */
         template<CommandID cmd_id, typename ResponsePayload>
         struct DeviceResponse {
+            static constexpr auto storage_status_absolute_address = 21; //magic number from firmware
+            static constexpr auto header_size = 8; //from _zero to last_command_status inclusive
+            static constexpr auto footer_size = 4; //crc
+            static constexpr auto boiler_size = header_size + footer_size;
+
             uint8_t _zero;
             uint8_t device_status;
             uint8_t command_id;  // originally last_command_type
             uint32_t last_command_crc;
             uint8_t last_command_status;
+
             union {
-                uint8_t _padding[HID_REPORT_SIZE - 12];
+                uint8_t _padding[HID_REPORT_SIZE - boiler_size];
                 ResponsePayload payload;
                 struct {
-                    uint8_t _storage_status_padding[20 - 8 + 1]; //starts on 20th byte minus already 8 used + zero byte
+                    uint8_t _storage_status_padding[storage_status_absolute_address - header_size];
                     uint8_t command_counter;
                     uint8_t command_id;
                     uint8_t device_status; //@see stick20::device_status
                     uint8_t progress_bar_value;
                 } __packed storage_status;
             } __packed;
+
             uint32_t crc;
 
             void initialize() { bzero(this, sizeof *this); }
@@ -120,9 +127,7 @@ namespace nitrokey {
             }
 
             void update_CRC() { crc = calculate_CRC(); }
-
             bool isCRCcorrect() const { return crc == calculate_CRC(); }
-
             bool isValid() const {
               //		return !_zero && payload.isValid() && isCRCcorrect() &&
               //				command_id == (uint8_t)(cmd_id);

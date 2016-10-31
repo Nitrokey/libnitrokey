@@ -18,8 +18,6 @@ namespace nitrokey {
 #define print_to_ss(x) ( ss << " " << (#x) <<":\t" << (x) << std::endl );
         namespace stick20 {
 
-
-
             class ChangeAdminUserPin20Current :
                 public PasswordCommand<CommandID::SEND_PASSWORD, PasswordKind::Admin> {};
             class ChangeAdminUserPin20New :
@@ -54,26 +52,8 @@ namespace nitrokey {
 
             class ExportFirmware : public PasswordCommand<CommandID::EXPORT_FIRMWARE_TO_FILE> {};
 
-            class CreateNewKeys : Command<CommandID::GENERATE_NEW_KEYS> {
-            public:
-                struct CommandPayload {
-                    uint8_t kind;
-                    uint8_t admin_pin[30]; //CS20_MAX_PASSWORD_LEN
-                    std::string dissect() const {
-                      std::stringstream ss;
-                      print_to_ss( kind );
-                      ss << " admin_pin:\t" << admin_pin << std::endl;
-                      return ss.str();
-                    }
-
-                    void setKindPrefixed() {
-                      kind = 'P';
-                    }
-                } __packed;
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
+            class CreateNewKeys :
+                public PasswordCommand<CommandID::GENERATE_NEW_KEYS, PasswordKind::AdminPrefixed, 30> {};
 
 
             class FillSDCardWithRandomChars : Command<CommandID::FILL_SD_CARD_WITH_RANDOM_CHARS> {

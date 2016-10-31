@@ -22,7 +22,8 @@ namespace nitrokey {
 namespace stick20{
         enum class PasswordKind : uint8_t {
             User = 'P',
-            Admin = 'A'
+            Admin = 'A',
+            AdminPrefixed
         };
 
         template<CommandID cmd_id, PasswordKind Tpassword_kind = PasswordKind::User, int password_length = 20>
@@ -41,6 +42,9 @@ namespace stick20{
                 void set_kind_admin() {
                   kind = (uint8_t) 'A';
                 }
+                void set_kind_admin_prefixed() {
+                  kind = (uint8_t) 'P';
+                }
                 void set_kind_user() {
                   kind = (uint8_t) 'P';
                 }
@@ -57,6 +61,9 @@ namespace stick20{
                     case PasswordKind::User:
                       set_kind_user();
                     break;
+                    case PasswordKind::AdminPrefixed:
+                      set_kind_admin_prefixed();
+                      break;
                   }
                 };
 

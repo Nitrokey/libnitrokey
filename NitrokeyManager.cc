@@ -420,8 +420,8 @@ namespace nitrokey{
             }
             case DeviceModel::STORAGE : {
                 auto p = get_payload<stick20::CreateNewKeys>();
-                strcpyT(p.admin_pin, admin_password);
-                p.setKindPrefixed();
+                strcpyT(p.password, admin_password);
+                p.set_defaults();
                 stick20::CreateNewKeys::CommandTransaction::run(*device, p);
                 break;
             }

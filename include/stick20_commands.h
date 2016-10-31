@@ -90,20 +90,37 @@ namespace nitrokey {
                     CommandTransaction;
             };
 
+            namespace StorageCommandResponsePayload{
+              static const int OUTPUT_CMD_RESULT_STICK20_STATUS_START = 25 + 1;
+              static const int payload_absolute_begin = 8;
+              static const int padding_size = OUTPUT_CMD_RESULT_STICK20_STATUS_START - payload_absolute_begin;
+              struct TransmissionData{
+                  uint8_t _padding[padding_size];
 
+                  uint8_t SendCounter_u8;
+                  uint8_t SendDataType_u8;
+                  uint8_t FollowBytesFlag_u8;
+                  uint8_t SendSize_u8;
+
+                  std::string dissect() const {
+                    std::stringstream ss;
+                    ss << "_padding:" << std::endl
+                       << ::nitrokey::misc::hexdump((const char *) (_padding),
+                                                    sizeof _padding);
+                    print_to_ss((int) SendCounter_u8);
+                    print_to_ss((int) SendDataType_u8);
+                    print_to_ss((int) FollowBytesFlag_u8);
+                    print_to_ss((int) SendSize_u8);
+                    return ss.str();
+                  }
+
+              } __packed;
+            }
 
             namespace DeviceConfigurationResponsePacket{
-                static const int OUTPUT_CMD_RESULT_STICK20_STATUS_START = 25 + 1;
-                static const int payload_absolute_begin = 8;
-                static const int padding_size = OUTPUT_CMD_RESULT_STICK20_STATUS_START - payload_absolute_begin;
 
                 struct ResponsePayload {
-                    uint8_t _padding[padding_size];
-
-                    uint8_t SendCounter_u8;
-                    uint8_t SendDataType_u8;
-                    uint8_t FollowBytesFlag_u8;
-                    uint8_t SendSize_u8;
+                    StorageCommandResponsePayload::TransmissionData transmission_data;
 
                     uint16_t MagicNumber_StickConfig_u16;
                     uint8_t ReadWriteFlagUncryptedVolume_u8;
@@ -126,11 +143,7 @@ namespace nitrokey {
                     std::string dissect() const {
                       std::stringstream ss;
 
-                      print_to_ss((int) SendCounter_u8 );
-                      print_to_ss((int) SendDataType_u8 );
-                      print_to_ss((int) FollowBytesFlag_u8 );
-                      print_to_ss((int) SendSize_u8 );
-
+                      print_to_ss(transmission_data.dissect());
                       print_to_ss( MagicNumber_StickConfig_u16 );
                       print_to_ss((int) ReadWriteFlagUncryptedVolume_u8 );
                       print_to_ss((int) ReadWriteFlagCryptedVolume_u8 );
@@ -147,9 +160,7 @@ namespace nitrokey {
                       print_to_ss((int) AdminPwRetryCount );
                       print_to_ss( ActiveSmartCardID_u32 );
                       print_to_ss((int) StickKeysNotInitiated );
-                      ss << "_padding:" << std::endl
-                         << ::nitrokey::misc::hexdump((const char *) (_padding),
-                                                      sizeof _padding);
+
                       return ss.str();
                     }
                 } __packed;
@@ -240,17 +251,9 @@ namespace nitrokey {
 
             class ProductionTest : Command<CommandID::PRODUCTION_TEST> {
             public:
-                static constexpr int OUTPUT_CMD_RESULT_STICK20_STATUS_START = 25 + 1;
-                static constexpr int payload_absolute_begin = 8;
-                static constexpr int padding_size = OUTPUT_CMD_RESULT_STICK20_STATUS_START - payload_absolute_begin;
-
                 struct ResponsePayload {
-                    uint8_t _padding[padding_size];
 
-                    uint8_t SendCounter_u8;
-                    uint8_t SendDataType_u8;
-                    uint8_t FollowBytesFlag_u8;
-                    uint8_t SendSize_u8;
+                    StorageCommandResponsePayload::TransmissionData transmission_data;
 
                     uint8_t FirmwareVersion_au8[2];        // 2 byte // 2
                     uint8_t FirmwareVersionInternal_u8;    // 1 byte // 3
@@ -271,11 +274,7 @@ namespace nitrokey {
                     std::string dissect() const {
                       std::stringstream ss;
 
-                      print_to_ss((int) SendCounter_u8);
-                      print_to_ss((int) SendDataType_u8);
-                      print_to_ss((int) FollowBytesFlag_u8);
-                      print_to_ss((int) SendSize_u8);
-
+                      print_to_ss(transmission_data.dissect());
                       print_to_ss((int) FirmwareVersion_au8[0]);
                       print_to_ss((int) FirmwareVersion_au8[1]);
                       print_to_ss((int) FirmwareVersionInternal_u8);
@@ -290,10 +289,6 @@ namespace nitrokey {
                       print_to_ss( SD_Card_OEM_u16);
                       print_to_ss( SD_WriteSpeed_u16);
                       print_to_ss((int) SD_Card_Manufacturer_u8);
-
-                      ss << "_padding:" << std::endl
-                         << ::nitrokey::misc::hexdump((const char *) (_padding),
-                                                      sizeof _padding);
                       return ss.str();
                     }
 

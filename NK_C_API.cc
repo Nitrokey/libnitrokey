@@ -375,5 +375,95 @@ extern int NK_login_auto() {
     });
 }
 
+// storage commands
+
+extern int NK_send_startup(uint64_t seconds_from_epoch){
+  auto m = NitrokeyManager::instance();
+  return get_without_result([&](){
+      m->send_startup(seconds_from_epoch);
+  });
+}
+
+extern int NK_unlock_encrypted_volume(const char* user_pin){
+    auto m = NitrokeyManager::instance();
+    return get_without_result([&](){
+        m->unlock_encrypted_volume(user_pin);
+    });
+}
+
+extern int NK_unlock_hidden_volume(const char* hidden_volume_password){
+    auto m = NitrokeyManager::instance();
+    return get_without_result([&](){
+        m->unlock_hidden_volume(hidden_volume_password);
+    });
+}
+
+extern int NK_create_hidden_volume(int slot_nr, int start_percent, int end_percent,
+                                   const char* hidden_volume_password){
+    auto m = NitrokeyManager::instance();
+    return get_without_result([&](){
+        m->create_hidden_volume( slot_nr,  start_percent,  end_percent,
+        hidden_volume_password);
+    });
+}
+
+extern int NK_set_unencrypted_read_only(const char* user_pin){
+    auto m = NitrokeyManager::instance();
+    return get_without_result([&](){
+        m->set_unencrypted_read_only(user_pin);
+    });
+}
+
+extern int NK_set_unencrypted_read_write(const char* user_pin){
+    auto m = NitrokeyManager::instance();
+    return get_without_result([&](){
+        m->set_unencrypted_read_write(user_pin);
+    });
+}
+
+extern int NK_export_firmware(const char* admin_pin) {
+    auto m = NitrokeyManager::instance();
+    return get_without_result([&](){
+        m->export_firmware(admin_pin) ;
+    });
+}
+
+extern int NK_clear_new_sd_card_warning(const char* admin_pin) {
+    auto m = NitrokeyManager::instance();
+    return get_without_result([&](){
+        m->clear_new_sd_card_warning(admin_pin);
+    });
+}
+
+extern int NK_fill_SD_card_with_random_data(const char* admin_pin) {
+    auto m = NitrokeyManager::instance();
+    return get_without_result([&](){
+        m->fill_SD_card_with_random_data(admin_pin);
+    });
+}
+
+extern int NK_change_update_password(const char* current_update_password,
+                                     const char* new_update_password) {
+    auto m = NitrokeyManager::instance();
+    return get_without_result([&](){
+        m->change_update_password(current_update_password, new_update_password);
+    });
+}
+
+extern const char* NK_get_status_storage() {
+  auto m = NitrokeyManager::instance();
+  return get_with_string_result([&](){
+      return m->get_status_storage();
+  });
+}
+
+extern const char* NK_get_SD_usage_data() {
+  auto m = NitrokeyManager::instance();
+  return get_with_string_result([&](){
+      return m->get_SD_usage_data();
+  });
+}
+
+
 }
 

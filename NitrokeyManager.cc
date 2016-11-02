@@ -3,6 +3,7 @@
 #include "include/NitrokeyManager.h"
 #include "include/LibraryException.h"
 #include <algorithm>
+#include "include/misc.h"
 
 namespace nitrokey{
 
@@ -486,4 +487,80 @@ namespace nitrokey{
         return true;
     }
 
-}
+    //storage commands
+
+    /**
+     * TODO rename to set_time ?
+     * TODO check what exactly this one is doing
+     * @param seconds_from_epoch
+     */
+    void NitrokeyManager::send_startup(uint64_t seconds_from_epoch){
+      auto p = get_payload<stick20::SendStartup>();
+//      p.set_defaults();
+      p.localtime = seconds_from_epoch;
+      //auto device_status =
+      stick20::SendStartup::CommandTransaction::run(*device, p);
+    }
+
+    void NitrokeyManager::unlock_encrypted_volume(const char* user_pin){
+      misc::execute_password_command<stick20::EnableEncryptedPartition>(*device, user_pin);
+    }
+
+    void NitrokeyManager::unlock_hidden_volume(const char* hidden_volume_password) {
+      misc::execute_password_command<stick20::EnableHiddenEncryptedPartition>(*device, hidden_volume_password);
+    }
+
+    //TODO check is encrypted volume unlocked before execution
+    //if not return library exception
+    void NitrokeyManager::create_hidden_volume(int slot_nr, int start_percent, int end_percent,
+                                               const char* hidden_volume_password) {
+      auto p = get_payload<stick20::SetupHiddenVolume>();
+      p.SlotNr_u8 = slot_nr;
+      p.StartBlockPercent_u8 = start_percent;
+      p.EndBlockPercent_u8 = end_percent;
+      strcpyT(p.HiddenVolumePassword_au8, hidden_volume_password);
+      stick20::SetupHiddenVolume::CommandTransaction::run(*device, p);
+    }
+
+    void NitrokeyManager::set_unencrypted_read_only(const char* user_pin) {
+      misc::execute_password_command<stick20::SendSetReadonlyToUncryptedVolume>(*device, user_pin);
+    }
+
+    void NitrokeyManager::set_unencrypted_read_write(const char* user_pin) {
+      misc::execute_password_command<stick20::SendSetReadwriteToUncryptedVolume>(*device, user_pin);
+    }
+
+    void NitrokeyManager::export_firmware(const char* admin_pin) {
+      misc::execute_password_command<stick20::ExportFirmware>(*device, admin_pin);
+    }
+
+    void NitrokeyManager::clear_new_sd_card_warning(const char* admin_pin) {
+      misc::execute_password_command<stick20::SendClearNewSdCardFound>(*device, admin_pin);
+    }
+
+    void NitrokeyManager::fill_SD_card_with_random_data(const char* admin_pin) {
+      auto p = get_payload<stick20::FillSDCardWithRandomChars>();
+      p.set_defaults();
+      strcpyT(p.admin_pin, admin_pin);
+      stick20::FillSDCardWithRandomChars::CommandTransaction::run(*device, p);
+    }
+
+    void NitrokeyManager::change_update_password(const char* current_update_password, const char* new_update_password) {
+      auto p = get_payload<stick20::ChangeUpdatePassword>();
+      strcpyT(p.current_update_password, current_update_password);
+      strcpyT(p.new_update_password, new_update_password);
+      stick20::ChangeUpdatePassword::CommandTransaction::run(*device, p);
+    }
+
+    const char * NitrokeyManager::get_status_storage(){
+      auto p = stick20::GetDeviceStatus::CommandTransaction::run(*device);
+      return strdup(p.data().dissect().c_str());
+    }
+
+    const char * NitrokeyManager::get_SD_usage_data(){
+      auto p = stick20::GetSDCardOccupancy::CommandTransaction::run(*device);
+      return strdup(p.data().dissect().c_str());
+    }
+
+
+    }

@@ -12,6 +12,8 @@ class DefaultPasswords(Enum):
     USER = '123456'
     ADMIN_TEMP = '123123123'
     USER_TEMP = '234234234'
+    UPDATE = '12345678'
+    UPDATE_TEMP = '123update123'
 
 
 class DeviceErrorCode(Enum):

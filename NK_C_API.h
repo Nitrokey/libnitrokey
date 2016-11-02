@@ -324,6 +324,23 @@ extern int NK_erase_password_safe_slot(uint8_t slot_number);
  */
 extern int NK_is_AES_supported(const char *user_password);
 
+
+extern int NK_send_startup(uint64_t seconds_from_epoch);
+extern int NK_unlock_encrypted_volume(const char* user_pin);
+extern int NK_unlock_hidden_volume(const char* hidden_volume_password);
+extern int NK_create_hidden_volume(int slot_nr, int start_percent, int end_percent,
+                                   const char* hidden_volume_password);
+extern int NK_set_unencrypted_read_only(const char* user_pin);
+extern int NK_set_unencrypted_read_write(const char* user_pin);
+extern int NK_export_firmware(const char* admin_pin) ;
+extern int NK_clear_new_sd_card_warning(const char* admin_pin) ;
+extern int NK_fill_SD_card_with_random_data(const char* admin_pin) ;
+extern int NK_change_update_password(const char* current_update_password,
+                                     const char* new_update_password);
+extern const char* NK_get_status_storage();
+extern const char* NK_get_SD_usage_data();
+
+
 }
 
 

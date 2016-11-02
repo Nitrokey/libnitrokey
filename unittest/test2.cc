@@ -50,7 +50,7 @@ TEST_CASE("long operation test", "[test_long]") {
   Stick20 stick;
   bool connected = stick.connect();
   REQUIRE(connected == true);
-  Log::instance().set_loglevel(Loglevel::DEBUG_L2);
+  Log::instance().set_loglevel(Loglevel::DEBUG);
   try{
     auto p = get_payload<FillSDCardWithRandomChars>();
     p.set_defaults();
@@ -127,8 +127,8 @@ TEST_CASE("test device internal status with various commands", "[fast]") {
   bool connected = stick.connect();
   REQUIRE(connected == true);
 
-  Log::instance().set_loglevel(Loglevel::DEBUG_L2);
-  auto p = get_payload<stick20::SendStartup::CommandPayload>();
+  Log::instance().set_loglevel(Loglevel::DEBUG);
+  auto p = get_payload<stick20::SendStartup>();
   p.set_defaults();
   auto device_status = stick20::SendStartup::CommandTransaction::run(stick, p);
   REQUIRE(device_status.data().AdminPwRetryCount == 3);
@@ -150,7 +150,7 @@ TEST_CASE("setup hidden volume test", "[hidden]") {
   Stick20 stick;
   bool connected = stick.connect();
   REQUIRE(connected == true);
-  Log::instance().set_loglevel(Loglevel::DEBUG_L2);
+  Log::instance().set_loglevel(Loglevel::DEBUG);
   stick10::LockDevice::CommandTransaction::run(stick);
   this_thread::sleep_for(2000ms);
 
@@ -173,7 +173,7 @@ TEST_CASE("setup multiple hidden volumes", "[hidden]") {
   Stick20 stick;
   bool connected = stick.connect();
   REQUIRE(connected == true);
-  Log::instance().set_loglevel(Loglevel::DEBUG_L2);
+  Log::instance().set_loglevel(Loglevel::DEBUG);
 
   auto user_pin = default_user_pin;
   stick10::LockDevice::CommandTransaction::run(stick);
@@ -210,7 +210,7 @@ TEST_CASE("update password change", "[dangerous]") {
   Stick20 stick;
   bool connected = stick.connect();
   REQUIRE(connected == true);
-  Log::instance().set_loglevel(Loglevel::DEBUG_L2);
+  Log::instance().set_loglevel(Loglevel::DEBUG);
 
   auto pass1 = default_admin_pin;
   auto pass2 = "12345678901234567890";
@@ -232,7 +232,7 @@ TEST_CASE("general test", "[test]") {
   bool connected = stick.connect();
   REQUIRE(connected == true);
 
-  Log::instance().set_loglevel(Loglevel::DEBUG_L2);
+  Log::instance().set_loglevel(Loglevel::DEBUG);
 
   stick10::LockDevice::CommandTransaction::run(stick);
 //  execute_password_command<EnableEncryptedPartition>(stick, "123456");

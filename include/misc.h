@@ -36,6 +36,13 @@ typename T::CommandPayload get_payload(){
     return st;
 }
 
+    template<typename CMDTYPE, typename Tdev>
+    void execute_password_command(Tdev &stick, const char *password) {
+        auto p = get_payload<CMDTYPE>();
+        p.set_defaults();
+        strcpyT(p.password, password);
+        CMDTYPE::CommandTransaction::run(stick, p);
+    }
 
     std::string hexdump(const char *p, size_t size, bool print_header=true);
     uint32_t stm_crc32(const uint8_t *data, size_t size);

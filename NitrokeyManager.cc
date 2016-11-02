@@ -16,7 +16,7 @@ namespace nitrokey{
       nitrokey::log::Log::instance()(std::string("strcpyT sizes dest src ")
                                      +std::to_string(s_dest)+ " "
                                      +std::to_string(strlen(src))+ " "
-          ,nitrokey::log::Loglevel::DEBUG);
+          ,nitrokey::log::Loglevel::DEBUG_L2);
         if (strlen(src) > s_dest){
             throw TooLongStringException(strlen(src), s_dest, src);
         }
@@ -94,7 +94,7 @@ namespace nitrokey{
 
     void NitrokeyManager::set_debug(bool state) {
         if (state){
-            Log::instance().set_loglevel(Loglevel::DEBUG_L2);
+            Log::instance().set_loglevel(Loglevel::DEBUG);
         } else {
             Log::instance().set_loglevel(Loglevel::ERROR);
         }

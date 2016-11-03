@@ -464,6 +464,13 @@ extern const char* NK_get_SD_usage_data() {
   });
 }
 
+extern int NK_get_progress_bar_value() {
+  auto m = NitrokeyManager::instance();
+  return get_with_result([&](){
+      return m->get_progress_bar_value();
+  });
+}
+
 
 }
 

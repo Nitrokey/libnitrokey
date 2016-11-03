@@ -106,6 +106,8 @@ namespace nitrokey {
 
         const char *get_SD_usage_data();
 
+        int get_progress_bar_value();
+
         ~NitrokeyManager();
     private:
         NitrokeyManager();

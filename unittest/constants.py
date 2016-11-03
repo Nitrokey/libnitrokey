@@ -18,6 +18,7 @@ class DefaultPasswords(Enum):
 
 class DeviceErrorCode(Enum):
     STATUS_OK = 0
+    BUSY = 1 # busy or busy progressbar in place of wrong_CRC status
     NOT_PROGRAMMED = 3
     WRONG_PASSWORD = 4
     STATUS_NOT_AUTHORIZED = 5

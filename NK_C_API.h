@@ -339,6 +339,7 @@ extern int NK_change_update_password(const char* current_update_password,
                                      const char* new_update_password);
 extern const char* NK_get_status_storage();
 extern const char* NK_get_SD_usage_data();
+extern int NK_get_progress_bar_value();
 
 
 }

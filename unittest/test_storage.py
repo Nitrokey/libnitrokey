@@ -83,7 +83,20 @@ def test_clear_new_sd_card_notification(C):
 
 @pytest.mark.skip
 def test_fill_SD_card(C):
-    assert C.NK_fill_SD_card_with_random_data(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+    status = C.NK_fill_SD_card_with_random_data(DefaultPasswords.ADMIN)
+    assert status == DeviceErrorCode.STATUS_OK or status == DeviceErrorCode.BUSY
+    while 1:
+        value = C.NK_get_progress_bar_value()
+        if value == -1: break
+        assert 0 <= value <= 100
+        assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+        wait(5)
+
+
+def test_get_busy_progress_on_idle(C):
+    value = C.NK_get_progress_bar_value()
+    assert value == -1
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
 
 def test_change_update_password(C):

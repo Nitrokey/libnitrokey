@@ -562,5 +562,14 @@ namespace nitrokey{
       return strdup(p.data().dissect().c_str());
     }
 
+    int NitrokeyManager::get_progress_bar_value(){
+      try{
+        stick20::GetDeviceStatus::CommandTransaction::run(*device);
+        return -1;
+      }
+      catch (LongOperationInProgressException &e){
+        return e.progress_bar_value;
+      }
+    }
 
     }

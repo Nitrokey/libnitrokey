@@ -49,7 +49,7 @@ def test_encrypted_volume_unlock_hidden(C):
     assert C.NK_create_hidden_volume(0, 20, 21, hidden_volume_password) == DeviceErrorCode.STATUS_OK
     assert C.NK_unlock_hidden_volume(hidden_volume_password) == DeviceErrorCode.STATUS_OK
 
-
+@pytest.mark.skip(reason='hangs device, to report')
 def test_encrypted_volume_setup_multiple_hidden(C):
     hidden_volume_password = 'hiddenpassword'
     p = lambda i: hidden_volume_password + str(i)

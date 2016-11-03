@@ -316,20 +316,21 @@ namespace nitrokey {
               clear_packet(outp);
 
               if (status <= 0)
-                throw std::runtime_error(
+                throw std::runtime_error( //FIXME replace with CriticalErrorException
                     std::string("Device error while executing command ") +
                     std::to_string(status));
-
-              if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy) &&
-                  static_cast<stick20::device_status>(resp.storage_status.device_status)
-                  == stick20::device_status::busy_progressbar){
-                throw LongOperationInProgressException(resp.command_id, resp.storage_status.progress_bar_value);
-              }
 
               Log::instance()("Incoming HID packet:", Loglevel::DEBUG);
               Log::instance()(static_cast<std::string>(resp), Loglevel::DEBUG);
               Log::instance()(std::string("receiving_retry_counter count: ") + std::to_string(receiving_retry_counter),
                               Loglevel::DEBUG);
+
+              if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy) &&
+                  static_cast<stick20::device_status>(resp.storage_status.device_status)
+                  == stick20::device_status::busy_progressbar){
+                throw LongOperationInProgressException(
+                    resp.command_id, resp.device_status, resp.storage_status.progress_bar_value);
+              }
 
               if (!resp.isValid()) throw std::runtime_error("Invalid incoming packet");
               if (receiving_retry_counter <= 0)

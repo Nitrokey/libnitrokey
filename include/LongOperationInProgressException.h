@@ -5,16 +5,16 @@
 #ifndef LIBNITROKEY_LONGOPERATIONINPROGRESSEXCEPTION_H
 #define LIBNITROKEY_LONGOPERATIONINPROGRESSEXCEPTION_H
 
+#include "CommandFailedException.h"
 
-class LongOperationInProgressException : public std::exception {
+class LongOperationInProgressException : public CommandFailedException {
 
 public:
     unsigned char progress_bar_value;
-    unsigned char command_id;
 
-    LongOperationInProgressException(unsigned char _command_id, unsigned char _progress_bar_value) {
-        command_id = _command_id;
-        progress_bar_value = _progress_bar_value;
+    LongOperationInProgressException(
+        unsigned char _command_id, uint8_t last_command_status, unsigned char _progress_bar_value)
+    : CommandFailedException(_command_id, last_command_status), progress_bar_value(_progress_bar_value){
       nitrokey::log::Log::instance()(
           std::string("LongOperationInProgressException, progress bar status: ")+
               std::to_string(progress_bar_value), nitrokey::log::Loglevel::DEBUG);

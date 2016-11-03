@@ -491,9 +491,8 @@ namespace nitrokey{
 
     void NitrokeyManager::send_startup(uint64_t seconds_from_epoch){
       auto p = get_payload<stick20::SendStartup>();
-//      p.set_defaults();
+//      p.set_defaults(); //set current time
       p.localtime = seconds_from_epoch;
-      //auto device_status =
       stick20::SendStartup::CommandTransaction::run(*device, p);
     }
 
@@ -547,12 +546,12 @@ namespace nitrokey{
       stick20::ChangeUpdatePassword::CommandTransaction::run(*device, p);
     }
 
-    const char * NitrokeyManager::get_status_storage(){
+    const char * NitrokeyManager::get_status_storage_as_string(){
       auto p = stick20::GetDeviceStatus::CommandTransaction::run(*device);
       return strdup(p.data().dissect().c_str());
     }
 
-    const char * NitrokeyManager::get_SD_usage_data(){
+    const char * NitrokeyManager::get_SD_usage_data_as_string(){
       auto p = stick20::GetSDCardOccupancy::CommandTransaction::run(*device);
       return strdup(p.data().dissect().c_str());
     }

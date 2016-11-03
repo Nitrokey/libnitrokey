@@ -103,9 +103,9 @@ namespace nitrokey {
 
         void send_startup(uint64_t seconds_from_epoch);
 
-        const char * get_status_storage();
+        const char * get_status_storage_as_string();
 
-        const char *get_SD_usage_data();
+        const char *get_SD_usage_data_as_string();
 
         int get_progress_bar_value();
 

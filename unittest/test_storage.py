@@ -22,15 +22,18 @@ def get_dict_from_dissect(status):
 
 
 def test_get_status_storage(C):
-    status_pointer = C.NK_get_status_storage()
+    status_pointer = C.NK_get_status_storage_as_string()
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     status_string = gs(status_pointer)
+    assert len(status_string) > 0
     status_dict = get_dict_from_dissect(status_string)
     default_admin_password_retry_count = 3
     assert int(status_dict['AdminPwRetryCount']) == default_admin_password_retry_count
 
 
 def test_sd_card_usage(C):
-    data_pointer = C.NK_get_SD_usage_data()
+    data_pointer = C.NK_get_SD_usage_data_as_string()
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     data_string = gs(data_pointer)
     assert len(data_string) > 0
     data_dict = get_dict_from_dissect(data_string)

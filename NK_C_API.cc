@@ -450,17 +450,17 @@ extern int NK_change_update_password(const char* current_update_password,
     });
 }
 
-extern const char* NK_get_status_storage() {
+extern const char* NK_get_status_storage_as_string() {
   auto m = NitrokeyManager::instance();
   return get_with_string_result([&](){
-      return m->get_status_storage();
+      return m->get_status_storage_as_string();
   });
 }
 
-extern const char* NK_get_SD_usage_data() {
+extern const char* NK_get_SD_usage_data_as_string() {
   auto m = NitrokeyManager::instance();
   return get_with_string_result([&](){
-      return m->get_SD_usage_data();
+      return m->get_SD_usage_data_as_string();
   });
 }
 

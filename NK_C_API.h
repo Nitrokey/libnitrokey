@@ -430,7 +430,7 @@ extern int NK_change_update_password(const char* current_update_password,
  * Storage only
  * @return string with devices attributes
  */
-extern const char* NK_get_status_storage();
+extern const char* NK_get_status_storage_as_string();
 
 /**
  * Get SD card usage attributes as string.
@@ -438,7 +438,7 @@ extern const char* NK_get_status_storage();
  * Storage only
  * @return string with SD card usage attributes
  */
-extern const char* NK_get_SD_usage_data();
+extern const char* NK_get_SD_usage_data_as_string();
 
 /**
  * Get progress value of current long operation.

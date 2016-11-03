@@ -98,7 +98,8 @@ namespace nitrokey {
 
         void change_update_password(const char *current_update_password, const char *new_update_password);
 
-        void create_hidden_volume(int slot_nr, int start_percent, int end_percent, const char *hidden_volume_password);
+        void create_hidden_volume(uint8_t slot_nr, uint8_t start_percent, uint8_t end_percent,
+                                  const char *hidden_volume_password);
 
         void send_startup(uint64_t seconds_from_epoch);
 

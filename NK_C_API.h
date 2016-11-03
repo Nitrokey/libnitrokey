@@ -325,22 +325,127 @@ extern int NK_erase_password_safe_slot(uint8_t slot_number);
 extern int NK_is_AES_supported(const char *user_password);
 
 
-extern int NK_send_startup(uint64_t seconds_from_epoch);
-extern int NK_unlock_encrypted_volume(const char* user_pin);
-extern int NK_unlock_hidden_volume(const char* hidden_volume_password);
-extern int NK_create_hidden_volume(int slot_nr, int start_percent, int end_percent,
-                                   const char* hidden_volume_password);
-extern int NK_set_unencrypted_read_only(const char* user_pin);
-extern int NK_set_unencrypted_read_write(const char* user_pin);
-extern int NK_export_firmware(const char* admin_pin) ;
-extern int NK_clear_new_sd_card_warning(const char* admin_pin) ;
-extern int NK_fill_SD_card_with_random_data(const char* admin_pin) ;
-extern int NK_change_update_password(const char* current_update_password,
-                                     const char* new_update_password);
-extern const char* NK_get_status_storage();
-extern const char* NK_get_SD_usage_data();
-extern int NK_get_progress_bar_value();
 
+
+
+/**
+ * This command is typically run to initiate
+ * communication with the device (altough not required).
+ * It sets time on device and returns its current status
+ * - a combination of set_time and get_status_storage commands
+ * Storage only
+ * @param seconds_from_epoch date and time expressed in seconds
+ */
+extern int NK_send_startup(uint64_t seconds_from_epoch);
+
+/**
+ * Unlock encrypted volume.
+ * Storage only
+ * @param user_pin user pin 20 characters
+ * @return command processing error code
+ */
+extern int NK_unlock_encrypted_volume(const char* user_pin);
+
+/**
+ * Unlock hidden volume and lock encrypted volume.
+ * Requires encrypted volume to be unlocked.
+ * Storage only
+ * @param hidden_volume_password 20 characters
+ * @return command processing error code
+ */
+extern int NK_unlock_hidden_volume(const char* hidden_volume_password);
+
+/**
+ * Create hidden volume.
+ * Requires encrypted volume to be unlocked.
+ * Storage only
+ * @param slot_nr slot number in range 0-3
+ * @param start_percent volume begin expressed in percent of total available storage, int in range 0-99
+ * @param end_percent volume end expressed in percent of total available storage, int in range 1-100
+ * @param hidden_volume_password 20 characters
+ * @return command processing error code
+ */
+extern int NK_create_hidden_volume(uint8_t slot_nr, uint8_t start_percent, uint8_t end_percent,
+                                   const char *hidden_volume_password);
+
+/**
+ * Make unencrypted volume read-only.
+ * Device hides unencrypted volume for a second therefore make sure
+ * buffers are flushed before running.
+ * Storage only
+ * @param user_pin 20 characters
+ * @return command processing error code
+ */
+extern int NK_set_unencrypted_read_only(const char* user_pin);
+
+/**
+ * Make unencrypted volume read-write.
+ * Device hides unencrypted volume for a second therefore make sure
+ * buffers are flushed before running.
+ * Storage only
+ * @param user_pin 20 characters
+ * @return command processing error code
+ */
+extern int NK_set_unencrypted_read_write(const char* user_pin);
+
+/**
+ * Exports device's firmware to unencrypted volume.
+ * Storage only
+ * @param admin_pin 20 characters
+ * @return command processing error code
+ */
+extern int NK_export_firmware(const char* admin_pin) ;
+
+/**
+ * Clear new SD card notification. It is set after factory reset.
+ * Storage only
+ * @param admin_pin 20 characters
+ * @return command processing error code
+ */
+extern int NK_clear_new_sd_card_warning(const char* admin_pin) ;
+
+/**
+ * Fill SD card with random data.
+ * Should be done on first stick initialization after creating keys.
+ * Storage only
+ * @param admin_pin 20 characters
+ * @return command processing error code
+ */
+extern int NK_fill_SD_card_with_random_data(const char* admin_pin) ;
+
+/**
+ * Change update password.
+ * Update password is used for entering update mode, where firmware
+ * could be uploaded using dfu-programmer or other means.
+ * Storage only
+ * @param current_update_password 20 characters
+ * @param new_update_password 20 characters
+ * @return command processing error code
+ */
+extern int NK_change_update_password(const char* current_update_password,
+                                 const char* new_update_password);
+
+/**
+ * Get Storage stick status as string.
+ * Storage only
+ * @return string with devices attributes
+ */
+extern const char* NK_get_status_storage();
+
+/**
+ * Get SD card usage attributes as string.
+ * Usable during hidden volumes creation.
+ * Storage only
+ * @return string with SD card usage attributes
+ */
+extern const char* NK_get_SD_usage_data();
+
+/**
+ * Get progress value of current long operation.
+ * Storage only
+ * @return int in range 0-100 or -1 if device is not busy
+ */
+extern int NK_get_progress_bar_value();
 
 }
 

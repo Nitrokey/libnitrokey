@@ -489,11 +489,6 @@ namespace nitrokey{
 
     //storage commands
 
-    /**
-     * TODO rename to set_time ?
-     * TODO check what exactly this one is doing
-     * @param seconds_from_epoch
-     */
     void NitrokeyManager::send_startup(uint64_t seconds_from_epoch){
       auto p = get_payload<stick20::SendStartup>();
 //      p.set_defaults();
@@ -512,8 +507,8 @@ namespace nitrokey{
 
     //TODO check is encrypted volume unlocked before execution
     //if not return library exception
-    void NitrokeyManager::create_hidden_volume(int slot_nr, int start_percent, int end_percent,
-                                               const char* hidden_volume_password) {
+    void NitrokeyManager::create_hidden_volume(uint8_t slot_nr, uint8_t start_percent, uint8_t end_percent,
+                                               const char *hidden_volume_password) {
       auto p = get_payload<stick20::SetupHiddenVolume>();
       p.SlotNr_u8 = slot_nr;
       p.StartBlockPercent_u8 = start_percent;

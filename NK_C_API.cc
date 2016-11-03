@@ -398,8 +398,8 @@ extern int NK_unlock_hidden_volume(const char* hidden_volume_password){
     });
 }
 
-extern int NK_create_hidden_volume(int slot_nr, int start_percent, int end_percent,
-                                   const char* hidden_volume_password){
+extern int NK_create_hidden_volume(uint8_t slot_nr, uint8_t start_percent, uint8_t end_percent,
+                                   const char *hidden_volume_password){
     auto m = NitrokeyManager::instance();
     return get_without_result([&](){
         m->create_hidden_volume( slot_nr,  start_percent,  end_percent,

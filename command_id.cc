@@ -139,6 +139,9 @@ const char *commandid_to_string(CommandID id) {
       return "DETECT_SC_AES";
     case CommandID::NEW_AES_KEY:
       return "NEW_AES_KEY";
+    case CommandID::WRITE_TO_SLOT_2:
+      return "WRITE_TO_SLOT_2";
+      break;
   }
   return "UNKNOWN";
 }

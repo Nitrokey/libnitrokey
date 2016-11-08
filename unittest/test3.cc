@@ -16,15 +16,13 @@ const char * RFC_SECRET = "12345678901234567890";
 #include <NitrokeyManager.h>
 #include "device_proto.h"
 #include "log.h"
-#include "stick10_commands.h"
 #include "stick10_commands_0.8.h"
 //#include "stick20_commands.h"
 
 using namespace std;
 using namespace nitrokey::device;
 using namespace nitrokey::proto;
-//using namespace nitrokey::proto::stick10_08;
-using namespace nitrokey::proto::stick10;
+using namespace nitrokey::proto::stick10_08;
 using namespace nitrokey::log;
 using namespace nitrokey::misc;
 
@@ -39,6 +37,11 @@ void authorize(Stick10 &stick) {
   strcpy((char *) (authreq.card_password), default_admin_pin);
   strcpy((char *) (authreq.temporary_password), temporary_password);
   FirstAuthenticate::CommandTransaction::run(stick, authreq);
+
+  auto user_auth = get_payload<UserAuthenticate>();
+  strcpyT(user_auth.temporary_password, temporary_password);
+  strcpyT(user_auth.card_password, default_user_pin);
+  UserAuthenticate::CommandTransaction::run(stick, user_auth);
 }
 
 TEST_CASE("write slot", "[pronew]"){
@@ -46,7 +49,6 @@ TEST_CASE("write slot", "[pronew]"){
   connect_and_setup(stick);
 
   auto p = get_payload<stick10_08::WriteToHOTPSlot>();
-//  p.slot_number = 0 + 0x10;
   strcpyT(p.slot_secret, RFC_SECRET);
   strcpyT(p.temporary_admin_password, temporary_password);
   p.use_8_digits = true;
@@ -71,8 +73,65 @@ TEST_CASE("erase slot", "[pronew]"){
   connect_and_setup(stick);
   authorize(stick);
 
+  auto p3 = get_payload<GetHOTP>();
+  p3.slot_number = 0 + 0x10;
+  GetHOTP::CommandTransaction::run(stick, p3);
+
   auto erase_payload = get_payload<stick10_08::EraseSlot>();
-  erase_payload.slot_number = 1 + 0x10;
+  erase_payload.slot_number = 0 + 0x10;
   strcpyT(erase_payload.temporary_admin_password, temporary_password);
   stick10_08::EraseSlot::CommandTransaction::run(stick, erase_payload);
+
+  auto p4 = get_payload<GetHOTP>();
+  p4.slot_number = 0 + 0x10;
+  REQUIRE_THROWS(
+      GetHOTP::CommandTransaction::run(stick, p4)
+  );
+}
+
+TEST_CASE("write general config", "[pronew]") {
+  Stick10 stick;
+  connect_and_setup(stick);
+  authorize(stick);
+
+  auto p = get_payload<WriteGeneralConfig>();
+  p.enable_user_password = 1;
+  REQUIRE_THROWS(
+      WriteGeneralConfig::CommandTransaction::run(stick, p);
+  );
+  strcpyT(p.temporary_admin_password, temporary_password);
+  WriteGeneralConfig::CommandTransaction::run(stick, p);
+}
+
+TEST_CASE("authorize user OTP", "[pronew]") {
+  Stick10 stick;
+  connect_and_setup(stick);
+  authorize(stick);
+
+  auto p = get_payload<WriteGeneralConfig>();
+  p.enable_user_password = 1;
+  strcpyT(p.temporary_admin_password, temporary_password);
+  WriteGeneralConfig::CommandTransaction::run(stick, p);
+
+  auto pw = get_payload<WriteToHOTPSlot>();
+  strcpyT(pw.slot_secret, RFC_SECRET);
+  strcpyT(pw.temporary_admin_password, temporary_password);
+  pw.use_8_digits = true;
+  WriteToHOTPSlot::CommandTransaction::run(stick, pw);
+
+  auto pw2 = get_payload<WriteToHOTPSlot_2>();
+  strcpyT(pw2.temporary_admin_password, temporary_password);
+  pw2.slot_number = 0 + 0x10;
+  pw2.slot_counter = 0;
+  strcpyT(pw2.slot_name, "test name aaa");
+  WriteToHOTPSlot_2::CommandTransaction::run(stick, pw2);
+
+  auto p3 = get_payload<GetHOTP>();
+  p3.slot_number = 0 + 0x10;
+  REQUIRE_THROWS(
+      GetHOTP::CommandTransaction::run(stick, p3);
+  );
+  strcpyT(p3.temporary_user_password, temporary_password);
+  GetHOTP::CommandTransaction::run(stick, p3);
+
 }

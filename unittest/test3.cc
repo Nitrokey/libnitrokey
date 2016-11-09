@@ -148,6 +148,13 @@ TEST_CASE("authorize user HOTP", "[pronew]") {
 
 }
 
+TEST_CASE("check firmware version", "[pronew]") {
+  Stick10 stick;
+  connect_and_setup(stick);
+
+  auto p = GetStatus::CommandTransaction::run(stick);
+  REQUIRE(p.data().firmware_version == 8);
+}
 
 TEST_CASE("authorize user TOTP", "[pronew]") {
   Stick10 stick;

@@ -24,6 +24,7 @@ namespace nitrokey {
             using stick10::FirstAuthenticate;
             using stick10::UserAuthenticate;
             using stick10::SetTime;
+            using stick10::GetStatus;
 
             class EraseSlot : Command<CommandID::ERASE_SLOT> {
             public:

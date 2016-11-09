@@ -3,6 +3,7 @@
 #include "include/NitrokeyManager.h"
 #include "include/LibraryException.h"
 #include <algorithm>
+#include <unordered_map>
 #include "include/misc.h"
 
 namespace nitrokey{
@@ -35,7 +36,11 @@ namespace nitrokey{
 
     // package type to auth, auth type [Authorize,UserAuthorize]
     template <typename S, typename A, typename T>
-    void authorize_packet(T &package, const char *admin_temporary_password, shared_ptr<Device> device){
+    void NitrokeyManager::authorize_packet(T &package, const char *admin_temporary_password, shared_ptr<Device> device){
+      if (!is_authorization_command_supported()){
+        Log::instance()("Authorization command not supported, skipping", Loglevel::WARNING);
+        return;
+      }
         auto auth = get_payload<A>();
         strcpyT(auth.temporary_password, admin_temporary_password);
         auth.crc_to_authorize = S::CommandTransaction::getCRC(package);
@@ -478,6 +483,15 @@ namespace nitrokey{
         vector<uint8_t> v = vector<uint8_t>(responsePayload.data().general_config,
                                             responsePayload.data().general_config+sizeof(responsePayload.data().general_config));
         return v;
+    }
+
+    bool NitrokeyManager::is_authorization_command_supported(){
+        auto m = std::unordered_map<DeviceModel , int, EnumClassHash>({
+                                                     {DeviceModel::PRO, 7},
+                                                     {DeviceModel::STORAGE, 43},
+         });
+      auto status_p = GetStatus::CommandTransaction::run(*device);
+      return status_p.data().firmware_version <= m[device->get_device_model()];
     }
 
     bool NitrokeyManager::is_AES_supported(const char *user_password) {

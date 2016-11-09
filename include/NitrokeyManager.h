@@ -110,6 +110,10 @@ namespace nitrokey {
         int get_progress_bar_value();
 
         ~NitrokeyManager();
+        bool is_authorization_command_supported();
+
+        template <typename S, typename A, typename T>
+        void authorize_packet(T &package, const char *admin_temporary_password, shared_ptr<Device> device);
     private:
         NitrokeyManager();
 

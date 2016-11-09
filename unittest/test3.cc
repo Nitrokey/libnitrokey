@@ -48,18 +48,23 @@ TEST_CASE("write slot", "[pronew]"){
   Stick10 stick;
   connect_and_setup(stick);
 
-  auto p = get_payload<stick10_08::WriteToHOTPSlot>();
+  auto p = get_payload<WriteToHOTPSlot>();
   strcpyT(p.slot_secret, RFC_SECRET);
   strcpyT(p.temporary_admin_password, temporary_password);
   p.use_8_digits = true;
   stick10_08::WriteToHOTPSlot::CommandTransaction::run(stick, p);
 
-  auto p2 = get_payload<stick10_08::WriteToHOTPSlot_2>();
+  auto p2 = get_payload<WriteToHOTPSlot_2>();
   strcpyT(p2.temporary_admin_password, temporary_password);
   p2.slot_number = 0 + 0x10;
   p2.slot_counter = 0;
   strcpyT(p2.slot_name, "test name aaa");
   stick10_08::WriteToHOTPSlot_2::CommandTransaction::run(stick, p2);
+
+  auto pc = get_payload<WriteGeneralConfig>();
+  pc.enable_user_password = 0;
+  strcpyT(pc.temporary_admin_password, temporary_password);
+  WriteGeneralConfig::CommandTransaction::run(stick, pc);
 
   auto p3 = get_payload<GetHOTP>();
   p3.slot_number = 0 + 0x10;
@@ -73,14 +78,19 @@ TEST_CASE("erase slot", "[pronew]"){
   connect_and_setup(stick);
   authorize(stick);
 
+  auto p = get_payload<WriteGeneralConfig>();
+  p.enable_user_password = 0;
+  strcpyT(p.temporary_admin_password, temporary_password);
+  WriteGeneralConfig::CommandTransaction::run(stick, p);
+
   auto p3 = get_payload<GetHOTP>();
   p3.slot_number = 0 + 0x10;
   GetHOTP::CommandTransaction::run(stick, p3);
 
-  auto erase_payload = get_payload<stick10_08::EraseSlot>();
+  auto erase_payload = get_payload<EraseSlot>();
   erase_payload.slot_number = 0 + 0x10;
   strcpyT(erase_payload.temporary_admin_password, temporary_password);
-  stick10_08::EraseSlot::CommandTransaction::run(stick, erase_payload);
+  EraseSlot::CommandTransaction::run(stick, erase_payload);
 
   auto p4 = get_payload<GetHOTP>();
   p4.slot_number = 0 + 0x10;
@@ -133,7 +143,7 @@ TEST_CASE("authorize user HOTP", "[pronew]") {
   );
   strcpyT(p3.temporary_user_password, temporary_password);
   auto code_response = GetHOTP::CommandTransaction::run(stick, p3);
-  REQUIRE(code_response.data().code == 1284755224);
+  REQUIRE(code_response.data().code == 84755224);
 
 }
 

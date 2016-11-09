@@ -47,6 +47,7 @@ void authorize(Stick10 &stick) {
 TEST_CASE("write slot", "[pronew]"){
   Stick10 stick;
   connect_and_setup(stick);
+  authorize(stick);
 
   auto p = get_payload<WriteToHOTPSlot>();
   strcpyT(p.slot_secret, RFC_SECRET);

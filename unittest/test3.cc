@@ -103,7 +103,7 @@ TEST_CASE("write general config", "[pronew]") {
   WriteGeneralConfig::CommandTransaction::run(stick, p);
 }
 
-TEST_CASE("authorize user OTP", "[pronew]") {
+TEST_CASE("authorize user HOTP", "[pronew]") {
   Stick10 stick;
   connect_and_setup(stick);
   authorize(stick);
@@ -132,6 +132,48 @@ TEST_CASE("authorize user OTP", "[pronew]") {
       GetHOTP::CommandTransaction::run(stick, p3);
   );
   strcpyT(p3.temporary_user_password, temporary_password);
-  GetHOTP::CommandTransaction::run(stick, p3);
+  auto code_response = GetHOTP::CommandTransaction::run(stick, p3);
+  REQUIRE(code_response.data().code == 1284755224);
+
+}
+
+
+TEST_CASE("authorize user TOTP", "[pronew]") {
+  Stick10 stick;
+  connect_and_setup(stick);
+  authorize(stick);
+
+  auto p = get_payload<WriteGeneralConfig>();
+  p.enable_user_password = 1;
+  strcpyT(p.temporary_admin_password, temporary_password);
+  WriteGeneralConfig::CommandTransaction::run(stick, p);
+
+  auto pw = get_payload<WriteToTOTPSlot>();
+  strcpyT(pw.slot_secret, RFC_SECRET);
+  strcpyT(pw.temporary_admin_password, temporary_password);
+  pw.use_8_digits = true;
+  WriteToTOTPSlot::CommandTransaction::run(stick, pw);
+
+  auto pw2 = get_payload<WriteToTOTPSlot_2>();
+  strcpyT(pw2.temporary_admin_password, temporary_password);
+  pw2.slot_number = 0 + 0x20;
+  pw2.slot_interval= 30;
+  strcpyT(pw2.slot_name, "test name TOTP");
+  WriteToTOTPSlot_2::CommandTransaction::run(stick, pw2);
+
+  auto p_get_totp = get_payload<GetTOTP>();
+  p_get_totp.slot_number = 0 + 0x20;
+
+  REQUIRE_THROWS(
+      GetTOTP::CommandTransaction::run(stick, p_get_totp);
+  );
+  strcpyT(p_get_totp.temporary_user_password, temporary_password);
+
+  auto p_set_time = get_payload<SetTime>();
+  p_set_time.reset = 1;
+  p_set_time.time = 59;
+  SetTime::CommandTransaction::run(stick, p_set_time);
+  auto code = GetTOTP::CommandTransaction::run(stick, p_get_totp);
+  REQUIRE(code.data().code == 94287082);
 
 }

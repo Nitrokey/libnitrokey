@@ -31,6 +31,10 @@ def is_pro_rtm_07(C):
     firmware = get_firmware_version_from_status(C)
     return '07 00' in firmware
 
+def is_pro_rtm_08(C):
+    firmware = get_firmware_version_from_status(C)
+    return '08 00' in firmware
+
 
 def is_storage(C):
     """

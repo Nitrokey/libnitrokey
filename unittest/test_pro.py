@@ -2,7 +2,7 @@ import pytest
 
 from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET
 from misc import ffi, gs, wait, cast_pointer_to_tuple
-from misc import is_pro_rtm_07, is_storage
+from misc import is_pro_rtm_07, is_pro_rtm_08, is_storage
 
 def test_enable_password_safe(C):
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
@@ -61,7 +61,7 @@ def test_password_safe_slot_status(C):
 
 
 def test_issue_device_locks_on_second_key_generation_in_sequence(C):
-    if is_pro_rtm_07(C):
+    if is_pro_rtm_07(C) or is_pro_rtm_08(C):
         pytest.skip("issue to register: device locks up "
                      "after below commands sequence (reinsertion fixes), skipping for now")
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK

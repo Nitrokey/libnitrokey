@@ -252,9 +252,9 @@ namespace nitrokey {
                 struct CommandPayload {
                     uint8_t temporary_user_password[25];
                     uint8_t slot_number;
-                    uint64_t challenge;
-                    uint64_t last_totp_time;
-                    uint8_t last_interval;
+                    uint64_t challenge; //@unused
+                    uint64_t last_totp_time; //@unused
+                    uint8_t last_interval; //@unused
 
                     bool isValid() const { return !(slot_number & 0xF0); }
                     std::string dissect() const {

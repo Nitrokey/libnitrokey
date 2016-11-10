@@ -134,8 +134,6 @@ namespace nitrokey {
         } __packed;
 
         struct EmptyPayload {
-            uint8_t _data[];
-
             bool isValid() const { return true; }
 
             std::string dissect() const { return std::string("Empty Payload."); }

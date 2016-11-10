@@ -5,6 +5,7 @@
 #include "log.h"
 #include "device_proto.h"
 #include "stick10_commands.h"
+#include "stick10_commands_0.8.h"
 #include "stick20_commands.h"
 #include <vector>
 #include <memory>
@@ -132,6 +133,21 @@ namespace nitrokey {
         template <typename ProCommand, PasswordKind StoKind>
         void change_PIN_general(char *current_PIN, char *new_PIN);
 
+        void write_HOTP_slot_authorize(uint8_t slot_number, const char *slot_name, const char *secret, uint64_t hotp_counter,
+                                   bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
+                                   const char *temporary_password);
+
+        void write_HOTP_slot_no_authorize(uint8_t slot_number, const char *slot_name, const char *secret, uint64_t hotp_counter,
+                                      bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
+                                      const char *temporary_password) const;
+
+        void write_TOTP_slot_authorize(uint8_t slot_number, const char *slot_name, const char *secret, uint16_t time_window,
+                                   bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
+                                   const char *temporary_password);
+
+        void write_TOTP_slot_no_authorize(uint8_t slot_number, const char *slot_name, const char *secret, uint16_t time_window,
+                                      bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
+                                      const char *temporary_password) const;
     };
 }
 

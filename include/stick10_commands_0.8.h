@@ -201,8 +201,13 @@ namespace nitrokey {
             class GetHOTP : Command<CommandID::GET_CODE> {
             public:
                 struct CommandPayload {
-                    uint8_t temporary_user_password[25];
                     uint8_t slot_number;
+                    struct {
+                        uint64_t challenge; //@unused
+                        uint64_t last_totp_time; //@unused
+                        uint8_t last_interval; //@unused
+                    } __packed _unused;
+                    uint8_t temporary_user_password[25];
 
                     bool isValid() const { return (slot_number & 0xF0); }
                     std::string dissect() const {
@@ -250,11 +255,11 @@ namespace nitrokey {
                 //user auth
             public:
                 struct CommandPayload {
-                    uint8_t temporary_user_password[25];
                     uint8_t slot_number;
                     uint64_t challenge; //@unused
                     uint64_t last_totp_time; //@unused
                     uint8_t last_interval; //@unused
+                    uint8_t temporary_user_password[25];
 
                     bool isValid() const { return !(slot_number & 0xF0); }
                     std::string dissect() const {

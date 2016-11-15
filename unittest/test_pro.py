@@ -74,6 +74,7 @@ def test_regenerate_aes_key(C):
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
+
 def test_enable_password_safe_after_factory_reset(C):
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_factory_reset(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
@@ -294,6 +295,7 @@ def test_HOTP_64bit_counter(C):
         assert C.NK_write_hotp_slot(slot_number, 'python_test', RFC_SECRET, t, use_8_digits, False, False, "",
                                     DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         code_device = str(C.NK_get_hotp_code(slot_number))
+        code_device = '0'+code_device if len(code_device) < 6 else code_device
         dev_res += (t, code_device)
         lib_res += (t, lib_at(t))
     assert dev_res == lib_res
@@ -319,6 +321,7 @@ def test_TOTP_64bit_time(C):
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         assert C.NK_totp_set_time(t) == DeviceErrorCode.STATUS_OK
         code_device = str((C.NK_get_totp_code(slot_number, T, 0, 30)))
+        code_device = '0'+code_device if len(code_device) < 6 else code_device
         dev_res += (t, code_device)
         lib_res += (t, lib_at(t))
     assert dev_res == lib_res
@@ -495,3 +498,25 @@ def test_get_serial_number(C):
     sn = gs(sn)
     assert len(sn) > 0
     print(('Serial number of the device: ', sn))
+
+@pytest.mark.parametrize("secret", ['000001', '00'*10+'ff', '00'*19+'ff', '000102', '002EF43F51AFA97BA2B46418768123C9E1809A5B' ])
+def test_OTP_secret_started_from_null(C, secret):
+    oath = pytest.importorskip("oath")
+    lib_at = lambda t: oath.hotp(secret, t, format='dec6')
+    PIN_protection = False
+    use_8_digits = False
+    slot_number = 1
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    dev_res = []
+    lib_res = []
+    for t in range(1,5):
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_write_hotp_slot(slot_number, 'null_secret', secret, t, use_8_digits, False, False, "",
+                                    DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        code_device = str(C.NK_get_hotp_code(slot_number))
+        code_device = '0'+code_device if len(code_device) < 6 else code_device
+        dev_res += (t, code_device)
+        lib_res += (t, lib_at(t))
+    assert dev_res == lib_res

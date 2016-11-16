@@ -49,18 +49,26 @@ TEST_CASE("write slot", "[pronew]"){
   connect_and_setup(stick);
   authorize(stick);
 
-  auto p = get_payload<WriteToHOTPSlot>();
-  strcpyT(p.slot_secret, RFC_SECRET);
+  auto p2 = get_payload<SendOTPData>();
+  strcpyT(p2.temporary_admin_password, temporary_password);
+  p2.setTypeName();
+  strcpyT(p2.data, "test name aaa");
+  p2.length = strlen((const char *) p2.data);
+  stick10_08::SendOTPData::CommandTransaction::run(stick, p2);
+
+  p2 = get_payload<SendOTPData>();
+  strcpyT(p2.temporary_admin_password, temporary_password);
+  strcpyT(p2.data, RFC_SECRET);
+  p2.length = strlen(RFC_SECRET);
+  p2.setTypeSecret();
+  stick10_08::SendOTPData::CommandTransaction::run(stick, p2);
+
+  auto p = get_payload<WriteToOTPSlot>();
   strcpyT(p.temporary_admin_password, temporary_password);
   p.use_8_digits = true;
-  stick10_08::WriteToHOTPSlot::CommandTransaction::run(stick, p);
-
-  auto p2 = get_payload<WriteToHOTPSlot_2>();
-  strcpyT(p2.temporary_admin_password, temporary_password);
-  p2.slot_number = 0 + 0x10;
-  p2.slot_counter = 0;
-  strcpyT(p2.slot_name, "test name aaa");
-  stick10_08::WriteToHOTPSlot_2::CommandTransaction::run(stick, p2);
+  p.slot_number = 0 + 0x10;
+  p.slot_counter_or_interval = 0;
+  stick10_08::WriteToOTPSlot::CommandTransaction::run(stick, p);
 
   auto pc = get_payload<WriteGeneralConfig>();
   pc.enable_user_password = 0;
@@ -119,23 +127,34 @@ TEST_CASE("authorize user HOTP", "[pronew]") {
   connect_and_setup(stick);
   authorize(stick);
 
-  auto p = get_payload<WriteGeneralConfig>();
-  p.enable_user_password = 1;
+  {
+    auto p = get_payload<WriteGeneralConfig>();
+    p.enable_user_password = 1;
+    strcpyT(p.temporary_admin_password, temporary_password);
+    WriteGeneralConfig::CommandTransaction::run(stick, p);
+  }
+
+  auto p2 = get_payload<SendOTPData>();
+  strcpyT(p2.temporary_admin_password, temporary_password);
+  p2.setTypeName();
+  strcpyT(p2.data, "test name aaa");
+  p2.length = strlen((const char *) p2.data);
+  stick10_08::SendOTPData::CommandTransaction::run(stick, p2);
+
+  p2 = get_payload<SendOTPData>();
+  strcpyT(p2.temporary_admin_password, temporary_password);
+  strcpyT(p2.data, RFC_SECRET);
+  p2.length = strlen(RFC_SECRET);
+  p2.setTypeSecret();
+  stick10_08::SendOTPData::CommandTransaction::run(stick, p2);
+
+  auto p = get_payload<WriteToOTPSlot>();
   strcpyT(p.temporary_admin_password, temporary_password);
-  WriteGeneralConfig::CommandTransaction::run(stick, p);
+  p.use_8_digits = true;
+  p.slot_number = 0 + 0x10;
+  p.slot_counter_or_interval = 0;
+  stick10_08::WriteToOTPSlot::CommandTransaction::run(stick, p);
 
-  auto pw = get_payload<WriteToHOTPSlot>();
-  strcpyT(pw.slot_secret, RFC_SECRET);
-  strcpyT(pw.temporary_admin_password, temporary_password);
-  pw.use_8_digits = true;
-  WriteToHOTPSlot::CommandTransaction::run(stick, pw);
-
-  auto pw2 = get_payload<WriteToHOTPSlot_2>();
-  strcpyT(pw2.temporary_admin_password, temporary_password);
-  pw2.slot_number = 0 + 0x10;
-  pw2.slot_counter = 0;
-  strcpyT(pw2.slot_name, "test name aaa");
-  WriteToHOTPSlot_2::CommandTransaction::run(stick, pw2);
 
   auto p3 = get_payload<GetHOTP>();
   p3.slot_number = 0 + 0x10;
@@ -161,23 +180,33 @@ TEST_CASE("authorize user TOTP", "[pronew]") {
   connect_and_setup(stick);
   authorize(stick);
 
-  auto p = get_payload<WriteGeneralConfig>();
-  p.enable_user_password = 1;
+  {
+    auto p = get_payload<WriteGeneralConfig>();
+    p.enable_user_password = 1;
+    strcpyT(p.temporary_admin_password, temporary_password);
+    WriteGeneralConfig::CommandTransaction::run(stick, p);
+  }
+
+  auto p2 = get_payload<SendOTPData>();
+  strcpyT(p2.temporary_admin_password, temporary_password);
+  p2.setTypeName();
+  strcpyT(p2.data, "test name TOTP");
+  p2.length = strlen((const char *) p2.data);
+  stick10_08::SendOTPData::CommandTransaction::run(stick, p2);
+
+  p2 = get_payload<SendOTPData>();
+  strcpyT(p2.temporary_admin_password, temporary_password);
+  strcpyT(p2.data, RFC_SECRET);
+  p2.length = strlen(RFC_SECRET);
+  p2.setTypeSecret();
+  stick10_08::SendOTPData::CommandTransaction::run(stick, p2);
+
+  auto p = get_payload<WriteToOTPSlot>();
   strcpyT(p.temporary_admin_password, temporary_password);
-  WriteGeneralConfig::CommandTransaction::run(stick, p);
-
-  auto pw = get_payload<WriteToTOTPSlot>();
-  strcpyT(pw.slot_secret, RFC_SECRET);
-  strcpyT(pw.temporary_admin_password, temporary_password);
-  pw.use_8_digits = true;
-  WriteToTOTPSlot::CommandTransaction::run(stick, pw);
-
-  auto pw2 = get_payload<WriteToTOTPSlot_2>();
-  strcpyT(pw2.temporary_admin_password, temporary_password);
-  pw2.slot_number = 0 + 0x20;
-  pw2.slot_interval= 30;
-  strcpyT(pw2.slot_name, "test name TOTP");
-  WriteToTOTPSlot_2::CommandTransaction::run(stick, pw2);
+  p.use_8_digits = true;
+  p.slot_number = 0 + 0x20;
+  p.slot_counter_or_interval = 30;
+  stick10_08::WriteToOTPSlot::CommandTransaction::run(stick, p);
 
   auto p_get_totp = get_payload<GetTOTP>();
   p_get_totp.slot_number = 0 + 0x20;

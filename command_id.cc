@@ -142,6 +142,9 @@ const char *commandid_to_string(CommandID id) {
     case CommandID::WRITE_TO_SLOT_2:
       return "WRITE_TO_SLOT_2";
       break;
+    case CommandID::SEND_OTP_DATA:
+      return "SEND_OTP_DATA";
+      break;
   }
   return "UNKNOWN";
 }

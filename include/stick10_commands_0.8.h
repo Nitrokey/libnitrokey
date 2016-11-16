@@ -44,47 +44,33 @@ namespace nitrokey {
                     CommandTransaction;
             };
 
-            class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
+            class SendOTPData : Command<CommandID::SEND_OTP_DATA> {
                 //admin auth
             public:
                 struct CommandPayload {
                     uint8_t temporary_admin_password[25];
-                    uint8_t slot_secret[20];
-                    union {
-                        uint8_t _slot_config;
-                        struct {
-                            bool use_8_digits   : 1;
-                            bool use_enter      : 1;
-                            bool use_tokenID    : 1;
-                        };
-                    };
-                    union {
-                        uint8_t slot_token_id[13]; /** OATH Token Identifier */
-                        struct { /** @see https://openauthentication.org/token-specs/ */
-                            uint8_t omp[2];
-                            uint8_t tt[2];
-                            uint8_t mui[8];
-                            uint8_t keyboard_layout; //disabled feature in nitroapp as of 20160805
-                        } slot_token_fields;
-                    };
+                    uint8_t type; //0-secret, 1-name
+                    uint8_t id; //multiple reports for values longer than 30 bytes
+                    uint8_t length; //data length
+                    uint8_t data[30]; //data, does not need null termination
 
                     bool isValid() const { return true; }
+
+                    void setTypeName(){
+                      type = 'N';
+                    }
+                    void setTypeSecret(){
+                      type = 'S';
+                    }
 
                     std::string dissect() const {
                       std::stringstream ss;
                       ss << "temporary_admin_password:\t" << temporary_admin_password << std::endl;
-                      ss << "slot_secret:" << std::endl
-                         << ::nitrokey::misc::hexdump((const char *) (&slot_secret), sizeof slot_secret);
-                      ss << "slot_config:\t" << std::bitset<8>((int) _slot_config) << std::endl;
-                      ss << "\tuse_8_digits(0):\t" << use_8_digits << std::endl;
-                      ss << "\tuse_enter(1):\t" << use_enter << std::endl;
-                      ss << "\tuse_tokenID(2):\t" << use_tokenID << std::endl;
-
-                      ss << "slot_token_id:\t";
-                      for (auto i : slot_token_id)
-                        ss << std::hex << std::setw(2) << std::setfill('0') << (int) i << " ";
-                      ss << std::endl;
-
+                      ss << "type:\t" << type << std::endl;
+                      ss << "id:\t" << (int)id << std::endl;
+                      ss << "length:\t" << (int)length << std::endl;
+                      ss << "data:" << std::endl
+                         << ::nitrokey::misc::hexdump((const char *) (&data), sizeof data);
                       return ss.str();
                     }
                 } __packed;
@@ -93,42 +79,16 @@ namespace nitrokey {
                     CommandTransaction;
             };
 
-            class WriteToHOTPSlot_2 : Command<CommandID::WRITE_TO_SLOT_2> {
+            class WriteToOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
+                //admin auth
             public:
                 struct CommandPayload {
                     uint8_t temporary_admin_password[25];
                     uint8_t slot_number;
-                    uint8_t slot_name[15];
                     union {
-                        uint64_t slot_counter;
+                        uint64_t slot_counter_or_interval;
                         uint8_t slot_counter_s[8];
                     } __packed;
-
-                    bool isValid() const { return !(slot_number & 0xF0); }
-
-                    std::string dissect() const {
-                      std::stringstream ss;
-                      ss << "temporary_admin_password:\t" << temporary_admin_password << std::endl;
-                      ss << "slot_number:\t" << (int) (slot_number) << std::endl;
-                      ss << "slot_name:\t" << slot_name << std::endl;
-                      ss << "slot_counter:\t[" << (int) slot_counter << "]\t"
-                         << ::nitrokey::misc::hexdump((const char *) (&slot_counter), sizeof slot_counter, false);
-
-                      return ss.str();
-                    }
-                } __packed;
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
-
-
-            class WriteToTOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
-                //admin auth
-            public:
-                struct CommandPayload {
-                    uint8_t temporary_admin_password[25];
-                    uint8_t slot_secret[20];
                     union {
                         uint8_t _slot_config;
                         struct {
@@ -152,12 +112,13 @@ namespace nitrokey {
                     std::string dissect() const {
                       std::stringstream ss;
                       ss << "temporary_admin_password:\t" << temporary_admin_password << std::endl;
-                      ss << "slot_secret:" << std::endl
-                         << ::nitrokey::misc::hexdump((const char *) (&slot_secret), sizeof slot_secret);
                       ss << "slot_config:\t" << std::bitset<8>((int) _slot_config) << std::endl;
                       ss << "\tuse_8_digits(0):\t" << use_8_digits << std::endl;
                       ss << "\tuse_enter(1):\t" << use_enter << std::endl;
                       ss << "\tuse_tokenID(2):\t" << use_tokenID << std::endl;
+                      ss << "slot_number:\t" << (int) (slot_number) << std::endl;
+                      ss << "slot_counter_or_interval:\t[" << (int) slot_counter_or_interval << "]\t"
+                         << ::nitrokey::misc::hexdump((const char *) (&slot_counter_or_interval), sizeof slot_counter_or_interval, false);
 
                       ss << "slot_token_id:\t";
                       for (auto i : slot_token_id)
@@ -171,32 +132,6 @@ namespace nitrokey {
                 typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
                     CommandTransaction;
             };
-
-            class WriteToTOTPSlot_2 : Command<CommandID::WRITE_TO_SLOT_2> {
-            public:
-                struct CommandPayload {
-                    uint8_t temporary_admin_password[25];
-                    uint8_t slot_number;
-                    uint8_t slot_name[15];
-                    uint16_t slot_interval;
-
-                    bool isValid() const { return !(slot_number & 0xF0); }
-
-                    std::string dissect() const {
-                      std::stringstream ss;
-                      ss << "temporary_admin_password:\t" << temporary_admin_password << std::endl;
-                      ss << "slot_number:\t" << (int) (slot_number) << std::endl;
-                      ss << "slot_name:\t" << slot_name << std::endl;
-                      ss << "slot_interval:\t" << (int)slot_interval << std::endl;
-
-                      return ss.str();
-                    }
-                } __packed;
-
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
-                    CommandTransaction;
-            };
-
 
             class GetHOTP : Command<CommandID::GET_CODE> {
             public:

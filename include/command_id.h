@@ -66,6 +66,7 @@ enum class CommandID : uint8_t {
   CHANGE_USER_PIN = 0x14,
   CHANGE_ADMIN_PIN = 0x15,
   WRITE_TO_SLOT_2 = 0x16,
+  SEND_OTP_DATA = 0x17,
 
   ENABLE_CRYPTED_PARI = 0x20,
   DISABLE_CRYPTED_PARI = 0x20 + 1, //@unused

@@ -536,7 +536,7 @@ def test_HOTP_slots_read_write_counter(C, counter):
     lib_res = []
     for slot_number in range(3):
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-        assert C.NK_write_hotp_slot(slot_number, 'null_secret', secret, counter, use_8_digits, False, False, "",
+        assert C.NK_write_hotp_slot(slot_number, 'HOTP rw' + str(slot_number), secret, counter, use_8_digits, False, False, "",
                                     DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         code_device = str(C.NK_get_hotp_code(slot_number))
         code_device = '0'+code_device if len(code_device) < 6 else code_device
@@ -546,7 +546,7 @@ def test_HOTP_slots_read_write_counter(C, counter):
 
 
 @pytest.mark.parametrize("period", [30,60] )
-@pytest.mark.parametrize("time", range(20,70,20) )
+@pytest.mark.parametrize("time", range(21,70,20) )
 def test_TOTP_slots_read_write_at_time_period(C, time, period):
     secret = RFC_SECRET
     oath = pytest.importorskip("oath")
@@ -561,7 +561,7 @@ def test_TOTP_slots_read_write_at_time_period(C, time, period):
     lib_res = []
     for slot_number in range(15):
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-        assert C.NK_write_totp_slot(slot_number, 'null_secret', secret, period, use_8_digits, False, False, "",
+        assert C.NK_write_totp_slot(slot_number, 'TOTP rw' + str(slot_number), secret, period, use_8_digits, False, False, "",
                                     DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         assert C.NK_totp_set_time(time) == DeviceErrorCode.STATUS_OK
@@ -569,6 +569,33 @@ def test_TOTP_slots_read_write_at_time_period(C, time, period):
         code_device = '0'+code_device if len(code_device) < 6 else code_device
         dev_res += (time, code_device)
         lib_res += (time, lib_at(time))
+    assert dev_res == lib_res
+
+
+@pytest.mark.parametrize("secret", [RFC_SECRET, 2*RFC_SECRET] )
+def test_TOTP_secrets(C, secret):
+    slot_number = 0
+    time = 0
+    period = 30
+    oath = pytest.importorskip("oath")
+    lib_at = lambda t: oath.totp(secret, t=t, period=period)
+    PIN_protection = False
+    use_8_digits = False
+    T = 0
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    dev_res = []
+    lib_res = []
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_totp_slot(slot_number, 'TOTP secret' + str(slot_number), secret, period, use_8_digits, False, False, "",
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_totp_set_time(time) == DeviceErrorCode.STATUS_OK
+    code_device = str(C.NK_get_totp_code(slot_number, T, 0, period))
+    code_device = '0'+code_device if len(code_device) < 6 else code_device
+    dev_res += (time, code_device)
+    lib_res += (time, lib_at(time))
     assert dev_res == lib_res
 
 

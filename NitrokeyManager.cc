@@ -228,23 +228,30 @@ namespace nitrokey{
                                                        uint64_t hotp_counter, bool use_8_digits, bool use_enter,
                                                        bool use_tokenID, const char *token_ID,
                                                        const char *temporary_password) const {
-      auto payload = get_payload<stick10_08::WriteToHOTPSlot>();
-      strcpyT(payload.temporary_admin_password, temporary_password);
+      auto payload2 = get_payload<stick10_08::SendOTPData>();
+      strcpyT(payload2.temporary_admin_password, temporary_password);
+      strcpyT(payload2.data, slot_name);
+      payload2.length = strlen((const char *) payload2.data);
+      payload2.setTypeName();
+      stick10_08::SendOTPData::CommandTransaction::run(*device, payload2);
+
+      payload2 = get_payload<stick10_08::SendOTPData>();
+      strcpyT(payload2.temporary_admin_password, temporary_password);
       auto secret_bin = misc::hex_string_to_byte(secret);
-      vector_copy(payload.slot_secret, secret_bin);
+      vector_copy(payload2.data, secret_bin);
+      payload2.length = strlen((const char *) payload2.data);
+      payload2.setTypeSecret();
+      stick10_08::SendOTPData::CommandTransaction::run(*device, payload2);
+
+      auto payload = get_payload<stick10_08::WriteToOTPSlot>();
+      strcpyT(payload.temporary_admin_password, temporary_password);
       strcpyT(payload.slot_token_id, token_ID);
       payload.use_8_digits = use_8_digits;
       payload.use_enter = use_enter;
       payload.use_tokenID = use_tokenID;
-
-      auto payload2 = get_payload<stick10_08::WriteToHOTPSlot_2>();
-      strcpyT(payload2.temporary_admin_password, temporary_password);
-      payload2.slot_number = slot_number;
-      strcpyT(payload2.slot_name, slot_name);
-      payload2.slot_counter = hotp_counter;
-
-      stick10_08::WriteToHOTPSlot::CommandTransaction::run(*device, payload);
-      stick10_08::WriteToHOTPSlot_2::CommandTransaction::run(*device, payload2);
+      payload.slot_counter_or_interval = hotp_counter;
+      payload.slot_number = slot_number;
+      stick10_08::WriteToOTPSlot::CommandTransaction::run(*device, payload);
     }
 
     void NitrokeyManager::write_HOTP_slot_authorize(uint8_t slot_number, const char *slot_name, const char *secret,
@@ -302,23 +309,31 @@ namespace nitrokey{
                                                        uint16_t time_window, bool use_8_digits, bool use_enter,
                                                        bool use_tokenID, const char *token_ID,
                                                        const char *temporary_password) const {
-      auto payload = get_payload<stick10_08::WriteToTOTPSlot>();
-      strcpyT(payload.temporary_admin_password, temporary_password);
+
+      auto payload2 = get_payload<stick10_08::SendOTPData>();
+      strcpyT(payload2.temporary_admin_password, temporary_password);
+      strcpyT(payload2.data, slot_name);
+      payload2.length = strlen((const char *) payload2.data);
+      payload2.setTypeName();
+      stick10_08::SendOTPData::CommandTransaction::run(*device, payload2);
+
+      payload2 = get_payload<stick10_08::SendOTPData>();
+      strcpyT(payload2.temporary_admin_password, temporary_password);
       auto secret_bin = misc::hex_string_to_byte(secret);
-      vector_copy(payload.slot_secret, secret_bin);
+      vector_copy(payload2.data, secret_bin);
+      payload2.length = strlen((const char *) payload2.data);
+      payload2.setTypeSecret();
+      stick10_08::SendOTPData::CommandTransaction::run(*device, payload2);
+
+      auto payload = get_payload<stick10_08::WriteToOTPSlot>();
+      strcpyT(payload.temporary_admin_password, temporary_password);
       strcpyT(payload.slot_token_id, token_ID);
       payload.use_8_digits = use_8_digits;
       payload.use_enter = use_enter;
       payload.use_tokenID = use_tokenID;
-
-      auto payload2 = get_payload<stick10_08::WriteToTOTPSlot_2>();
-      strcpyT(payload2.temporary_admin_password, temporary_password);
-      payload2.slot_number = slot_number;
-      strcpyT(payload2.slot_name, slot_name);
-      payload2.slot_interval= time_window;
-
-      stick10_08::WriteToTOTPSlot::CommandTransaction::run(*device, payload);
-      stick10_08::WriteToTOTPSlot_2::CommandTransaction::run(*device, payload2);
+      payload.slot_counter_or_interval = time_window;
+      payload.slot_number = slot_number;
+      stick10_08::WriteToOTPSlot::CommandTransaction::run(*device, payload);
     }
 
     void NitrokeyManager::write_TOTP_slot_authorize(uint8_t slot_number, const char *slot_name, const char *secret,
@@ -583,8 +598,8 @@ namespace nitrokey{
 
     bool NitrokeyManager::is_authorization_command_supported(){
         auto m = std::unordered_map<DeviceModel , int, EnumClassHash>({
-                                                     {DeviceModel::PRO, 7},
-                                                     {DeviceModel::STORAGE, 43},
+                                               {DeviceModel::PRO, 7},
+                                               {DeviceModel::STORAGE, 43},
          });
       auto status_p = GetStatus::CommandTransaction::run(*device);
       return status_p.data().firmware_version <= m[device->get_device_model()];

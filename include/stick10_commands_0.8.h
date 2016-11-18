@@ -75,7 +75,23 @@ namespace nitrokey {
                     }
                 } __packed;
 
-                typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+
+                struct ResponsePayload {
+                    union {
+                        uint8_t data[40];
+                    } __packed;
+
+                    bool isValid() const { return true; }
+                    std::string dissect() const {
+                      std::stringstream ss;
+                      ss << "data:" << std::endl
+                         << ::nitrokey::misc::hexdump((const char *) (&data), sizeof data);
+                      return ss.str();
+                    }
+                } __packed;
+
+
+                typedef Transaction<command_id(), struct CommandPayload, struct ResponsePayload>
                     CommandTransaction;
             };
 

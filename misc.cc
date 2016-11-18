@@ -16,7 +16,8 @@ std::vector<uint8_t> hex_string_to_byte(const char* hexString){
     if (s_size%2!=0 || s_size==0 || s_size>big_string_size){
         throw InvalidHexString(0);
     }
-    auto data = std::vector<uint8_t>(d_size, 0);
+    auto data = std::vector<uint8_t>();
+    data.reserve(d_size);
 
     char buf[2];
     for(int i=0; i<s_size; i++){
@@ -28,7 +29,7 @@ std::vector<uint8_t> hex_string_to_byte(const char* hexString){
         }
         buf[i%2] = c;
         if (i%2==1){
-            data[i/2] = strtoul(buf, NULL, 16) & 0xFF;
+            data.push_back( strtoul(buf, NULL, 16) & 0xFF );
         }
     }
     return data;

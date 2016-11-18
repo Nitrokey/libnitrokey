@@ -501,6 +501,9 @@ def test_get_serial_number(C):
 
 @pytest.mark.parametrize("secret", ['000001', '00'*10+'ff', '00'*19+'ff', '000102', '002EF43F51AFA97BA2B46418768123C9E1809A5B' ])
 def test_OTP_secret_started_from_null(C, secret):
+    '''
+    NK Pro 0.8+, NK Storage 0.43+
+    '''
     oath = pytest.importorskip("oath")
     lib_at = lambda t: oath.hotp(secret, t, format='dec6')
     PIN_protection = False
@@ -522,7 +525,7 @@ def test_OTP_secret_started_from_null(C, secret):
     assert dev_res == lib_res
 
 
-@pytest.mark.parametrize("counter", [0, 3, 7, 0xffff] )
+@pytest.mark.parametrize("counter", [0, 3, 7, 0xffff, 0xffffffff, 0xffffffffffffffff] )
 def test_HOTP_slots_read_write_counter(C, counter):
     secret = RFC_SECRET
     oath = pytest.importorskip("oath")
@@ -571,9 +574,13 @@ def test_TOTP_slots_read_write_at_time_period(C, time, period):
         lib_res += (time, lib_at(time))
     assert dev_res == lib_res
 
-
-@pytest.mark.parametrize("secret", [RFC_SECRET, 2*RFC_SECRET] )
+@pytest.mark.parametrize("secret", [RFC_SECRET, 2*RFC_SECRET, '12'*10, '12'*30] )
 def test_TOTP_secrets(C, secret):
+    '''
+    NK Pro 0.8+, NK Storage 0.44+
+    '''
+    if is_pro_rtm_07(C) and len(secret)>20*2: #*2 since secret is in hex
+        pytest.skip("Secret lengths over 20 bytes are not supported by NK Pro 0.7 ")
     slot_number = 0
     time = 0
     period = 30
@@ -587,10 +594,8 @@ def test_TOTP_secrets(C, secret):
                              DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     dev_res = []
     lib_res = []
-    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_totp_slot(slot_number, 'TOTP secret' + str(slot_number), secret, period, use_8_digits, False, False, "",
+    assert C.NK_write_totp_slot(slot_number, 'secret' + str(len(secret)), secret, period, use_8_digits, False, False, "",
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_totp_set_time(time) == DeviceErrorCode.STATUS_OK
     code_device = str(C.NK_get_totp_code(slot_number, T, 0, period))
     code_device = '0'+code_device if len(code_device) < 6 else code_device
@@ -598,6 +603,30 @@ def test_TOTP_secrets(C, secret):
     lib_res += (time, lib_at(time))
     assert dev_res == lib_res
 
-
-
+@pytest.mark.parametrize("secret", [RFC_SECRET, 2*RFC_SECRET, '12'*10, '12'*30] )
+def test_HOTP_secrets(C, secret):
+    '''
+    NK Pro 0.8+, NK Storage 0.44+
+    '''
+    if is_pro_rtm_07(C) and len(secret)>20*2: #*2 since secret is in hex
+        pytest.skip("Secret lengths over 20 bytes are not supported by NK Pro 0.7 ")
+    slot_number = 0
+    counter = 0
+    oath = pytest.importorskip("oath")
+    lib_at = lambda t: oath.hotp(secret, counter=t)
+    PIN_protection = False
+    use_8_digits = False
+    T = 0
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    dev_res = []
+    lib_res = []
+    assert C.NK_write_hotp_slot(slot_number, 'secret' + str(len(secret)), secret, counter, use_8_digits, False, False, "",
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    code_device = str(C.NK_get_hotp_code(slot_number))
+    code_device = '0'+code_device if len(code_device) < 6 else code_device
+    dev_res += (counter, code_device)
+    lib_res += (counter, lib_at(counter))
+    assert dev_res == lib_res
 

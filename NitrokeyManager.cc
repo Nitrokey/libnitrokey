@@ -199,6 +199,16 @@ namespace nitrokey{
     }
 
     template <typename T, typename U>
+    void vector_copy_ranged(T& dest, std::vector<U> &vec, size_t begin, size_t elements_to_copy){
+        const size_t d_size = sizeof(dest);
+      if(d_size < elements_to_copy){
+            throw TargetBufferSmallerThanSource(elements_to_copy, d_size);
+        }
+        std::fill(dest, dest+d_size, 0);
+        std::copy(vec.begin() + begin, vec.begin() +begin + elements_to_copy, dest);
+    }
+
+    template <typename T, typename U>
     void vector_copy(T& dest, std::vector<U> &vec){
         const size_t d_size = sizeof(dest);
         if(d_size < vec.size()){
@@ -317,13 +327,20 @@ namespace nitrokey{
       payload2.setTypeName();
       stick10_08::SendOTPData::CommandTransaction::run(*device, payload2);
 
-      payload2 = get_payload<stick10_08::SendOTPData>();
-      strcpyT(payload2.temporary_admin_password, temporary_password);
-      auto secret_bin = misc::hex_string_to_byte(secret);
-      vector_copy(payload2.data, secret_bin);
-      payload2.length = strlen((const char *) payload2.data);
       payload2.setTypeSecret();
-      stick10_08::SendOTPData::CommandTransaction::run(*device, payload2);
+      payload2.id = 0;
+      auto secret_bin = misc::hex_string_to_byte(secret);
+      auto remaining_secret_length = secret_bin.size();
+
+      while (remaining_secret_length>0){
+        const auto bytesToCopy = std::min(sizeof(payload2.data), remaining_secret_length);
+        const auto start = secret_bin.size() - remaining_secret_length;
+        memset(payload2.data, 0, sizeof(payload2.data));
+        vector_copy_ranged(payload2.data, secret_bin, start, bytesToCopy);
+        stick10_08::SendOTPData::CommandTransaction::run(*device, payload2);
+        remaining_secret_length -= bytesToCopy;
+        payload2.id++;
+      }
 
       auto payload = get_payload<stick10_08::WriteToOTPSlot>();
       strcpyT(payload.temporary_admin_password, temporary_password);

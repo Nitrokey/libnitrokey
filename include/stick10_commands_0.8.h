@@ -51,7 +51,6 @@ namespace nitrokey {
                     uint8_t temporary_admin_password[25];
                     uint8_t type; //0-secret, 1-name
                     uint8_t id; //multiple reports for values longer than 30 bytes
-                    uint8_t length; //data length
                     uint8_t data[30]; //data, does not need null termination
 
                     bool isValid() const { return true; }
@@ -68,7 +67,6 @@ namespace nitrokey {
                       ss << "temporary_admin_password:\t" << temporary_admin_password << std::endl;
                       ss << "type:\t" << type << std::endl;
                       ss << "id:\t" << (int)id << std::endl;
-                      ss << "length:\t" << (int)length << std::endl;
                       ss << "data:" << std::endl
                          << ::nitrokey::misc::hexdump((const char *) (&data), sizeof data);
                       return ss.str();

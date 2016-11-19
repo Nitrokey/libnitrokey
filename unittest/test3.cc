@@ -53,13 +53,11 @@ TEST_CASE("write slot", "[pronew]"){
   strcpyT(p2.temporary_admin_password, temporary_password);
   p2.setTypeName();
   strcpyT(p2.data, "test name aaa");
-  p2.length = strlen((const char *) p2.data);
   stick10_08::SendOTPData::CommandTransaction::run(stick, p2);
 
   p2 = get_payload<SendOTPData>();
   strcpyT(p2.temporary_admin_password, temporary_password);
   strcpyT(p2.data, RFC_SECRET);
-  p2.length = strlen(RFC_SECRET);
   p2.setTypeSecret();
   stick10_08::SendOTPData::CommandTransaction::run(stick, p2);
 
@@ -138,13 +136,11 @@ TEST_CASE("authorize user HOTP", "[pronew]") {
   strcpyT(p2.temporary_admin_password, temporary_password);
   p2.setTypeName();
   strcpyT(p2.data, "test name aaa");
-  p2.length = strlen((const char *) p2.data);
   stick10_08::SendOTPData::CommandTransaction::run(stick, p2);
 
   p2 = get_payload<SendOTPData>();
   strcpyT(p2.temporary_admin_password, temporary_password);
   strcpyT(p2.data, RFC_SECRET);
-  p2.length = strlen(RFC_SECRET);
   p2.setTypeSecret();
   stick10_08::SendOTPData::CommandTransaction::run(stick, p2);
 
@@ -191,13 +187,11 @@ TEST_CASE("authorize user TOTP", "[pronew]") {
   strcpyT(p2.temporary_admin_password, temporary_password);
   p2.setTypeName();
   strcpyT(p2.data, "test name TOTP");
-  p2.length = strlen((const char *) p2.data);
   stick10_08::SendOTPData::CommandTransaction::run(stick, p2);
 
   p2 = get_payload<SendOTPData>();
   strcpyT(p2.temporary_admin_password, temporary_password);
   strcpyT(p2.data, RFC_SECRET);
-  p2.length = strlen(RFC_SECRET);
   p2.setTypeSecret();
   stick10_08::SendOTPData::CommandTransaction::run(stick, p2);
 

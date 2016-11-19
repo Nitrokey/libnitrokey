@@ -323,7 +323,6 @@ namespace nitrokey{
       auto payload2 = get_payload<stick10_08::SendOTPData>();
       strcpyT(payload2.temporary_admin_password, temporary_password);
       strcpyT(payload2.data, slot_name);
-      payload2.length = strlen((const char *) payload2.data);
       payload2.setTypeName();
       stick10_08::SendOTPData::CommandTransaction::run(*device, payload2);
 

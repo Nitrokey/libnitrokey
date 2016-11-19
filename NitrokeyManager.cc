@@ -223,45 +223,15 @@ namespace nitrokey{
                                           const char *temporary_password) {
         if (!is_valid_hotp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
 
-        slot_number = get_internal_slot_number_for_hotp(slot_number);
+      int internal_slot_number = get_internal_slot_number_for_hotp(slot_number);
       if (is_authorization_command_supported()){
-        write_HOTP_slot_authorize(slot_number, slot_name, secret, hotp_counter, use_8_digits, use_enter, use_tokenID,
+        write_HOTP_slot_authorize(internal_slot_number, slot_name, secret, hotp_counter, use_8_digits, use_enter, use_tokenID,
                     token_ID, temporary_password);
       } else {
-        write_HOTP_slot_no_authorize(slot_number, slot_name, secret, hotp_counter, use_8_digits, use_enter, use_tokenID,
-                                     token_ID, temporary_password);
+        write_OTP_slot_no_authorize(internal_slot_number, slot_name, secret, hotp_counter, use_8_digits, use_enter, use_tokenID,
+                                    token_ID, temporary_password);
       }
       return true;
-    }
-
-    void NitrokeyManager::write_HOTP_slot_no_authorize(uint8_t slot_number, const char *slot_name, const char *secret,
-                                                       uint64_t hotp_counter, bool use_8_digits, bool use_enter,
-                                                       bool use_tokenID, const char *token_ID,
-                                                       const char *temporary_password) const {
-      auto payload2 = get_payload<stick10_08::SendOTPData>();
-      strcpyT(payload2.temporary_admin_password, temporary_password);
-      strcpyT(payload2.data, slot_name);
-      payload2.length = strlen((const char *) payload2.data);
-      payload2.setTypeName();
-      stick10_08::SendOTPData::CommandTransaction::run(*device, payload2);
-
-      payload2 = get_payload<stick10_08::SendOTPData>();
-      strcpyT(payload2.temporary_admin_password, temporary_password);
-      auto secret_bin = misc::hex_string_to_byte(secret);
-      vector_copy(payload2.data, secret_bin);
-      payload2.length = strlen((const char *) payload2.data);
-      payload2.setTypeSecret();
-      stick10_08::SendOTPData::CommandTransaction::run(*device, payload2);
-
-      auto payload = get_payload<stick10_08::WriteToOTPSlot>();
-      strcpyT(payload.temporary_admin_password, temporary_password);
-      strcpyT(payload.slot_token_id, token_ID);
-      payload.use_8_digits = use_8_digits;
-      payload.use_enter = use_enter;
-      payload.use_tokenID = use_tokenID;
-      payload.slot_counter_or_interval = hotp_counter;
-      payload.slot_number = slot_number;
-      stick10_08::WriteToOTPSlot::CommandTransaction::run(*device, payload);
     }
 
     void NitrokeyManager::write_HOTP_slot_authorize(uint8_t slot_number, const char *slot_name, const char *secret,
@@ -302,23 +272,24 @@ namespace nitrokey{
                                               bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
                                               const char *temporary_password) {
         if (!is_valid_totp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
-        slot_number = get_internal_slot_number_for_totp(slot_number);
+       int internal_slot_number = get_internal_slot_number_for_totp(slot_number);
 
       if (is_authorization_command_supported()){
-      write_TOTP_slot_authorize(slot_number, slot_name, secret, time_window, use_8_digits, use_enter, use_tokenID,
+      write_TOTP_slot_authorize(internal_slot_number, slot_name, secret, time_window, use_8_digits, use_enter, use_tokenID,
                                 token_ID, temporary_password);
       } else {
-        write_TOTP_slot_no_authorize(slot_number, slot_name, secret, time_window, use_8_digits, use_enter, use_tokenID,
-                                     token_ID, temporary_password);
+        write_OTP_slot_no_authorize(internal_slot_number, slot_name, secret, time_window, use_8_digits, use_enter, use_tokenID,
+                                    token_ID, temporary_password);
       }
 
       return true;
     }
 
-    void NitrokeyManager::write_TOTP_slot_no_authorize(uint8_t slot_number, const char *slot_name, const char *secret,
-                                                       uint16_t time_window, bool use_8_digits, bool use_enter,
-                                                       bool use_tokenID, const char *token_ID,
-                                                       const char *temporary_password) const {
+    void NitrokeyManager::write_OTP_slot_no_authorize(uint8_t internal_slot_number, const char *slot_name,
+                                                      const char *secret,
+                                                      uint64_t counter_or_interval, bool use_8_digits, bool use_enter,
+                                                      bool use_tokenID, const char *token_ID,
+                                                      const char *temporary_password) const {
 
       auto payload2 = get_payload<stick10_08::SendOTPData>();
       strcpyT(payload2.temporary_admin_password, temporary_password);
@@ -347,8 +318,8 @@ namespace nitrokey{
       payload.use_8_digits = use_8_digits;
       payload.use_enter = use_enter;
       payload.use_tokenID = use_tokenID;
-      payload.slot_counter_or_interval = time_window;
-      payload.slot_number = slot_number;
+      payload.slot_counter_or_interval = counter_or_interval;
+      payload.slot_number = internal_slot_number;
       stick10_08::WriteToOTPSlot::CommandTransaction::run(*device, payload);
     }
 

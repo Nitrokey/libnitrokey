@@ -327,9 +327,12 @@ def test_TOTP_64bit_time(C):
     assert dev_res == lib_res
 
 
-@pytest.mark.xfail(reason="NK Pro: possible firmware bug or communication issue: set time command not always changes the time on stick thus failing this test, "
-                          "this does not influence normal use since setting time is not done every TOTP code request"
-                          "Rarely fail occurs on NK Storage")
+@pytest.mark.xfail(reason="NK Pro: Test fails in 50% of cases due to test vectors set 1 second before interval count change"
+                          "Here time is changed on seconds side only and miliseconds part is not being reset apparently"
+                          "This results in available time to test of half a second on average, thus 50% failed cases"
+                          "With disabled two first test vectors test passess 10/10 times"
+                          "Fail may also occurs on NK Storage with lower occurrency since it needs less time to execute "
+                          "commands")
 @pytest.mark.parametrize("PIN_protection", [False, True, ])
 def test_TOTP_RFC_usepin(C, PIN_protection):
     slot_number = 1
@@ -350,8 +353,8 @@ def test_TOTP_RFC_usepin(C, PIN_protection):
     # Mode: Sha1, time step X=30
     test_data = [
         #Time         T (hex)               TOTP
-        (59,          0x1,                94287082),
-        (1111111109,  0x00000000023523EC, 7081804),
+        (59,          0x1,                94287082), # Warning - test vector time 1 second before interval count changes
+        (1111111109,  0x00000000023523EC, 7081804), # Warning - test vector time 1 second before interval count changes
         (1111111111,  0x00000000023523ED, 14050471),
         (1234567890,  0x000000000273EF07, 89005924),
         (2000000000,  0x0000000003F940AA, 69279037),

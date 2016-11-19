@@ -630,3 +630,34 @@ def test_HOTP_secrets(C, secret):
     lib_res += (counter, lib_at(counter))
     assert dev_res == lib_res
 
+
+def test_edit_OTP_slot(C):
+    """
+    should change slots counter and name without changing its secret (using null secret for second update)
+    """
+    secret = RFC_SECRET
+    counter = 0
+    PIN_protection = False
+    use_8_digits = False
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    slot_number = 0
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    first_name = 'edit slot'
+    assert C.NK_write_hotp_slot(slot_number, first_name, secret, counter, use_8_digits, False, False, "",
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert gs(C.NK_get_hotp_slot_name(slot_number)) == first_name
+
+
+    first_code = C.NK_get_hotp_code(slot_number)
+    changed_name = 'changedname'
+    empty_secret = ''
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_hotp_slot(slot_number, changed_name, empty_secret, counter, use_8_digits, False, False, "",
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    second_code = C.NK_get_hotp_code(slot_number)
+    assert first_code == second_code
+    assert gs(C.NK_get_hotp_slot_name(slot_number)) == changed_name
+
+

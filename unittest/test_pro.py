@@ -631,6 +631,25 @@ def test_HOTP_secrets(C, secret):
     assert dev_res == lib_res
 
 
+def test_special_double_press(C):
+    """
+    requires manual check after function run
+    double press each of num-, scroll-, caps-lock and check inserted OTP codes (each 1st should be 755224)
+    on nkpro 0.7 scrolllock should do nothing, on nkpro 0.8+ should return OTP code
+    """
+    secret = RFC_SECRET
+    counter = 0
+    PIN_protection = False
+    use_8_digits = False
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(0, 1, 2, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    for slot_number in range(3):
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_write_hotp_slot(slot_number, 'double' + str(slot_number), secret, counter, use_8_digits, False, False, "",
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    # requires manual check
+
 def test_edit_OTP_slot(C):
     """
     should change slots counter and name without changing its secret (using null secret for second update)

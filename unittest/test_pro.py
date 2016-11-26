@@ -683,3 +683,23 @@ def test_edit_OTP_slot(C):
     assert gs(C.NK_get_hotp_slot_name(slot_number)) == changed_name
 
 
+@pytest.mark.skip
+@pytest.mark.parametrize("secret", ['31323334353637383930'*2,'31323334353637383930'*4] )
+def test_TOTP_codes_from_nitrokeyapp(secret, C):
+    """
+    Helper test for manual TOTP check of written secret by Nitrokey App
+    Destined to run by hand
+    """
+    slot_number = 0
+    PIN_protection = False
+    period = 30
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    code_device = str(C.NK_get_totp_code(slot_number, 0, 0, period))
+    code_device = '0'+code_device if len(code_device) < 6 else code_device
+
+    oath = pytest.importorskip("oath")
+    lib_at = lambda : oath.totp(secret, period=period)
+    print (lib_at())
+    assert lib_at() == code_device

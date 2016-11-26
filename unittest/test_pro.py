@@ -1,109 +1,8 @@
 import pytest
-import cffi
-from enum import Enum
 
-ffi = cffi.FFI()
-gs = ffi.string
-
-
-def to_hex(s):
-    return "".join("{:02x}".format(ord(c)) for c in s)
-
-
-def wait(t):
-    import time
-    msg = 'Waiting for %d seconds' % t
-    print(msg.center(40, '='))
-    time.sleep(t)
-
-
-RFC_SECRET_HR = '12345678901234567890'
-RFC_SECRET = to_hex(RFC_SECRET_HR)  # '12345678901234567890'
-
-
-# print( repr((RFC_SECRET, RFC_SECRET_, len(RFC_SECRET))) )
-
-class DefaultPasswords(Enum):
-    ADMIN = '12345678'
-    USER = '123456'
-    ADMIN_TEMP = '123123123'
-    USER_TEMP = '234234234'
-
-
-class DeviceErrorCode(Enum):
-    STATUS_OK = 0
-    NOT_PROGRAMMED = 3
-    WRONG_PASSWORD = 4
-    STATUS_NOT_AUTHORIZED = 5
-    STATUS_AES_DEC_FAILED = 0xa
-
-
-class LibraryErrors(Enum):
-    TOO_LONG_STRING = 200
-    INVALID_SLOT = 201
-    INVALID_HEX_STRING = 202
-    TARGET_BUFFER_SIZE_SMALLER_THAN_SOURCE = 203
-
-
-@pytest.fixture(scope="module")
-def C(request):
-    fp = '../NK_C_API.h'
-
-    declarations = []
-    with open(fp, 'r') as f:
-        declarations = f.readlines()
-
-    a = iter(declarations)
-    for declaration in a:
-        if declaration.startswith('extern') and not '"C"' in declaration:
-            declaration = declaration.replace('extern', '').strip()
-            while not ';' in declaration:
-                declaration += (next(a)).strip()
-            print(declaration)
-            ffi.cdef(declaration)
-
-    C = ffi.dlopen("../build/libnitrokey.so")
-    C.NK_set_debug(False)
-    nk_login = C.NK_login_auto()
-    if nk_login != 1:
-        print('No devices detected!')
-    assert nk_login == 1  # returns 0 if not connected or wrong model or 1 when connected
-
-    # assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    # assert C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP) == DeviceErrorCode.STATUS_OK
-
-    # C.NK_status()
-
-    def fin():
-        print('\nFinishing connection to device')
-        C.NK_logout()
-        print('Finished')
-
-    request.addfinalizer(fin)
-    C.NK_set_debug(True)
-
-    return C
-
-
-def get_firmware_version_from_status(C):
-    status = gs(C.NK_status())
-    status = [s if 'firmware_version' in s else '' for s in status.split('\n')]
-    firmware = status[0].split(':')[1]
-    return firmware
-
-
-def is_pro_rtm_07(C):
-    firmware = get_firmware_version_from_status(C)
-    return '07 00' in firmware
-
-
-def is_storage(C):
-    """
-    exact firmware storage is sent by other function
-    """
-    firmware = get_firmware_version_from_status(C)
-    return '01 00' in firmware
-
+from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET
+from misc import ffi, gs, wait, cast_pointer_to_tuple
+from misc import is_pro_rtm_07, is_storage
 
 def test_enable_password_safe(C):
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
@@ -230,39 +129,6 @@ def test_user_PIN_change(C):
     assert C.NK_change_user_PIN('wrong_password', new_password) == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_change_user_PIN(DefaultPasswords.USER, new_password) == DeviceErrorCode.STATUS_OK
     assert C.NK_change_user_PIN(new_password, DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
-
-
-def test_too_long_strings(C):
-    new_password = '123123123'
-    long_string = 'a' * 100
-    assert C.NK_change_user_PIN(long_string, new_password) == LibraryErrors.TOO_LONG_STRING
-    assert C.NK_change_user_PIN(new_password, long_string) == LibraryErrors.TOO_LONG_STRING
-    assert C.NK_change_admin_PIN(long_string, new_password) == LibraryErrors.TOO_LONG_STRING
-    assert C.NK_change_admin_PIN(new_password, long_string) == LibraryErrors.TOO_LONG_STRING
-    assert C.NK_first_authenticate(long_string, DefaultPasswords.ADMIN_TEMP) == LibraryErrors.TOO_LONG_STRING
-    assert C.NK_erase_totp_slot(0, long_string) == LibraryErrors.TOO_LONG_STRING
-    digits = False
-    assert C.NK_write_hotp_slot(1, long_string, RFC_SECRET, 0, digits, False, False, "",
-                                DefaultPasswords.ADMIN_TEMP) == LibraryErrors.TOO_LONG_STRING
-    assert C.NK_write_hotp_slot(1, 'long_test', RFC_SECRET, 0, digits, False, False, "",
-                                long_string) == LibraryErrors.TOO_LONG_STRING
-    assert C.NK_get_hotp_code_PIN(0, long_string) == 0
-    assert C.NK_get_last_command_status() == LibraryErrors.TOO_LONG_STRING
-
-
-def test_invalid_slot(C):
-    invalid_slot = 255
-    assert C.NK_erase_totp_slot(invalid_slot, 'some password') == LibraryErrors.INVALID_SLOT
-    assert C.NK_write_hotp_slot(invalid_slot, 'long_test', RFC_SECRET, 0, False, False, False, "",
-                                'aaa') == LibraryErrors.INVALID_SLOT
-    assert C.NK_get_hotp_code_PIN(invalid_slot, 'some password') == 0
-    assert C.NK_get_last_command_status() == LibraryErrors.INVALID_SLOT
-    assert C.NK_erase_password_safe_slot(invalid_slot) == LibraryErrors.INVALID_SLOT
-    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
-    assert gs(C.NK_get_password_safe_slot_name(invalid_slot)) == ''
-    assert C.NK_get_last_command_status() == LibraryErrors.INVALID_SLOT
-    assert gs(C.NK_get_password_safe_slot_login(invalid_slot)) == ''
-    assert C.NK_get_last_command_status() == LibraryErrors.INVALID_SLOT
 
 
 def test_admin_retry_counts(C):
@@ -609,14 +475,6 @@ def test_factory_reset(C):
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
 
 
-@pytest.mark.skip(reason='Experimental')
-def test_clear(C):
-    d = 'asdasdasd'
-    print(d)
-    C.clear_password(d)
-    print(d)
-
-
 def test_get_status(C):
     status = C.NK_status()
     s = gs(status)
@@ -628,27 +486,3 @@ def test_get_serial_number(C):
     sn = gs(sn)
     assert len(sn) > 0
     print(('Serial number of the device: ', sn))
-
-
-@pytest.mark.parametrize("invalid_hex_string",
-                         ['text', '00  ', '0xff', 'zzzzzzzzzzzz', 'fff', '', 'f' * 257, 'f' * 258])
-def test_invalid_secret_hex_string_for_OTP_write(C, invalid_hex_string):
-    """
-    Tests for invalid secret hex string during writing to OTP slot. Invalid strings are not hexadecimal number,
-    empty or longer than 255 characters.
-    """
-    assert C.NK_write_hotp_slot(1, 'slot_name', invalid_hex_string, 0, True, False, False, '',
-                                DefaultPasswords.ADMIN_TEMP) == LibraryErrors.INVALID_HEX_STRING
-    assert C.NK_write_totp_slot(1, 'python_test', invalid_hex_string, 30, True, False, False, "",
-                                DefaultPasswords.ADMIN_TEMP) == LibraryErrors.INVALID_HEX_STRING
-
-
-def test_warning_binary_bigger_than_secret_buffer(C):
-    invalid_hex_string = to_hex('1234567890') * 3
-    assert C.NK_write_hotp_slot(1, 'slot_name', invalid_hex_string, 0, True, False, False, '',
-                                DefaultPasswords.ADMIN_TEMP) == LibraryErrors.TARGET_BUFFER_SIZE_SMALLER_THAN_SOURCE
-
-
-@pytest.mark.xfail(reason="TODO")
-def test_OTP_secret_started_from_null(C):
-    assert False

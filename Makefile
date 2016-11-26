@@ -30,14 +30,14 @@ $(BUILD)/%.o: %.cc $(DEPENDS)
 clean:
 	rm -f $(OBJ)
 	rm -f $(BUILD)/libnitrokey.so
-	make -C unittest clean
+	${MAKE} -C unittest clean
 
 mrproper: clean
 	rm -f $(BUILD)/*.d
-	make -C unittest mrproper
+	${MAKE} -C unittest mrproper
 
 unittest: $(BUILD)/libnitrokey.so
-	make -C unittest
+	${MAKE} -C unittest
 	cd unittest/build && ln -fs ../../build/libnitrokey.so .
 
 .PHONY: all clean mrproper unittest

@@ -3,6 +3,7 @@
 #include "include/NitrokeyManager.h"
 #include "include/LibraryException.h"
 #include <algorithm>
+#include "include/misc.h"
 
 namespace nitrokey{
 
@@ -16,7 +17,7 @@ namespace nitrokey{
       nitrokey::log::Log::instance()(std::string("strcpyT sizes dest src ")
                                      +std::to_string(s_dest)+ " "
                                      +std::to_string(strlen(src))+ " "
-          ,nitrokey::log::Loglevel::DEBUG);
+          ,nitrokey::log::Loglevel::DEBUG_L2);
         if (strlen(src) > s_dest){
             throw TooLongStringException(strlen(src), s_dest, src);
         }
@@ -94,7 +95,7 @@ namespace nitrokey{
 
     void NitrokeyManager::set_debug(bool state) {
         if (state){
-            Log::instance().set_loglevel(Loglevel::DEBUG_L2);
+            Log::instance().set_loglevel(Loglevel::DEBUG);
         } else {
             Log::instance().set_loglevel(Loglevel::ERROR);
         }
@@ -304,10 +305,10 @@ namespace nitrokey{
             case DeviceModel::STORAGE:
             {
                 auto p = get_payload<ChangeAdminUserPin20Current>();
-                strcpyT(p.old_pin, current_PIN);
+                strcpyT(p.password, current_PIN);
                 p.set_kind(StoKind);
                 auto p2 = get_payload<ChangeAdminUserPin20New>();
-                strcpyT(p2.new_pin, new_PIN);
+                strcpyT(p2.password, new_PIN);
                 p2.set_kind(StoKind);
                 ChangeAdminUserPin20Current::CommandTransaction::run(*device, p);
                 ChangeAdminUserPin20New::CommandTransaction::run(*device, p2);
@@ -420,8 +421,8 @@ namespace nitrokey{
             }
             case DeviceModel::STORAGE : {
                 auto p = get_payload<stick20::CreateNewKeys>();
-                strcpyT(p.admin_password, admin_password);
-                p.setKindPrefixed();
+                strcpyT(p.password, admin_password);
+                p.set_defaults();
                 stick20::CreateNewKeys::CommandTransaction::run(*device, p);
                 break;
             }
@@ -445,13 +446,13 @@ namespace nitrokey{
         }
         case DeviceModel::STORAGE : {
           auto p2 = get_payload<ChangeAdminUserPin20Current>();
-          p2.set_kind(PasswordKind::Admin);
-          strcpyT(p2.old_pin, admin_password);
+          p2.set_defaults();
+          strcpyT(p2.password, admin_password);
           ChangeAdminUserPin20Current::CommandTransaction::run(*device, p2);
-          auto p3 = get_payload<stick20::UnlockUserPassword>();
-          p3.set_kind(PasswordKind::Admin);
-          strcpyT(p3.user_new_password, new_user_password);
-          stick20::UnlockUserPassword::CommandTransaction::run(*device, p3);
+          auto p3 = get_payload<stick20::UnlockUserPin>();
+          p3.set_defaults();
+          strcpyT(p3.password, new_user_password);
+          stick20::UnlockUserPin::CommandTransaction::run(*device, p3);
           break;
         }
       }
@@ -486,4 +487,83 @@ namespace nitrokey{
         return true;
     }
 
-}
+    //storage commands
+
+    void NitrokeyManager::send_startup(uint64_t seconds_from_epoch){
+      auto p = get_payload<stick20::SendStartup>();
+//      p.set_defaults(); //set current time
+      p.localtime = seconds_from_epoch;
+      stick20::SendStartup::CommandTransaction::run(*device, p);
+    }
+
+    void NitrokeyManager::unlock_encrypted_volume(const char* user_pin){
+      misc::execute_password_command<stick20::EnableEncryptedPartition>(*device, user_pin);
+    }
+
+    void NitrokeyManager::unlock_hidden_volume(const char* hidden_volume_password) {
+      misc::execute_password_command<stick20::EnableHiddenEncryptedPartition>(*device, hidden_volume_password);
+    }
+
+    //TODO check is encrypted volume unlocked before execution
+    //if not return library exception
+    void NitrokeyManager::create_hidden_volume(uint8_t slot_nr, uint8_t start_percent, uint8_t end_percent,
+                                               const char *hidden_volume_password) {
+      auto p = get_payload<stick20::SetupHiddenVolume>();
+      p.SlotNr_u8 = slot_nr;
+      p.StartBlockPercent_u8 = start_percent;
+      p.EndBlockPercent_u8 = end_percent;
+      strcpyT(p.HiddenVolumePassword_au8, hidden_volume_password);
+      stick20::SetupHiddenVolume::CommandTransaction::run(*device, p);
+    }
+
+    void NitrokeyManager::set_unencrypted_read_only(const char* user_pin) {
+      misc::execute_password_command<stick20::SendSetReadonlyToUncryptedVolume>(*device, user_pin);
+    }
+
+    void NitrokeyManager::set_unencrypted_read_write(const char* user_pin) {
+      misc::execute_password_command<stick20::SendSetReadwriteToUncryptedVolume>(*device, user_pin);
+    }
+
+    void NitrokeyManager::export_firmware(const char* admin_pin) {
+      misc::execute_password_command<stick20::ExportFirmware>(*device, admin_pin);
+    }
+
+    void NitrokeyManager::clear_new_sd_card_warning(const char* admin_pin) {
+      misc::execute_password_command<stick20::SendClearNewSdCardFound>(*device, admin_pin);
+    }
+
+    void NitrokeyManager::fill_SD_card_with_random_data(const char* admin_pin) {
+      auto p = get_payload<stick20::FillSDCardWithRandomChars>();
+      p.set_defaults();
+      strcpyT(p.admin_pin, admin_pin);
+      stick20::FillSDCardWithRandomChars::CommandTransaction::run(*device, p);
+    }
+
+    void NitrokeyManager::change_update_password(const char* current_update_password, const char* new_update_password) {
+      auto p = get_payload<stick20::ChangeUpdatePassword>();
+      strcpyT(p.current_update_password, current_update_password);
+      strcpyT(p.new_update_password, new_update_password);
+      stick20::ChangeUpdatePassword::CommandTransaction::run(*device, p);
+    }
+
+    const char * NitrokeyManager::get_status_storage_as_string(){
+      auto p = stick20::GetDeviceStatus::CommandTransaction::run(*device);
+      return strdup(p.data().dissect().c_str());
+    }
+
+    const char * NitrokeyManager::get_SD_usage_data_as_string(){
+      auto p = stick20::GetSDCardOccupancy::CommandTransaction::run(*device);
+      return strdup(p.data().dissect().c_str());
+    }
+
+    int NitrokeyManager::get_progress_bar_value(){
+      try{
+        stick20::GetDeviceStatus::CommandTransaction::run(*device);
+        return -1;
+      }
+      catch (LongOperationInProgressException &e){
+        return e.progress_bar_value;
+      }
+    }
+
+    }

@@ -82,6 +82,33 @@ namespace nitrokey {
 
         bool is_AES_supported(const char *user_password);
 
+        void unlock_encrypted_volume(const char *user_password);
+
+        void unlock_hidden_volume(const char *hidden_volume_password);
+
+        void set_unencrypted_read_only(const char *user_pin);
+
+        void set_unencrypted_read_write(const char *user_pin);
+
+        void export_firmware(const char *admin_pin);
+
+        void clear_new_sd_card_warning(const char *admin_pin);
+
+        void fill_SD_card_with_random_data(const char *admin_pin);
+
+        void change_update_password(const char *current_update_password, const char *new_update_password);
+
+        void create_hidden_volume(uint8_t slot_nr, uint8_t start_percent, uint8_t end_percent,
+                                  const char *hidden_volume_password);
+
+        void send_startup(uint64_t seconds_from_epoch);
+
+        const char * get_status_storage_as_string();
+
+        const char *get_SD_usage_data_as_string();
+
+        int get_progress_bar_value();
+
         ~NitrokeyManager();
     private:
         NitrokeyManager();
@@ -100,7 +127,6 @@ namespace nitrokey {
 
         template <typename ProCommand, PasswordKind StoKind>
         void change_PIN_general(char *current_PIN, char *new_PIN);
-
 
     };
 }

@@ -30,6 +30,9 @@ set(SOURCE_FILES
     NitrokeyManager.cc
         NK_C_API.cc include/CommandFailedException.h include/LibraryException.h
         unittest/test_C_API.cpp
-        unittest/catch_main.cpp)
+        unittest/catch_main.cpp
+        unittest/test2.cc
+        include/LongOperationInProgressException.h
+        )
 
 add_executable(libnitrokey ${SOURCE_FILES})

@@ -34,6 +34,7 @@ std::vector<uint8_t> hex_string_to_byte(const char* hexString){
     return data;
 };
 
+#include <cctype>
 std::string hexdump(const char *p, size_t size, bool print_header) {
   std::stringstream out;
   char formatbuf[128];
@@ -45,9 +46,23 @@ std::string hexdump(const char *p, size_t size, bool print_header) {
           out << formatbuf;
       }
 
-    for (const char *le = p + 16; p < le && p < pend; p++) {
-      snprintf(formatbuf, 128, "%02x ", uint8_t(*p));
-      out << formatbuf;
+    const char* pp = p;
+    for (const char *le = p + 16; p < le; p++) {
+      if (p < pend){
+        snprintf(formatbuf, 128, "%02x ", uint8_t(*p));
+        out << formatbuf;
+      } else {
+        out << "-- ";
+      }
+
+    }
+    out << "\t";
+
+    for (const char *le = pp + 16; pp < le && pp < pend; pp++) {
+      if (std::isgraph(*pp))
+        out << uint8_t(*pp);
+      else
+        out << '.';
     }
     out << std::endl;
   }

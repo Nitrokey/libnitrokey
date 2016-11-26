@@ -2,7 +2,7 @@ from enum import Enum
 from misc import to_hex
 
 RFC_SECRET_HR = '12345678901234567890'
-RFC_SECRET = to_hex(RFC_SECRET_HR)  # '3031323334353637383930...'
+RFC_SECRET = to_hex(RFC_SECRET_HR)  # '31323334353637383930...'
 
 
 # print( repr((RFC_SECRET, RFC_SECRET_, len(RFC_SECRET))) )

@@ -4,6 +4,7 @@ from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET
 from misc import ffi, gs, wait, cast_pointer_to_tuple
 from misc import is_pro_rtm_07, is_pro_rtm_08, is_storage
 
+
 def test_enable_password_safe(C):
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe('wrong_password') == DeviceErrorCode.WRONG_PASSWORD
@@ -252,6 +253,7 @@ def test_HOTP_token(C):
         assert hotp_code != 0
         assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
+
 def test_HOTP_counters(C):
     """
     # https://tools.ietf.org/html/rfc4226#page-32
@@ -373,6 +375,7 @@ def test_TOTP_RFC_usepin(C, PIN_protection):
         responses += [ (t, code_from_device) ]
         correct += expected_code == code_from_device
     assert data == responses or correct == len(test_data)
+
 
 def test_get_slot_names(C):
     C.NK_set_debug(True)
@@ -502,6 +505,7 @@ def test_get_serial_number(C):
     assert len(sn) > 0
     print(('Serial number of the device: ', sn))
 
+
 @pytest.mark.parametrize("secret", ['000001', '00'*10+'ff', '00'*19+'ff', '000102', '002EF43F51AFA97BA2B46418768123C9E1809A5B' ])
 def test_OTP_secret_started_from_null(C, secret):
     '''
@@ -577,6 +581,7 @@ def test_TOTP_slots_read_write_at_time_period(C, time, period):
         lib_res += (time, lib_at(time))
     assert dev_res == lib_res
 
+
 @pytest.mark.parametrize("secret", [RFC_SECRET, 2*RFC_SECRET, '12'*10, '12'*30] )
 def test_TOTP_secrets(C, secret):
     '''
@@ -605,6 +610,7 @@ def test_TOTP_secrets(C, secret):
     dev_res += (time, code_device)
     lib_res += (time, lib_at(time))
     assert dev_res == lib_res
+
 
 @pytest.mark.parametrize("secret", [RFC_SECRET, 2*RFC_SECRET, '12'*10, '12'*30] )
 def test_HOTP_secrets(C, secret):
@@ -652,6 +658,7 @@ def test_special_double_press(C):
         assert C.NK_write_hotp_slot(slot_number, 'double' + str(slot_number), secret, counter, use_8_digits, False, False, "",
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # requires manual check
+
 
 def test_edit_OTP_slot(C):
     """

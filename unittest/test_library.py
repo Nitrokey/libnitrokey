@@ -36,12 +36,13 @@ def test_invalid_slot(C):
     assert C.NK_get_last_command_status() == LibraryErrors.INVALID_SLOT
 
 @pytest.mark.parametrize("invalid_hex_string",
-                         ['text', '00  ', '0xff', 'zzzzzzzzzzzz', 'fff', '', 'f' * 257, 'f' * 258])
+                         ['text', '00  ', '0xff', 'zzzzzzzzzzzz', 'fff', 'f' * 257, 'f' * 258])
 def test_invalid_secret_hex_string_for_OTP_write(C, invalid_hex_string):
     """
     Tests for invalid secret hex string during writing to OTP slot. Invalid strings are not hexadecimal number,
     empty or longer than 255 characters.
     """
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_hotp_slot(1, 'slot_name', invalid_hex_string, 0, True, False, False, '',
                                 DefaultPasswords.ADMIN_TEMP) == LibraryErrors.INVALID_HEX_STRING
     assert C.NK_write_totp_slot(1, 'python_test', invalid_hex_string, 30, True, False, False, "",

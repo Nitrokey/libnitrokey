@@ -302,6 +302,10 @@ namespace nitrokey{
       payload2.id = 0;
       auto secret_bin = misc::hex_string_to_byte(secret);
       auto remaining_secret_length = secret_bin.size();
+      const auto maximum_OTP_secret_size = 40;
+      if(remaining_secret_length > maximum_OTP_secret_size){
+        throw TargetBufferSmallerThanSource(remaining_secret_length, maximum_OTP_secret_size);
+      }
 
       while (remaining_secret_length>0){
         const auto bytesToCopy = std::min(sizeof(payload2.data), remaining_secret_length);

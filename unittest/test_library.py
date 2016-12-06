@@ -1,6 +1,6 @@
 import pytest
 
-from misc import ffi, gs, to_hex
+from misc import ffi, gs, to_hex, is_pro_rtm_07, is_long_OTP_secret_handled
 from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET, LibraryErrors
 
 def test_too_long_strings(C):
@@ -50,6 +50,8 @@ def test_invalid_secret_hex_string_for_OTP_write(C, invalid_hex_string):
 
 def test_warning_binary_bigger_than_secret_buffer(C):
     invalid_hex_string = to_hex('1234567890') * 3
+    if is_long_OTP_secret_handled(C):
+        invalid_hex_string *= 2
     assert C.NK_write_hotp_slot(1, 'slot_name', invalid_hex_string, 0, True, False, False, '',
                                 DefaultPasswords.ADMIN_TEMP) == LibraryErrors.TARGET_BUFFER_SIZE_SMALLER_THAN_SOURCE
 

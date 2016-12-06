@@ -115,6 +115,8 @@ namespace nitrokey {
 
         template <typename S, typename A, typename T>
         void authorize_packet(T &package, const char *admin_temporary_password, shared_ptr<Device> device);
+        int get_major_firmware_version();
+
     private:
         NitrokeyManager();
 
@@ -145,6 +147,7 @@ namespace nitrokey {
                                          uint64_t counter_or_interval,
                                          bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
                                          const char *temporary_password) const;
+
     };
 }
 

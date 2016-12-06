@@ -324,7 +324,11 @@ extern int NK_erase_password_safe_slot(uint8_t slot_number);
  */
 extern int NK_is_AES_supported(const char *user_password);
 
-
+/**
+ * Get device's major firmware version
+ * @return 7,8 for Pro and major for Storage
+ */
+extern int NK_get_major_firmware_version();
 
 
 

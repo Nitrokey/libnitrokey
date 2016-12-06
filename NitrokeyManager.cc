@@ -4,6 +4,7 @@
 #include "include/LibraryException.h"
 #include <algorithm>
 #include <unordered_map>
+#include <stick20_commands.h>
 #include "include/misc.h"
 
 namespace nitrokey{
@@ -589,7 +590,22 @@ namespace nitrokey{
                                                {DeviceModel::STORAGE, 43},
          });
       auto status_p = GetStatus::CommandTransaction::run(*device);
+      //FIXME use different function for checking storage firmware version
       return status_p.data().firmware_version <= m[device->get_device_model()];
+    }
+
+    int NitrokeyManager::get_major_firmware_version(){
+      switch(device->get_device_model()){
+        case DeviceModel::PRO:{
+          auto status_p = GetStatus::CommandTransaction::run(*device);
+          return status_p.data().firmware_version; //7 or 8
+        }
+        case DeviceModel::STORAGE:{
+          auto status = stick20::GetDeviceStatus::CommandTransaction::run(*device);
+          return status.data().versionInfo.major;
+        }
+      }
+      return 0;
     }
 
     bool NitrokeyManager::is_AES_supported(const char *user_password) {

@@ -36,44 +36,65 @@ class QueryDissector : semantics::non_constructible {
   }
 };
 
+
+
+
 template <CommandID id, class HIDPacket>
 class ResponseDissector : semantics::non_constructible {
  public:
+    static std::string status_translate_device(int status){
+      auto enum_status = static_cast<proto::stick10::device_status>(status);
+      switch (enum_status){
+        case stick10::device_status::ok: return "OK";
+        case stick10::device_status::busy: return "BUSY";
+        case stick10::device_status::error: return "ERROR";
+        case stick10::device_status::received_report: return "RECEIVED_REPORT";
+      }
+      return std::string("UNKNOWN: ") + std::to_string(status);
+    }
+
+    static std::string to_upper(std::string str){
+        for (auto & c: str) c = toupper(c);
+      return str;
+    }
+    static std::string status_translate_command(int status){
+      auto enum_status = static_cast<proto::stick10::command_status >(status);
+      switch (enum_status) {
+#define p(X) case X: return to_upper(std::string(#X));
+        p(stick10::command_status::ok)
+        p(stick10::command_status::wrong_CRC)
+        p(stick10::command_status::wrong_slot)
+        p(stick10::command_status::slot_not_programmed)
+        p(stick10::command_status::wrong_password)
+        p(stick10::command_status::not_authorized)
+        p(stick10::command_status::timestamp_warning)
+        p(stick10::command_status::no_name_error)
+        p(stick10::command_status::not_supported)
+        p(stick10::command_status::unknown_command)
+        p(stick10::command_status::AES_dec_failed)
+#undef p
+      }
+      return std::string("UNKNOWN: ") + std::to_string(status);
+    }
+
   static std::string dissect(const HIDPacket &pod) {
     std::stringstream out;
 
     // FIXME use values from firmware (possibly generate separate
     // header automatically)
-    std::string status[4];
-    status[0] = " STATUS_READY";
-    status[1] = " STATUS_BUSY";
-    status[2] = " STATUS_ERROR";
-    status[3] = " STATUS_RECEIVED_REPORT";
-    std::string cmd[11];
-    cmd[0] = " CMD_STATUS_OK";
-    cmd[1] = " CMD_STATUS_WRONG_CRC";
-    cmd[2] = " CMD_STATUS_WRONG_SLOT";
-    cmd[3] = " CMD_STATUS_SLOT_NOT_PROGRAMMED";
-    cmd[4] = " CMD_STATUS_WRONG_PASSWORD";
-    cmd[5] = " CMD_STATUS_NOT_AUTHORIZED";
-    cmd[6] = " CMD_STATUS_TIMESTAMP_WARNING";
-    cmd[7] = " CMD_STATUS_NO_NAME_ERROR";
-    cmd[8] = " CMD_STATUS_NOT_SUPPORTED";
-    cmd[9] = " CMD_STATUS_UNKNOWN_COMMAND";
-    cmd[10] = " CMD_STATUS_AES_DEC_FAILED";
 
     out << "Raw HID packet:" << std::endl;
     out << ::nitrokey::misc::hexdump((const char *)(&pod), sizeof pod);
 
     out << "Device status:\t" << pod.device_status + 0 << " "
-        << status[pod.device_status] << std::endl;
+        << status_translate_device(pod.device_status) << std::endl;
     out << "Command ID:\t" << commandid_to_string((CommandID)(pod.command_id)) << " hex: " << std::hex << (int)pod.command_id
         << std::endl;
     out << "Last command CRC:\t"
             << std::hex << std::setw(2) << std::setfill('0')
             << pod.last_command_crc << std::endl;
     out << "Last command status:\t" << pod.last_command_status + 0 << " "
-        << cmd[pod.last_command_status] << std::endl;
+        << status_translate_command(pod.last_command_status) << std::endl;
     out << "CRC:\t"
             << std::hex << std::setw(2) << std::setfill('0')
             << pod.crc << std::endl;

@@ -1,5 +1,6 @@
 import pytest
 
+from conftest import skip_if_device_version_lower_than
 from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET
 from misc import ffi, gs, wait, cast_pointer_to_tuple
 from misc import is_pro_rtm_07, is_pro_rtm_08, is_storage
@@ -511,6 +512,8 @@ def test_OTP_secret_started_from_null(C, secret):
     '''
     NK Pro 0.8+, NK Storage 0.43+
     '''
+    skip_if_device_version_lower_than({'S': 43, 'P': 8})
+
     oath = pytest.importorskip("oath")
     lib_at = lambda t: oath.hotp(secret, t, format='dec6')
     PIN_protection = False
@@ -532,8 +535,18 @@ def test_OTP_secret_started_from_null(C, secret):
     assert dev_res == lib_res
 
 
-@pytest.mark.parametrize("counter", [0, 3, 7, 0xffff, 0xffffffff, 0xffffffffffffffff] )
+@pytest.mark.parametrize("counter", [0, 3, 7, 0xffff,
+                                     0xffffffff,
+                                     0xffffffffffffffff] )
 def test_HOTP_slots_read_write_counter(C, counter):
+    """
+    Write different counters to all HOTP slots, read code and compare with 3rd party
+    :param counter:
+    """
+    if counter >= 1e7:
+        # Storage does not handle counters longer than 7 digits
+        skip_if_device_version_lower_than({'P': 7})
+
     secret = RFC_SECRET
     oath = pytest.importorskip("oath")
     lib_at = lambda t: oath.hotp(secret, t, format='dec6')
@@ -587,6 +600,8 @@ def test_TOTP_secrets(C, secret):
     '''
     NK Pro 0.8+, NK Storage 0.44+
     '''
+    skip_if_device_version_lower_than({'S': 44, 'P': 8})
+
     if is_pro_rtm_07(C) and len(secret)>20*2: #*2 since secret is in hex
         pytest.skip("Secret lengths over 20 bytes are not supported by NK Pro 0.7 ")
     slot_number = 0
@@ -617,6 +632,8 @@ def test_HOTP_secrets(C, secret):
     '''
     NK Pro 0.8+, NK Storage 0.44+
     '''
+    skip_if_device_version_lower_than({'S': 44, 'P': 8})
+
     if is_pro_rtm_07(C) and len(secret)>20*2: #*2 since secret is in hex
         pytest.skip("Secret lengths over 20 bytes are not supported by NK Pro 0.7 ")
     slot_number = 0

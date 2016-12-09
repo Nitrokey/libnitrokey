@@ -58,11 +58,6 @@ def test_warning_binary_bigger_than_secret_buffer(C):
                                 DefaultPasswords.ADMIN_TEMP) == LibraryErrors.TARGET_BUFFER_SIZE_SMALLER_THAN_SOURCE
 
 
-@pytest.mark.xfail(reason="TODO")
-def test_OTP_secret_started_from_null(C):
-    assert False
-
-
 @pytest.mark.skip(reason='Experimental')
 def test_clear(C):
     d = 'asdasdasd'

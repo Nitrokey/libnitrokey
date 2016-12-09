@@ -635,13 +635,12 @@ def test_TOTP_secrets(C, secret):
 
 @pytest.mark.parametrize("secret", [RFC_SECRET, 2*RFC_SECRET, '12'*10, '12'*30] )
 def test_HOTP_secrets(C, secret):
-    '''
+    """
     NK Pro 0.8+, NK Storage 0.44+
-    '''
+    feature needed: support for 320bit secrets
+    """
     skip_if_device_version_lower_than({'S': 44, 'P': 8})
 
-    if is_pro_rtm_07(C) and len(secret)>20*2: #*2 since secret is in hex
-        pytest.skip("Secret lengths over 20 bytes are not supported by NK Pro 0.7 ")
     slot_number = 0
     counter = 0
     oath = pytest.importorskip("oath")

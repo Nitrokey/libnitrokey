@@ -509,12 +509,16 @@ def test_get_serial_number(C):
     print(('Serial number of the device: ', sn))
 
 
-@pytest.mark.parametrize("secret", ['000001', '00'*10+'ff', '00'*19+'ff', '000102', '002EF43F51AFA97BA2B46418768123C9E1809A5B' ])
+@pytest.mark.parametrize("secret", ['000001', '00'*10+'ff', '00'*19+'ff', '000102',
+                                    '00'*29+'ff', '00'*39+'ff', '002EF43F51AFA97BA2B46418768123C9E1809A5B' ])
 def test_OTP_secret_started_from_null(C, secret):
-    '''
+    """
     NK Pro 0.8+, NK Storage 0.43+
-    '''
+    """
     skip_if_device_version_lower_than({'S': 43, 'P': 8})
+    if len(secret) > 40:
+        # feature: 320 bit long secret handling
+        skip_if_device_version_lower_than({'S': 44, 'P': 8})
 
     oath = pytest.importorskip("oath")
     lib_at = lambda t: oath.hotp(secret, t, format='dec6')

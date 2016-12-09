@@ -476,8 +476,6 @@ def test_read_write_config(C):
 
 
 def test_factory_reset(C):
-    if is_storage(C):
-        pytest.skip('Recovery not implemented for NK Storage')
     C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -494,6 +492,8 @@ def test_factory_reset(C):
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    if is_storage(C):
+        C.NK_clear_new_sd_card_warning(DefaultPasswords.ADMIN)
 
 
 def test_get_status(C):
@@ -573,6 +573,10 @@ def test_HOTP_slots_read_write_counter(C, counter):
 @pytest.mark.parametrize("period", [30,60] )
 @pytest.mark.parametrize("time", range(21,70,20) )
 def test_TOTP_slots_read_write_at_time_period(C, time, period):
+    """
+    Write to all TOTP slots with specified period, read code at specified time
+    and compare with 3rd party
+    """
     secret = RFC_SECRET
     oath = pytest.importorskip("oath")
     lib_at = lambda t: oath.totp(RFC_SECRET, t=t, period=period)

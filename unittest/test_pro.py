@@ -7,6 +7,9 @@ from misc import is_pro_rtm_07, is_pro_rtm_08, is_storage
 
 
 def test_enable_password_safe(C):
+    """
+    All Password Safe tests depend on AES keys being initialized. They will fail otherwise.
+    """
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe('wrong_password') == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK

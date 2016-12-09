@@ -81,7 +81,9 @@ def test_enable_password_safe_after_factory_reset(C):
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_factory_reset(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     wait(10)
-    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_AES_DEC_FAILED
+    enable_password_safe_result = C.NK_enable_password_safe(DefaultPasswords.USER)
+    assert enable_password_safe_result == DeviceErrorCode.STATUS_AES_DEC_FAILED \
+           or is_storage(C) and enable_password_safe_result == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 

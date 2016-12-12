@@ -48,7 +48,6 @@ class EraseSlot : Command<CommandID::ERASE_SLOT> {
  public:
   struct CommandPayload {
     uint8_t slot_number;
-      uint8_t temporary_admin_password[25];
 
     bool isValid() const { return !(slot_number & 0xF0); }
       std::string dissect() const {
@@ -138,7 +137,6 @@ class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
 };
 
 class WriteToTOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
-	//admin auth
  public:
   struct CommandPayload {
     uint8_t slot_number;
@@ -184,7 +182,6 @@ class WriteToTOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
 };
 
 class GetTOTP : Command<CommandID::GET_CODE> {
-	//user auth
  public:
   struct CommandPayload {
     uint8_t slot_number;
@@ -615,7 +612,6 @@ class PasswordSafeSendSlotViaHID : Command<CommandID::PW_SAFE_SEND_DATA> {
 // TODO "Device::passwordSafeSendSlotDataViaHID"
 
 class WriteGeneralConfig : Command<CommandID::WRITE_CONFIG> {
-	//admin auth
  public:
   struct CommandPayload {
     union{

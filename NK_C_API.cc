@@ -471,6 +471,13 @@ extern int NK_get_progress_bar_value() {
   });
 }
 
+extern int NK_get_major_firmware_version(){
+  auto m = NitrokeyManager::instance();
+  return get_with_result([&](){
+      return m->get_major_firmware_version();
+  });
+}
+
 
 }
 

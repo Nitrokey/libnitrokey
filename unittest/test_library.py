@@ -1,7 +1,8 @@
 import pytest
 
-from misc import ffi, gs, to_hex
+from misc import ffi, gs, to_hex, is_pro_rtm_07, is_long_OTP_secret_handled
 from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET, LibraryErrors
+
 
 def test_too_long_strings(C):
     new_password = '123123123'
@@ -35,28 +36,26 @@ def test_invalid_slot(C):
     assert gs(C.NK_get_password_safe_slot_login(invalid_slot)) == ''
     assert C.NK_get_last_command_status() == LibraryErrors.INVALID_SLOT
 
+
 @pytest.mark.parametrize("invalid_hex_string",
-                         ['text', '00  ', '0xff', 'zzzzzzzzzzzz', 'fff', '', 'f' * 257, 'f' * 258])
+                         ['text', '00  ', '0xff', 'zzzzzzzzzzzz', 'fff', 'f' * 257, 'f' * 258])
 def test_invalid_secret_hex_string_for_OTP_write(C, invalid_hex_string):
     """
     Tests for invalid secret hex string during writing to OTP slot. Invalid strings are not hexadecimal number,
     empty or longer than 255 characters.
     """
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_hotp_slot(1, 'slot_name', invalid_hex_string, 0, True, False, False, '',
                                 DefaultPasswords.ADMIN_TEMP) == LibraryErrors.INVALID_HEX_STRING
     assert C.NK_write_totp_slot(1, 'python_test', invalid_hex_string, 30, True, False, False, "",
                                 DefaultPasswords.ADMIN_TEMP) == LibraryErrors.INVALID_HEX_STRING
 
-
 def test_warning_binary_bigger_than_secret_buffer(C):
     invalid_hex_string = to_hex('1234567890') * 3
+    if is_long_OTP_secret_handled(C):
+        invalid_hex_string *= 2
     assert C.NK_write_hotp_slot(1, 'slot_name', invalid_hex_string, 0, True, False, False, '',
                                 DefaultPasswords.ADMIN_TEMP) == LibraryErrors.TARGET_BUFFER_SIZE_SMALLER_THAN_SOURCE
-
-
-@pytest.mark.xfail(reason="TODO")
-def test_OTP_secret_started_from_null(C):
-    assert False
 
 
 @pytest.mark.skip(reason='Experimental')

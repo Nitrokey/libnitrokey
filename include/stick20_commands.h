@@ -125,7 +125,17 @@ namespace nitrokey {
                     uint16_t MagicNumber_StickConfig_u16;
                     uint8_t ReadWriteFlagUncryptedVolume_u8;
                     uint8_t ReadWriteFlagCryptedVolume_u8;
+
+                    union{
                     uint8_t VersionInfo_au8[4];
+                        struct {
+                            uint8_t __unused;
+                            uint8_t major;
+                            uint8_t __unused2;
+                            uint8_t minor;
+                        } __packed versionInfo;
+                    };
+
                     uint8_t ReadWriteFlagHiddenVolume_u8;
                     uint8_t FirmwareLocked_u8;
                     uint8_t NewSDCardFound_u8;

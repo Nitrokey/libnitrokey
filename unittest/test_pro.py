@@ -1,10 +1,15 @@
 import pytest
 
+from conftest import skip_if_device_version_lower_than
 from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET
 from misc import ffi, gs, wait, cast_pointer_to_tuple
-from misc import is_pro_rtm_07, is_storage
+from misc import is_pro_rtm_07, is_pro_rtm_08, is_storage
+
 
 def test_enable_password_safe(C):
+    """
+    All Password Safe tests depend on AES keys being initialized. They will fail otherwise.
+    """
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe('wrong_password') == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
@@ -61,7 +66,7 @@ def test_password_safe_slot_status(C):
 
 
 def test_issue_device_locks_on_second_key_generation_in_sequence(C):
-    if is_pro_rtm_07(C):
+    if is_pro_rtm_07(C) or is_pro_rtm_08(C):
         pytest.skip("issue to register: device locks up "
                      "after below commands sequence (reinsertion fixes), skipping for now")
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
@@ -71,6 +76,19 @@ def test_issue_device_locks_on_second_key_generation_in_sequence(C):
 def test_regenerate_aes_key(C):
     C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+
+
+def test_enable_password_safe_after_factory_reset(C):
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_factory_reset(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+    wait(10)
+    if is_storage(C):
+        assert C.NK_clear_new_sd_card_warning(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+    enable_password_safe_result = C.NK_enable_password_safe(DefaultPasswords.USER)
+    assert enable_password_safe_result == DeviceErrorCode.STATUS_AES_DEC_FAILED \
+           or is_storage(C) and enable_password_safe_result == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
@@ -96,6 +114,7 @@ def test_destroy_password_safe(C):
 
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
     assert gs(C.NK_get_password_safe_slot_name(0)) != 'slotname1'
@@ -242,6 +261,7 @@ def test_HOTP_token(C):
         assert hotp_code != 0
         assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
+
 def test_HOTP_counters(C):
     """
     # https://tools.ietf.org/html/rfc4226#page-32
@@ -285,6 +305,7 @@ def test_HOTP_64bit_counter(C):
         assert C.NK_write_hotp_slot(slot_number, 'python_test', RFC_SECRET, t, use_8_digits, False, False, "",
                                     DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         code_device = str(C.NK_get_hotp_code(slot_number))
+        code_device = '0'+code_device if len(code_device) < 6 else code_device
         dev_res += (t, code_device)
         lib_res += (t, lib_at(t))
     assert dev_res == lib_res
@@ -310,14 +331,18 @@ def test_TOTP_64bit_time(C):
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         assert C.NK_totp_set_time(t) == DeviceErrorCode.STATUS_OK
         code_device = str((C.NK_get_totp_code(slot_number, T, 0, 30)))
+        code_device = '0'+code_device if len(code_device) < 6 else code_device
         dev_res += (t, code_device)
         lib_res += (t, lib_at(t))
     assert dev_res == lib_res
 
 
-@pytest.mark.xfail(reason="NK Pro: possible firmware bug or communication issue: set time command not always changes the time on stick thus failing this test, "
-                          "this does not influence normal use since setting time is not done every TOTP code request"
-                          "Rarely fail occurs on NK Storage")
+@pytest.mark.xfail(reason="NK Pro: Test fails in 50% of cases due to test vectors set 1 second before interval count change"
+                          "Here time is changed on seconds side only and miliseconds part is not being reset apparently"
+                          "This results in available time to test of half a second on average, thus 50% failed cases"
+                          "With disabled two first test vectors test passess 10/10 times"
+                          "Fail may also occurs on NK Storage with lower occurrency since it needs less time to execute "
+                          "commands")
 @pytest.mark.parametrize("PIN_protection", [False, True, ])
 def test_TOTP_RFC_usepin(C, PIN_protection):
     slot_number = 1
@@ -338,8 +363,8 @@ def test_TOTP_RFC_usepin(C, PIN_protection):
     # Mode: Sha1, time step X=30
     test_data = [
         #Time         T (hex)               TOTP
-        (59,          0x1,                94287082),
-        (1111111109,  0x00000000023523EC, 7081804),
+        (59,          0x1,                94287082), # Warning - test vector time 1 second before interval count changes
+        (1111111109,  0x00000000023523EC, 7081804), # Warning - test vector time 1 second before interval count changes
         (1111111111,  0x00000000023523ED, 14050471),
         (1234567890,  0x000000000273EF07, 89005924),
         (2000000000,  0x0000000003F940AA, 69279037),
@@ -358,6 +383,7 @@ def test_TOTP_RFC_usepin(C, PIN_protection):
         responses += [ (t, code_from_device) ]
         correct += expected_code == code_from_device
     assert data == responses or correct == len(test_data)
+
 
 def test_get_slot_names(C):
     C.NK_set_debug(True)
@@ -455,8 +481,6 @@ def test_read_write_config(C):
 
 
 def test_factory_reset(C):
-    if is_storage(C):
-        pytest.skip('Recovery not implemented for NK Storage')
     C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -473,6 +497,8 @@ def test_factory_reset(C):
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    if is_storage(C):
+       assert C.NK_clear_new_sd_card_warning(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
 
 
 def test_get_status(C):
@@ -486,3 +512,235 @@ def test_get_serial_number(C):
     sn = gs(sn)
     assert len(sn) > 0
     print(('Serial number of the device: ', sn))
+
+
+@pytest.mark.parametrize("secret", ['000001', '00'*10+'ff', '00'*19+'ff', '000102',
+                                    '00'*29+'ff', '00'*39+'ff', '002EF43F51AFA97BA2B46418768123C9E1809A5B' ])
+def test_OTP_secret_started_from_null(C, secret):
+    """
+    NK Pro 0.8+, NK Storage 0.43+
+    """
+    skip_if_device_version_lower_than({'S': 43, 'P': 8})
+    if len(secret) > 40:
+        # feature: 320 bit long secret handling
+        skip_if_device_version_lower_than({'S': 44, 'P': 8})
+
+    oath = pytest.importorskip("oath")
+    lib_at = lambda t: oath.hotp(secret, t, format='dec6')
+    PIN_protection = False
+    use_8_digits = False
+    slot_number = 1
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    dev_res = []
+    lib_res = []
+    for t in range(1,5):
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_write_hotp_slot(slot_number, 'null_secret', secret, t, use_8_digits, False, False, "",
+                                    DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        code_device = str(C.NK_get_hotp_code(slot_number))
+        code_device = '0'+code_device if len(code_device) < 6 else code_device
+        dev_res += (t, code_device)
+        lib_res += (t, lib_at(t))
+    assert dev_res == lib_res
+
+
+@pytest.mark.parametrize("counter", [0, 3, 7, 0xffff,
+                                     0xffffffff,
+                                     0xffffffffffffffff] )
+def test_HOTP_slots_read_write_counter(C, counter):
+    """
+    Write different counters to all HOTP slots, read code and compare with 3rd party
+    :param counter:
+    """
+    if counter >= 1e7:
+        # Storage does not handle counters longer than 7 digits
+        skip_if_device_version_lower_than({'P': 7})
+
+    secret = RFC_SECRET
+    oath = pytest.importorskip("oath")
+    lib_at = lambda t: oath.hotp(secret, t, format='dec6')
+    PIN_protection = False
+    use_8_digits = False
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    dev_res = []
+    lib_res = []
+    for slot_number in range(3):
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_write_hotp_slot(slot_number, 'HOTP rw' + str(slot_number), secret, counter, use_8_digits, False, False, "",
+                                    DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        code_device = str(C.NK_get_hotp_code(slot_number))
+        code_device = '0'+code_device if len(code_device) < 6 else code_device
+        dev_res += (counter, code_device)
+        lib_res += (counter, lib_at(counter))
+    assert dev_res == lib_res
+
+
+@pytest.mark.parametrize("period", [30,60] )
+@pytest.mark.parametrize("time", range(21,70,20) )
+def test_TOTP_slots_read_write_at_time_period(C, time, period):
+    """
+    Write to all TOTP slots with specified period, read code at specified time
+    and compare with 3rd party
+    """
+    secret = RFC_SECRET
+    oath = pytest.importorskip("oath")
+    lib_at = lambda t: oath.totp(RFC_SECRET, t=t, period=period)
+    PIN_protection = False
+    use_8_digits = False
+    T = 0
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    dev_res = []
+    lib_res = []
+    for slot_number in range(15):
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_write_totp_slot(slot_number, 'TOTP rw' + str(slot_number), secret, period, use_8_digits, False, False, "",
+                                    DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_totp_set_time(time) == DeviceErrorCode.STATUS_OK
+        code_device = str(C.NK_get_totp_code(slot_number, T, 0, period))
+        code_device = '0'+code_device if len(code_device) < 6 else code_device
+        dev_res += (time, code_device)
+        lib_res += (time, lib_at(time))
+    assert dev_res == lib_res
+
+
+@pytest.mark.parametrize("secret", [RFC_SECRET, 2*RFC_SECRET, '12'*10, '12'*30] )
+def test_TOTP_secrets(C, secret):
+    '''
+    NK Pro 0.8+, NK Storage 0.44+
+    '''
+    skip_if_device_version_lower_than({'S': 44, 'P': 8})
+
+    if is_pro_rtm_07(C) and len(secret)>20*2: #*2 since secret is in hex
+        pytest.skip("Secret lengths over 20 bytes are not supported by NK Pro 0.7 ")
+    slot_number = 0
+    time = 0
+    period = 30
+    oath = pytest.importorskip("oath")
+    lib_at = lambda t: oath.totp(secret, t=t, period=period)
+    PIN_protection = False
+    use_8_digits = False
+    T = 0
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    dev_res = []
+    lib_res = []
+    assert C.NK_write_totp_slot(slot_number, 'secret' + str(len(secret)), secret, period, use_8_digits, False, False, "",
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_totp_set_time(time) == DeviceErrorCode.STATUS_OK
+    code_device = str(C.NK_get_totp_code(slot_number, T, 0, period))
+    code_device = '0'+code_device if len(code_device) < 6 else code_device
+    dev_res += (time, code_device)
+    lib_res += (time, lib_at(time))
+    assert dev_res == lib_res
+
+
+@pytest.mark.parametrize("secret", [RFC_SECRET, 2*RFC_SECRET, '12'*10, '12'*30] )
+def test_HOTP_secrets(C, secret):
+    """
+    NK Pro 0.8+, NK Storage 0.44+
+    feature needed: support for 320bit secrets
+    """
+    skip_if_device_version_lower_than({'S': 44, 'P': 8})
+
+    slot_number = 0
+    counter = 0
+    oath = pytest.importorskip("oath")
+    lib_at = lambda t: oath.hotp(secret, counter=t)
+    PIN_protection = False
+    use_8_digits = False
+    T = 0
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    dev_res = []
+    lib_res = []
+    assert C.NK_write_hotp_slot(slot_number, 'secret' + str(len(secret)), secret, counter, use_8_digits, False, False, "",
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    code_device = str(C.NK_get_hotp_code(slot_number))
+    code_device = '0'+code_device if len(code_device) < 6 else code_device
+    dev_res += (counter, code_device)
+    lib_res += (counter, lib_at(counter))
+    assert dev_res == lib_res
+
+
+def test_special_double_press(C):
+    """
+    requires manual check after function run
+    double press each of num-, scroll-, caps-lock and check inserted OTP codes (each 1st should be 755224)
+    on nkpro 0.7 scrolllock should do nothing, on nkpro 0.8+ should return OTP code
+    """
+    secret = RFC_SECRET
+    counter = 0
+    PIN_protection = False
+    use_8_digits = False
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(0, 1, 2, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    for slot_number in range(3):
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_write_hotp_slot(slot_number, 'double' + str(slot_number), secret, counter, use_8_digits, False, False, "",
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    # requires manual check
+
+
+def test_edit_OTP_slot(C):
+    """
+    should change slots counter and name without changing its secret (using null secret for second update)
+    """
+    # counter does not reset under Storage v0.43
+    skip_if_device_version_lower_than({'S': 44, 'P': 7})
+
+    secret = RFC_SECRET
+    counter = 0
+    PIN_protection = False
+    use_8_digits = False
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    slot_number = 0
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    first_name = 'edit slot'
+    assert C.NK_write_hotp_slot(slot_number, first_name, secret, counter, use_8_digits, False, False, "",
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert gs(C.NK_get_hotp_slot_name(slot_number)) == first_name
+
+
+    first_code = C.NK_get_hotp_code(slot_number)
+    changed_name = 'changedname'
+    empty_secret = ''
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_hotp_slot(slot_number, changed_name, empty_secret, counter, use_8_digits, False, False, "",
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    second_code = C.NK_get_hotp_code(slot_number)
+    assert first_code == second_code
+    assert gs(C.NK_get_hotp_slot_name(slot_number)) == changed_name
+
+
+@pytest.mark.skip
+@pytest.mark.parametrize("secret", ['31323334353637383930'*2,'31323334353637383930'*4] )
+def test_TOTP_codes_from_nitrokeyapp(secret, C):
+    """
+    Helper test for manual TOTP check of written secret by Nitrokey App
+    Destined to run by hand
+    """
+    slot_number = 0
+    PIN_protection = False
+    period = 30
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    code_device = str(C.NK_get_totp_code(slot_number, 0, 0, period))
+    code_device = '0'+code_device if len(code_device) < 6 else code_device
+
+    oath = pytest.importorskip("oath")
+    lib_at = lambda : oath.totp(secret, period=period)
+    print (lib_at())
+    assert lib_at() == code_device

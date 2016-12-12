@@ -20,21 +20,29 @@ def cast_pointer_to_tuple(obj, typen, len):
     #     config = cast_pointer_to_tuple(config_raw_data, 'uint8_t', 5)
     return tuple(ffi.cast("%s [%d]" % (typen, len), obj)[0:len])
 
-def get_firmware_version_from_status(C):
-    status = gs(C.NK_status())
-    status = [s if 'firmware_version' in s else '' for s in status.split('\n')]
-    firmware = status[0].split(':')[1]
+
+def get_devices_firmware_version(C):
+    firmware = C.NK_get_major_firmware_version()
     return firmware
 
 
 def is_pro_rtm_07(C):
-    firmware = get_firmware_version_from_status(C)
-    return '07 00' in firmware
+    firmware = get_devices_firmware_version(C)
+    return firmware == 7
+
+
+def is_pro_rtm_08(C):
+    firmware = get_devices_firmware_version(C)
+    return firmware == 8
 
 
 def is_storage(C):
     """
     exact firmware storage is sent by other function
     """
-    firmware = get_firmware_version_from_status(C)
-    return '01 00' in firmware
+    # TODO identify connected device directly
+    return not is_pro_rtm_08(C) and not is_pro_rtm_07(C)
+
+
+def is_long_OTP_secret_handled(C):
+    return is_pro_rtm_08(C) or is_storage(C) and get_devices_firmware_version(C) > 43

@@ -25,6 +25,27 @@ namespace nitrokey {
             using stick10::UserAuthenticate;
             using stick10::SetTime;
             using stick10::GetStatus;
+            using stick10::BuildAESKey;
+            using stick10::ChangeAdminPin;
+            using stick10::ChangeUserPin;
+            using stick10::EnablePasswordSafe;
+            using stick10::ErasePasswordSafeSlot;
+            using stick10::FactoryReset;
+            using stick10::GetPasswordRetryCount;
+            using stick10::GetUserPasswordRetryCount;
+            using stick10::GetPasswordSafeSlotLogin;
+            using stick10::GetPasswordSafeSlotName;
+            using stick10::GetPasswordSafeSlotPassword;
+            using stick10::GetPasswordSafeSlotStatus;
+            using stick10::GetSlotName;
+            using stick10::IsAESSupported;
+            using stick10::LockDevice;
+            using stick10::PasswordSafeInitKey;
+            using stick10::PasswordSafeSendSlotViaHID;
+            using stick10::SetPasswordSafeSlotData;
+            using stick10::SetPasswordSafeSlotData2;
+            using stick10::UnlockUserPassword;
+            using stick10::ReadSlot;
 
             class EraseSlot : Command<CommandID::ERASE_SLOT> {
             public:

@@ -589,13 +589,12 @@ namespace nitrokey{
     }
 
     bool NitrokeyManager::is_authorization_command_supported(){
+      //authorization command is supported for versions equal or below:
         auto m = std::unordered_map<DeviceModel , int, EnumClassHash>({
                                                {DeviceModel::PRO, 7},
                                                {DeviceModel::STORAGE, 43},
          });
-      auto status_p = GetStatus::CommandTransaction::run(*device);
-      //FIXME use different function for checking storage firmware version
-      return status_p.data().firmware_version <= m[device->get_device_model()];
+        return get_major_firmware_version() <= m[device->get_device_model()];
     }
 
     int NitrokeyManager::get_major_firmware_version(){

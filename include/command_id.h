@@ -1,6 +1,6 @@
 #ifndef COMMAND_ID_H
 #define COMMAND_ID_H
-#include "inttypes.h"
+#include <stdint.h>
 
 namespace nitrokey {
 namespace proto {

@@ -2,7 +2,7 @@
 #define DEVICE_H
 #include <chrono>
 #include <hidapi/hidapi.h>
-#include "inttypes.h"
+#include <stdint.h>
 
 #define HID_REPORT_SIZE 65
 

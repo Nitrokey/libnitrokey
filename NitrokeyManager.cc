@@ -84,7 +84,7 @@ namespace nitrokey{
 
     shared_ptr<NitrokeyManager> NitrokeyManager::instance() {
         if (_instance == nullptr){
-            _instance = shared_ptr<NitrokeyManager>(new NitrokeyManager());
+            _instance = make_shared<NitrokeyManager>();
         }
         return _instance;
     }

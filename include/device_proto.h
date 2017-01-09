@@ -8,7 +8,7 @@
 #include <string>
 #include <strings.h>
 // a local version for compatibility with Windows
-#include "inttypes.h"
+#include <stdint.h>
 #include "cxx_semantics.h"
 #include "device.h"
 #include "misc.h"

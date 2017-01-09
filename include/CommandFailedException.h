@@ -7,7 +7,7 @@
 
 #include <exception>
 #include <cstdint>
-#include <log.h>
+#include "log.h"
 
 class CommandFailedException : public std::exception {
 public:

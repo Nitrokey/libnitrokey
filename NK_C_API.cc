@@ -168,7 +168,7 @@ void clear_string(std::string &s){
 extern const char * NK_status() {
     auto m = NitrokeyManager::instance();
     return get_with_string_result([&](){
-        string && s = m->get_status();
+        string && s = m->get_status_as_string();
         char * rs = strdup(s.c_str());
         clear_string(s);
         return rs;

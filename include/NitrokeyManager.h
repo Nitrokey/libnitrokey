@@ -39,8 +39,11 @@ namespace nitrokey {
         bool connect(const char *device_model);
         bool connect();
         bool disconnect();
-        void set_debug(bool state);
-        string get_status();
+        bool is_connected();
+        DeviceModel get_connected_device_model();
+          void set_debug(bool state);
+        stick10::GetStatus::ResponsePayload get_status();
+        string get_status_as_string();
         string get_serial_number();
 
         const char * get_totp_slot_name(uint8_t slot_number);
@@ -105,6 +108,7 @@ namespace nitrokey {
         void send_startup(uint64_t seconds_from_epoch);
 
         const char * get_status_storage_as_string();
+        stick20::DeviceConfigurationResponsePacket::ResponsePayload get_status_storage();
 
         const char *get_SD_usage_data_as_string();
 
@@ -117,11 +121,10 @@ namespace nitrokey {
         void authorize_packet(T &package, const char *admin_temporary_password, shared_ptr<Device> device);
         int get_major_firmware_version();
 
+        explicit NitrokeyManager();
     private:
-        NitrokeyManager();
 
         static shared_ptr <NitrokeyManager> _instance;
-        bool connected;
         std::shared_ptr<Device> device;
 
         bool is_valid_hotp_slot_number(uint8_t slot_number) const;

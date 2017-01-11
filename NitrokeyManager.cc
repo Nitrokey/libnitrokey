@@ -90,12 +90,16 @@ namespace nitrokey{
     }
 
     bool NitrokeyManager::disconnect() {
-      if (device == nullptr){
+      if (!is_connected()){
         return false;
       }
       const auto res = device->disconnect();
       device = nullptr;
       return res;
+    }
+
+    bool NitrokeyManager::is_connected(){
+      return device != nullptr;
     }
 
     void NitrokeyManager::set_debug(bool state) {
@@ -111,7 +115,12 @@ namespace nitrokey{
         return response.data().get_card_serial_hex();
     }
 
-    string NitrokeyManager::get_status() {
+    stick10::GetStatus::ResponsePayload NitrokeyManager::get_status(){
+      auto response = GetStatus::CommandTransaction::run(*device);
+      return response.data();
+    }
+
+    string NitrokeyManager::get_status_as_string() {
         auto response = GetStatus::CommandTransaction::run(*device);
         return response.data().dissect();
     }
@@ -597,6 +606,10 @@ namespace nitrokey{
         return get_major_firmware_version() <= m[device->get_device_model()];
     }
 
+    DeviceModel NitrokeyManager::get_connected_device_model(){
+      return device->get_device_model();
+    }
+
     int NitrokeyManager::get_major_firmware_version(){
       switch(device->get_device_model()){
         case DeviceModel::PRO:{
@@ -680,6 +693,11 @@ namespace nitrokey{
     const char * NitrokeyManager::get_status_storage_as_string(){
       auto p = stick20::GetDeviceStatus::CommandTransaction::run(*device);
       return strdup(p.data().dissect().c_str());
+    }
+
+    stick20::DeviceConfigurationResponsePacket::ResponsePayload NitrokeyManager::get_status_storage(){
+      auto p = stick20::GetDeviceStatus::CommandTransaction::run(*device);
+      return p.data();
     }
 
     const char * NitrokeyManager::get_SD_usage_data_as_string(){

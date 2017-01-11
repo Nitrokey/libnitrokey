@@ -141,7 +141,14 @@ namespace nitrokey {
                     uint8_t NewSDCardFound_u8;
                     uint8_t SDFillWithRandomChars_u8;
                     uint32_t ActiveSD_CardID_u32;
-                    uint8_t VolumeActiceFlag_u8;
+                    union{
+                      uint8_t VolumeActiceFlag_u8;
+                        struct {
+                            bool unencrypted :1;
+                            bool encrypted :1;
+                            bool hidden :1;
+                        } __packed VolumeActiceFlag_st;
+                    } __packed;
                     uint8_t NewSmartCardFound_u8;
                     uint8_t UserPwRetryCount;
                     uint8_t AdminPwRetryCount;

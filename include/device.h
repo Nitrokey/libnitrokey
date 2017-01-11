@@ -23,7 +23,6 @@ namespace device {
     };
 
 enum class DeviceModel{
-    UNKNOWN,
     PRO,
     STORAGE
 };

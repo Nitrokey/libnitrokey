@@ -6,8 +6,12 @@
 #include <unordered_map>
 #include <stick20_commands.h>
 #include "include/misc.h"
+#include <mutex>
 
 namespace nitrokey{
+
+    std::mutex mex_dev_com;
+
 
     template <typename T>
     void strcpyT(T& dest, const char* src){
@@ -58,6 +62,7 @@ namespace nitrokey{
 
     bool NitrokeyManager::connect() {
         this->disconnect();
+        std::lock_guard<std::mutex> lock(mex_dev_com);
         vector< shared_ptr<Device> > devices = { make_shared<Stick10>(), make_shared<Stick20>() };
         for( auto & d : devices ){
             if (d->connect()){
@@ -70,6 +75,7 @@ namespace nitrokey{
 
     bool NitrokeyManager::connect(const char *device_model) {
       this->disconnect();
+      std::lock_guard<std::mutex> lock(mex_dev_com);
       switch (device_model[0]){
             case 'P':
                 device = make_shared<Stick10>();
@@ -90,7 +96,10 @@ namespace nitrokey{
         return _instance;
     }
 
+
+
     bool NitrokeyManager::disconnect() {
+      std::lock_guard<std::mutex> lock(mex_dev_com);
       if (!is_connected()){
         return false;
       }
@@ -99,7 +108,7 @@ namespace nitrokey{
       return res;
     }
 
-    bool NitrokeyManager::is_connected(){
+    bool NitrokeyManager::is_connected() const throw(){
       return device != nullptr;
     }
 

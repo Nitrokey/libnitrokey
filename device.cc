@@ -9,20 +9,26 @@
 
 using namespace nitrokey::device;
 using namespace nitrokey::log;
+using namespace std::chrono;
 
-Device::Device()
-    : m_vid(0),
-      m_pid(0),
+Device::Device(const uint16_t vid, const uint16_t pid, const DeviceModel model,
+               const milliseconds send_receive_delay, const int retry_receiving_count,
+               const milliseconds retry_timeout)
+    : m_vid(vid),
+      m_pid(pid),
       m_retry_sending_count(3),
-      m_retry_receiving_count(40),
-      m_retry_timeout(100),
+      m_retry_receiving_count(retry_receiving_count),
+      m_retry_timeout(retry_timeout),
       mp_devhandle(NULL),
-      last_command_status(0){}
+      last_command_status(0),
+      m_model(model),
+      m_send_receive_delay(send_receive_delay)
+{}
 
 bool Device::disconnect() {
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
-  if(mp_devhandle== nullptr) return false;
+  if(mp_devhandle == nullptr) return false;
   hid_close(mp_devhandle);
   mp_devhandle = NULL;
   hid_exit();
@@ -31,9 +37,8 @@ bool Device::disconnect() {
 bool Device::connect() {
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
-//   hid_init();
+//   hid_init(); // done automatically on hid_open
   mp_devhandle = hid_open(m_vid, m_pid, NULL);
-  // hid_init();
   return mp_devhandle != NULL;
 }
 
@@ -41,7 +46,7 @@ int Device::send(const void *packet) {
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
   if (mp_devhandle == NULL)
-    throw std::runtime_error("Attempted HID send on an invalid descriptor.");
+    throw std::runtime_error("Attempted HID send on an invalid descriptor."); //TODO migrate except to library_error
 
   return (hid_send_feature_report(
       mp_devhandle, (const unsigned char *)(packet), HID_REPORT_SIZE));
@@ -54,7 +59,7 @@ int Device::recv(void *packet) {
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
   if (mp_devhandle == NULL)
-    throw std::runtime_error("Attempted HID receive on an invalid descriptor.");
+    throw std::runtime_error("Attempted HID receive on an invalid descriptor."); //TODO migrate except to library_error
 
   // FIXME extract error handling and repeating to parent function in
   // device_proto:192
@@ -84,19 +89,11 @@ int Device::recv(void *packet) {
   return status;
 }
 
-Stick10::Stick10() {
-  m_vid = 0x20a0;
-  m_pid = 0x4108;
-  m_model = DeviceModel::PRO;
-    m_send_receive_delay = 100ms;
-  m_retry_receiving_count = 100;
-}
+Stick10::Stick10():
+  Device(0x20a0, 0x4108, DeviceModel::PRO, 100ms, 100, 100ms)
+  {}
 
-Stick20::Stick20() {
-  m_vid = 0x20a0;
-  m_pid = 0x4109;
-  m_retry_timeout = 200ms;
-  m_model = DeviceModel::STORAGE;
-  m_send_receive_delay = 200ms;
-  m_retry_receiving_count = 40;
-}
+
+Stick20::Stick20():
+  Device(0x20a0, 0x4109, DeviceModel::STORAGE, 200ms, 40, 200ms)
+  {}

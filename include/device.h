@@ -8,9 +8,12 @@
 
 // TODO !! SEMAPHORE
 
+#include <atomic>
+
 namespace nitrokey {
 namespace device {
     using namespace std::chrono_literals;
+    using std::chrono::milliseconds;
 
     struct EnumClassHash
     {
@@ -22,6 +25,7 @@ namespace device {
     };
 
 enum class DeviceModel{
+    UNKNOWN,
     PRO,
     STORAGE
 };
@@ -29,8 +33,11 @@ enum class DeviceModel{
 class Device {
 
 public:
-  Device();
-  virtual ~Device(){disconnect();}
+    Device(const uint16_t vid, const uint16_t pid, const DeviceModel model,
+                   const milliseconds send_receive_delay, const int retry_receiving_count,
+                   const milliseconds retry_timeout);
+
+    virtual ~Device(){disconnect();}
 
   // lack of device is not actually an error,
   // so it doesn't throw
@@ -51,31 +58,32 @@ public:
   int get_retry_receiving_count() const { return m_retry_receiving_count; };
   int get_retry_sending_count() const { return m_retry_sending_count; };
   std::chrono::milliseconds get_retry_timeout() const { return m_retry_timeout; };
-    std::chrono::milliseconds get_send_receive_delay() const {return m_send_receive_delay;}
+  std::chrono::milliseconds get_send_receive_delay() const {return m_send_receive_delay;}
 
-    int get_last_command_status() {auto a = last_command_status; last_command_status = 0; return a;};
-    void set_last_command_status(uint8_t _err) { last_command_status = _err;} ;
-    bool last_command_sucessfull() const {return last_command_status == 0;};
-    DeviceModel get_device_model() const {return m_model;}
+  int get_last_command_status() {int a = last_command_status; last_command_status = 0; return a;};
+  void set_last_command_status(uint8_t _err) { last_command_status = _err;} ;
+  bool last_command_sucessfull() const {return last_command_status == 0;};
+  DeviceModel get_device_model() const {return m_model;}
 private:
-    uint8_t last_command_status;
+  std::atomic<uint8_t> last_command_status;
 
- protected:
-  uint16_t m_vid;
-  uint16_t m_pid;
-    DeviceModel m_model;
+protected:
+  const uint16_t m_vid;
+  const uint16_t m_pid;
+  const DeviceModel m_model;
 
   /*
    *	While the project uses Signal11 portable HIDAPI
    *	library, there's no way of doing it asynchronously,
    *	hence polling.
    */
-  int m_retry_sending_count;
-  int m_retry_receiving_count;
-  std::chrono::milliseconds m_retry_timeout;
-  std::chrono::milliseconds m_send_receive_delay;
+  const int m_retry_sending_count;
+  const int m_retry_receiving_count;
+  const std::chrono::milliseconds m_retry_timeout;
+  const std::chrono::milliseconds m_send_receive_delay;
 
-  hid_device *mp_devhandle;
+  std::atomic<hid_device *>mp_devhandle;
+
 };
 
 class Stick10 : public Device {

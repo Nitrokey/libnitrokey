@@ -49,7 +49,8 @@ namespace nitrokey{
 
     shared_ptr <NitrokeyManager> NitrokeyManager::_instance = nullptr;
 
-    NitrokeyManager::NitrokeyManager() {
+    NitrokeyManager::NitrokeyManager() : device(nullptr)
+    {
         set_debug(true);
     }
     NitrokeyManager::~NitrokeyManager() {

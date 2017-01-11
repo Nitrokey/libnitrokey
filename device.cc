@@ -22,7 +22,7 @@ Device::Device(const uint16_t vid, const uint16_t pid, const DeviceModel model,
       m_retry_sending_count(3),
       m_retry_receiving_count(retry_receiving_count),
       m_retry_timeout(retry_timeout),
-      mp_devhandle(NULL),
+      mp_devhandle(nullptr),
       last_command_status(0),
       m_model(model),
       m_send_receive_delay(send_receive_delay)
@@ -34,7 +34,7 @@ bool Device::disconnect() {
 
   if(mp_devhandle == nullptr) return false;
   hid_close(mp_devhandle);
-  mp_devhandle = NULL;
+  mp_devhandle = nullptr;
   hid_exit();
   return true;
 }
@@ -43,15 +43,15 @@ bool Device::connect() {
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
 //   hid_init(); // done automatically on hid_open
-  mp_devhandle = hid_open(m_vid, m_pid, NULL);
-  return mp_devhandle != NULL;
+  mp_devhandle = hid_open(m_vid, m_pid, nullptr);
+  return mp_devhandle != nullptr;
 }
 
 int Device::send(const void *packet) {
   std::lock_guard<std::mutex> lock(mex_dev_com);
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
-  if (mp_devhandle == NULL)
+  if (mp_devhandle == nullptr)
     throw std::runtime_error("Attempted HID send on an invalid descriptor."); //TODO migrate except to library_error
 
   return (hid_send_feature_report(
@@ -65,7 +65,7 @@ int Device::recv(void *packet) {
 
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
-  if (mp_devhandle == NULL)
+  if (mp_devhandle == nullptr)
     throw std::runtime_error("Attempted HID receive on an invalid descriptor."); //TODO migrate except to library_error
 
   // FIXME extract error handling and repeating to parent function in
@@ -76,7 +76,7 @@ int Device::recv(void *packet) {
 
     // FIXME handle getting libhid error message somewhere else
     auto pwherr = hid_error(mp_devhandle);
-    std::wstring wherr = (pwherr != NULL) ? pwherr : L"No error message";
+    std::wstring wherr = (pwherr != nullptr) ? pwherr : L"No error message";
     std::string herr(wherr.begin(), wherr.end());
     Log::instance()(std::string("libhid error message: ") + herr,
                     Loglevel::DEBUG_L2);

@@ -6,6 +6,9 @@
 #include "include/misc.h"
 #include "include/device.h"
 #include "include/log.h"
+#include <mutex>
+
+std::mutex mex_dev_com;
 
 using namespace nitrokey::device;
 using namespace nitrokey::log;
@@ -26,6 +29,7 @@ Device::Device(const uint16_t vid, const uint16_t pid, const DeviceModel model,
 {}
 
 bool Device::disconnect() {
+  std::lock_guard<std::mutex> lock(mex_dev_com);
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
   if(mp_devhandle == nullptr) return false;
@@ -35,6 +39,7 @@ bool Device::disconnect() {
   return true;
 }
 bool Device::connect() {
+  std::lock_guard<std::mutex> lock(mex_dev_com);
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
 //   hid_init(); // done automatically on hid_open
@@ -43,6 +48,7 @@ bool Device::connect() {
 }
 
 int Device::send(const void *packet) {
+  std::lock_guard<std::mutex> lock(mex_dev_com);
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
   if (mp_devhandle == NULL)
@@ -53,6 +59,7 @@ int Device::send(const void *packet) {
 }
 
 int Device::recv(void *packet) {
+  std::lock_guard<std::mutex> lock(mex_dev_com);
   int status;
   int retry_count = 0;
 

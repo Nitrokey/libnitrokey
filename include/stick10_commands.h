@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <string>
 #include <sstream>
-#include "inttypes.h"
+#include <stdint.h>
 #include "command.h"
 #include "device_proto.h"
 

@@ -1,7 +1,7 @@
 #ifndef STICK20_COMMANDS_H
 #define STICK20_COMMANDS_H
 
-#include "inttypes.h"
+#include <stdint.h>
 #include "command.h"
 #include <string>
 #include <sstream>

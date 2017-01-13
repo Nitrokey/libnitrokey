@@ -612,7 +612,7 @@ namespace nitrokey{
                                                {DeviceModel::PRO, 7},
                                                {DeviceModel::STORAGE, 43},
          });
-        return get_major_firmware_version() <= m[device->get_device_model()];
+        return get_minor_firmware_version() <= m[device->get_device_model()];
     }
 
     DeviceModel NitrokeyManager::get_connected_device_model() const{
@@ -620,7 +620,7 @@ namespace nitrokey{
       return device->get_device_model();
     }
 
-    int NitrokeyManager::get_major_firmware_version(){
+    int NitrokeyManager::get_minor_firmware_version(){
       switch(device->get_device_model()){
         case DeviceModel::PRO:{
           auto status_p = GetStatus::CommandTransaction::run(*device);

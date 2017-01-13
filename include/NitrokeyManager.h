@@ -119,7 +119,7 @@ namespace nitrokey {
 
         template <typename S, typename A, typename T>
         void authorize_packet(T &package, const char *admin_temporary_password, shared_ptr<Device> device);
-        int get_major_firmware_version();
+        int get_minor_firmware_version();
 
         explicit NitrokeyManager();
     private:

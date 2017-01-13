@@ -32,6 +32,8 @@
 #define PWS_SEND_TAB 2
 #define PWS_SEND_CR 3
 
+#include <mutex>
+
 namespace nitrokey {
     namespace proto {
 /*
@@ -204,12 +206,14 @@ namespace nitrokey {
               bzero(&st, sizeof(st));
             }
 
-
             static ClearingProxy<ResponsePacket, response_payload> run(device::Device &dev,
                                                                        const command_payload &payload) {
               using namespace ::nitrokey::device;
               using namespace ::nitrokey::log;
               using namespace std::chrono_literals;
+
+              static std::mutex send_receive_mtx;
+              std::lock_guard<std::mutex> guard(send_receive_mtx);
 
               Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 

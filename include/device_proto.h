@@ -296,7 +296,7 @@ namespace nitrokey {
                     successful_communication = true;
                     break;
                   }
-                  Log::instance()(std::string("Retry status - dev status, equal crc, correct CRC: ")
+                  Log::instance()(std::string("Retry status - dev status, awaited cmd crc, correct packet CRC: ")
                                   + std::to_string(resp.device_status) + " " +
                                   std::to_string(resp.last_command_crc == outp.crc) +
                                   " " + std::to_string(resp.isCRCcorrect()), Loglevel::DEBUG_L2);

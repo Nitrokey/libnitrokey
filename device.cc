@@ -107,7 +107,7 @@ int Device::recv(void *packet) {
 }
 
 Stick10::Stick10():
-  Device(0x20a0, 0x4108, DeviceModel::PRO, 100ms, 100, 100ms)
+  Device(0x20a0, 0x4108, DeviceModel::PRO, 100ms, 20, 100ms)
   {}
 
 

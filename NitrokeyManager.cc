@@ -614,7 +614,8 @@ namespace nitrokey{
         return get_major_firmware_version() <= m[device->get_device_model()];
     }
 
-    DeviceModel NitrokeyManager::get_connected_device_model(){
+    DeviceModel NitrokeyManager::get_connected_device_model() const{
+      //FIXME throw if no device is connected or return unknown/unconnected value
       return device->get_device_model();
     }
 

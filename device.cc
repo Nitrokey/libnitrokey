@@ -29,27 +29,36 @@ Device::Device(const uint16_t vid, const uint16_t pid, const DeviceModel model,
 {}
 
 bool Device::disconnect() {
-  std::lock_guard<std::mutex> lock(mex_dev_com);
+  //called in object's destructor
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
+  std::lock_guard<std::mutex> lock(mex_dev_com);
+  Log::instance()(std::string(__FUNCTION__) +  std::string(m_model==DeviceModel::PRO?"PRO":"STORAGE"), Loglevel::DEBUG_L2);
+  Log::instance()(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
 
+  Log::instance()(std::string("Disconnection success: ") + std::to_string(mp_devhandle == nullptr), Loglevel::DEBUG_L2);
   if(mp_devhandle == nullptr) return false;
+
   hid_close(mp_devhandle);
   mp_devhandle = nullptr;
   hid_exit();
   return true;
 }
 bool Device::connect() {
-  std::lock_guard<std::mutex> lock(mex_dev_com);
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
+  std::lock_guard<std::mutex> lock(mex_dev_com);
+  Log::instance()(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
 
 //   hid_init(); // done automatically on hid_open
   mp_devhandle = hid_open(m_vid, m_pid, nullptr);
-  return mp_devhandle != nullptr;
+  const auto success = mp_devhandle != nullptr;
+  Log::instance()(std::string("Connection success: ") + std::to_string(success), Loglevel::DEBUG_L2);
+  return success;
 }
 
 int Device::send(const void *packet) {
-  std::lock_guard<std::mutex> lock(mex_dev_com);
   Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
+  std::lock_guard<std::mutex> lock(mex_dev_com);
+  Log::instance()(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
 
   if (mp_devhandle == nullptr)
     throw std::runtime_error("Attempted HID send on an invalid descriptor."); //TODO migrate except to library_error
@@ -59,11 +68,12 @@ int Device::send(const void *packet) {
 }
 
 int Device::recv(void *packet) {
+  Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
+  Log::instance()(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
   int status;
   int retry_count = 0;
 
-  Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
   if (mp_devhandle == nullptr)
     throw std::runtime_error("Attempted HID receive on an invalid descriptor."); //TODO migrate except to library_error

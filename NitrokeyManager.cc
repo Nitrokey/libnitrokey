@@ -628,7 +628,7 @@ namespace nitrokey{
         }
         case DeviceModel::STORAGE:{
           auto status = stick20::GetDeviceStatus::CommandTransaction::run(*device);
-          return status.data().versionInfo.major;
+          return status.data().versionInfo.minor;
         }
       }
       return 0;

@@ -88,6 +88,7 @@ namespace nitrokey{
     }
 
     shared_ptr<NitrokeyManager> NitrokeyManager::instance() {
+      //FIXME check thread safety - add atomic for instance, add lock guard
         if (_instance == nullptr){
             _instance = make_shared<NitrokeyManager>();
         }

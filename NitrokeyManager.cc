@@ -61,7 +61,6 @@ namespace nitrokey{
     }
 
     bool NitrokeyManager::connect() {
-        this->disconnect();
         std::lock_guard<std::mutex> lock(mex_dev_com);
         vector< shared_ptr<Device> > devices = { make_shared<Stick10>(), make_shared<Stick20>() };
         for( auto & d : devices ){
@@ -74,7 +73,6 @@ namespace nitrokey{
 
 
     bool NitrokeyManager::connect(const char *device_model) {
-      this->disconnect();
       std::lock_guard<std::mutex> lock(mex_dev_com);
       switch (device_model[0]){
             case 'P':

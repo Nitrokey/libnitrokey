@@ -11,8 +11,8 @@
 
 class CommandFailedException : public std::exception {
 public:
-    uint8_t last_command_code;
-    uint8_t last_command_status;
+    const uint8_t last_command_code;
+    const uint8_t last_command_status;
 
     CommandFailedException(uint8_t last_command_code, uint8_t last_command_status) :
             last_command_code(last_command_code),
@@ -22,6 +22,10 @@ public:
 
     virtual const char *what() const throw() {
         return "Command execution has failed on device";
+    }
+
+    bool reason_slot_not_programmed() const throw(){
+      return last_command_status == 3; //FIXME use enum status codes
     }
 
 };

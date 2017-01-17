@@ -332,7 +332,7 @@ class GetStatus : Command<CommandID::GET_STATUS> {
 
     std::string get_card_serial_hex() const {
         return ::nitrokey::misc::hexdump((const char *)(card_serial),
-                sizeof card_serial, false);
+                sizeof card_serial, false, false, false);
     }
 
     std::string dissect() const {

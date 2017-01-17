@@ -8,6 +8,9 @@
 #include <exception>
 #include <cstdint>
 #include "log.h"
+#include "command_id.h"
+
+using cs = nitrokey::proto::stick10::command_status;
 
 class CommandFailedException : public std::exception {
 public:
@@ -25,7 +28,11 @@ public:
     }
 
     bool reason_slot_not_programmed() const throw(){
-      return last_command_status == 3; //FIXME use enum status codes
+      return last_command_status == static_cast<uint8_t>(cs::slot_not_programmed);
+    }
+
+    bool reason_wrong_password() const throw(){
+      return last_command_status == static_cast<uint8_t>(cs::wrong_password);
     }
 
 };

@@ -617,6 +617,9 @@ namespace nitrokey{
 
     DeviceModel NitrokeyManager::get_connected_device_model() const{
       //FIXME throw if no device is connected or return unknown/unconnected value
+        if (device == nullptr){
+            throw std::runtime_error("device not connected");
+        }
       return device->get_device_model();
     }
 

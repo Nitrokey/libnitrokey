@@ -293,18 +293,44 @@ class ReadSlot : Command<CommandID::READ_SLOT> {
 
   struct ResponsePayload {
     uint8_t slot_name[15];
-    uint8_t config;
-    uint8_t token_id[13];
-    uint64_t counter;
+    union{
+      uint8_t _slot_config;
+      struct{
+        bool use_8_digits   : 1;
+        bool use_enter      : 1;
+        bool use_tokenID    : 1;
+      };
+    };
+    union{
+      uint8_t slot_token_id[13]; /** OATH Token Identifier */
+      struct{ /** @see https://openauthentication.org/token-specs/ */
+        uint8_t omp[2];
+        uint8_t tt[2];
+        uint8_t mui[8];
+        uint8_t keyboard_layout; //disabled feature in nitroapp as of 20160805
+      } slot_token_fields;
+    };
+    union{
+      uint64_t slot_counter;
+      uint8_t slot_counter_s[8];
+    } __packed;
 
     bool isValid() const { return true; }
 
     std::string dissect() const {
       std::stringstream ss;
       ss << "slot_name:\t" << slot_name << std::endl;
-      ss << "config:\t" << config << std::endl;
-      ss << "token_id:\t" << token_id << std::endl;
-      ss << "counter:\t" << counter << std::endl;
+      ss << "slot_config:\t" << std::bitset<8>((int)_slot_config) << std::endl;
+      ss << "\tuse_8_digits(0):\t" << use_8_digits << std::endl;
+      ss << "\tuse_enter(1):\t" << use_enter << std::endl;
+      ss << "\tuse_tokenID(2):\t" << use_tokenID << std::endl;
+
+      ss << "slot_token_id:\t";
+      for (auto i : slot_token_id)
+        ss << std::hex << std::setw(2) << std::setfill('0')<< (int) i << " " ;
+      ss << std::endl;
+      ss << "slot_counter:\t[" << (int)slot_counter << "]\t"
+         << ::nitrokey::misc::hexdump((const char *)(&slot_counter), sizeof slot_counter, false);
       return ss.str();
     }
   } __packed;

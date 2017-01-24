@@ -468,6 +468,7 @@ namespace nitrokey{
         auto response = GetUserPasswordRetryCount::CommandTransaction::run(*device);
         return response.data().password_retry_count;
     }
+
     uint8_t NitrokeyManager::get_admin_retry_count() {
         if(device->get_device_model() == DeviceModel::STORAGE){
           stick20::GetDeviceStatus::CommandTransaction::run(*device);
@@ -728,4 +729,23 @@ namespace nitrokey{
       }
     }
 
-    }
+  uint32_t NitrokeyManager::get_TOTP_code(uint8_t slot_number, const char *user_temporary_password) {
+    return get_TOTP_code(slot_number, 0, 0, 0, user_temporary_password);
+  }
+
+  stick10::ReadSlot::ResponsePayload NitrokeyManager::get_OTP_slot_data(const uint8_t slot_number) {
+    auto p = get_payload<stick10::ReadSlot>();
+    p.slot_number = slot_number;
+    auto data = stick10::ReadSlot::CommandTransaction::run(*device, p);
+    return data.data();
+  }
+
+  stick10::ReadSlot::ResponsePayload NitrokeyManager::get_TOTP_slot_data(const uint8_t slot_number) {
+    return get_OTP_slot_data(get_internal_slot_number_for_totp(slot_number));
+  }
+
+  stick10::ReadSlot::ResponsePayload NitrokeyManager::get_HOTP_slot_data(const uint8_t slot_number) {
+    return get_OTP_slot_data(get_internal_slot_number_for_hotp(slot_number));
+  }
+
+}

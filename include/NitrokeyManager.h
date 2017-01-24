@@ -32,6 +32,10 @@ namespace nitrokey {
         uint32_t get_HOTP_code(uint8_t slot_number, const char *user_temporary_password);
         uint32_t get_TOTP_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time, uint8_t last_interval,
                                const char *user_temporary_password);
+        uint32_t get_TOTP_code(uint8_t slot_number, const char *user_temporary_password);
+        stick10::ReadSlot::ResponsePayload get_TOTP_slot_data(const uint8_t slot_number);
+        stick10::ReadSlot::ResponsePayload get_HOTP_slot_data(const uint8_t slot_number);
+
         bool set_time(uint64_t time);
         bool get_time();
         bool erase_totp_slot(uint8_t slot_number, const char *temporary_password);
@@ -127,7 +131,8 @@ namespace nitrokey {
         static shared_ptr <NitrokeyManager> _instance;
         std::shared_ptr<Device> device;
 
-        bool is_valid_hotp_slot_number(uint8_t slot_number) const;
+      stick10::ReadSlot::ResponsePayload get_OTP_slot_data(const uint8_t slot_number);
+      bool is_valid_hotp_slot_number(uint8_t slot_number) const;
         bool is_valid_totp_slot_number(uint8_t slot_number) const;
         bool is_valid_password_safe_slot_number(uint8_t slot_number) const;
         uint8_t get_internal_slot_number_for_hotp(uint8_t slot_number) const;

@@ -610,7 +610,7 @@ namespace nitrokey{
       //authorization command is supported for versions equal or below:
         auto m = std::unordered_map<DeviceModel , int, EnumClassHash>({
                                                {DeviceModel::PRO, 7},
-                                               {DeviceModel::STORAGE, 43},
+                                               {DeviceModel::STORAGE, 99},
          });
         return get_minor_firmware_version() <= m[device->get_device_model()];
     }

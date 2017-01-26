@@ -53,8 +53,8 @@ namespace nitrokey {
         const char * get_totp_slot_name(uint8_t slot_number);
         const char * get_hotp_slot_name(uint8_t slot_number);
 
-        void change_user_PIN(char *current_PIN, char *new_PIN);
-        void change_admin_PIN(char *current_PIN, char *new_PIN);
+        void change_user_PIN(const char *current_PIN, const char *new_PIN);
+        void change_admin_PIN(const char *current_PIN, const char *new_PIN);
 
         void enable_password_safe(const char *user_pin);
 
@@ -141,7 +141,7 @@ namespace nitrokey {
         const char * get_slot_name(uint8_t slot_number);
 
         template <typename ProCommand, PasswordKind StoKind>
-        void change_PIN_general(char *current_PIN, char *new_PIN);
+        void change_PIN_general(const char *current_PIN, const char *new_PIN);
 
         void write_HOTP_slot_authorize(uint8_t slot_number, const char *slot_name, const char *secret, uint64_t hotp_counter,
                                    bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,

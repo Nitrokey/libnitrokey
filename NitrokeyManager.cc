@@ -406,16 +406,16 @@ namespace nitrokey{
         return false;
     }
 
-    void NitrokeyManager::change_user_PIN(char *current_PIN, char *new_PIN) {
+    void NitrokeyManager::change_user_PIN(const char *current_PIN, const char *new_PIN) {
         change_PIN_general<ChangeUserPin, PasswordKind::User>(current_PIN, new_PIN);
     }
 
-    void NitrokeyManager::change_admin_PIN(char *current_PIN, char *new_PIN) {
+    void NitrokeyManager::change_admin_PIN(const char *current_PIN, const char *new_PIN) {
         change_PIN_general<ChangeAdminPin, PasswordKind::Admin>(current_PIN, new_PIN);
     }
 
     template <typename ProCommand, PasswordKind StoKind>
-    void NitrokeyManager::change_PIN_general(char *current_PIN, char *new_PIN) {
+    void NitrokeyManager::change_PIN_general(const char *current_PIN, const char *new_PIN) {
         switch (device->get_device_model()){
             case DeviceModel::PRO:
             {

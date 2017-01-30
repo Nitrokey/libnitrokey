@@ -273,7 +273,7 @@ extern int NK_totp_set_time(uint64_t time){
 extern int NK_totp_get_time(){
     auto m = NitrokeyManager::instance();
     return get_without_result([&](){
-        m->get_time(); // FIXME check how that should work
+      m->get_time(0); // FIXME check how that should work
     });
 }
 

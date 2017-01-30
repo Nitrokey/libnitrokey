@@ -37,7 +37,7 @@ namespace nitrokey {
         stick10::ReadSlot::ResponsePayload get_HOTP_slot_data(const uint8_t slot_number);
 
         bool set_time(uint64_t time);
-        bool get_time();
+        bool get_time(uint64_t time = 0);
         bool erase_totp_slot(uint8_t slot_number, const char *temporary_password);
         bool erase_hotp_slot(uint8_t slot_number, const char *temporary_password);
         bool connect(const char *device_model);

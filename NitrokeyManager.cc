@@ -399,11 +399,12 @@ namespace nitrokey{
         return false;
     }
 
-    bool NitrokeyManager::get_time() {
+    bool NitrokeyManager::get_time(uint64_t time) {
         auto p = get_payload<SetTime>();
         p.reset = 0;
+        p.time = time;
         SetTime::CommandTransaction::run(*device, p);
-        return false;
+        return true;
     }
 
     void NitrokeyManager::change_user_PIN(const char *current_PIN, const char *new_PIN) {

@@ -357,8 +357,14 @@ class GetStatus : Command<CommandID::GET_STATUS> {
     bool isValid() const { return enable_user_password!=delete_user_password; }
 
     std::string get_card_serial_hex() const {
-        return ::nitrokey::misc::hexdump((const char *)(card_serial),
-                sizeof card_serial, false, false, false);
+//        return ::nitrokey::misc::hexdump((const char *)(card_serial),
+//                sizeof card_serial, false, false, false);
+      std::stringstream ss;
+      ss << std::hex << std::setfill('0');
+      for (int i = 0; i < sizeof(card_serial); ++i) {
+        ss << std::setw(2) << static_cast<unsigned>(card_serial[i]);
+      }
+      return ss.str();
     }
 
     std::string dissect() const {

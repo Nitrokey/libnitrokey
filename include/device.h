@@ -52,6 +52,8 @@ public:
    */
   virtual int recv(void *packet);
 
+  bool is_connected();
+
   int get_retry_receiving_count() const { return m_retry_receiving_count; };
   int get_retry_sending_count() const { return m_retry_sending_count; };
   std::chrono::milliseconds get_retry_timeout() const { return m_retry_timeout; };

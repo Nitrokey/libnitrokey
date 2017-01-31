@@ -106,6 +106,24 @@ int Device::recv(void *packet) {
   return status;
 }
 
+bool Device::is_connected() {
+  Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
+  std::lock_guard<std::mutex> lock(mex_dev_com);
+  if (mp_devhandle==nullptr){
+    return false;
+  }
+  auto pInfo = hid_enumerate(m_vid, m_pid);
+  if (pInfo != nullptr){
+    hid_free_enumeration(pInfo);
+    return true;
+  }
+  return false;
+
+//  alternative:
+//  unsigned char buf[1];
+//  return hid_read_timeout(mp_devhandle, buf, sizeof(buf), 20) != -1;
+}
+
 Stick10::Stick10():
   Device(0x20a0, 0x4108, DeviceModel::PRO, 100ms, 20, 100ms)
   {}

@@ -206,7 +206,7 @@ namespace nitrokey {
               bzero(&st, sizeof(st));
             }
 
-            static ClearingProxy<ResponsePacket, response_payload> run(device::Device &dev,
+            static ClearingProxy<ResponsePacket, response_payload> run(std::shared_ptr<device::Device> dev,
                                                                        const command_payload &payload) {
               using namespace ::nitrokey::device;
               using namespace ::nitrokey::log;
@@ -235,22 +235,22 @@ namespace nitrokey {
 
               bool successful_communication = false;
               int receiving_retry_counter = 0;
-              int sending_retry_counter = dev.get_retry_sending_count();
+              int sending_retry_counter = dev->get_retry_sending_count();
               while (sending_retry_counter-- > 0) {
-                status = dev.send(&outp);
+                status = dev->send(&outp);
                 if (status <= 0)
-                  throw std::runtime_error(
+                  throw DeviceSendingFailure(
                       std::string("Device error while sending command ") +
                       std::to_string(status));
 
-                std::this_thread::sleep_for(dev.get_send_receive_delay());
+                std::this_thread::sleep_for(dev->get_send_receive_delay());
 
                 // FIXME make checks done in device:recv here
-                receiving_retry_counter = dev.get_retry_receiving_count();
+                receiving_retry_counter = dev->get_retry_receiving_count();
                 while (receiving_retry_counter-- > 0) {
-                  status = dev.recv(&resp);
+                  status = dev->recv(&resp);
 
-                  if (dev.get_device_model() == DeviceModel::STORAGE &&
+                  if (dev->get_device_model() == DeviceModel::STORAGE &&
                       resp.command_id >= stick20::CMD_START_VALUE &&
                       resp.command_id < stick20::CMD_END_VALUE ) {
                     Log::instance()(std::string("Detected storage device cmd, status: ") +
@@ -306,7 +306,7 @@ namespace nitrokey {
                       Loglevel::DEBUG);
                   Log::instance()("Invalid incoming HID packet:", Loglevel::DEBUG_L2);
                   Log::instance()(static_cast<std::string>(resp), Loglevel::DEBUG_L2);
-                  std::this_thread::sleep_for(dev.get_retry_timeout());
+                  std::this_thread::sleep_for(dev->get_retry_timeout());
                   continue;
                 }
                 if (successful_communication) break;
@@ -315,7 +315,7 @@ namespace nitrokey {
                                 Loglevel::DEBUG);
               }
 
-              dev.set_last_command_status(resp.last_command_status); // FIXME should be handled on device.recv
+              dev->set_last_command_status(resp.last_command_status); // FIXME should be handled on device.recv
 
               clear_packet(outp);
 
@@ -348,7 +348,7 @@ namespace nitrokey {
               return resp;
             }
 
-            static ClearingProxy<ResponsePacket, response_payload> run(device::Device &dev) {
+            static ClearingProxy<ResponsePacket, response_payload> run(std::shared_ptr<device::Device> dev) {
               command_payload empty_payload;
               return run(dev, empty_payload);
             }

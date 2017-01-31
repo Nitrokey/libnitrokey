@@ -48,7 +48,7 @@ namespace nitrokey{
         auto auth = get_payload<A>();
         strcpyT(auth.temporary_password, admin_temporary_password);
         auth.crc_to_authorize = S::CommandTransaction::getCRC(package);
-        A::CommandTransaction::run(*device, auth);
+        A::CommandTransaction::run(device, auth);
     }
 
     shared_ptr <NitrokeyManager> NitrokeyManager::_instance = nullptr;
@@ -137,17 +137,17 @@ namespace nitrokey{
     }
 
     string NitrokeyManager::get_serial_number() {
-        auto response = GetStatus::CommandTransaction::run(*device);
+        auto response = GetStatus::CommandTransaction::run(device);
         return response.data().get_card_serial_hex();
     }
 
     stick10::GetStatus::ResponsePayload NitrokeyManager::get_status(){
-      auto response = GetStatus::CommandTransaction::run(*device);
+      auto response = GetStatus::CommandTransaction::run(device);
       return response.data();
     }
 
     string NitrokeyManager::get_status_as_string() {
-        auto response = GetStatus::CommandTransaction::run(*device);
+        auto response = GetStatus::CommandTransaction::run(device);
         return response.data().dissect();
     }
 
@@ -160,7 +160,7 @@ namespace nitrokey{
         if(user_temporary_password != nullptr && strlen(user_temporary_password)!=0){ //FIXME use string instead of strlen
             authorize_packet<GetHOTP, UserAuthorize>(gh, user_temporary_password, device);
         }
-        auto resp = GetHOTP::CommandTransaction::run(*device, gh);
+        auto resp = GetHOTP::CommandTransaction::run(device, gh);
         return resp.data().code;
       } else {
         auto gh = get_payload<stick10_08::GetHOTP>();
@@ -168,7 +168,7 @@ namespace nitrokey{
         if(user_temporary_password != nullptr && strlen(user_temporary_password)!=0) {
           strcpyT(gh.temporary_user_password, user_temporary_password);
         }
-        auto resp = stick10_08::GetHOTP::CommandTransaction::run(*device, gh);
+        auto resp = stick10_08::GetHOTP::CommandTransaction::run(device, gh);
         return resp.data().code;
       }
     }
@@ -195,13 +195,13 @@ namespace nitrokey{
           if(user_temporary_password != nullptr && strlen(user_temporary_password)!=0){ //FIXME use string instead of strlen
               authorize_packet<GetTOTP, UserAuthorize>(gt, user_temporary_password, device);
           }
-          auto resp = GetTOTP::CommandTransaction::run(*device, gt);
+          auto resp = GetTOTP::CommandTransaction::run(device, gt);
           return resp.data().code;
         } else {
           auto gt = get_payload<stick10_08::GetTOTP>();
           strcpyT(gt.temporary_user_password, user_temporary_password);
           gt.slot_number = slot_number;
-          auto resp = stick10_08::GetTOTP::CommandTransaction::run(*device, gt);
+          auto resp = stick10_08::GetTOTP::CommandTransaction::run(device, gt);
           return resp.data().code;
         }
 
@@ -212,12 +212,12 @@ namespace nitrokey{
         auto p = get_payload<EraseSlot>();
         p.slot_number = slot_number;
         authorize_packet<EraseSlot, Authorize>(p, temporary_password, device);
-        auto resp = EraseSlot::CommandTransaction::run(*device,p);
+        auto resp = EraseSlot::CommandTransaction::run(device,p);
       } else {
         auto p = get_payload<stick10_08::EraseSlot>();
         p.slot_number = slot_number;
         strcpyT(p.temporary_admin_password, temporary_password);
-        auto resp = stick10_08::EraseSlot::CommandTransaction::run(*device,p);
+        auto resp = stick10_08::EraseSlot::CommandTransaction::run(device,p);
       }
         return true;
     }
@@ -301,7 +301,7 @@ namespace nitrokey{
 
       authorize_packet<WriteToHOTPSlot, Authorize>(payload, temporary_password, device);
 
-      auto resp = WriteToHOTPSlot::CommandTransaction::run(*device, payload);
+      auto resp = WriteToHOTPSlot::CommandTransaction::run(device, payload);
     }
 
     bool NitrokeyManager::write_TOTP_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint16_t time_window,
@@ -331,7 +331,7 @@ namespace nitrokey{
       strcpyT(payload2.temporary_admin_password, temporary_password);
       strcpyT(payload2.data, slot_name);
       payload2.setTypeName();
-      stick10_08::SendOTPData::CommandTransaction::run(*device, payload2);
+      stick10_08::SendOTPData::CommandTransaction::run(device, payload2);
 
       payload2.setTypeSecret();
       payload2.id = 0;
@@ -347,7 +347,7 @@ namespace nitrokey{
         const auto start = secret_bin.size() - remaining_secret_length;
         memset(payload2.data, 0, sizeof(payload2.data));
         vector_copy_ranged(payload2.data, secret_bin, start, bytesToCopy);
-        stick10_08::SendOTPData::CommandTransaction::run(*device, payload2);
+        stick10_08::SendOTPData::CommandTransaction::run(device, payload2);
         remaining_secret_length -= bytesToCopy;
         payload2.id++;
       }
@@ -360,7 +360,7 @@ namespace nitrokey{
       payload.use_tokenID = use_tokenID;
       payload.slot_counter_or_interval = counter_or_interval;
       payload.slot_number = internal_slot_number;
-      stick10_08::WriteToOTPSlot::CommandTransaction::run(*device, payload);
+      stick10_08::WriteToOTPSlot::CommandTransaction::run(device, payload);
     }
 
     void NitrokeyManager::write_TOTP_slot_authorize(uint8_t slot_number, const char *slot_name, const char *secret,
@@ -379,7 +379,7 @@ namespace nitrokey{
 
       authorize_packet<WriteToTOTPSlot, Authorize>(payload, temporary_password, device);
 
-      auto resp = WriteToTOTPSlot::CommandTransaction::run(*device, payload);
+      auto resp = WriteToTOTPSlot::CommandTransaction::run(device, payload);
     }
 
     const char * NitrokeyManager::get_totp_slot_name(uint8_t slot_number) {
@@ -396,7 +396,7 @@ namespace nitrokey{
     const char * NitrokeyManager::get_slot_name(uint8_t slot_number)  {
         auto payload = get_payload<GetSlotName>();
         payload.slot_number = slot_number;
-        auto resp = GetSlotName::CommandTransaction::run(*device, payload);
+        auto resp = GetSlotName::CommandTransaction::run(device, payload);
         return strdup((const char *) resp.data().slot_name);
     }
 
@@ -404,7 +404,7 @@ namespace nitrokey{
         auto authreq = get_payload<FirstAuthenticate>();
         strcpyT(authreq.card_password, pin);
         strcpyT(authreq.temporary_password, temporary_password);
-        FirstAuthenticate::CommandTransaction::run(*device, authreq);
+        FirstAuthenticate::CommandTransaction::run(device, authreq);
         return true;
     }
 
@@ -412,7 +412,7 @@ namespace nitrokey{
         auto p = get_payload<SetTime>();
         p.reset = 1;
         p.time = time;
-        SetTime::CommandTransaction::run(*device, p);
+        SetTime::CommandTransaction::run(device, p);
         return false;
     }
 
@@ -420,7 +420,7 @@ namespace nitrokey{
         auto p = get_payload<SetTime>();
         p.reset = 0;
         p.time = time;
-        SetTime::CommandTransaction::run(*device, p);
+        SetTime::CommandTransaction::run(device, p);
         return true;
     }
 
@@ -440,7 +440,7 @@ namespace nitrokey{
                 auto p = get_payload<ProCommand>();
                 strcpyT(p.old_pin, current_PIN);
                 strcpyT(p.new_pin, new_PIN);
-                ProCommand::CommandTransaction::run(*device, p);
+                ProCommand::CommandTransaction::run(device, p);
             }
                 break;
             //in Storage change admin/user pin is divided to two commands with 20 chars field len
@@ -452,8 +452,8 @@ namespace nitrokey{
                 auto p2 = get_payload<ChangeAdminUserPin20New>();
                 strcpyT(p2.password, new_PIN);
                 p2.set_kind(StoKind);
-                ChangeAdminUserPin20Current::CommandTransaction::run(*device, p);
-                ChangeAdminUserPin20New::CommandTransaction::run(*device, p2);
+                ChangeAdminUserPin20Current::CommandTransaction::run(device, p);
+                ChangeAdminUserPin20New::CommandTransaction::run(device, p2);
             }
                 break;
         }
@@ -464,15 +464,15 @@ namespace nitrokey{
         //The following command will cancel enabling PWS if it is not supported
         auto a = get_payload<IsAESSupported>();
         strcpyT(a.user_password, user_pin);
-        IsAESSupported::CommandTransaction::run(*device, a);
+        IsAESSupported::CommandTransaction::run(device, a);
 
         auto p = get_payload<EnablePasswordSafe>();
         strcpyT(p.user_password, user_pin);
-        EnablePasswordSafe::CommandTransaction::run(*device, p);
+        EnablePasswordSafe::CommandTransaction::run(device, p);
     }
 
     vector <uint8_t> NitrokeyManager::get_password_safe_slot_status() {
-        auto responsePayload = GetPasswordSafeSlotStatus::CommandTransaction::run(*device);
+        auto responsePayload = GetPasswordSafeSlotStatus::CommandTransaction::run(device);
         vector<uint8_t> v = vector<uint8_t>(responsePayload.data().password_safe_status,
                                             responsePayload.data().password_safe_status
                                             + sizeof(responsePayload.data().password_safe_status));
@@ -481,29 +481,29 @@ namespace nitrokey{
 
     uint8_t NitrokeyManager::get_user_retry_count() {
         if(device->get_device_model() == DeviceModel::STORAGE){
-          stick20::GetDeviceStatus::CommandTransaction::run(*device);
+          stick20::GetDeviceStatus::CommandTransaction::run(device);
         }
-        auto response = GetUserPasswordRetryCount::CommandTransaction::run(*device);
+        auto response = GetUserPasswordRetryCount::CommandTransaction::run(device);
         return response.data().password_retry_count;
     }
 
     uint8_t NitrokeyManager::get_admin_retry_count() {
         if(device->get_device_model() == DeviceModel::STORAGE){
-          stick20::GetDeviceStatus::CommandTransaction::run(*device);
+          stick20::GetDeviceStatus::CommandTransaction::run(device);
         }
-        auto response = GetPasswordRetryCount::CommandTransaction::run(*device);
+        auto response = GetPasswordRetryCount::CommandTransaction::run(device);
         return response.data().password_retry_count;
     }
 
     void NitrokeyManager::lock_device() {
-        LockDevice::CommandTransaction::run(*device);
+        LockDevice::CommandTransaction::run(device);
     }
 
     const char *NitrokeyManager::get_password_safe_slot_name(uint8_t slot_number) {
         if (!is_valid_password_safe_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         auto p = get_payload<GetPasswordSafeSlotName>();
         p.slot_number = slot_number;
-        auto response = GetPasswordSafeSlotName::CommandTransaction::run(*device, p);
+        auto response = GetPasswordSafeSlotName::CommandTransaction::run(device, p);
         return strdup((const char *) response.data().slot_name);
     }
 
@@ -513,7 +513,7 @@ namespace nitrokey{
         if (!is_valid_password_safe_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         auto p = get_payload<GetPasswordSafeSlotLogin>();
         p.slot_number = slot_number;
-        auto response = GetPasswordSafeSlotLogin::CommandTransaction::run(*device, p);
+        auto response = GetPasswordSafeSlotLogin::CommandTransaction::run(device, p);
         return strdup((const char *) response.data().slot_login);
     }
 
@@ -521,7 +521,7 @@ namespace nitrokey{
         if (!is_valid_password_safe_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         auto p = get_payload<GetPasswordSafeSlotPassword>();
         p.slot_number = slot_number;
-        auto response = GetPasswordSafeSlotPassword::CommandTransaction::run(*device, p);
+        auto response = GetPasswordSafeSlotPassword::CommandTransaction::run(device, p);
         return strdup((const char *) response.data().slot_password);
     }
 
@@ -532,26 +532,26 @@ namespace nitrokey{
         p.slot_number = slot_number;
         strcpyT(p.slot_name, slot_name);
         strcpyT(p.slot_password, slot_password);
-        SetPasswordSafeSlotData::CommandTransaction::run(*device, p);
+        SetPasswordSafeSlotData::CommandTransaction::run(device, p);
 
         auto p2 = get_payload<SetPasswordSafeSlotData2>();
         p2.slot_number = slot_number;
         strcpyT(p2.slot_login_name, slot_login);
-        SetPasswordSafeSlotData2::CommandTransaction::run(*device, p2);
+        SetPasswordSafeSlotData2::CommandTransaction::run(device, p2);
     }
 
     void NitrokeyManager::erase_password_safe_slot(uint8_t slot_number) {
         if (!is_valid_password_safe_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         auto p = get_payload<ErasePasswordSafeSlot>();
         p.slot_number = slot_number;
-        ErasePasswordSafeSlot::CommandTransaction::run(*device, p);
+        ErasePasswordSafeSlot::CommandTransaction::run(device, p);
     }
 
     void NitrokeyManager::user_authenticate(const char *user_password, const char *temporary_password) {
         auto p = get_payload<UserAuthenticate>();
         strcpyT(p.card_password, user_password);
         strcpyT(p.temporary_password, temporary_password);
-        UserAuthenticate::CommandTransaction::run(*device, p);
+        UserAuthenticate::CommandTransaction::run(device, p);
     }
 
     void NitrokeyManager::build_aes_key(const char *admin_password) {
@@ -559,14 +559,14 @@ namespace nitrokey{
             case DeviceModel::PRO: {
                 auto p = get_payload<BuildAESKey>();
                 strcpyT(p.admin_password, admin_password);
-                BuildAESKey::CommandTransaction::run(*device, p);
+                BuildAESKey::CommandTransaction::run(device, p);
                 break;
             }
             case DeviceModel::STORAGE : {
                 auto p = get_payload<stick20::CreateNewKeys>();
                 strcpyT(p.password, admin_password);
                 p.set_defaults();
-                stick20::CreateNewKeys::CommandTransaction::run(*device, p);
+                stick20::CreateNewKeys::CommandTransaction::run(device, p);
                 break;
             }
         }
@@ -575,7 +575,7 @@ namespace nitrokey{
     void NitrokeyManager::factory_reset(const char *admin_password) {
         auto p = get_payload<FactoryReset>();
         strcpyT(p.admin_password, admin_password);
-        FactoryReset::CommandTransaction::run(*device, p);
+        FactoryReset::CommandTransaction::run(device, p);
     }
 
     void NitrokeyManager::unlock_user_password(const char *admin_password, const char *new_user_password) {
@@ -584,18 +584,18 @@ namespace nitrokey{
           auto p = get_payload<stick10::UnlockUserPassword>();
           strcpyT(p.admin_password, admin_password);
           strcpyT(p.user_new_password, new_user_password);
-          stick10::UnlockUserPassword::CommandTransaction::run(*device, p);
+          stick10::UnlockUserPassword::CommandTransaction::run(device, p);
           break;
         }
         case DeviceModel::STORAGE : {
           auto p2 = get_payload<ChangeAdminUserPin20Current>();
           p2.set_defaults();
           strcpyT(p2.password, admin_password);
-          ChangeAdminUserPin20Current::CommandTransaction::run(*device, p2);
+          ChangeAdminUserPin20Current::CommandTransaction::run(device, p2);
           auto p3 = get_payload<stick20::UnlockUserPin>();
           p3.set_defaults();
           strcpyT(p3.password, new_user_password);
-          stick20::UnlockUserPin::CommandTransaction::run(*device, p3);
+          stick20::UnlockUserPin::CommandTransaction::run(device, p3);
           break;
         }
       }
@@ -615,11 +615,11 @@ namespace nitrokey{
         } else {
           strcpyT(p.temporary_admin_password, admin_temporary_password);
         }
-        stick10_08::WriteGeneralConfig::CommandTransaction::run(*device, p);
+        stick10_08::WriteGeneralConfig::CommandTransaction::run(device, p);
     }
 
     vector<uint8_t> NitrokeyManager::read_config() {
-        auto responsePayload = GetStatus::CommandTransaction::run(*device);
+        auto responsePayload = GetStatus::CommandTransaction::run(device);
         vector<uint8_t> v = vector<uint8_t>(responsePayload.data().general_config,
                                             responsePayload.data().general_config+sizeof(responsePayload.data().general_config));
         return v;
@@ -645,11 +645,11 @@ namespace nitrokey{
     int NitrokeyManager::get_minor_firmware_version(){
       switch(device->get_device_model()){
         case DeviceModel::PRO:{
-          auto status_p = GetStatus::CommandTransaction::run(*device);
+          auto status_p = GetStatus::CommandTransaction::run(device);
           return status_p.data().firmware_version; //7 or 8
         }
         case DeviceModel::STORAGE:{
-          auto status = stick20::GetDeviceStatus::CommandTransaction::run(*device);
+          auto status = stick20::GetDeviceStatus::CommandTransaction::run(device);
           return status.data().versionInfo.minor;
         }
       }
@@ -659,7 +659,7 @@ namespace nitrokey{
     bool NitrokeyManager::is_AES_supported(const char *user_password) {
         auto a = get_payload<IsAESSupported>();
         strcpyT(a.user_password, user_password);
-        IsAESSupported::CommandTransaction::run(*device, a);
+        IsAESSupported::CommandTransaction::run(device, a);
         return true;
     }
 
@@ -669,15 +669,15 @@ namespace nitrokey{
       auto p = get_payload<stick20::SendStartup>();
 //      p.set_defaults(); //set current time
       p.localtime = seconds_from_epoch;
-      stick20::SendStartup::CommandTransaction::run(*device, p);
+      stick20::SendStartup::CommandTransaction::run(device, p);
     }
 
     void NitrokeyManager::unlock_encrypted_volume(const char* user_pin){
-      misc::execute_password_command<stick20::EnableEncryptedPartition>(*device, user_pin);
+      misc::execute_password_command<stick20::EnableEncryptedPartition>(device, user_pin);
     }
 
     void NitrokeyManager::unlock_hidden_volume(const char* hidden_volume_password) {
-      misc::execute_password_command<stick20::EnableHiddenEncryptedPartition>(*device, hidden_volume_password);
+      misc::execute_password_command<stick20::EnableHiddenEncryptedPartition>(device, hidden_volume_password);
     }
 
     //TODO check is encrypted volume unlocked before execution
@@ -689,57 +689,57 @@ namespace nitrokey{
       p.StartBlockPercent_u8 = start_percent;
       p.EndBlockPercent_u8 = end_percent;
       strcpyT(p.HiddenVolumePassword_au8, hidden_volume_password);
-      stick20::SetupHiddenVolume::CommandTransaction::run(*device, p);
+      stick20::SetupHiddenVolume::CommandTransaction::run(device, p);
     }
 
     void NitrokeyManager::set_unencrypted_read_only(const char* user_pin) {
-      misc::execute_password_command<stick20::SendSetReadonlyToUncryptedVolume>(*device, user_pin);
+      misc::execute_password_command<stick20::SendSetReadonlyToUncryptedVolume>(device, user_pin);
     }
 
     void NitrokeyManager::set_unencrypted_read_write(const char* user_pin) {
-      misc::execute_password_command<stick20::SendSetReadwriteToUncryptedVolume>(*device, user_pin);
+      misc::execute_password_command<stick20::SendSetReadwriteToUncryptedVolume>(device, user_pin);
     }
 
     void NitrokeyManager::export_firmware(const char* admin_pin) {
-      misc::execute_password_command<stick20::ExportFirmware>(*device, admin_pin);
+      misc::execute_password_command<stick20::ExportFirmware>(device, admin_pin);
     }
 
     void NitrokeyManager::clear_new_sd_card_warning(const char* admin_pin) {
-      misc::execute_password_command<stick20::SendClearNewSdCardFound>(*device, admin_pin);
+      misc::execute_password_command<stick20::SendClearNewSdCardFound>(device, admin_pin);
     }
 
     void NitrokeyManager::fill_SD_card_with_random_data(const char* admin_pin) {
       auto p = get_payload<stick20::FillSDCardWithRandomChars>();
       p.set_defaults();
       strcpyT(p.admin_pin, admin_pin);
-      stick20::FillSDCardWithRandomChars::CommandTransaction::run(*device, p);
+      stick20::FillSDCardWithRandomChars::CommandTransaction::run(device, p);
     }
 
     void NitrokeyManager::change_update_password(const char* current_update_password, const char* new_update_password) {
       auto p = get_payload<stick20::ChangeUpdatePassword>();
       strcpyT(p.current_update_password, current_update_password);
       strcpyT(p.new_update_password, new_update_password);
-      stick20::ChangeUpdatePassword::CommandTransaction::run(*device, p);
+      stick20::ChangeUpdatePassword::CommandTransaction::run(device, p);
     }
 
     const char * NitrokeyManager::get_status_storage_as_string(){
-      auto p = stick20::GetDeviceStatus::CommandTransaction::run(*device);
+      auto p = stick20::GetDeviceStatus::CommandTransaction::run(device);
       return strdup(p.data().dissect().c_str());
     }
 
     stick20::DeviceConfigurationResponsePacket::ResponsePayload NitrokeyManager::get_status_storage(){
-      auto p = stick20::GetDeviceStatus::CommandTransaction::run(*device);
+      auto p = stick20::GetDeviceStatus::CommandTransaction::run(device);
       return p.data();
     }
 
     const char * NitrokeyManager::get_SD_usage_data_as_string(){
-      auto p = stick20::GetSDCardOccupancy::CommandTransaction::run(*device);
+      auto p = stick20::GetSDCardOccupancy::CommandTransaction::run(device);
       return strdup(p.data().dissect().c_str());
     }
 
     int NitrokeyManager::get_progress_bar_value(){
       try{
-        stick20::GetDeviceStatus::CommandTransaction::run(*device);
+        stick20::GetDeviceStatus::CommandTransaction::run(device);
         return -1;
       }
       catch (LongOperationInProgressException &e){
@@ -754,7 +754,7 @@ namespace nitrokey{
   stick10::ReadSlot::ResponsePayload NitrokeyManager::get_OTP_slot_data(const uint8_t slot_number) {
     auto p = get_payload<stick10::ReadSlot>();
     p.slot_number = slot_number;
-    auto data = stick10::ReadSlot::CommandTransaction::run(*device, p);
+    auto data = stick10::ReadSlot::CommandTransaction::run(device, p);
     return data.data();
   }
 

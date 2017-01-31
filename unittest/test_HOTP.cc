@@ -34,8 +34,8 @@ TEST_CASE("test secret", "[functions]") {
 }
 
 TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
-    Stick10 stick;
-    bool connected = stick.connect();
+    std::shared_ptr<Stick10> stick = make_shared<Stick10>();
+    bool connected = stick->connect();
 
   REQUIRE(connected == true);
 
@@ -98,5 +98,5 @@ TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
   }
 
 
-  stick.disconnect();
+  stick->disconnect();
 }

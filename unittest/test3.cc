@@ -26,13 +26,15 @@ using namespace nitrokey::proto::stick10_08;
 using namespace nitrokey::log;
 using namespace nitrokey::misc;
 
-void connect_and_setup(Stick10 &stick) {
-  bool connected = stick.connect();
+using Dev10 = std::shared_ptr<Stick10>;
+
+void connect_and_setup(Dev10 stick) {
+  bool connected = stick->connect();
   REQUIRE(connected == true);
   Log::instance().set_loglevel(Loglevel::DEBUG);
 }
 
-void authorize(Stick10 &stick) {
+void authorize(Dev10 stick) {
   auto authreq = get_payload<FirstAuthenticate>();
   strcpy((char *) (authreq.card_password), default_admin_pin);
   strcpy((char *) (authreq.temporary_password), temporary_password);
@@ -45,7 +47,8 @@ void authorize(Stick10 &stick) {
 }
 
 TEST_CASE("write slot", "[pronew]"){
-  Stick10 stick;
+  auto stick = make_shared<Stick10>();
+
   connect_and_setup(stick);
   authorize(stick);
 
@@ -81,7 +84,7 @@ TEST_CASE("write slot", "[pronew]"){
 
 
 TEST_CASE("erase slot", "[pronew]"){
-  Stick10 stick;
+  auto stick = make_shared<Stick10>();
   connect_and_setup(stick);
   authorize(stick);
 
@@ -107,7 +110,7 @@ TEST_CASE("erase slot", "[pronew]"){
 }
 
 TEST_CASE("write general config", "[pronew]") {
-  Stick10 stick;
+  auto stick = make_shared<Stick10>();
   connect_and_setup(stick);
   authorize(stick);
 
@@ -121,7 +124,7 @@ TEST_CASE("write general config", "[pronew]") {
 }
 
 TEST_CASE("authorize user HOTP", "[pronew]") {
-  Stick10 stick;
+  auto stick = make_shared<Stick10>();
   connect_and_setup(stick);
   authorize(stick);
 
@@ -164,7 +167,7 @@ TEST_CASE("authorize user HOTP", "[pronew]") {
 }
 
 TEST_CASE("check firmware version", "[pronew]") {
-  Stick10 stick;
+  auto stick = make_shared<Stick10>();
   connect_and_setup(stick);
 
   auto p = GetStatus::CommandTransaction::run(stick);
@@ -172,7 +175,7 @@ TEST_CASE("check firmware version", "[pronew]") {
 }
 
 TEST_CASE("authorize user TOTP", "[pronew]") {
-  Stick10 stick;
+  auto stick = make_shared<Stick10>();
   connect_and_setup(stick);
   authorize(stick);
 

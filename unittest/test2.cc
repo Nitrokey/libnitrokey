@@ -20,9 +20,10 @@ using namespace nitrokey::proto::stick20;
 using namespace nitrokey::log;
 using namespace nitrokey::misc;
 
+#include <memory>
 
 template<typename CMDTYPE>
-void execute_password_command(Device &stick, const char *password, const char kind = 'P') {
+void execute_password_command(std::shared_ptr<Device> stick, const char *password, const char kind = 'P') {
   auto p = get_payload<CMDTYPE>();
   if (kind == 'P'){
     p.set_kind_user();
@@ -47,8 +48,8 @@ void SKIP_TEST() {
 TEST_CASE("long operation test", "[test_long]") {
   SKIP_TEST();
 
-  Stick20 stick;
-  bool connected = stick.connect();
+  auto stick = make_shared<Stick20>();
+  bool connected = stick->connect();
   REQUIRE(connected == true);
   Log::instance().set_loglevel(Loglevel::DEBUG);
   try{
@@ -123,8 +124,8 @@ TEST_CASE("test device commands ids", "[fast]") {
 }
 
 TEST_CASE("test device internal status with various commands", "[fast]") {
-  Stick20 stick;
-  bool connected = stick.connect();
+  auto stick = make_shared<Stick20>();
+  bool connected = stick->connect();
   REQUIRE(connected == true);
 
   Log::instance().set_loglevel(Loglevel::DEBUG);
@@ -147,8 +148,8 @@ TEST_CASE("test device internal status with various commands", "[fast]") {
 }
 
 TEST_CASE("setup hidden volume test", "[hidden]") {
-  Stick20 stick;
-  bool connected = stick.connect();
+  auto stick = make_shared<Stick20>();
+  bool connected = stick->connect();
   REQUIRE(connected == true);
   Log::instance().set_loglevel(Loglevel::DEBUG);
   stick10::LockDevice::CommandTransaction::run(stick);
@@ -170,8 +171,8 @@ TEST_CASE("setup hidden volume test", "[hidden]") {
 }
 
 TEST_CASE("setup multiple hidden volumes", "[hidden]") {
-  Stick20 stick;
-  bool connected = stick.connect();
+  auto stick = make_shared<Stick20>();
+  bool connected = stick->connect();
   REQUIRE(connected == true);
   Log::instance().set_loglevel(Loglevel::DEBUG);
 
@@ -207,8 +208,8 @@ TEST_CASE("setup multiple hidden volumes", "[hidden]") {
 TEST_CASE("update password change", "[dangerous]") {
   SKIP_TEST();
 
-  Stick20 stick;
-  bool connected = stick.connect();
+  auto stick = make_shared<Stick20>();
+  bool connected = stick->connect();
   REQUIRE(connected == true);
   Log::instance().set_loglevel(Loglevel::DEBUG);
 
@@ -228,8 +229,8 @@ TEST_CASE("update password change", "[dangerous]") {
 }
 
 TEST_CASE("general test", "[test]") {
-  Stick20 stick;
-  bool connected = stick.connect();
+  auto stick = make_shared<Stick20>();
+  bool connected = stick->connect();
   REQUIRE(connected == true);
 
   Log::instance().set_loglevel(Loglevel::DEBUG);

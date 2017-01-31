@@ -7,6 +7,7 @@
 #include "include/device.h"
 #include "include/log.h"
 #include <mutex>
+#include "DeviceCommunicationExceptions.h"
 
 std::mutex mex_dev_com;
 
@@ -60,8 +61,10 @@ int Device::send(const void *packet) {
   std::lock_guard<std::mutex> lock(mex_dev_com);
   Log::instance()(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
 
-  if (mp_devhandle == nullptr)
-    throw std::runtime_error("Attempted HID send on an invalid descriptor."); //TODO migrate except to library_error
+  if (mp_devhandle == nullptr) {
+    Log::instance()(std::string("Connection fail") , Loglevel::DEBUG_L2);
+    throw DeviceNotConnected("Attempted HID send on an invalid descriptor.");
+  }
 
   return (hid_send_feature_report(
       mp_devhandle, (const unsigned char *)(packet), HID_REPORT_SIZE));
@@ -75,8 +78,10 @@ int Device::recv(void *packet) {
   int retry_count = 0;
 
 
-  if (mp_devhandle == nullptr)
-    throw std::runtime_error("Attempted HID receive on an invalid descriptor."); //TODO migrate except to library_error
+  if (mp_devhandle == nullptr){
+    Log::instance()(std::string("Connection fail") , Loglevel::DEBUG_L2);
+    throw DeviceNotConnected("Attempted HID receive on an invalid descriptor.");
+  }
 
   // FIXME extract error handling and repeating to parent function in
   // device_proto:192

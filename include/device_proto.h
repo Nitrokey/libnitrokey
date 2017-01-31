@@ -33,6 +33,7 @@
 #define PWS_SEND_CR 3
 
 #include <mutex>
+#include "DeviceCommunicationExceptions.h"
 
 namespace nitrokey {
     namespace proto {
@@ -217,6 +218,10 @@ namespace nitrokey {
 
               Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
 
+              if (dev == nullptr){
+                throw DeviceNotConnected("Device not initialized");
+              }
+
               int status;
               OutgoingPacket outp;
               ResponsePacket resp;
@@ -320,7 +325,7 @@ namespace nitrokey {
               clear_packet(outp);
 
               if (status <= 0)
-                throw std::runtime_error( //FIXME replace with CriticalErrorException
+                throw DeviceReceivingFailure( //FIXME replace with CriticalErrorException
                     std::string("Device error while executing command ") +
                     std::to_string(status));
 

@@ -11,8 +11,6 @@ public:
     virtual uint8_t exception_id()= 0;
 };
 
-
-
 class TargetBufferSmallerThanSource: public LibraryException {
 public:
     virtual uint8_t exception_id() override {

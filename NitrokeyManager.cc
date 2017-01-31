@@ -88,7 +88,8 @@ namespace nitrokey{
     }
 
     shared_ptr<NitrokeyManager> NitrokeyManager::instance() {
-      //FIXME check thread safety - add atomic for instance, add lock guard
+      static std::mutex mutex;
+      std::lock_guard<std::mutex> lock(mutex);
         if (_instance == nullptr){
             _instance = make_shared<NitrokeyManager>();
         }

@@ -100,16 +100,32 @@ namespace nitrokey{
 
     bool NitrokeyManager::disconnect() {
       std::lock_guard<std::mutex> lock(mex_dev_com);
-      if (!is_connected()){
-        return false;
-      }
-      const auto res = device->disconnect();
-      device = nullptr;
-      return res;
+      return _disconnect_no_lock();
     }
 
-    bool NitrokeyManager::is_connected() const throw(){
-      return device != nullptr;
+  bool NitrokeyManager::_disconnect_no_lock() {
+    //do not use directly without locked mutex,
+    //used by is_connected, disconnect
+    if (device == nullptr){
+      return false;
+    }
+    const auto res = device->disconnect();
+    device = nullptr;
+    return res;
+  }
+
+  bool NitrokeyManager::is_connected() throw(){
+      std::lock_guard<std::mutex> lock(mex_dev_com);
+      if(device != nullptr){
+        auto connected = device->is_connected();
+        if(connected){
+          return true;
+        } else {
+          _disconnect_no_lock();
+          return false;
+        }
+      }
+      return false;
     }
 
     void NitrokeyManager::set_debug(bool state) {

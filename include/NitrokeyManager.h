@@ -43,7 +43,7 @@ namespace nitrokey {
         bool connect(const char *device_model);
         bool connect();
         bool disconnect();
-        bool is_connected() const throw() ;
+        bool is_connected() throw() ;
         DeviceModel get_connected_device_model() const;
           void set_debug(bool state);
         stick10::GetStatus::ResponsePayload get_status();
@@ -156,6 +156,7 @@ namespace nitrokey {
                                          bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
                                          const char *temporary_password) const;
 
+      bool _disconnect_no_lock();
     };
 }
 

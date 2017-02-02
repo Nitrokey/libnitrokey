@@ -123,6 +123,9 @@ namespace nitrokey {
                     StorageCommandResponsePayload::TransmissionData transmission_data;
 
                     uint16_t MagicNumber_StickConfig_u16;
+                  /**
+                   * READ_WRITE_ACTIVE = ReadWriteFlagUncryptedVolume_u8 == 0;
+                   */
                     uint8_t ReadWriteFlagUncryptedVolume_u8;
                     uint8_t ReadWriteFlagCryptedVolume_u8;
 
@@ -134,11 +137,22 @@ namespace nitrokey {
                             uint8_t __unused2;
                             uint8_t major;
                         } __packed versionInfo;
-                    };
+                    } __packed;
 
                     uint8_t ReadWriteFlagHiddenVolume_u8;
                     uint8_t FirmwareLocked_u8;
-                    uint8_t NewSDCardFound_u8;
+
+                    union{
+                      uint8_t NewSDCardFound_u8;
+                      struct {
+                        bool NewCard :1;
+                        uint8_t Counter :7;
+                      } __packed NewSDCardFound_st;
+                    } __packed;
+
+                    /**
+                     * SD card FILLED with random chars
+                     */
                     uint8_t SDFillWithRandomChars_u8;
                     uint32_t ActiveSD_CardID_u32;
                     union{

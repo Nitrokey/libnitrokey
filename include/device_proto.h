@@ -243,10 +243,13 @@ namespace nitrokey {
               int sending_retry_counter = dev->get_retry_sending_count();
               while (sending_retry_counter-- > 0) {
                 status = dev->send(&outp);
-                if (status <= 0)
+                if (status <= 0){
+                  Log::instance()("Encountered communication error, disconnecting device", Loglevel::DEBUG_L2);
+                  dev->disconnect();
                   throw DeviceSendingFailure(
                       std::string("Device error while sending command ") +
                       std::to_string(status));
+                }
 
                 std::this_thread::sleep_for(dev->get_send_receive_delay());
 

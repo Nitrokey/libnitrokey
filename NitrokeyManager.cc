@@ -766,4 +766,12 @@ namespace nitrokey{
     return get_OTP_slot_data(get_internal_slot_number_for_hotp(slot_number));
   }
 
+  void NitrokeyManager::lock_encrypted_volume() {
+    misc::execute_password_command<stick20::DisableEncryptedPartition>(device, "");
+  }
+
+  void NitrokeyManager::lock_hidden_volume() {
+    misc::execute_password_command<stick20::DisableHiddenEncryptedPartition>(device, "");
+  }
+
 }

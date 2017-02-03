@@ -26,9 +26,12 @@ namespace nitrokey {
                 public PasswordCommand<CommandID::UNLOCK_USER_PASSWORD, PasswordKind::Admin> {};
 
             class EnableEncryptedPartition : public PasswordCommand<CommandID::ENABLE_CRYPTED_PARI> {};
-            class DisableEncryptedPartition : public PasswordCommand<CommandID::DISABLE_CRYPTED_PARI> {};
             class EnableHiddenEncryptedPartition : public PasswordCommand<CommandID::ENABLE_HIDDEN_CRYPTED_PARI> {};
+
+            //FIXME the volume disabling commands do not need password
+            class DisableEncryptedPartition : public PasswordCommand<CommandID::DISABLE_CRYPTED_PARI> {};
             class DisableHiddenEncryptedPartition : public PasswordCommand<CommandID::DISABLE_CRYPTED_PARI> {};
+
             class EnableFirmwareUpdate : public PasswordCommand<CommandID::ENABLE_FIRMWARE_UPDATE> {};
 
             class ChangeUpdatePassword : Command<CommandID::CHANGE_UPDATE_PIN> {

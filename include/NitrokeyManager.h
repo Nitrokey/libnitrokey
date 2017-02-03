@@ -91,8 +91,10 @@ namespace nitrokey {
         bool is_AES_supported(const char *user_password);
 
         void unlock_encrypted_volume(const char *user_password);
+        void lock_encrypted_volume();
 
         void unlock_hidden_volume(const char *hidden_volume_password);
+        void lock_hidden_volume();
 
         void set_unencrypted_read_only(const char *user_pin);
 

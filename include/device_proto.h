@@ -245,8 +245,9 @@ namespace nitrokey {
               while (sending_retry_counter-- > 0) {
                 status = dev->send(&outp);
                 if (status <= 0){
-                  Log::instance()("Encountered communication error, disconnecting device", Loglevel::DEBUG_L2);
-                  dev->disconnect();
+                    //FIXME early disconnection not yet working properly
+//                  Log::instance()("Encountered communication error, disconnecting device", Loglevel::DEBUG_L2);
+//                  dev->disconnect();
                   dev->m_counters.sending_error++;
                   throw DeviceSendingFailure(
                       std::string("Device error while sending command ") +

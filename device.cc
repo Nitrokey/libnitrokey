@@ -101,6 +101,9 @@ int Device::recv(void *packet) {
       Log::instance()(
           "Maximum retry count reached" + std::to_string(retry_count),
           Loglevel::WARNING);
+      Log::instance()(
+          std::string("Counter stats") + m_counters.get_as_string(),
+          Loglevel::DEBUG);
       break;
     }
     Log::instance()("Retrying... " + std::to_string(retry_count),
@@ -129,6 +132,11 @@ bool Device::is_connected() {
 //  return hid_read_timeout(mp_devhandle, buf, sizeof(buf), 20) != -1;
 }
 
+void Device::show_stats() {
+  auto s = m_counters.get_as_string();
+  Log::instance()(s, Loglevel::DEBUG_L2);
+}
+
 Stick10::Stick10():
   Device(0x20a0, 0x4108, DeviceModel::PRO, 100ms, 20, 100ms)
   {}
@@ -137,3 +145,19 @@ Stick10::Stick10():
 Stick20::Stick20():
   Device(0x20a0, 0x4109, DeviceModel::STORAGE, 200ms, 40, 200ms)
   {}
+
+#include <sstream>
+#define p(x) ss << #x << " " << x << ", ";
+std::string Device::ErrorCounters::get_as_string() {
+  std::stringstream ss;
+  p(wrong_CRC);
+  p(CRC_other_than_awaited);
+  p(busy);
+  p(total_retries);
+  p(sending_error);
+  p(receiving_error);
+  p(total_comm_runs);
+  p(storage_commands);
+  p(successful	);
+  return ss.str();
+}

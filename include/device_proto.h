@@ -221,6 +221,7 @@ namespace nitrokey {
               if (dev == nullptr){
                 throw DeviceNotConnected("Device not initialized");
               }
+              dev->m_counters.total_comm_runs++;
 
               int status;
               OutgoingPacket outp;
@@ -246,6 +247,7 @@ namespace nitrokey {
                 if (status <= 0){
                   Log::instance()("Encountered communication error, disconnecting device", Loglevel::DEBUG_L2);
                   dev->disconnect();
+                  dev->m_counters.sending_error++;
                   throw DeviceSendingFailure(
                       std::string("Device error while sending command ") +
                       std::to_string(status));
@@ -263,6 +265,7 @@ namespace nitrokey {
                       resp.command_id < stick20::CMD_END_VALUE ) {
                     Log::instance()(std::string("Detected storage device cmd, status: ") +
                                     std::to_string(resp.storage_status.device_status), Loglevel::DEBUG_L2);
+                    dev->m_counters.storage_commands++;
 
                     resp.last_command_status = static_cast<uint8_t>(stick10::command_status::ok);
                     switch (static_cast<stick20::device_status>(resp.storage_status.device_status)) {
@@ -288,8 +291,9 @@ namespace nitrokey {
 
                   //SENDPASSWORD gives wrong CRC , for now rely on !=0 (TODO report)
 //                  if (resp.device_status == 0 && resp.last_command_crc == outp.crc && resp.isCRCcorrect()) break;
+                  auto CRC_equal_awaited = resp.last_command_crc == outp.crc;
                   if (resp.device_status == static_cast<uint8_t>(stick10::device_status::ok) &&
-                      resp.last_command_crc == outp.crc && resp.isValid()){
+                      CRC_equal_awaited && resp.isValid()){
                     successful_communication = true;
                     break;
                   }
@@ -306,14 +310,19 @@ namespace nitrokey {
                   }
                   Log::instance()(std::string("Retry status - dev status, awaited cmd crc, correct packet CRC: ")
                                   + std::to_string(resp.device_status) + " " +
-                                  std::to_string(resp.last_command_crc == outp.crc) +
+                                  std::to_string(CRC_equal_awaited) +
                                   " " + std::to_string(resp.isCRCcorrect()), Loglevel::DEBUG_L2);
+
+                  if (!resp.isCRCcorrect()) dev->m_counters.wrong_CRC++;
+                  if (!CRC_equal_awaited) dev->m_counters.CRC_other_than_awaited++;
+
 
                   Log::instance()(
                       "Device is not ready or received packet's last CRC is not equal to sent CRC packet, retrying...",
                       Loglevel::DEBUG);
                   Log::instance()("Invalid incoming HID packet:", Loglevel::DEBUG_L2);
                   Log::instance()(static_cast<std::string>(resp), Loglevel::DEBUG_L2);
+                  dev->m_counters.total_retries++;
                   std::this_thread::sleep_for(dev->get_retry_timeout());
                   continue;
                 }
@@ -327,10 +336,12 @@ namespace nitrokey {
 
               clear_packet(outp);
 
-              if (status <= 0)
+              if (status <= 0) {
+                dev->m_counters.receiving_error++;
                 throw DeviceReceivingFailure( //FIXME replace with CriticalErrorException
                     std::string("Device error while executing command ") +
                     std::to_string(status));
+              }
 
               Log::instance()("Incoming HID packet:", Loglevel::DEBUG);
               Log::instance()(static_cast<std::string>(resp), Loglevel::DEBUG);
@@ -351,6 +362,7 @@ namespace nitrokey {
               if (resp.last_command_status != static_cast<uint8_t>(stick10::command_status::ok))
                 throw CommandFailedException(resp.command_id, resp.last_command_status);
 
+              dev->m_counters.successful++;
 
               // See: DeviceResponse
               return resp;

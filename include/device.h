@@ -2,7 +2,8 @@
 #define DEVICE_H
 #include <chrono>
 #include <hidapi/hidapi.h>
-#include <stdint.h>
+#include <cstdint>
+#include <string>
 
 #define HID_REPORT_SIZE 65
 
@@ -30,11 +31,26 @@ enum class DeviceModel{
 class Device {
 
 public:
+
+  struct ErrorCounters{
+    int wrong_CRC;
+    int CRC_other_than_awaited;
+    int busy;
+    int total_retries;
+    int sending_error;
+    int receiving_error;
+    int total_comm_runs;
+    int storage_commands;
+    int successful;
+    std::string get_as_string();
+  } m_counters = {};
+
+
     Device(const uint16_t vid, const uint16_t pid, const DeviceModel model,
                    const milliseconds send_receive_delay, const int retry_receiving_count,
                    const milliseconds retry_timeout);
 
-    virtual ~Device(){disconnect();}
+    virtual ~Device(){show_stats(); disconnect();}
 
   // lack of device is not actually an error,
   // so it doesn't throw
@@ -54,6 +70,8 @@ public:
 
   bool is_connected();
 
+  void show_stats();
+  ErrorCounters get_stats(){ return m_counters; }
   int get_retry_receiving_count() const { return m_retry_receiving_count; };
   int get_retry_sending_count() const { return m_retry_sending_count; };
   std::chrono::milliseconds get_retry_timeout() const { return m_retry_timeout; };

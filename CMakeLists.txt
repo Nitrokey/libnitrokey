@@ -54,7 +54,9 @@ set(SOURCE_FILES
 
 
 add_library(nitrokey SHARED ${SOURCE_FILES})
+add_library(nitrokey-static STATIC ${SOURCE_FILES})
 target_link_libraries(nitrokey hidapi-libusb)
+target_link_libraries(nitrokey-static hidapi-libusb)
 
 install (TARGETS nitrokey DESTINATION "lib")
 file(GLOB LIB_INCLUDES "include/libnitrokey/*.h")

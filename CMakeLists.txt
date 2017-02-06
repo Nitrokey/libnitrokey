@@ -1,5 +1,3 @@
-SET(PROJECT_VERSION "3.0-alpha")
-
 cmake_minimum_required(VERSION 3.5)
 IF (UNIX)
     OPTION(ADD_ASAN "Use ASAN to show memory issues" FALSE)
@@ -17,13 +15,14 @@ IF (UNIX)
 ENDIF()
 
 project(libnitrokey CXX)
+SET(PROJECT_VERSION "3.0-alpha")
 set(CMAKE_CXX_STANDARD 14)
 
 OPTION(COMPILE_TESTS "Compile tests" FALSE)
 IF (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE RelWithDebInfo)
 ENDIF()
-MESSAGE("Build type: ${CMAKE_BUILD_TYPE}")
+MESSAGE("${PROJECT_NAME}: Build type: ${CMAKE_BUILD_TYPE}")
 
 include_directories(include)
 set(SOURCE_FILES
@@ -90,6 +89,8 @@ IF (COMPILE_TESTS)
 ENDIF()
 
 
+#SET(CPACK_GENERATOR
+#        "DEB;RPM")
 # build a CPack driven installer package
 include (InstallRequiredSystemLibraries)
 set (CPACK_RESOURCE_FILE_LICENSE

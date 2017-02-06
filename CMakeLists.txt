@@ -19,8 +19,9 @@ project(libnitrokey CXX)
 set(CMAKE_CXX_STANDARD 14)
 
 OPTION(COMPILE_TESTS "Compile tests" FALSE)
-set(CMAKE_BUILD_TYPE RelWithDebInfo)
-
+IF (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE RelWithDebInfo)
+ENDIF()
 MESSAGE("Build type: ${CMAKE_BUILD_TYPE}")
 
 include_directories(include)

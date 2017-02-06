@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main()
 #include "catch.hpp"
 #include <iostream>
 #include "device_proto.h"
@@ -14,7 +13,7 @@ using namespace nitrokey::log;
 using namespace nitrokey::misc;
 
 void hexStringToByte(uint8_t data[], const char* hexString){
-    assert(strlen(hexString)%2==0);
+  REQUIRE(strlen(hexString)%2==0);
     char buf[2];
     for(int i=0; i<strlen(hexString); i++){
         buf[i%2] = hexString[i];

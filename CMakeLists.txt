@@ -29,12 +29,25 @@ set(SOURCE_FILES
     misc.cc
     NitrokeyManager.cc
         NK_C_API.cc include/CommandFailedException.h include/LibraryException.h
-        unittest/test_C_API.cpp
-        unittest/catch_main.cpp
-        unittest/test2.cc
-        unittest/test3.cc
         include/LongOperationInProgressException.h
         include/stick10_commands_0.8.h
         )
 
-add_executable(libnitrokey ${SOURCE_FILES})
+#add_library(libnitrokey STATIC ${SOURCE_FILES})
+add_library(nitrokey SHARED ${SOURCE_FILES})
+add_library(catch STATIC unittest/catch_main.cpp )
+
+add_executable (test_C_API unittest/test_C_API.cpp)
+target_link_libraries (test_C_API PUBLIC nitrokey catch)
+
+add_executable (test2 unittest/test2.cc)
+target_link_libraries (test2 PUBLIC nitrokey catch)
+
+add_executable (test3 unittest/test3.cc)
+target_link_libraries (test3 PUBLIC nitrokey catch)
+
+add_executable (test_HOTP unittest/test_HOTP.cc)
+target_link_libraries (test_HOTP PUBLIC nitrokey catch)
+
+add_executable (test1 unittest/test.cc)
+target_link_libraries (test1 PUBLIC nitrokey catch)

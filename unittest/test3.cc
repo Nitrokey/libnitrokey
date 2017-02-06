@@ -1,8 +1,3 @@
-//
-// Created by sz on 08.11.16.
-//
-
-#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main()
 
 static const char *const default_admin_pin = "12345678";
 static const char *const default_user_pin = "123456";

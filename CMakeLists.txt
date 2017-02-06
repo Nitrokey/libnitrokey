@@ -18,6 +18,8 @@ project(libnitrokey CXX)
 SET(PROJECT_VERSION "3.0-alpha")
 set(CMAKE_CXX_STANDARD 14)
 
+OPTION(LIBNITROKEY_STATIC "Build libnitrokey statically" TRUE)
+
 OPTION(COMPILE_TESTS "Compile tests" FALSE)
 IF (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE RelWithDebInfo)
@@ -52,12 +54,15 @@ set(SOURCE_FILES
 )
 
 
-add_library(nitrokey SHARED ${SOURCE_FILES})
-add_library(nitrokey-static STATIC ${SOURCE_FILES})
-target_link_libraries(nitrokey hidapi-libusb)
-target_link_libraries(nitrokey-static hidapi-libusb)
+IF (NOT LIBNITROKEY_STATIC)
+    add_library(nitrokey SHARED ${SOURCE_FILES})
+    target_link_libraries(nitrokey hidapi-libusb)
+    install (TARGETS nitrokey DESTINATION "lib")
+ELSE()
+    add_library(nitrokey-static STATIC ${SOURCE_FILES})
+    target_link_libraries(nitrokey-static hidapi-libusb)
+ENDIF()
 
-install (TARGETS nitrokey DESTINATION "lib")
 file(GLOB LIB_INCLUDES "include/libnitrokey/*.h")
 install (FILES ${LIB_INCLUDES} DESTINATION "include")
 

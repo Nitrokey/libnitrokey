@@ -1,5 +1,6 @@
-cmake_minimum_required(VERSION 3.5)
+SET(PROJECT_VERSION "3.0-alpha")
 
+cmake_minimum_required(VERSION 3.5)
 IF (UNIX)
     OPTION(ADD_ASAN "Use ASAN to show memory issues" FALSE)
     OPTION(USE_CLANG "Use CLang" FALSE)
@@ -55,6 +56,10 @@ set(SOURCE_FILES
 add_library(nitrokey SHARED ${SOURCE_FILES})
 target_link_libraries(nitrokey hidapi-libusb)
 
+install (TARGETS nitrokey DESTINATION "lib")
+file(GLOB LIB_INCLUDES "include/libnitrokey/*.h")
+install (FILES ${LIB_INCLUDES} DESTINATION "include")
+
 IF (COMPILE_TESTS)
     include_directories(unittest/Catch/include)
 
@@ -82,3 +87,10 @@ IF (COMPILE_TESTS)
     add_test (runs test_C_API)
 ENDIF()
 
+
+# build a CPack driven installer package
+include (InstallRequiredSystemLibraries)
+set (CPACK_RESOURCE_FILE_LICENSE
+        "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set (CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+include (CPack)

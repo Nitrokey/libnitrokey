@@ -21,7 +21,8 @@ using namespace nitrokey::proto::stick10_08;
 using namespace nitrokey::log;
 using namespace nitrokey::misc;
 
-using Dev10 = std::shared_ptr<Stick10>;
+using Dev = Stick10;
+using Dev10 = std::shared_ptr<Dev>;
 
 void connect_and_setup(Dev10 stick) {
   bool connected = stick->connect();
@@ -42,7 +43,7 @@ void authorize(Dev10 stick) {
 }
 
 TEST_CASE("write slot", "[pronew]"){
-  auto stick = make_shared<Stick10>();
+  auto stick = make_shared<Dev>();
 
   connect_and_setup(stick);
   authorize(stick);
@@ -79,7 +80,7 @@ TEST_CASE("write slot", "[pronew]"){
 
 
 TEST_CASE("erase slot", "[pronew]"){
-  auto stick = make_shared<Stick10>();
+  auto stick = make_shared<Dev>();
   connect_and_setup(stick);
   authorize(stick);
 
@@ -105,7 +106,7 @@ TEST_CASE("erase slot", "[pronew]"){
 }
 
 TEST_CASE("write general config", "[pronew]") {
-  auto stick = make_shared<Stick10>();
+  auto stick = make_shared<Dev>();
   connect_and_setup(stick);
   authorize(stick);
 
@@ -119,7 +120,7 @@ TEST_CASE("write general config", "[pronew]") {
 }
 
 TEST_CASE("authorize user HOTP", "[pronew]") {
-  auto stick = make_shared<Stick10>();
+  auto stick = make_shared<Dev>();
   connect_and_setup(stick);
   authorize(stick);
 
@@ -162,7 +163,7 @@ TEST_CASE("authorize user HOTP", "[pronew]") {
 }
 
 TEST_CASE("check firmware version", "[pronew]") {
-  auto stick = make_shared<Stick10>();
+  auto stick = make_shared<Dev>();
   connect_and_setup(stick);
 
   auto p = GetStatus::CommandTransaction::run(stick);
@@ -170,7 +171,7 @@ TEST_CASE("check firmware version", "[pronew]") {
 }
 
 TEST_CASE("authorize user TOTP", "[pronew]") {
-  auto stick = make_shared<Stick10>();
+  auto stick = make_shared<Dev>();
   connect_and_setup(stick);
   authorize(stick);
 

@@ -522,7 +522,7 @@ namespace nitrokey{
         auto p = get_payload<GetPasswordSafeSlotPassword>();
         p.slot_number = slot_number;
         auto response = GetPasswordSafeSlotPassword::CommandTransaction::run(device, p);
-        return strdup((const char *) response.data().slot_password);
+        return strdup((const char *) response.data().slot_password); //FIXME use secure way
     }
 
     void NitrokeyManager::write_password_safe_slot(uint8_t slot_number, const char *slot_name, const char *slot_login,

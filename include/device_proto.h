@@ -300,9 +300,9 @@ namespace nitrokey {
                   }
                   if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy)) {
                     static int busy_counter = 0;
+                    dev->m_counters.busy++;
                     if (busy_counter++<10) {
                       receiving_retry_counter++;
-                      dev->m_counters.busy++;
                       Log::instance()("Status busy, not decreasing receiving_retry_counter counter: " +
                                       std::to_string(receiving_retry_counter), Loglevel::DEBUG_L2);
                     } else {

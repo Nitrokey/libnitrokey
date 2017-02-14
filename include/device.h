@@ -1,7 +1,7 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 #include <chrono>
-#include <hidapi/hidapi.h>
+#include "hidapi/hidapi.h"
 #include <cstdint>
 #include <string>
 

@@ -61,13 +61,13 @@ set(SOURCE_FILES
     NK_C_API.cc
 )
 
-#IF(UNIX)
+IF(UNIX)
 #	add_library(hidapi-libusb STATIC hidapi/libusb/hid.c )
-#ELSE()
+ELSEIF(WIN32)
 	include_directories(hidapi/hidapi)
-	add_library(hidapi-libusb SHARED hidapi/windows/hid.c )
-	target_link_libraries(hidapi-libusb setupapi setupapi kernel32 user32 gdi32 winspool comdlg32 advapi32 shell32 ole32 oleaut32 uuid odbc32 odbccp32)
-#ENDIF()
+	add_library(hidapi-libusb STATIC hidapi/windows/hid.c )
+	target_link_libraries(hidapi-libusb setupapi)
+ENDIF()
 
 IF (NOT LIBNITROKEY_STATIC)
     add_library(nitrokey SHARED ${SOURCE_FILES})

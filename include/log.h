@@ -6,6 +6,10 @@
 namespace nitrokey {
 namespace log {
 
+#ifdef ERROR
+#undef ERROR
+#endif
+
 enum class Loglevel : int { DEBUG_L2, DEBUG, INFO, WARNING, ERROR };
 
 class LogHandler {

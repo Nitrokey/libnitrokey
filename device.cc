@@ -41,7 +41,8 @@ bool Device::disconnect() {
 
   hid_close(mp_devhandle);
   mp_devhandle = nullptr;
-  hid_exit();
+  //FIXME hidexit should not be called if some devices are still active - use static active devices counter
+  //  hid_exit();
   return true;
 }
 bool Device::connect() {

@@ -1,10 +1,14 @@
 #ifndef CXX_SEMANTICS_H
 #define CXX_SEMANTICS_H
 
-#ifndef _WINDOWS
+#ifndef _MSC_VER
 #define __packed __attribute__((__packed__))
 #else
 #define __packed 
+#endif
+
+#ifdef _MSC_VER
+#define strdup _strdup
 #endif
 
 /*

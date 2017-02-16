@@ -7,6 +7,8 @@
 #include <stick20_commands.h>
 #include "include/misc.h"
 #include <mutex>
+#include "include/cxx_semantics.h"
+
 
 namespace nitrokey{
 

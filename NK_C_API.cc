@@ -1,6 +1,7 @@
 #include <cstring>
 #include "NK_C_API.h"
 #include "include/LibraryException.h"
+#include "include/cxx_semantics.h"
 
 using namespace nitrokey;
 

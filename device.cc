@@ -100,10 +100,10 @@ int Device::recv(void *packet) {
     if (status > 0) break;  // success
     if (retry_count++ >= m_retry_receiving_count) {
       Log::instance()(
-          "Maximum retry count reached" + std::to_string(retry_count),
+          "Maximum retry count reached: " + std::to_string(retry_count),
           Loglevel::WARNING);
       Log::instance()(
-          std::string("Counter stats") + m_counters.get_as_string(),
+          std::string("Counter stats: ") + m_counters.get_as_string(),
           Loglevel::DEBUG);
       break;
     }

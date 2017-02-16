@@ -144,8 +144,14 @@ namespace nitrokey{
     }
 
     stick10::GetStatus::ResponsePayload NitrokeyManager::get_status(){
-      auto response = GetStatus::CommandTransaction::run(device);
-      return response.data();
+      try{
+        auto response = GetStatus::CommandTransaction::run(device);
+        return response.data();
+      }
+      catch (DeviceSendingFailure &e){
+        disconnect();
+        throw;
+      }
     }
 
     string NitrokeyManager::get_status_as_string() {

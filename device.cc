@@ -150,14 +150,23 @@ Stick20::Stick20():
 #define p(x) ss << #x << " " << x << ", ";
 std::string Device::ErrorCounters::get_as_string() {
   std::stringstream ss;
-  p(wrong_CRC);
-  p(CRC_other_than_awaited);
-  p(busy);
+  p(total_comm_runs);
+  p(communication_successful);
+  ss << "(";
+  p(command_successful_recv);
+  p(command_result_not_equal_0_recv);
+  ss << "), ";
+  p(sends_executed);
+  p(recv_executed);
+  p(successful_storage_commands);
   p(total_retries);
+  ss << "(";
+  p(busy);
+  p(busy_progressbar);
+  p(CRC_other_than_awaited);
+  p(wrong_CRC);
+  ss << "), ";
   p(sending_error);
   p(receiving_error);
-  p(total_comm_runs);
-  p(storage_commands);
-  p(successful	);
   return ss.str();
 }

@@ -245,6 +245,7 @@ namespace nitrokey {
               int receiving_retry_counter = 0;
               int sending_retry_counter = dev->get_retry_sending_count();
               while (sending_retry_counter-- > 0) {
+                dev->m_counters.sends_executed++;
                 status = dev->send(&outp);
                 if (status <= 0){
                     //FIXME early disconnection not yet working properly
@@ -261,6 +262,7 @@ namespace nitrokey {
                 // FIXME make checks done in device:recv here
                 receiving_retry_counter = dev->get_retry_receiving_count();
                 while (receiving_retry_counter-- > 0) {
+                  dev->m_counters.recv_executed++;
                   status = dev->recv(&resp);
 
                   if (dev->get_device_model() == DeviceModel::STORAGE &&
@@ -268,7 +270,6 @@ namespace nitrokey {
                       resp.command_id < stick20::CMD_END_VALUE ) {
                     Log::instance()(std::string("Detected storage device cmd, status: ") +
                                     std::to_string(resp.storage_status.device_status), Loglevel::DEBUG_L2);
-                    dev->m_counters.storage_commands++;
 
                     resp.last_command_status = static_cast<uint8_t>(stick10::command_status::ok);
                     switch (static_cast<stick20::device_status>(resp.storage_status.device_status)) {
@@ -362,6 +363,7 @@ namespace nitrokey {
               if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy) &&
                   static_cast<stick20::device_status>(resp.storage_status.device_status)
                   == stick20::device_status::busy_progressbar){
+                dev->m_counters.busy_progressbar++;
                 throw LongOperationInProgressException(
                     resp.command_id, resp.device_status, resp.storage_status.progress_bar_value);
               }
@@ -370,10 +372,20 @@ namespace nitrokey {
               if (receiving_retry_counter <= 0)
                 throw std::runtime_error(
                     "Maximum receiving_retry_counter count reached for receiving response from the device!");
-              if (resp.last_command_status != static_cast<uint8_t>(stick10::command_status::ok))
-                throw CommandFailedException(resp.command_id, resp.last_command_status);
+              dev->m_counters.communication_successful++;
 
-              dev->m_counters.successful++;
+              if (resp.last_command_status != static_cast<uint8_t>(stick10::command_status::ok)){
+                dev->m_counters.command_result_not_equal_0_recv++;
+                throw CommandFailedException(resp.command_id, resp.last_command_status);
+              }
+
+              dev->m_counters.command_successful_recv++;
+
+              if (dev->get_device_model() == DeviceModel::STORAGE &&
+                  resp.command_id >= stick20::CMD_START_VALUE &&
+                  resp.command_id < stick20::CMD_END_VALUE ) {
+                dev->m_counters.successful_storage_commands++;
+              }
 
               // See: DeviceResponse
               return resp;

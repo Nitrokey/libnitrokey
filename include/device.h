@@ -28,21 +28,30 @@ enum class DeviceModel{
     STORAGE
 };
 
+#include <atomic>
+
 class Device {
 
 public:
 
   struct ErrorCounters{
-    int wrong_CRC;
-    int CRC_other_than_awaited;
-    int busy;
-    int total_retries;
-    int sending_error;
-    int receiving_error;
-    int total_comm_runs;
-    int storage_commands;
-    int successful;
+    using cnt = std::atomic_int;
+    cnt wrong_CRC;
+    cnt CRC_other_than_awaited;
+    cnt busy;
+    cnt total_retries;
+    cnt sending_error;
+    cnt receiving_error;
+    cnt total_comm_runs;
+    cnt successful_storage_commands;
+    cnt command_successful_recv;
+    cnt recv_executed;
+    cnt sends_executed;
+    cnt busy_progressbar;
+    cnt command_result_not_equal_0_recv;
+    cnt communication_successful;
     std::string get_as_string();
+
   } m_counters = {};
 
 
@@ -71,7 +80,7 @@ public:
   bool is_connected();
 
   void show_stats();
-  ErrorCounters get_stats(){ return m_counters; }
+//  ErrorCounters get_stats(){ return m_counters; }
   int get_retry_receiving_count() const { return m_retry_receiving_count; };
   int get_retry_sending_count() const { return m_retry_sending_count; };
   std::chrono::milliseconds get_retry_timeout() const { return m_retry_timeout; };

@@ -139,12 +139,12 @@ void Device::show_stats() {
 }
 
 Stick10::Stick10():
-  Device(0x20a0, 0x4108, DeviceModel::PRO, 100ms, 20, 100ms)
+  Device(0x20a0, 0x4108, DeviceModel::PRO, 100ms, 5, 100ms)
   {}
 
 
 Stick20::Stick20():
-  Device(0x20a0, 0x4109, DeviceModel::STORAGE, 200ms, 40, 200ms)
+  Device(0x20a0, 0x4109, DeviceModel::STORAGE, 200ms, 5, 200ms)
   {}
 
 #include <sstream>

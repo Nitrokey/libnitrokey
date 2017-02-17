@@ -115,7 +115,7 @@ int Device::recv(void *packet) {
   return status;
 }
 
-bool Device::is_connected() {
+bool Device::could_be_enumerated() {
   Log::instance()(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
   if (mp_devhandle==nullptr){

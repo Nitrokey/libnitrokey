@@ -77,7 +77,12 @@ public:
    */
   virtual int recv(void *packet);
 
-  bool is_connected();
+  /***
+   * Returns true if some device is visible by OS with given VID and PID
+   * whether the device is connected through HID API or not.
+   * @return true if visible by OS
+   */
+  bool could_be_enumerated();
 
   void show_stats();
 //  ErrorCounters get_stats(){ return m_counters; }

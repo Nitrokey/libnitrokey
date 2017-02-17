@@ -107,7 +107,7 @@ namespace nitrokey{
 
   bool NitrokeyManager::_disconnect_no_lock() {
     //do not use directly without locked mutex,
-    //used by is_connected, disconnect
+    //used by could_be_enumerated, disconnect
     if (device == nullptr){
       return false;
     }
@@ -119,7 +119,7 @@ namespace nitrokey{
   bool NitrokeyManager::is_connected() throw(){
       std::lock_guard<std::mutex> lock(mex_dev_com);
       if(device != nullptr){
-        auto connected = device->is_connected();
+        auto connected = device->could_be_enumerated();
         if(connected){
           return true;
         } else {

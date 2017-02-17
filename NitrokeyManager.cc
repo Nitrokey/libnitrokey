@@ -143,7 +143,7 @@ namespace nitrokey{
       switch (device->get_device_model()) {
         case DeviceModel::PRO: {
           auto response = GetStatus::CommandTransaction::run(device);
-          return nitrokey::misc::toHex(response.data().card_serial_i);
+          return nitrokey::misc::toHex(response.data().card_serial_u32);
         }
           break;
 

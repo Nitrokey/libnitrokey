@@ -350,7 +350,7 @@ class GetStatus : Command<CommandID::GET_STATUS> {
     uint16_t firmware_version;
     union{
       uint8_t card_serial[4];
-      uint32_t card_serial_i;
+      uint32_t card_serial_u32;
     } __packed;
       union {
           uint8_t general_config[5];
@@ -365,7 +365,7 @@ class GetStatus : Command<CommandID::GET_STATUS> {
     bool isValid() const { return enable_user_password!=delete_user_password; }
 
     std::string get_card_serial_hex() const {
-      return nitrokey::misc::toHex(card_serial_i);
+      return nitrokey::misc::toHex(card_serial_u32);
     }
 
     std::string dissect() const {
@@ -374,7 +374,7 @@ class GetStatus : Command<CommandID::GET_STATUS> {
           << "[" << firmware_version << "]" << "\t"
           << ::nitrokey::misc::hexdump(
           (const char *)(&firmware_version), sizeof firmware_version, false);
-      ss << "card_serial_i:\t" << std::hex << card_serial_i << std::endl;
+      ss << "card_serial_u32:\t" << std::hex << card_serial_u32 << std::endl;
       ss << "card_serial:\t"
          << ::nitrokey::misc::hexdump((const char *)(card_serial),
                                       sizeof card_serial, false);

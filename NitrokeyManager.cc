@@ -787,7 +787,7 @@ namespace nitrokey{
     misc::execute_password_command<stick20::DisableHiddenEncryptedPartition>(device, "");
   }
 
-  int NitrokeyManager::get_SD_card_size() {
+  uint8_t NitrokeyManager::get_SD_card_size() {
     auto data = stick20::ProductionTest::CommandTransaction::run(device);
     return data.data().SD_Card_Size_u8;
   }

@@ -106,7 +106,7 @@ namespace nitrokey {
 
         void fill_SD_card_with_random_data(const char *admin_pin);
 
-        int get_SD_card_size();
+        uint8_t get_SD_card_size();
 
         void change_update_password(const char *current_update_password, const char *new_update_password);
 

@@ -745,6 +745,11 @@ namespace nitrokey{
       return strdup(p.data().dissect().c_str());
     }
 
+    std::pair<uint8_t,uint8_t> NitrokeyManager::get_SD_usage_data(){
+      auto p = stick20::GetSDCardOccupancy::CommandTransaction::run(device);
+      return std::make_pair(p.data().WriteLevelMin, p.data().WriteLevelMax);
+    }
+
     int NitrokeyManager::get_progress_bar_value(){
       try{
         stick20::GetDeviceStatus::CommandTransaction::run(device);
@@ -780,6 +785,11 @@ namespace nitrokey{
 
   void NitrokeyManager::lock_hidden_volume() {
     misc::execute_password_command<stick20::DisableHiddenEncryptedPartition>(device, "");
+  }
+
+  int NitrokeyManager::get_SD_card_size() {
+    auto data = stick20::ProductionTest::CommandTransaction::run(device);
+    return data.data().SD_Card_Size_u8;
   }
 
 }

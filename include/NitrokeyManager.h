@@ -106,6 +106,8 @@ namespace nitrokey {
 
         void fill_SD_card_with_random_data(const char *admin_pin);
 
+        int get_SD_card_size();
+
         void change_update_password(const char *current_update_password, const char *new_update_password);
 
         void create_hidden_volume(uint8_t slot_nr, uint8_t start_percent, uint8_t end_percent,
@@ -117,8 +119,10 @@ namespace nitrokey {
         stick20::DeviceConfigurationResponsePacket::ResponsePayload get_status_storage();
 
         const char *get_SD_usage_data_as_string();
+        std::pair<uint8_t,uint8_t> get_SD_usage_data();
 
-        int get_progress_bar_value();
+
+      int get_progress_bar_value();
 
         ~NitrokeyManager();
         bool is_authorization_command_supported();
@@ -159,6 +163,7 @@ namespace nitrokey {
                                          const char *temporary_password) const;
 
       bool _disconnect_no_lock();
+
     };
 }
 

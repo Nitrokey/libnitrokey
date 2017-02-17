@@ -6,9 +6,20 @@
 #include <string.h>
 #include "log.h"
 #include "LibraryException.h"
+#include <sstream>
+#include <iomanip>
+
 
 namespace nitrokey {
 namespace misc {
+
+    template<typename T>
+    std::string toHex(T value){
+      using namespace std;
+      std::ostringstream oss;
+      oss << std::hex << std::setw(sizeof(value)*2) << std::setfill('0') << value;
+      return oss.str();
+    }
 
     template <typename T>
     void strcpyT(T& dest, const char* src){

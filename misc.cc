@@ -10,6 +10,8 @@
 namespace nitrokey {
 namespace misc {
 
+
+
 ::std::vector<uint8_t> hex_string_to_byte(const char* hexString){
     const size_t big_string_size = 256; //arbitrary 'big' number
     const size_t s_size = strlen(hexString);

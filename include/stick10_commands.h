@@ -348,7 +348,10 @@ class GetStatus : Command<CommandID::GET_STATUS> {
  public:
   struct ResponsePayload {
     uint16_t firmware_version;
-    uint8_t card_serial[4];
+    union{
+      uint8_t card_serial[4];
+      uint32_t card_serial_i;
+    } __packed;
       union {
           uint8_t general_config[5];
           struct{
@@ -357,19 +360,12 @@ class GetStatus : Command<CommandID::GET_STATUS> {
               uint8_t scrolllock;  /** same as numlock */
               uint8_t enable_user_password;
               uint8_t delete_user_password;
-          };
-      };
+          } __packed;
+      } __packed;
     bool isValid() const { return enable_user_password!=delete_user_password; }
 
     std::string get_card_serial_hex() const {
-//        return ::nitrokey::misc::hexdump((const char *)(card_serial),
-//                sizeof card_serial, false, false, false);
-      std::stringstream ss;
-      ss << std::hex << std::setfill('0');
-      for (int i = 0; i < sizeof(card_serial); ++i) {
-        ss << std::setw(2) << static_cast<unsigned>(card_serial[i]);
-      }
-      return ss.str();
+      return nitrokey::misc::toHex(card_serial_i);
     }
 
     std::string dissect() const {
@@ -378,6 +374,7 @@ class GetStatus : Command<CommandID::GET_STATUS> {
           << "[" << firmware_version << "]" << "\t"
           << ::nitrokey::misc::hexdump(
           (const char *)(&firmware_version), sizeof firmware_version, false);
+      ss << "card_serial_i:\t" << std::hex << card_serial_i << std::endl;
       ss << "card_serial:\t"
          << ::nitrokey::misc::hexdump((const char *)(card_serial),
                                       sizeof card_serial, false);

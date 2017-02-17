@@ -138,9 +138,22 @@ namespace nitrokey{
         }
     }
 
+
     string NitrokeyManager::get_serial_number() {
-        auto response = GetStatus::CommandTransaction::run(device);
-        return response.data().get_card_serial_hex();
+      switch (device->get_device_model()) {
+        case DeviceModel::PRO: {
+          auto response = GetStatus::CommandTransaction::run(device);
+          return nitrokey::misc::toHex(response.data().card_serial_i);
+        }
+          break;
+
+        case DeviceModel::STORAGE:
+        {
+          auto response = stick20::GetDeviceStatus::CommandTransaction::run(device);
+          return nitrokey::misc::toHex(response.data().ActiveSmartCardID_u32);
+        }
+          break;
+      }
     }
 
     stick10::GetStatus::ResponsePayload NitrokeyManager::get_status(){

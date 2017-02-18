@@ -33,7 +33,7 @@ namespace nitrokey {
 
             //FIXME the volume disabling commands do not need password
             class DisableEncryptedPartition : public PasswordCommand<CommandID::DISABLE_CRYPTED_PARI> {};
-            class DisableHiddenEncryptedPartition : public PasswordCommand<CommandID::DISABLE_CRYPTED_PARI> {};
+            class DisableHiddenEncryptedPartition : public PasswordCommand<CommandID::DISABLE_HIDDEN_CRYPTED_PARI> {};
 
             class EnableFirmwareUpdate : public PasswordCommand<CommandID::ENABLE_FIRMWARE_UPDATE> {};
 

@@ -22,6 +22,71 @@ def test_write_password_safe_slot(C):
     assert C.NK_write_password_safe_slot(0, 'slotname1', 'login1', 'pass1') == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.slowtest
+def test_write_all_password_safe_slots_and_read_10_times(C):
+    def fill(s, wid):
+        assert wid >= len(s)
+        numbers = '1234567890'*4
+        s += numbers[:wid-len(s)]
+        assert len(s) == wid
+        return s
+
+    def get_pass(suffix):
+        return fill('pass' + suffix, 20)
+
+    def get_loginname(suffix):
+        return fill('login' + suffix, 32)
+
+    def get_slotname(suffix):
+        return fill('slotname' + suffix, 11)
+
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    PWS_slot_count = 16
+    for i in range(0, PWS_slot_count):
+        iss = str(i)
+        assert C.NK_write_password_safe_slot(i,
+                                             get_slotname(iss), get_loginname(iss),
+                                             get_pass(iss)) == DeviceErrorCode.STATUS_OK
+
+    for j in range(0, 10):
+        for i in range(0, PWS_slot_count):
+            iss = str(i)
+            assert gs(C.NK_get_password_safe_slot_name(i)) == get_slotname(iss)
+            assert gs(C.NK_get_password_safe_slot_login(i)) == get_loginname(iss)
+            assert gs(C.NK_get_password_safe_slot_password(i)) == get_pass(iss)
+
+
+@pytest.mark.slowtest
+def test_read_all_password_safe_slots_10_times(C):
+    def fill(s, wid):
+        assert wid >= len(s)
+        numbers = '1234567890'*4
+        s += numbers[:wid-len(s)]
+        assert len(s) == wid
+        return s
+
+    def get_pass(suffix):
+        return fill('pass' + suffix, 20)
+
+    def get_loginname(suffix):
+        return fill('login' + suffix, 32)
+
+    def get_slotname(suffix):
+        return fill('slotname' + suffix, 11)
+
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    PWS_slot_count = 16
+
+    for j in range(0, 10):
+        for i in range(0, PWS_slot_count):
+            iss = str(i)
+            assert gs(C.NK_get_password_safe_slot_name(i)) == get_slotname(iss)
+            assert gs(C.NK_get_password_safe_slot_login(i)) == get_loginname(iss)
+            assert gs(C.NK_get_password_safe_slot_password(i)) == get_pass(iss)
+
+
 def test_get_password_safe_slot_name(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_password_safe_slot(0, 'slotname1', 'login1', 'pass1') == DeviceErrorCode.STATUS_OK
@@ -645,10 +710,11 @@ def test_TOTP_secrets(C, secret):
 @pytest.mark.parametrize("secret", [RFC_SECRET, 2*RFC_SECRET, '12'*10, '12'*30] )
 def test_HOTP_secrets(C, secret):
     """
-    NK Pro 0.8+, NK Storage 0.44+
+    NK Pro 0.8+
     feature needed: support for 320bit secrets
     """
-    skip_if_device_version_lower_than({'S': 44, 'P': 8})
+    if len(secret)>40:
+        skip_if_device_version_lower_than({'P': 8})
 
     slot_number = 0
     counter = 0

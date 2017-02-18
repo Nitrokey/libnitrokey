@@ -57,6 +57,7 @@ def test_encrypted_volume_unlock_hidden(C):
     assert C.NK_create_hidden_volume(0, 20, 21, hidden_volume_password) == DeviceErrorCode.STATUS_OK
     assert C.NK_unlock_hidden_volume(hidden_volume_password) == DeviceErrorCode.STATUS_OK
 
+
 @pytest.mark.skip(reason='hangs device, to report')
 def test_encrypted_volume_setup_multiple_hidden(C):
     skip_if_device_version_lower_than({'S': 43})
@@ -71,6 +72,149 @@ def test_encrypted_volume_setup_multiple_hidden(C):
         assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
         assert C.NK_unlock_hidden_volume(p(i)) == DeviceErrorCode.STATUS_OK
 
+
+@pytest.mark.parametrize("volumes_to_setup", range(1, 5))
+def test_encrypted_volume_setup_multiple_hidden_no_lock_device_volumes(C, volumes_to_setup):
+    skip_if_device_version_lower_than({'S': 43})
+    hidden_volume_password = 'hiddenpassword'
+    p = lambda i: hidden_volume_password + str(i)
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    for i in range(volumes_to_setup):
+        assert C.NK_create_hidden_volume(i, 20+i*10, 20+i*10+i+1, p(i)) == DeviceErrorCode.STATUS_OK
+
+    assert C.NK_lock_encrypted_volume() == DeviceErrorCode.STATUS_OK
+    assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+
+    for i in range(volumes_to_setup):
+        assert C.NK_unlock_hidden_volume(p(i)) == DeviceErrorCode.STATUS_OK
+        # TODO mount and test for files
+        assert C.NK_lock_hidden_volume() == DeviceErrorCode.STATUS_OK
+
+
+@pytest.mark.parametrize("volumes_to_setup", range(1, 5))
+def test_encrypted_volume_setup_multiple_hidden_no_lock_device_volumes_unlock_at_once(C, volumes_to_setup):
+    skip_if_device_version_lower_than({'S': 43})
+    hidden_volume_password = 'hiddenpassword'
+    p = lambda i: hidden_volume_password + str(i)
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    for i in range(volumes_to_setup):
+        assert C.NK_create_hidden_volume(i, 20+i*10, 20+i*10+i+1, p(i)) == DeviceErrorCode.STATUS_OK
+        assert C.NK_unlock_hidden_volume(p(i)) == DeviceErrorCode.STATUS_OK
+        assert C.NK_lock_hidden_volume() == DeviceErrorCode.STATUS_OK
+
+    assert C.NK_lock_encrypted_volume() == DeviceErrorCode.STATUS_OK
+    assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+
+    for i in range(volumes_to_setup):
+        assert C.NK_unlock_hidden_volume(p(i)) == DeviceErrorCode.STATUS_OK
+        # TODO mount and test for files
+        assert C.NK_lock_hidden_volume() == DeviceErrorCode.STATUS_OK
+
+
+@pytest.mark.parametrize("use_slot", range(4))
+def test_encrypted_volume_setup_one_hidden_no_lock_device_slot(C, use_slot):
+    skip_if_device_version_lower_than({'S': 43})
+    hidden_volume_password = 'hiddenpassword'
+    p = lambda i: hidden_volume_password + str(i)
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    i = use_slot
+    assert C.NK_create_hidden_volume(i, 20+i*10, 20+i*10+i+1, p(i)) == DeviceErrorCode.STATUS_OK
+    assert C.NK_unlock_hidden_volume(p(i)) == DeviceErrorCode.STATUS_OK
+    assert C.NK_lock_hidden_volume() == DeviceErrorCode.STATUS_OK
+
+    assert C.NK_lock_encrypted_volume() == DeviceErrorCode.STATUS_OK
+    assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+
+    for j in range(3):
+        assert C.NK_unlock_hidden_volume(p(i)) == DeviceErrorCode.STATUS_OK
+        # TODO mount and test for files
+        assert C.NK_lock_hidden_volume() == DeviceErrorCode.STATUS_OK
+
+
+def test_password_safe_slot_name_corruption(C):
+    skip_if_device_version_lower_than({'S': 43})
+    volumes_to_setup = 4
+    # connected with encrypted volumes, possible also with hidden
+    def fill(s, wid):
+        assert wid >= len(s)
+        numbers = '1234567890' * 4
+        s += numbers[:wid - len(s)]
+        assert len(s) == wid
+        return s
+
+    def get_pass(suffix):
+        return fill('pass' + suffix, 20)
+
+    def get_loginname(suffix):
+        return fill('login' + suffix, 32)
+
+    def get_slotname(suffix):
+        return fill('slotname' + suffix, 11)
+
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    PWS_slot_count = 16
+    for i in range(0, PWS_slot_count):
+        iss = str(i)
+        assert C.NK_write_password_safe_slot(i,
+                                             get_slotname(iss), get_loginname(iss),
+                                             get_pass(iss)) == DeviceErrorCode.STATUS_OK
+
+    def check_PWS_correctness(C):
+        for i in range(0, PWS_slot_count):
+            iss = str(i)
+            assert gs(C.NK_get_password_safe_slot_name(i)) == get_slotname(iss)
+            assert gs(C.NK_get_password_safe_slot_login(i)) == get_loginname(iss)
+            assert gs(C.NK_get_password_safe_slot_password(i)) == get_pass(iss)
+
+    hidden_volume_password = 'hiddenpassword'
+    p = lambda i: hidden_volume_password + str(i)
+    def check_volumes_correctness(C):
+        for i in range(volumes_to_setup):
+            assert C.NK_unlock_hidden_volume(p(i)) == DeviceErrorCode.STATUS_OK
+            # TODO mount and test for files
+            assert C.NK_lock_hidden_volume() == DeviceErrorCode.STATUS_OK
+
+    check_PWS_correctness(C)
+
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    for i in range(volumes_to_setup):
+        assert C.NK_create_hidden_volume(i, 20+i*10, 20+i*10+i+1, p(i)) == DeviceErrorCode.STATUS_OK
+        assert C.NK_unlock_hidden_volume(p(i)) == DeviceErrorCode.STATUS_OK
+        assert C.NK_lock_hidden_volume() == DeviceErrorCode.STATUS_OK
+
+    assert C.NK_lock_encrypted_volume() == DeviceErrorCode.STATUS_OK
+    assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+
+    check_volumes_correctness(C)
+    check_PWS_correctness(C)
+    check_volumes_correctness(C)
+    check_PWS_correctness(C)
+
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    check_volumes_correctness(C)
+    check_PWS_correctness(C)
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    check_volumes_correctness(C)
+    check_PWS_correctness(C)
+
+def test_hidden_volume_corruption(C):
+    # bug: this should return error without unlocking encrypted volume each hidden volume lock, but it does not
+    assert C.NK_lock_encrypted_volume() == DeviceErrorCode.STATUS_OK
+    assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    hidden_volume_password = 'hiddenpassword'
+    p = lambda i: hidden_volume_password + str(i)
+    for i in range(4):
+        assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+        assert C.NK_unlock_hidden_volume(p(i)) == DeviceErrorCode.STATUS_OK
+        wait(2)
+        assert C.NK_lock_hidden_volume() == DeviceErrorCode.STATUS_OK
 
 def test_unencrypted_volume_set_read_only(C):
     skip_if_device_version_lower_than({'S': 43})
@@ -94,7 +238,8 @@ def test_clear_new_sd_card_notification(C):
     assert C.NK_clear_new_sd_card_warning(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
 
 
-@pytest.mark.skip
+@pytest.mark.slowtest
+@pytest.mark.skip(reason='long test (about 1h)')
 def test_fill_SD_card(C):
     skip_if_device_version_lower_than({'S': 43})
     status = C.NK_fill_SD_card_with_random_data(DefaultPasswords.ADMIN)

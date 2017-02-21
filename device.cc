@@ -31,12 +31,12 @@ Device::Device(const uint16_t vid, const uint16_t pid, const DeviceModel model,
 
 bool Device::disconnect() {
   //called in object's destructor
-  Log::instance()(__FUNCTION__, Loglevel::DEBUG_L2);
+  LOG(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
-  Log::instance()(std::string(__FUNCTION__) +  std::string(m_model==DeviceModel::PRO?"PRO":"STORAGE"), Loglevel::DEBUG_L2);
-  Log::instance()(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
+  LOG(std::string(__FUNCTION__) +  std::string(m_model==DeviceModel::PRO?"PRO":"STORAGE"), Loglevel::DEBUG_L2);
+  LOG(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
 
-  Log::instance()(std::string("Disconnection success: ") + std::to_string(mp_devhandle == nullptr), Loglevel::DEBUG_L2);
+  LOG(std::string("Disconnection success: ") + std::to_string(mp_devhandle == nullptr), Loglevel::DEBUG_L2);
   if(mp_devhandle == nullptr) return false;
 
   hid_close(mp_devhandle);
@@ -46,24 +46,24 @@ bool Device::disconnect() {
   return true;
 }
 bool Device::connect() {
-  Log::instance()(__FUNCTION__, Loglevel::DEBUG_L2);
+  LOG(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
-  Log::instance()(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
+  LOG(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
 
 //   hid_init(); // done automatically on hid_open
   mp_devhandle = hid_open(m_vid, m_pid, nullptr);
   const auto success = mp_devhandle != nullptr;
-  Log::instance()(std::string("Connection success: ") + std::to_string(success), Loglevel::DEBUG_L2);
+  LOG(std::string("Connection success: ") + std::to_string(success), Loglevel::DEBUG_L2);
   return success;
 }
 
 int Device::send(const void *packet) {
-  Log::instance()(__FUNCTION__, Loglevel::DEBUG_L2);
+  LOG(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
-  Log::instance()(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
+  LOG(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
 
   if (mp_devhandle == nullptr) {
-    Log::instance()(std::string("Connection fail") , Loglevel::DEBUG_L2);
+    LOG(std::string("Connection fail") , Loglevel::DEBUG_L2);
     throw DeviceNotConnected("Attempted HID send on an invalid descriptor.");
   }
 
@@ -72,15 +72,15 @@ int Device::send(const void *packet) {
 }
 
 int Device::recv(void *packet) {
-  Log::instance()(__FUNCTION__, Loglevel::DEBUG_L2);
+  LOG(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
-  Log::instance()(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
+  LOG(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
   int status;
   int retry_count = 0;
 
 
   if (mp_devhandle == nullptr){
-    Log::instance()(std::string("Connection fail") , Loglevel::DEBUG_L2);
+    LOG(std::string("Connection fail") , Loglevel::DEBUG_L2);
     throw DeviceNotConnected("Attempted HID receive on an invalid descriptor.");
   }
 
@@ -94,20 +94,20 @@ int Device::recv(void *packet) {
     auto pwherr = hid_error(mp_devhandle);
     std::wstring wherr = (pwherr != nullptr) ? pwherr : L"No error message";
     std::string herr(wherr.begin(), wherr.end());
-    Log::instance()(std::string("libhid error message: ") + herr,
+    LOG(std::string("libhid error message: ") + herr,
                     Loglevel::DEBUG_L2);
 
     if (status > 0) break;  // success
     if (retry_count++ >= m_retry_receiving_count) {
-      Log::instance()(
+      LOG(
           "Maximum retry count reached: " + std::to_string(retry_count),
           Loglevel::WARNING);
-      Log::instance()(
+      LOG(
           std::string("Counter stats: ") + m_counters.get_as_string(),
           Loglevel::DEBUG);
       break;
     }
-    Log::instance()("Retrying... " + std::to_string(retry_count),
+    LOG("Retrying... " + std::to_string(retry_count),
                     Loglevel::DEBUG);
     std::this_thread::sleep_for(m_retry_timeout);
   }
@@ -116,7 +116,7 @@ int Device::recv(void *packet) {
 }
 
 bool Device::could_be_enumerated() {
-  Log::instance()(__FUNCTION__, Loglevel::DEBUG_L2);
+  LOG(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
   if (mp_devhandle==nullptr){
     return false;
@@ -135,7 +135,7 @@ bool Device::could_be_enumerated() {
 
 void Device::show_stats() {
   auto s = m_counters.get_as_string();
-  Log::instance()(s, Loglevel::DEBUG_L2);
+  LOG(s, Loglevel::DEBUG_L2);
 }
 
 Stick10::Stick10():

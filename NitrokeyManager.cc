@@ -22,7 +22,7 @@ namespace nitrokey{
 //            throw EmptySourceStringException(slot_number);
             return;
         const size_t s_dest = sizeof dest;
-      nitrokey::log::Log::instance()(std::string("strcpyT sizes dest src ")
+      LOG(std::string("strcpyT sizes dest src ")
                                      +std::to_string(s_dest)+ " "
                                      +std::to_string(strlen(src))+ " "
           ,nitrokey::log::Loglevel::DEBUG_L2);
@@ -45,7 +45,7 @@ namespace nitrokey{
     template <typename S, typename A, typename T>
     void NitrokeyManager::authorize_packet(T &package, const char *admin_temporary_password, shared_ptr<Device> device){
       if (!is_authorization_command_supported()){
-        Log::instance()("Authorization command not supported, skipping", Loglevel::WARNING);
+        LOG("Authorization command not supported, skipping", Loglevel::WARNING);
       }
         auto auth = get_payload<A>();
         strcpyT(auth.temporary_password, admin_temporary_password);
@@ -311,7 +311,7 @@ namespace nitrokey{
           break;
         }
         default:
-          Log::instance()(string(__FILE__) + to_string(__LINE__) +
+          LOG(string(__FILE__) + to_string(__LINE__) +
                           string(__FUNCTION__) + string(" Unhandled device model for HOTP")
               , Loglevel::DEBUG);
           break;

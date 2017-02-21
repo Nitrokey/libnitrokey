@@ -218,7 +218,7 @@ namespace nitrokey {
               static std::mutex send_receive_mtx;
               std::lock_guard<std::mutex> guard(send_receive_mtx);
 
-              Log::instance()(__FUNCTION__, Loglevel::DEBUG_L2);
+              LOG(__FUNCTION__, Loglevel::DEBUG_L2);
 
               if (dev == nullptr){
                 throw DeviceNotConnected("Device not initialized");
@@ -236,8 +236,8 @@ namespace nitrokey {
               outp.payload = payload;
               outp.update_CRC();
 
-              Log::instance()("Outgoing HID packet:", Loglevel::DEBUG);
-              Log::instance()(static_cast<std::string>(outp), Loglevel::DEBUG);
+              LOG("Outgoing HID packet:", Loglevel::DEBUG);
+              LOG(static_cast<std::string>(outp), Loglevel::DEBUG);
 
               if (!outp.isValid()) throw std::runtime_error("Invalid outgoing packet");
 
@@ -249,7 +249,7 @@ namespace nitrokey {
                 status = dev->send(&outp);
                 if (status <= 0){
                     //FIXME early disconnection not yet working properly
-//                  Log::instance()("Encountered communication error, disconnecting device", Loglevel::DEBUG_L2);
+//                  LOG("Encountered communication error, disconnecting device", Loglevel::DEBUG_L2);
 //                  dev->disconnect();
                   dev->m_counters.sending_error++;
                   throw DeviceSendingFailure(
@@ -268,7 +268,7 @@ namespace nitrokey {
                   if (dev->get_device_model() == DeviceModel::STORAGE &&
                       resp.command_id >= stick20::CMD_START_VALUE &&
                       resp.command_id < stick20::CMD_END_VALUE ) {
-                    Log::instance()(std::string("Detected storage device cmd, status: ") +
+                    LOG(std::string("Detected storage device cmd, status: ") +
                                     std::to_string(resp.storage_status.device_status), Loglevel::DEBUG_L2);
 
                     resp.last_command_status = static_cast<uint8_t>(stick10::command_status::ok);
@@ -286,7 +286,7 @@ namespace nitrokey {
                         resp.device_status = static_cast<uint8_t>(stick10::device_status::ok);
                         break;
                       default:
-                        Log::instance()(std::string("Unknown storage device status, cannot translate: ") +
+                        LOG(std::string("Unknown storage device status, cannot translate: ") +
                                         std::to_string(resp.storage_status.device_status), Loglevel::DEBUG);
                         resp.device_status = resp.storage_status.device_status;
                         break;
@@ -306,11 +306,11 @@ namespace nitrokey {
                     dev->m_counters.busy++;
                     if (busy_counter++<10) {
                       receiving_retry_counter++;
-                      Log::instance()("Status busy, not decreasing receiving_retry_counter counter: " +
+                      LOG("Status busy, not decreasing receiving_retry_counter counter: " +
                                       std::to_string(receiving_retry_counter), Loglevel::DEBUG_L2);
                     } else {
                       busy_counter = 0;
-                      Log::instance()("Status busy, decreasing receiving_retry_counter counter: " +
+                      LOG("Status busy, decreasing receiving_retry_counter counter: " +
                                       std::to_string(receiving_retry_counter), Loglevel::DEBUG);
                     }
                   }
@@ -320,7 +320,7 @@ namespace nitrokey {
                     successful_communication = true;
                     break;
                   }
-                  Log::instance()(std::string("Retry status - dev status, awaited cmd crc, correct packet CRC: ")
+                  LOG(std::string("Retry status - dev status, awaited cmd crc, correct packet CRC: ")
                                   + std::to_string(resp.device_status) + " " +
                                   std::to_string(CRC_equal_awaited) +
                                   " " + std::to_string(resp.isCRCcorrect()), Loglevel::DEBUG_L2);
@@ -329,18 +329,18 @@ namespace nitrokey {
                   if (!CRC_equal_awaited) dev->m_counters.CRC_other_than_awaited++;
 
 
-                  Log::instance()(
+                  LOG(
                       "Device is not ready or received packet's last CRC is not equal to sent CRC packet, retrying...",
                       Loglevel::DEBUG);
-                  Log::instance()("Invalid incoming HID packet:", Loglevel::DEBUG_L2);
-                  Log::instance()(static_cast<std::string>(resp), Loglevel::DEBUG_L2);
+                  LOG("Invalid incoming HID packet:", Loglevel::DEBUG_L2);
+                  LOG(static_cast<std::string>(resp), Loglevel::DEBUG_L2);
                   dev->m_counters.total_retries++;
                   std::this_thread::sleep_for(dev->get_retry_timeout());
                   continue;
                 }
                 if (successful_communication) break;
-                Log::instance()(std::string("Resending (outer loop) "), Loglevel::DEBUG_L2);
-                Log::instance()(std::string("sending_retry_counter count: ") + std::to_string(sending_retry_counter),
+                LOG(std::string("Resending (outer loop) "), Loglevel::DEBUG_L2);
+                LOG(std::string("sending_retry_counter count: ") + std::to_string(sending_retry_counter),
                                 Loglevel::DEBUG);
               }
 
@@ -355,9 +355,9 @@ namespace nitrokey {
                     std::to_string(status));
               }
 
-              Log::instance()("Incoming HID packet:", Loglevel::DEBUG);
-              Log::instance()(static_cast<std::string>(resp), Loglevel::DEBUG);
-              Log::instance()(std::string("receiving_retry_counter count: ") + std::to_string(receiving_retry_counter),
+              LOG("Incoming HID packet:", Loglevel::DEBUG);
+              LOG(static_cast<std::string>(resp), Loglevel::DEBUG);
+              LOG(std::string("receiving_retry_counter count: ") + std::to_string(receiving_retry_counter),
                               Loglevel::DEBUG);
 
               if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy) &&

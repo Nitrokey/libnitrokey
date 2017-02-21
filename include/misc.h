@@ -28,7 +28,7 @@ namespace misc {
 //            throw EmptySourceStringException(slot_number);
             return;
         const size_t s_dest = sizeof dest;
-        nitrokey::log::Log::instance()(std::string("strcpyT sizes dest src ")
+        LOG(std::string("strcpyT sizes dest src ")
                                        +std::to_string(s_dest)+ " "
                                        +std::to_string(strlen(src))+ " "
             ,nitrokey::log::Loglevel::DEBUG);

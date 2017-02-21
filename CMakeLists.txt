@@ -71,13 +71,19 @@ ENDIF()
 
 IF (NOT LIBNITROKEY_STATIC)
     add_library(nitrokey SHARED ${SOURCE_FILES})
+    add_library(nitrokey-log SHARED ${SOURCE_FILES})
     install (TARGETS nitrokey DESTINATION "lib")
 	SET(LIBNAME nitrokey)
 ELSE()
     add_library(nitrokey-static STATIC ${SOURCE_FILES})    
+    add_library(nitrokey-static-log STATIC ${SOURCE_FILES})
 	SET(LIBNAME nitrokey-static)
 ENDIF()
 target_link_libraries(${LIBNAME} hidapi-libusb)
+target_link_libraries(${LIBNAME}-log hidapi-libusb)
+
+SET_TARGET_PROPERTIES(${LIBNAME} PROPERTIES COMPILE_DEFINITIONS "NO_LOG")
+
 
 file(GLOB LIB_INCLUDES "include/libnitrokey/*.h")
 install (FILES ${LIB_INCLUDES} DESTINATION "include")

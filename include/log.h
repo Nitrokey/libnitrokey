@@ -53,4 +53,11 @@ class Log {
 }
 }
 
+
+#ifdef NO_LOG
+#define LOG(string, level) while(false){}
+#else
+#define LOG(string, level) nitrokey::log::Log::instance()((string), (level))
+#endif
+
 #endif

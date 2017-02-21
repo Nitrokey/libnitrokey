@@ -34,7 +34,7 @@ class Log {
   Log() : mp_loghandler(&stdlog_handler), m_loglevel(Loglevel::WARNING) {}
 
   static Log &instance() {
-    if (mp_instance == NULL) mp_instance = new Log;
+    if (mp_instance == nullptr) mp_instance = new Log;
     return *mp_instance;
   }
 

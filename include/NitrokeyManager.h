@@ -122,12 +122,14 @@ namespace nitrokey {
         std::pair<uint8_t,uint8_t> get_SD_usage_data();
 
 
-      int get_progress_bar_value();
+        int get_progress_bar_value();
 
         ~NitrokeyManager();
         bool is_authorization_command_supported();
+        bool is_320_OTP_secret_supported();
 
-        template <typename S, typename A, typename T>
+
+      template <typename S, typename A, typename T>
         void authorize_packet(T &package, const char *admin_temporary_password, shared_ptr<Device> device);
         int get_minor_firmware_version();
 

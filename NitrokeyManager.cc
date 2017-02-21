@@ -650,9 +650,18 @@ namespace nitrokey{
       //authorization command is supported for versions equal or below:
         auto m = std::unordered_map<DeviceModel , int, EnumClassHash>({
                                                {DeviceModel::PRO, 7},
-                                               {DeviceModel::STORAGE, 99},
+                                               {DeviceModel::STORAGE, 999},
          });
         return get_minor_firmware_version() <= m[device->get_device_model()];
+    }
+
+    bool NitrokeyManager::is_320_OTP_secret_supported(){
+      //authorization command is supported for versions equal or below:
+        auto m = std::unordered_map<DeviceModel , int, EnumClassHash>({
+                                               {DeviceModel::PRO, 8},
+                                               {DeviceModel::STORAGE, 999},
+         });
+        return get_minor_firmware_version() >= m[device->get_device_model()];
     }
 
     DeviceModel NitrokeyManager::get_connected_device_model() const{

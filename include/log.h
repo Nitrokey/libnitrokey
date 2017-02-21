@@ -5,7 +5,7 @@
 
 namespace nitrokey {
 namespace log {
-
+  
 #ifdef ERROR
 #undef ERROR
 #endif

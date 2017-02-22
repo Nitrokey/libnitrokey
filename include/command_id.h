@@ -12,7 +12,7 @@ namespace proto {
         wrong_password,
         busy_progressbar,
         password_matrix_ready,
-        no_user_password_unlock,
+        no_user_password_unlock, // FIXME: translate on receive to command status error (fix in firmware?)
         smartcard_error,
         security_bit_active
       };

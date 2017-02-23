@@ -76,6 +76,7 @@ namespace nitrokey{
 
     bool NitrokeyManager::connect(const char *device_model) {
       std::lock_guard<std::mutex> lock(mex_dev_com);
+      LOG(__FUNCTION__, nitrokey::log::Loglevel::DEBUG_L2);
       switch (device_model[0]){
             case 'P':
                 device = make_shared<Stick10>();

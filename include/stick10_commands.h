@@ -6,8 +6,8 @@
 #include <string>
 #include <sstream>
 #include <stdint.h>
-#include "command.h"
 #include "device_proto.h"
+#include "command.h"
 
 #pragma pack (push,1)
 

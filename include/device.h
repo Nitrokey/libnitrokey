@@ -50,6 +50,7 @@ public:
     cnt busy_progressbar;
     cnt command_result_not_equal_0_recv;
     cnt communication_successful;
+    cnt low_level_reconnect;
     std::string get_as_string();
 
   } m_counters = {};
@@ -59,7 +60,7 @@ public:
                    const milliseconds send_receive_delay, const int retry_receiving_count,
                    const milliseconds retry_timeout);
 
-    virtual ~Device(){show_stats(); disconnect();}
+    virtual ~Device();
 
   // lack of device is not actually an error,
   // so it doesn't throw
@@ -97,6 +98,9 @@ public:
   DeviceModel get_device_model() const {return m_model;}
 private:
   std::atomic<uint8_t> last_command_status;
+  void _reconnect();
+  bool _connect();
+  bool _disconnect();
 
 protected:
   const uint16_t m_vid;
@@ -115,6 +119,8 @@ protected:
 
   std::atomic<hid_device *>mp_devhandle;
 
+
+  static std::atomic_int instances_count;
 };
 
 class Stick10 : public Device {

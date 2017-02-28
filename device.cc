@@ -15,6 +15,8 @@ using namespace nitrokey::device;
 using namespace nitrokey::log;
 using namespace std::chrono;
 
+std::atomic_int Device::instances_count{0};
+
 Device::Device(const uint16_t vid, const uint16_t pid, const DeviceModel model,
                const milliseconds send_receive_delay, const int retry_receiving_count,
                const milliseconds retry_timeout)
@@ -27,13 +29,19 @@ Device::Device(const uint16_t vid, const uint16_t pid, const DeviceModel model,
       last_command_status(0),
       m_model(model),
       m_send_receive_delay(send_receive_delay)
-{}
+{
+  instances_count++;
+}
 
 bool Device::disconnect() {
   //called in object's destructor
   LOG(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
-  LOG(std::string(__FUNCTION__) +  std::string(m_model==DeviceModel::PRO?"PRO":"STORAGE"), Loglevel::DEBUG_L2);
+  return _disconnect();
+}
+
+bool Device::_disconnect() {
+  LOG(std::string(__FUNCTION__) + std::string(m_model == DeviceModel::PRO ? "PRO" : "STORAGE"), Loglevel::DEBUG_L2);
   LOG(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
 
   LOG(std::string("Disconnection success: ") + std::to_string(mp_devhandle == nullptr), Loglevel::DEBUG_L2);
@@ -41,14 +49,21 @@ bool Device::disconnect() {
 
   hid_close(mp_devhandle);
   mp_devhandle = nullptr;
-  //FIXME hidexit should not be called if some devices are still active - use static active devices counter
-  //  hid_exit();
+  if (instances_count == 1){
+    LOG(std::string("Calling hid_exit"), Loglevel::DEBUG_L2);
+    hid_exit();
+  }
   return true;
 }
+
 bool Device::connect() {
   LOG(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
-  LOG(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
+  return _connect();
+}
+
+bool Device::_connect() {
+  LOG(std::string(__FUNCTION__) + std::string(" *IN* "), Loglevel::DEBUG_L2);
 
 //   hid_init(); // done automatically on hid_open
   mp_devhandle = hid_open(m_vid, m_pid, nullptr);
@@ -67,8 +82,16 @@ int Device::send(const void *packet) {
     throw DeviceNotConnected("Attempted HID send on an invalid descriptor.");
   }
 
-  return (hid_send_feature_report(
-      mp_devhandle, (const unsigned char *)(packet), HID_REPORT_SIZE));
+  int send_feature_report = -1;
+
+  for (int i = 0; i < 3 && send_feature_report < 0; ++i) {
+    send_feature_report = hid_send_feature_report(
+        mp_devhandle, (const unsigned char *)(packet), HID_REPORT_SIZE);
+    if (send_feature_report < 0) _reconnect();
+    //add thread sleep?
+    LOG(std::string("Sending attempt: ")+std::to_string(i) + " / 3" , Loglevel::DEBUG_L2);
+  }
+  return send_feature_report;
 }
 
 int Device::recv(void *packet) {
@@ -138,6 +161,23 @@ void Device::show_stats() {
   LOG(s, Loglevel::DEBUG_L2);
 }
 
+void Device::_reconnect() {
+  if (mex_dev_com.try_lock()){
+    throw std::runtime_error("mutex should be locked before entering this function");
+  }
+  LOG(__FUNCTION__, Loglevel::DEBUG_L2);
+  ++m_counters.low_level_reconnect;
+  _disconnect();
+  _connect();
+
+}
+
+Device::~Device() {
+  show_stats();
+  disconnect();
+  instances_count--;
+}
+
 Stick10::Stick10():
   Device(0x20a0, 0x4108, DeviceModel::PRO, 100ms, 5, 100ms)
   {}
@@ -167,7 +207,9 @@ std::string Device::ErrorCounters::get_as_string() {
   p(CRC_other_than_awaited);
   p(wrong_CRC);
   ss << "), ";
+  p(low_level_reconnect);
   p(sending_error);
   p(receiving_error);
   return ss.str();
 }
+#undef p

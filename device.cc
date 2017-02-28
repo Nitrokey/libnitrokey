@@ -107,13 +107,10 @@ int Device::recv(void *packet) {
     throw DeviceNotConnected("Attempted HID receive on an invalid descriptor.");
   }
 
-  // FIXME extract error handling and repeating to parent function in
-  // device_proto:192
   for (;;) {
     status = (hid_get_feature_report(mp_devhandle, (unsigned char *)(packet),
                                      HID_REPORT_SIZE));
 
-    // FIXME handle getting libhid error message somewhere else
     auto pwherr = hid_error(mp_devhandle);
     std::wstring wherr = (pwherr != nullptr) ? pwherr : L"No error message";
     std::string herr(wherr.begin(), wherr.end());

@@ -130,6 +130,7 @@ int Device::recv(void *packet) {
           Loglevel::DEBUG);
       break;
     }
+    _reconnect();
     LOG("Retrying... " + std::to_string(retry_count),
                     Loglevel::DEBUG);
     std::this_thread::sleep_for(m_retry_timeout);

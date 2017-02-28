@@ -162,14 +162,10 @@ void Device::show_stats() {
 }
 
 void Device::_reconnect() {
-  if (mex_dev_com.try_lock()){
-    throw std::runtime_error("mutex should be locked before entering this function");
-  }
   LOG(__FUNCTION__, Loglevel::DEBUG_L2);
   ++m_counters.low_level_reconnect;
   _disconnect();
   _connect();
-
 }
 
 Device::~Device() {

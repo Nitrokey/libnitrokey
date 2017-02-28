@@ -60,7 +60,7 @@ set(SOURCE_FILES
     NitrokeyManager.cc
     NK_C_API.h
     NK_C_API.cc
-)
+        DeviceCommunicationExceptions.cpp)
 
 IF(UNIX)
 #	add_library(hidapi-libusb STATIC hidapi/libusb/hid.c )

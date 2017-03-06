@@ -58,10 +58,10 @@ def test_encrypted_volume_unlock_hidden(C):
     assert C.NK_unlock_hidden_volume(hidden_volume_password) == DeviceErrorCode.STATUS_OK
 
 
-@pytest.mark.skip(reason='hangs device, to report')
-def test_encrypted_volume_setup_multiple_hidden(C):
-    skip_if_device_version_lower_than({'S': 43})
-    hidden_volume_password = 'hiddenpassword'
+def test_encrypted_volume_setup_multiple_hidden_lock(C):
+    import random
+    skip_if_device_version_lower_than({'S': 45}) #hangs device on lower version
+    hidden_volume_password = 'hiddenpassword' + str(random.randint(0,100))
     p = lambda i: hidden_volume_password + str(i)
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK

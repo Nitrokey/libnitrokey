@@ -58,6 +58,7 @@ def test_write_all_password_safe_slots_and_read_10_times(C):
 
 
 @pytest.mark.slowtest
+@pytest.mark.xfail(reason="This test should be run directly after test_write_all_password_safe_slots_and_read_10_times")
 def test_read_all_password_safe_slots_10_times(C):
     def fill(s, wid):
         assert wid >= len(s)
@@ -591,7 +592,7 @@ def test_OTP_secret_started_from_null(C, secret):
     skip_if_device_version_lower_than({'S': 43, 'P': 8})
     if len(secret) > 40:
         # feature: 320 bit long secret handling
-        skip_if_device_version_lower_than({'S': 44, 'P': 8})
+        skip_if_device_version_lower_than({'P': 8})
 
     oath = pytest.importorskip("oath")
     lib_at = lambda t: oath.hotp(secret, t, format='dec6')
@@ -685,8 +686,9 @@ def test_TOTP_secrets(C, secret):
     '''
     skip_if_device_version_lower_than({'S': 44, 'P': 8})
 
-    if is_pro_rtm_07(C) and len(secret)>20*2: #*2 since secret is in hex
-        pytest.skip("Secret lengths over 20 bytes are not supported by NK Pro 0.7 ")
+    if len(secret)>20*2: #*2 since secret is in hex
+        # pytest.skip("Secret lengths over 20 bytes are not supported by NK Pro 0.7 and NK Storage")
+        skip_if_device_version_lower_than({'P': 8})
     slot_number = 0
     time = 0
     period = 30
@@ -764,7 +766,7 @@ def test_edit_OTP_slot(C):
     """
     should change slots counter and name without changing its secret (using null secret for second update)
     """
-    # counter does not reset under Storage v0.43
+    # counter is not getting updated under Storage v0.43 - #TOREPORT
     skip_if_device_version_lower_than({'S': 44, 'P': 7})
 
     secret = RFC_SECRET

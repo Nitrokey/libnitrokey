@@ -147,6 +147,9 @@ def test_regenerate_aes_key(C):
 
 def test_enable_password_safe_after_factory_reset(C):
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    if is_storage(C):
+        # for some reason storage likes to be authenticated before reset (to investigate)
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_factory_reset(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     wait(10)
     if is_storage(C):

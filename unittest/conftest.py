@@ -29,7 +29,23 @@ def C(request):
             print(declaration)
             ffi.cdef(declaration, override=True)
 
-    C = ffi.dlopen("../build/libnitrokey.so")
+    C = None
+    import os, sys
+    path_build = os.path.join("..", "build")
+    paths = [ os.path.join(path_build,"libnitrokey-log.so"),
+              os.path.join(path_build,"libnitrokey.so")]
+    for p in paths:
+        print p
+        if os.path.exists(p):
+            C = ffi.dlopen(p)
+            break
+        else:
+            print("File does not exist: " + p)
+            print("Trying another")
+    if not C:
+        print("No library file found")
+        sys.exit(1)
+
     C.NK_set_debug(False)
     nk_login = C.NK_login_auto()
     if nk_login != 1:

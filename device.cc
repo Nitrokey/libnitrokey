@@ -77,14 +77,13 @@ int Device::send(const void *packet) {
   std::lock_guard<std::mutex> lock(mex_dev_com);
   LOG(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
 
-  if (mp_devhandle == nullptr) {
-    LOG(std::string("Connection fail") , Loglevel::DEBUG_L2);
-    throw DeviceNotConnected("Attempted HID send on an invalid descriptor.");
-  }
-
   int send_feature_report = -1;
 
   for (int i = 0; i < 3 && send_feature_report < 0; ++i) {
+    if (mp_devhandle == nullptr) {
+      LOG(std::string("Connection fail") , Loglevel::DEBUG_L2);
+      throw DeviceNotConnected("Attempted HID send on an invalid descriptor.");
+    }
     send_feature_report = hid_send_feature_report(
         mp_devhandle, (const unsigned char *)(packet), HID_REPORT_SIZE);
     if (send_feature_report < 0) _reconnect();
@@ -101,13 +100,12 @@ int Device::recv(void *packet) {
   int status;
   int retry_count = 0;
 
-
-  if (mp_devhandle == nullptr){
-    LOG(std::string("Connection fail") , Loglevel::DEBUG_L2);
-    throw DeviceNotConnected("Attempted HID receive on an invalid descriptor.");
-  }
-
   for (;;) {
+    if (mp_devhandle == nullptr){
+      LOG(std::string("Connection fail") , Loglevel::DEBUG_L2);
+      throw DeviceNotConnected("Attempted HID receive on an invalid descriptor.");
+    }
+
     status = (hid_get_feature_report(mp_devhandle, (unsigned char *)(packet),
                                      HID_REPORT_SIZE));
 

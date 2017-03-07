@@ -370,7 +370,7 @@ namespace nitrokey {
 
               if (!resp.isValid()) throw std::runtime_error("Invalid incoming packet");
               if (receiving_retry_counter <= 0)
-                throw std::runtime_error(
+                throw std::runtime_error( //TODO change to other kind to handle correctly by caller, communication exception?
                     "Maximum receiving_retry_counter count reached for receiving response from the device!");
               dev->m_counters.communication_successful++;
 

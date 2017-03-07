@@ -101,6 +101,7 @@ namespace nitrokey {
         void set_unencrypted_read_write(const char *user_pin);
 
         void export_firmware(const char *admin_pin);
+        void enable_firmware_update(const char *firmware_pin);
 
         void clear_new_sd_card_warning(const char *admin_pin);
 

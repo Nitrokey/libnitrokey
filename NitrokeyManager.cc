@@ -735,6 +735,10 @@ namespace nitrokey{
       misc::execute_password_command<stick20::ExportFirmware>(device, admin_pin);
     }
 
+    void NitrokeyManager::enable_firmware_update(const char* firmware_pin) {
+      misc::execute_password_command<stick20::EnableFirmwareUpdate>(device, firmware_pin);
+    }
+
     void NitrokeyManager::clear_new_sd_card_warning(const char* admin_pin) {
       misc::execute_password_command<stick20::SendClearNewSdCardFound>(device, admin_pin);
     }

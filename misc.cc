@@ -5,18 +5,19 @@
 #include <cstdlib>
 #include <cstring>
 #include "LibraryException.h"
+#include <vector>
 
 namespace nitrokey {
 namespace misc {
 
-std::vector<uint8_t> hex_string_to_byte(const char* hexString){
+::std::vector<uint8_t> hex_string_to_byte(const char* hexString){
     const size_t big_string_size = 256; //arbitrary 'big' number
     const size_t s_size = strlen(hexString);
     const size_t d_size = s_size/2;
     if (s_size%2!=0 || s_size>big_string_size){
         throw InvalidHexString(0);
     }
-    auto data = std::vector<uint8_t>();
+    auto data = ::std::vector<uint8_t>();
     data.reserve(d_size);
 
     char buf[2];
@@ -36,9 +37,9 @@ std::vector<uint8_t> hex_string_to_byte(const char* hexString){
 };
 
 #include <cctype>
-std::string hexdump(const char *p, size_t size, bool print_header,
+::std::string hexdump(const char *p, size_t size, bool print_header,
         bool print_ascii, bool print_empty) {
-  std::stringstream out;
+  ::std::stringstream out;
   char formatbuf[128];
   const char *pstart = p;
 
@@ -68,7 +69,7 @@ std::string hexdump(const char *p, size_t size, bool print_header,
             out << '.';
         }
       }
-    out << std::endl;
+    out << ::std::endl;
   }
   return out.str();
 }

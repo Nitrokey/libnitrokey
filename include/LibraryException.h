@@ -27,7 +27,7 @@ public:
 
     virtual const char *what() const throw() override {
         std::string s = " ";
-        auto ts = [](int x){ return std::to_string(x); };
+        auto ts = [](size_t x){ return std::to_string(x); };
         std::string msg = std::string("Target buffer size is smaller than source: [source size, buffer size]")
             +s+ ts(source_size) +s+ ts(target_size);
         return msg.c_str();

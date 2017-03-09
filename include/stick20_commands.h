@@ -1,12 +1,15 @@
 #ifndef STICK20_COMMANDS_H
 #define STICK20_COMMANDS_H
 
+
+
 #include <stdint.h>
 #include "command.h"
 #include <string>
 #include <sstream>
 #include "device_proto.h"
 
+#pragma pack (push,1)
 
 namespace nitrokey {
     namespace proto {
@@ -332,10 +335,12 @@ namespace nitrokey {
                 typedef Transaction<command_id(), struct EmptyPayload, struct ResponsePayload>
                     CommandTransaction;
             };
+
         }
     }
 }
 
 #undef print_to_ss
+#pragma pack (pop)
 
 #endif

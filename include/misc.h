@@ -27,7 +27,7 @@ namespace misc {
         strncpy((char*) &dest, src, s_dest);
     }
 
-
+#define bzero(b,len) (memset((b), '\0', (len)), (void) 0)  
     template <typename T>
 typename T::CommandPayload get_payload(){
     //Create, initialize and return by value command payload

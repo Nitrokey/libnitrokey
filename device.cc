@@ -2,7 +2,7 @@
 #include <thread>
 #include <cstddef>
 #include <stdexcept>
-#include <hidapi/hidapi.h>
+#include "hidapi/hidapi.h"
 #include "include/misc.h"
 #include "include/device.h"
 #include "include/log.h"
@@ -31,7 +31,7 @@ Device::Device(const uint16_t vid, const uint16_t pid, const DeviceModel model,
 
 bool Device::disconnect() {
   //called in object's destructor
-  Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
+  Log::instance()(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
   Log::instance()(std::string(__FUNCTION__) +  std::string(m_model==DeviceModel::PRO?"PRO":"STORAGE"), Loglevel::DEBUG_L2);
   Log::instance()(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
@@ -45,7 +45,7 @@ bool Device::disconnect() {
   return true;
 }
 bool Device::connect() {
-  Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
+  Log::instance()(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
   Log::instance()(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
 
@@ -57,7 +57,7 @@ bool Device::connect() {
 }
 
 int Device::send(const void *packet) {
-  Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
+  Log::instance()(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
   Log::instance()(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
 
@@ -71,7 +71,7 @@ int Device::send(const void *packet) {
 }
 
 int Device::recv(void *packet) {
-  Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
+  Log::instance()(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
   Log::instance()(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
   int status;
@@ -115,7 +115,7 @@ int Device::recv(void *packet) {
 }
 
 bool Device::is_connected() {
-  Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
+  Log::instance()(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
   if (mp_devhandle==nullptr){
     return false;

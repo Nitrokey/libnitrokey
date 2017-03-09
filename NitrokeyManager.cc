@@ -397,7 +397,7 @@ namespace nitrokey{
         auto payload = get_payload<GetSlotName>();
         payload.slot_number = slot_number;
         auto resp = GetSlotName::CommandTransaction::run(device, payload);
-        return strdup((const char *) resp.data().slot_name);
+        return _strdup((const char *) resp.data().slot_name);
     }
 
     bool NitrokeyManager::first_authenticate(const char *pin, const char *temporary_password) {
@@ -504,7 +504,7 @@ namespace nitrokey{
         auto p = get_payload<GetPasswordSafeSlotName>();
         p.slot_number = slot_number;
         auto response = GetPasswordSafeSlotName::CommandTransaction::run(device, p);
-        return strdup((const char *) response.data().slot_name);
+        return _strdup((const char *) response.data().slot_name);
     }
 
     bool NitrokeyManager::is_valid_password_safe_slot_number(uint8_t slot_number) const { return slot_number < 16; }
@@ -514,7 +514,7 @@ namespace nitrokey{
         auto p = get_payload<GetPasswordSafeSlotLogin>();
         p.slot_number = slot_number;
         auto response = GetPasswordSafeSlotLogin::CommandTransaction::run(device, p);
-        return strdup((const char *) response.data().slot_login);
+        return _strdup((const char *) response.data().slot_login);
     }
 
     const char *NitrokeyManager::get_password_safe_slot_password(uint8_t slot_number) {
@@ -522,7 +522,7 @@ namespace nitrokey{
         auto p = get_payload<GetPasswordSafeSlotPassword>();
         p.slot_number = slot_number;
         auto response = GetPasswordSafeSlotPassword::CommandTransaction::run(device, p);
-        return strdup((const char *) response.data().slot_password); //FIXME use secure way
+        return _strdup((const char *) response.data().slot_password); //FIXME use secure way
     }
 
     void NitrokeyManager::write_password_safe_slot(uint8_t slot_number, const char *slot_name, const char *slot_login,
@@ -724,7 +724,7 @@ namespace nitrokey{
 
     const char * NitrokeyManager::get_status_storage_as_string(){
       auto p = stick20::GetDeviceStatus::CommandTransaction::run(device);
-      return strdup(p.data().dissect().c_str());
+      return _strdup(p.data().dissect().c_str());
     }
 
     stick20::DeviceConfigurationResponsePacket::ResponsePayload NitrokeyManager::get_status_storage(){
@@ -734,7 +734,7 @@ namespace nitrokey{
 
     const char * NitrokeyManager::get_SD_usage_data_as_string(){
       auto p = stick20::GetSDCardOccupancy::CommandTransaction::run(device);
-      return strdup(p.data().dissect().c_str());
+      return _strdup(p.data().dissect().c_str());
     }
 
     int NitrokeyManager::get_progress_bar_value(){

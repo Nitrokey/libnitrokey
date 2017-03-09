@@ -7,3 +7,4 @@ core
 .cache/
 .idea/
 CMakeFiles/
+/.vs

@@ -6,7 +6,6 @@
 #include <type_traits>
 #include <stdexcept>
 #include <string>
-#include <strings.h>
 // a local version for compatibility with Windows
 #include <stdint.h>
 #include "cxx_semantics.h"
@@ -34,6 +33,7 @@
 
 #include <mutex>
 #include "DeviceCommunicationExceptions.h"
+#define bzero(b,len) (memset((b), '\0', (len)), (void) 0)  
 
 namespace nitrokey {
     namespace proto {
@@ -43,7 +43,7 @@ namespace nitrokey {
  *
  *	TODO (future) support for Big Endian
  */
-
+#pragma pack (push,1)
 /*
  *	Every packet is a USB HID report (check USB spec)
  */
@@ -181,8 +181,10 @@ namespace nitrokey {
             typedef command_payload CommandPayload;
             typedef response_payload ResponsePayload;
 
+
             typedef struct HIDReport<cmd_id, CommandPayload> OutgoingPacket;
             typedef struct DeviceResponse<cmd_id, ResponsePayload> ResponsePacket;
+#pragma pack (pop)
 
             static_assert(std::is_pod<OutgoingPacket>::value,
                           "outgoingpacket must be a pod type");
@@ -216,7 +218,7 @@ namespace nitrokey {
               static std::mutex send_receive_mtx;
               std::lock_guard<std::mutex> guard(send_receive_mtx);
 
-              Log::instance()(__PRETTY_FUNCTION__, Loglevel::DEBUG_L2);
+              Log::instance()(__FUNCTION__, Loglevel::DEBUG_L2);
 
               if (dev == nullptr){
                 throw DeviceNotConnected("Device not initialized");

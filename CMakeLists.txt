@@ -65,7 +65,7 @@ set(SOURCE_FILES
 #	add_library(hidapi-libusb STATIC hidapi/libusb/hid.c )
 #ELSE()
 	include_directories(hidapi/hidapi)
-	add_library(hidapi-libusb STATIC hidapi/windows/hid.c )
+	add_library(hidapi-libusb SHARED hidapi/windows/hid.c )
 	target_link_libraries(hidapi-libusb setupapi setupapi kernel32 user32 gdi32 winspool comdlg32 advapi32 shell32 ole32 oleaut32 uuid odbc32 odbccp32)
 #ENDIF()
 
@@ -85,7 +85,7 @@ install (FILES ${LIB_INCLUDES} DESTINATION "include")
 IF (COMPILE_TESTS)
     include_directories(unittest/Catch/include)
 
-    add_library(catch STATIC unittest/catch_main.cpp )
+    add_library(catch SHARED unittest/catch_main.cpp )
 	
     add_executable (test_C_API unittest/test_C_API.cpp)
     target_link_libraries (test_C_API ${EXTRA_LIBS} ${LIBNAME} catch)

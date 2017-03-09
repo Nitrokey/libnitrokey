@@ -1,5 +1,6 @@
 #ifndef STICK10_COMMANDS_H
 #define STICK10_COMMANDS_H
+
 #include <bitset>
 #include <iomanip>
 #include <string>
@@ -8,8 +9,12 @@
 #include "command.h"
 #include "device_proto.h"
 
+#pragma pack (push,1)
+
 namespace nitrokey {
 namespace proto {
+
+
 
 /*
  *	Stick10 protocol definition
@@ -844,8 +849,11 @@ class BuildAESKey : Command<CommandID::NEW_AES_KEY> {
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
       CommandTransaction;
+
 };
+
 }
 }
 }
+#pragma pack (pop)
 #endif

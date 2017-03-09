@@ -21,7 +21,7 @@ IF (UNIX)
     ENDIF()
 ENDIF()
 
-project(libnitrokey CXX)
+project(libnitrokey)
 SET(PROJECT_VERSION "3.0-alpha")
 set(CMAKE_CXX_STANDARD 14)
 
@@ -33,6 +33,7 @@ IF (NOT CMAKE_BUILD_TYPE)
 ENDIF()
 MESSAGE("${PROJECT_NAME}: Build type: ${CMAKE_BUILD_TYPE}")
 
+include_directories(hidapi)
 include_directories(include)
 set(SOURCE_FILES
     include/command.h
@@ -60,15 +61,23 @@ set(SOURCE_FILES
     NK_C_API.cc
 )
 
+#IF(UNIX)
+#	add_library(hidapi-libusb STATIC hidapi/libusb/hid.c )
+#ELSE()
+	include_directories(hidapi/hidapi)
+	add_library(hidapi-libusb STATIC hidapi/windows/hid.c )
+	target_link_libraries(hidapi-libusb setupapi setupapi kernel32 user32 gdi32 winspool comdlg32 advapi32 shell32 ole32 oleaut32 uuid odbc32 odbccp32)
+#ENDIF()
 
 IF (NOT LIBNITROKEY_STATIC)
     add_library(nitrokey SHARED ${SOURCE_FILES})
-    target_link_libraries(nitrokey hidapi-libusb)
     install (TARGETS nitrokey DESTINATION "lib")
+	SET(LIBNAME nitrokey)
 ELSE()
-    add_library(nitrokey-static STATIC ${SOURCE_FILES})
-    target_link_libraries(nitrokey-static hidapi-libusb)
+    add_library(nitrokey-static STATIC ${SOURCE_FILES})    
+	SET(LIBNAME nitrokey-static)
 ENDIF()
+target_link_libraries(${LIBNAME} hidapi-libusb)
 
 file(GLOB LIB_INCLUDES "include/libnitrokey/*.h")
 install (FILES ${LIB_INCLUDES} DESTINATION "include")
@@ -76,22 +85,22 @@ install (FILES ${LIB_INCLUDES} DESTINATION "include")
 IF (COMPILE_TESTS)
     include_directories(unittest/Catch/include)
 
-    add_library(catch SHARED unittest/catch_main.cpp )
-
+    add_library(catch STATIC unittest/catch_main.cpp )
+	
     add_executable (test_C_API unittest/test_C_API.cpp)
-    target_link_libraries (test_C_API ${EXTRA_LIBS} nitrokey catch)
+    target_link_libraries (test_C_API ${EXTRA_LIBS} ${LIBNAME} catch)
 
     add_executable (test2 unittest/test2.cc)
-    target_link_libraries (test2 ${EXTRA_LIBS} nitrokey catch)
+    target_link_libraries (test2 ${EXTRA_LIBS} ${LIBNAME} catch)
 
     add_executable (test3 unittest/test3.cc)
-    target_link_libraries (test3 ${EXTRA_LIBS} nitrokey catch)
+    target_link_libraries (test3 ${EXTRA_LIBS} ${LIBNAME} catch)
 
     add_executable (test_HOTP unittest/test_HOTP.cc)
-    target_link_libraries (test_HOTP ${EXTRA_LIBS} nitrokey catch)
+    target_link_libraries (test_HOTP ${EXTRA_LIBS} ${LIBNAME} catch)
 
     add_executable (test1 unittest/test.cc)
-    target_link_libraries (test1 ${EXTRA_LIBS} nitrokey catch)
+    target_link_libraries (test1 ${EXTRA_LIBS} ${LIBNAME} catch)
 
     #run with 'make test' or 'ctest'
     #needs connected PRO device for success

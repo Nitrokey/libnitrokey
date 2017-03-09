@@ -261,6 +261,8 @@ namespace nitrokey {
 
                 // FIXME make checks done in device:recv here
                 receiving_retry_counter = dev->get_retry_receiving_count();
+                int busy_counter = 0;
+                auto retry_timeout = dev->get_retry_timeout();
                 while (receiving_retry_counter-- > 0) {
                   dev->m_counters.recv_executed++;
                   status = dev->recv(&resp);
@@ -302,16 +304,17 @@ namespace nitrokey {
                     break;
                   }
                   if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy)) {
-                    static int busy_counter = 0;
                     dev->m_counters.busy++;
                     if (busy_counter++<10) {
                       receiving_retry_counter++;
                       LOG("Status busy, not decreasing receiving_retry_counter counter: " +
                                       std::to_string(receiving_retry_counter), Loglevel::DEBUG_L2);
                     } else {
+                      retry_timeout *= 2;
                       busy_counter = 0;
                       LOG("Status busy, decreasing receiving_retry_counter counter: " +
-                                      std::to_string(receiving_retry_counter), Loglevel::DEBUG);
+                                      std::to_string(receiving_retry_counter) + ", current delay:"
+                          + std::to_string(retry_timeout.count()), Loglevel::DEBUG);
                     }
                   }
                   if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy) &&
@@ -335,7 +338,7 @@ namespace nitrokey {
                   LOG("Invalid incoming HID packet:", Loglevel::DEBUG_L2);
                   LOG(static_cast<std::string>(resp), Loglevel::DEBUG_L2);
                   dev->m_counters.total_retries++;
-                  std::this_thread::sleep_for(dev->get_retry_timeout());
+                  std::this_thread::sleep_for(retry_timeout);
                   continue;
                 }
                 if (successful_communication) break;

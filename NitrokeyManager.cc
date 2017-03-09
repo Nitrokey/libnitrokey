@@ -129,7 +129,15 @@ namespace nitrokey{
         }
       }
       return false;
+  }
+
+  bool NitrokeyManager::could_current_device_be_enumerated() {
+    std::lock_guard<std::mutex> lock(mex_dev_com);
+    if (device != nullptr) {
+      return device->could_be_enumerated();
     }
+    return false;
+  }
 
     void NitrokeyManager::set_debug(bool state) {
         if (state){

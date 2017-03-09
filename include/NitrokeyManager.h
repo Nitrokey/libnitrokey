@@ -44,7 +44,9 @@ namespace nitrokey {
         bool connect();
         bool disconnect();
         bool is_connected() throw() ;
-        DeviceModel get_connected_device_model() const;
+        bool could_current_device_be_enumerated();
+
+      DeviceModel get_connected_device_model() const;
           void set_debug(bool state);
         stick10::GetStatus::ResponsePayload get_status();
         string get_status_as_string();

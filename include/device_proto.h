@@ -239,7 +239,7 @@ namespace nitrokey {
               LOG("Outgoing HID packet:", Loglevel::DEBUG);
               LOG(static_cast<std::string>(outp), Loglevel::DEBUG);
 
-              if (!outp.isValid()) throw std::runtime_error("Invalid outgoing packet");
+              if (!outp.isValid()) throw DeviceSendingFailure("Invalid outgoing packet");
 
               bool successful_communication = false;
               int receiving_retry_counter = 0;
@@ -368,9 +368,9 @@ namespace nitrokey {
                     resp.command_id, resp.device_status, resp.storage_status.progress_bar_value);
               }
 
-              if (!resp.isValid()) throw std::runtime_error("Invalid incoming packet");
+              if (!resp.isValid()) throw DeviceReceivingFailure("Invalid incoming packet");
               if (receiving_retry_counter <= 0)
-                throw std::runtime_error( //TODO change to other kind to handle correctly by caller, communication exception?
+                throw DeviceReceivingFailure(
                     "Maximum receiving_retry_counter count reached for receiving response from the device!");
               dev->m_counters.communication_successful++;
 

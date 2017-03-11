@@ -7,7 +7,7 @@
 namespace nitrokey {
 namespace log {
 
-Log *Log::mp_instance = NULL;
+Log *Log::mp_instance = nullptr;
 StdlogHandler stdlog_handler;
 
 std::string LogHandler::loglevel_to_str(Loglevel lvl) {
@@ -27,7 +27,7 @@ std::string LogHandler::loglevel_to_str(Loglevel lvl) {
 }
 
 void Log::operator()(const std::string &logstr, Loglevel lvl) {
-  if (mp_loghandler != NULL)
+  if (mp_loghandler != nullptr)
     if ((int)(lvl) >= (int)(m_loglevel)) mp_loghandler->print(logstr, lvl);
 }
 

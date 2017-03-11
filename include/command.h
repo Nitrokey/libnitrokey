@@ -28,6 +28,7 @@ namespace stick20{
 
         template<CommandID cmd_id, PasswordKind Tpassword_kind = PasswordKind::User, int password_length = 20>
         class PasswordCommand : public Command<cmd_id> {
+			constexpr static CommandID _command_id() { return cmd_id; }
         public:
             struct CommandPayload {
                 uint8_t kind;
@@ -69,8 +70,10 @@ namespace stick20{
 
             } __packed;
 
-            typedef Transaction<Command<cmd_id>::command_id(), struct CommandPayload, struct EmptyPayload>
-                CommandTransaction;
+            //typedef Transaction<Command<cmd_id>::command_id(), struct CommandPayload, struct EmptyPayload>
+            //    CommandTransaction;
+			using CommandTransaction = Transaction<cmd_id,  CommandPayload,  EmptyPayload>;
+			//using CommandTransaction = Transaction<_command_id(), CommandPayload, EmptyPayload>;
 
         };
     }

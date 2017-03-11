@@ -32,22 +32,31 @@ namespace nitrokey {
         uint32_t get_HOTP_code(uint8_t slot_number, const char *user_temporary_password);
         uint32_t get_TOTP_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time, uint8_t last_interval,
                                const char *user_temporary_password);
+        uint32_t get_TOTP_code(uint8_t slot_number, const char *user_temporary_password);
+        stick10::ReadSlot::ResponsePayload get_TOTP_slot_data(const uint8_t slot_number);
+        stick10::ReadSlot::ResponsePayload get_HOTP_slot_data(const uint8_t slot_number);
+
         bool set_time(uint64_t time);
-        bool get_time();
+        bool get_time(uint64_t time = 0);
         bool erase_totp_slot(uint8_t slot_number, const char *temporary_password);
         bool erase_hotp_slot(uint8_t slot_number, const char *temporary_password);
         bool connect(const char *device_model);
         bool connect();
         bool disconnect();
-        void set_debug(bool state);
-        string get_status();
+        bool is_connected() throw() ;
+        bool could_current_device_be_enumerated();
+
+      DeviceModel get_connected_device_model() const;
+          void set_debug(bool state);
+        stick10::GetStatus::ResponsePayload get_status();
+        string get_status_as_string();
         string get_serial_number();
 
         const char * get_totp_slot_name(uint8_t slot_number);
         const char * get_hotp_slot_name(uint8_t slot_number);
 
-        void change_user_PIN(char *current_PIN, char *new_PIN);
-        void change_admin_PIN(char *current_PIN, char *new_PIN);
+        void change_user_PIN(const char *current_PIN, const char *new_PIN);
+        void change_admin_PIN(const char *current_PIN, const char *new_PIN);
 
         void enable_password_safe(const char *user_pin);
 
@@ -84,18 +93,23 @@ namespace nitrokey {
         bool is_AES_supported(const char *user_password);
 
         void unlock_encrypted_volume(const char *user_password);
+        void lock_encrypted_volume();
 
         void unlock_hidden_volume(const char *hidden_volume_password);
+        void lock_hidden_volume();
 
         void set_unencrypted_read_only(const char *user_pin);
 
         void set_unencrypted_read_write(const char *user_pin);
 
         void export_firmware(const char *admin_pin);
+        void enable_firmware_update(const char *firmware_pin);
 
         void clear_new_sd_card_warning(const char *admin_pin);
 
         void fill_SD_card_with_random_data(const char *admin_pin);
+
+        uint8_t get_SD_card_size();
 
         void change_update_password(const char *current_update_password, const char *new_update_password);
 
@@ -105,26 +119,31 @@ namespace nitrokey {
         void send_startup(uint64_t seconds_from_epoch);
 
         const char * get_status_storage_as_string();
+        stick20::DeviceConfigurationResponsePacket::ResponsePayload get_status_storage();
 
         const char *get_SD_usage_data_as_string();
+        std::pair<uint8_t,uint8_t> get_SD_usage_data();
+
 
         int get_progress_bar_value();
 
         ~NitrokeyManager();
         bool is_authorization_command_supported();
+        bool is_320_OTP_secret_supported();
 
-        template <typename S, typename A, typename T>
+
+      template <typename S, typename A, typename T>
         void authorize_packet(T &package, const char *admin_temporary_password, shared_ptr<Device> device);
-        int get_major_firmware_version();
+        int get_minor_firmware_version();
 
+        explicit NitrokeyManager();
     private:
-        NitrokeyManager();
 
         static shared_ptr <NitrokeyManager> _instance;
-        bool connected;
         std::shared_ptr<Device> device;
 
-        bool is_valid_hotp_slot_number(uint8_t slot_number) const;
+      stick10::ReadSlot::ResponsePayload get_OTP_slot_data(const uint8_t slot_number);
+      bool is_valid_hotp_slot_number(uint8_t slot_number) const;
         bool is_valid_totp_slot_number(uint8_t slot_number) const;
         bool is_valid_password_safe_slot_number(uint8_t slot_number) const;
         uint8_t get_internal_slot_number_for_hotp(uint8_t slot_number) const;
@@ -133,7 +152,7 @@ namespace nitrokey {
         const char * get_slot_name(uint8_t slot_number);
 
         template <typename ProCommand, PasswordKind StoKind>
-        void change_PIN_general(char *current_PIN, char *new_PIN);
+        void change_PIN_general(const char *current_PIN, const char *new_PIN);
 
         void write_HOTP_slot_authorize(uint8_t slot_number, const char *slot_name, const char *secret, uint64_t hotp_counter,
                                    bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
@@ -147,6 +166,8 @@ namespace nitrokey {
                                          uint64_t counter_or_interval,
                                          bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
                                          const char *temporary_password) const;
+
+      bool _disconnect_no_lock();
 
     };
 }

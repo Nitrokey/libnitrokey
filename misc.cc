@@ -5,18 +5,21 @@
 #include <cstdlib>
 #include <cstring>
 #include "LibraryException.h"
+#include <vector>
 
 namespace nitrokey {
 namespace misc {
 
-std::vector<uint8_t> hex_string_to_byte(const char* hexString){
+
+
+::std::vector<uint8_t> hex_string_to_byte(const char* hexString){
     const size_t big_string_size = 256; //arbitrary 'big' number
     const size_t s_size = strlen(hexString);
     const size_t d_size = s_size/2;
     if (s_size%2!=0 || s_size>big_string_size){
         throw InvalidHexString(0);
     }
-    auto data = std::vector<uint8_t>();
+    auto data = ::std::vector<uint8_t>();
     data.reserve(d_size);
 
     char buf[2];
@@ -36,8 +39,9 @@ std::vector<uint8_t> hex_string_to_byte(const char* hexString){
 };
 
 #include <cctype>
-std::string hexdump(const char *p, size_t size, bool print_header) {
-  std::stringstream out;
+::std::string hexdump(const char *p, size_t size, bool print_header,
+        bool print_ascii, bool print_empty) {
+  ::std::stringstream out;
   char formatbuf[128];
   const char *pstart = p;
 
@@ -53,19 +57,21 @@ std::string hexdump(const char *p, size_t size, bool print_header) {
         snprintf(formatbuf, 128, "%02x ", uint8_t(*p));
         out << formatbuf;
       } else {
-        out << "-- ";
+          if(print_empty)
+            out << "-- ";
       }
 
     }
-    out << "\t";
-
-    for (const char *le = pp + 16; pp < le && pp < pend; pp++) {
-      if (std::isgraph(*pp))
-        out << uint8_t(*pp);
-      else
-        out << '.';
-    }
-    out << std::endl;
+      if(print_ascii){
+        out << "\t";
+        for (const char *le = pp + 16; pp < le && pp < pend; pp++) {
+          if (std::isgraph(*pp))
+            out << uint8_t(*pp);
+          else
+            out << '.';
+        }
+      }
+    out << ::std::endl;
   }
   return out.str();
 }

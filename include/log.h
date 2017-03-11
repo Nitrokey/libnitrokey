@@ -6,6 +6,12 @@
 namespace nitrokey {
 namespace log {
 
+//for MSVC
+#ifdef ERROR
+#undef ERROR
+#endif
+
+
 enum class Loglevel : int { DEBUG_L2, DEBUG, INFO, WARNING, ERROR };
 
 class LogHandler {
@@ -28,7 +34,7 @@ class Log {
   Log() : mp_loghandler(&stdlog_handler), m_loglevel(Loglevel::WARNING) {}
 
   static Log &instance() {
-    if (mp_instance == NULL) mp_instance = new Log;
+    if (mp_instance == nullptr) mp_instance = new Log;
     return *mp_instance;
   }
 
@@ -46,5 +52,12 @@ class Log {
 };
 }
 }
+
+
+#ifdef NO_LOG
+#define LOG(string, level) while(false){}
+#else
+#define LOG(string, level) nitrokey::log::Log::instance()((string), (level))
+#endif
 
 #endif

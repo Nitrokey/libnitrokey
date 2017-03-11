@@ -11,8 +11,6 @@ public:
     virtual uint8_t exception_id()= 0;
 };
 
-
-
 class TargetBufferSmallerThanSource: public LibraryException {
 public:
     virtual uint8_t exception_id() override {
@@ -29,7 +27,7 @@ public:
 
     virtual const char *what() const throw() override {
         std::string s = " ";
-        auto ts = [](int x){ return std::to_string(x); };
+        auto ts = [](size_t x){ return std::to_string(x); };
         std::string msg = std::string("Target buffer size is smaller than source: [source size, buffer size]")
             +s+ ts(source_size) +s+ ts(target_size);
         return msg.c_str();
@@ -85,7 +83,7 @@ public:
 
     TooLongStringException(size_t size_source, size_t size_destination, const std::string &message = "") : size_source(
             size_source), size_destination(size_destination), message(message) {
-      nitrokey::log::Log::instance()(std::string("TooLongStringException, size diff: ")+ std::to_string(size_source-size_destination), nitrokey::log::Loglevel::DEBUG);
+      LOG(std::string("TooLongStringException, size diff: ")+ std::to_string(size_source-size_destination), nitrokey::log::Loglevel::DEBUG);
 
     }
 

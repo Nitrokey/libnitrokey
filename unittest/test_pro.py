@@ -22,6 +22,72 @@ def test_write_password_safe_slot(C):
     assert C.NK_write_password_safe_slot(0, 'slotname1', 'login1', 'pass1') == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.slowtest
+def test_write_all_password_safe_slots_and_read_10_times(C):
+    def fill(s, wid):
+        assert wid >= len(s)
+        numbers = '1234567890'*4
+        s += numbers[:wid-len(s)]
+        assert len(s) == wid
+        return s
+
+    def get_pass(suffix):
+        return fill('pass' + suffix, 20)
+
+    def get_loginname(suffix):
+        return fill('login' + suffix, 32)
+
+    def get_slotname(suffix):
+        return fill('slotname' + suffix, 11)
+
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    PWS_slot_count = 16
+    for i in range(0, PWS_slot_count):
+        iss = str(i)
+        assert C.NK_write_password_safe_slot(i,
+                                             get_slotname(iss), get_loginname(iss),
+                                             get_pass(iss)) == DeviceErrorCode.STATUS_OK
+
+    for j in range(0, 10):
+        for i in range(0, PWS_slot_count):
+            iss = str(i)
+            assert gs(C.NK_get_password_safe_slot_name(i)) == get_slotname(iss)
+            assert gs(C.NK_get_password_safe_slot_login(i)) == get_loginname(iss)
+            assert gs(C.NK_get_password_safe_slot_password(i)) == get_pass(iss)
+
+
+@pytest.mark.slowtest
+@pytest.mark.xfail(reason="This test should be run directly after test_write_all_password_safe_slots_and_read_10_times")
+def test_read_all_password_safe_slots_10_times(C):
+    def fill(s, wid):
+        assert wid >= len(s)
+        numbers = '1234567890'*4
+        s += numbers[:wid-len(s)]
+        assert len(s) == wid
+        return s
+
+    def get_pass(suffix):
+        return fill('pass' + suffix, 20)
+
+    def get_loginname(suffix):
+        return fill('login' + suffix, 32)
+
+    def get_slotname(suffix):
+        return fill('slotname' + suffix, 11)
+
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    PWS_slot_count = 16
+
+    for j in range(0, 10):
+        for i in range(0, PWS_slot_count):
+            iss = str(i)
+            assert gs(C.NK_get_password_safe_slot_name(i)) == get_slotname(iss)
+            assert gs(C.NK_get_password_safe_slot_login(i)) == get_loginname(iss)
+            assert gs(C.NK_get_password_safe_slot_password(i)) == get_pass(iss)
+
+
 def test_get_password_safe_slot_name(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_password_safe_slot(0, 'slotname1', 'login1', 'pass1') == DeviceErrorCode.STATUS_OK
@@ -82,6 +148,9 @@ def test_regenerate_aes_key(C):
 
 def test_enable_password_safe_after_factory_reset(C):
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    if is_storage(C):
+        # for some reason storage likes to be authenticated before reset (to investigate)
+        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_factory_reset(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     wait(10)
     if is_storage(C):
@@ -523,7 +592,7 @@ def test_OTP_secret_started_from_null(C, secret):
     skip_if_device_version_lower_than({'S': 43, 'P': 8})
     if len(secret) > 40:
         # feature: 320 bit long secret handling
-        skip_if_device_version_lower_than({'S': 44, 'P': 8})
+        skip_if_device_version_lower_than({'P': 8})
 
     oath = pytest.importorskip("oath")
     lib_at = lambda t: oath.hotp(secret, t, format='dec6')
@@ -617,8 +686,9 @@ def test_TOTP_secrets(C, secret):
     '''
     skip_if_device_version_lower_than({'S': 44, 'P': 8})
 
-    if is_pro_rtm_07(C) and len(secret)>20*2: #*2 since secret is in hex
-        pytest.skip("Secret lengths over 20 bytes are not supported by NK Pro 0.7 ")
+    if len(secret)>20*2: #*2 since secret is in hex
+        # pytest.skip("Secret lengths over 20 bytes are not supported by NK Pro 0.7 and NK Storage")
+        skip_if_device_version_lower_than({'P': 8})
     slot_number = 0
     time = 0
     period = 30
@@ -645,10 +715,11 @@ def test_TOTP_secrets(C, secret):
 @pytest.mark.parametrize("secret", [RFC_SECRET, 2*RFC_SECRET, '12'*10, '12'*30] )
 def test_HOTP_secrets(C, secret):
     """
-    NK Pro 0.8+, NK Storage 0.44+
+    NK Pro 0.8+
     feature needed: support for 320bit secrets
     """
-    skip_if_device_version_lower_than({'S': 44, 'P': 8})
+    if len(secret)>40:
+        skip_if_device_version_lower_than({'P': 8})
 
     slot_number = 0
     counter = 0
@@ -695,7 +766,7 @@ def test_edit_OTP_slot(C):
     """
     should change slots counter and name without changing its secret (using null secret for second update)
     """
-    # counter does not reset under Storage v0.43
+    # counter is not getting updated under Storage v0.43 - #TOREPORT
     skip_if_device_version_lower_than({'S': 44, 'P': 7})
 
     secret = RFC_SECRET

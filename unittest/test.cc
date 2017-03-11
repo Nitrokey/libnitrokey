@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main()
 #include "catch.hpp"
 
 #include <iostream>
@@ -13,8 +12,9 @@ using namespace nitrokey::proto::stick10;
 using namespace nitrokey::log;
 using namespace nitrokey::misc;
 
+using Dev10 = std::shared_ptr<Stick10>;
 
-std::string getSlotName(Stick10 &stick, int slotNo) {
+std::string getSlotName(Dev10 stick, int slotNo) {
   auto slot_req = get_payload<ReadSlot>();
   slot_req.slot_number = slotNo;
   auto slot = ReadSlot::CommandTransaction::run(stick, slot_req);
@@ -23,8 +23,8 @@ std::string getSlotName(Stick10 &stick, int slotNo) {
 }
 
 TEST_CASE("Slot names are correct", "[slotNames]") {
-  Stick10 stick;
-  bool connected = stick.connect();
+  auto stick = make_shared<Stick10>();
+  bool connected = stick->connect();
   REQUIRE(connected == true);
 
   Log::instance().set_loglevel(Loglevel::DEBUG);
@@ -79,5 +79,5 @@ TEST_CASE("Slot names are correct", "[slotNames]") {
     REQUIRE(sName == std::string("login1"));
   }
 
-  stick.disconnect();
+  stick->disconnect();
 }

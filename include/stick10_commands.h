@@ -1,15 +1,20 @@
 #ifndef STICK10_COMMANDS_H
 #define STICK10_COMMANDS_H
+
 #include <bitset>
 #include <iomanip>
 #include <string>
 #include <sstream>
-#include "inttypes.h"
-#include "command.h"
+#include <stdint.h>
 #include "device_proto.h"
+#include "command.h"
+
+#pragma pack (push,1)
 
 namespace nitrokey {
 namespace proto {
+
+
 
 /*
  *	Stick10 protocol definition
@@ -293,18 +298,44 @@ class ReadSlot : Command<CommandID::READ_SLOT> {
 
   struct ResponsePayload {
     uint8_t slot_name[15];
-    uint8_t config;
-    uint8_t token_id[13];
-    uint64_t counter;
+    union{
+      uint8_t _slot_config;
+      struct{
+        bool use_8_digits   : 1;
+        bool use_enter      : 1;
+        bool use_tokenID    : 1;
+      };
+    };
+    union{
+      uint8_t slot_token_id[13]; /** OATH Token Identifier */
+      struct{ /** @see https://openauthentication.org/token-specs/ */
+        uint8_t omp[2];
+        uint8_t tt[2];
+        uint8_t mui[8];
+        uint8_t keyboard_layout; //disabled feature in nitroapp as of 20160805
+      } slot_token_fields;
+    };
+    union{
+      uint64_t slot_counter;
+      uint8_t slot_counter_s[8];
+    } __packed;
 
     bool isValid() const { return true; }
 
     std::string dissect() const {
       std::stringstream ss;
       ss << "slot_name:\t" << slot_name << std::endl;
-      ss << "config:\t" << config << std::endl;
-      ss << "token_id:\t" << token_id << std::endl;
-      ss << "counter:\t" << counter << std::endl;
+      ss << "slot_config:\t" << std::bitset<8>((int)_slot_config) << std::endl;
+      ss << "\tuse_8_digits(0):\t" << use_8_digits << std::endl;
+      ss << "\tuse_enter(1):\t" << use_enter << std::endl;
+      ss << "\tuse_tokenID(2):\t" << use_tokenID << std::endl;
+
+      ss << "slot_token_id:\t";
+      for (auto i : slot_token_id)
+        ss << std::hex << std::setw(2) << std::setfill('0')<< (int) i << " " ;
+      ss << std::endl;
+      ss << "slot_counter:\t[" << (int)slot_counter << "]\t"
+         << ::nitrokey::misc::hexdump((const char *)(&slot_counter), sizeof slot_counter, false);
       return ss.str();
     }
   } __packed;
@@ -317,7 +348,10 @@ class GetStatus : Command<CommandID::GET_STATUS> {
  public:
   struct ResponsePayload {
     uint16_t firmware_version;
-    uint8_t card_serial[4];
+    union{
+      uint8_t card_serial[4];
+      uint32_t card_serial_u32;
+    } __packed;
       union {
           uint8_t general_config[5];
           struct{
@@ -326,13 +360,12 @@ class GetStatus : Command<CommandID::GET_STATUS> {
               uint8_t scrolllock;  /** same as numlock */
               uint8_t enable_user_password;
               uint8_t delete_user_password;
-          };
-      };
+          } __packed;
+      } __packed;
     bool isValid() const { return enable_user_password!=delete_user_password; }
 
     std::string get_card_serial_hex() const {
-        return ::nitrokey::misc::hexdump((const char *)(card_serial),
-                sizeof card_serial, false);
+      return nitrokey::misc::toHex(card_serial_u32);
     }
 
     std::string dissect() const {
@@ -341,6 +374,7 @@ class GetStatus : Command<CommandID::GET_STATUS> {
           << "[" << firmware_version << "]" << "\t"
           << ::nitrokey::misc::hexdump(
           (const char *)(&firmware_version), sizeof firmware_version, false);
+      ss << "card_serial_u32:\t" << std::hex << card_serial_u32 << std::endl;
       ss << "card_serial:\t"
          << ::nitrokey::misc::hexdump((const char *)(card_serial),
                                       sizeof card_serial, false);
@@ -812,8 +846,11 @@ class BuildAESKey : Command<CommandID::NEW_AES_KEY> {
 
   typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
       CommandTransaction;
+
 };
+
 }
 }
 }
+#pragma pack (pop)
 #endif

@@ -1,6 +1,6 @@
 #ifndef COMMAND_ID_H
 #define COMMAND_ID_H
-#include "inttypes.h"
+#include <stdint.h>
 
 namespace nitrokey {
 namespace proto {
@@ -12,7 +12,7 @@ namespace proto {
         wrong_password,
         busy_progressbar,
         password_matrix_ready,
-        no_user_password_unlock,
+        no_user_password_unlock, // FIXME: translate on receive to command status error (fix in firmware?)
         smartcard_error,
         security_bit_active
       };
@@ -69,9 +69,9 @@ enum class CommandID : uint8_t {
   SEND_OTP_DATA = 0x17,
 
   ENABLE_CRYPTED_PARI = 0x20,
-  DISABLE_CRYPTED_PARI = 0x20 + 1, //@unused
+  DISABLE_CRYPTED_PARI = 0x20 + 1,
   ENABLE_HIDDEN_CRYPTED_PARI = 0x20 + 2,
-  DISABLE_HIDDEN_CRYPTED_PARI = 0x20 + 3, //@unused
+  DISABLE_HIDDEN_CRYPTED_PARI = 0x20 + 3,
   ENABLE_FIRMWARE_UPDATE = 0x20 + 4, //enables update mode
   EXPORT_FIRMWARE_TO_FILE = 0x20 + 5,
   GENERATE_NEW_KEYS = 0x20 + 6,

@@ -1,12 +1,15 @@
 #ifndef STICK20_COMMANDS_H
 #define STICK20_COMMANDS_H
 
-#include "inttypes.h"
+
+
+#include <stdint.h>
 #include "command.h"
 #include <string>
 #include <sstream>
 #include "device_proto.h"
 
+#pragma pack (push,1)
 
 namespace nitrokey {
     namespace proto {
@@ -26,9 +29,12 @@ namespace nitrokey {
                 public PasswordCommand<CommandID::UNLOCK_USER_PASSWORD, PasswordKind::Admin> {};
 
             class EnableEncryptedPartition : public PasswordCommand<CommandID::ENABLE_CRYPTED_PARI> {};
-            class DisableEncryptedPartition : public PasswordCommand<CommandID::DISABLE_CRYPTED_PARI> {};
             class EnableHiddenEncryptedPartition : public PasswordCommand<CommandID::ENABLE_HIDDEN_CRYPTED_PARI> {};
-            class DisableHiddenEncryptedPartition : public PasswordCommand<CommandID::DISABLE_CRYPTED_PARI> {};
+
+            //FIXME the volume disabling commands do not need password
+            class DisableEncryptedPartition : public PasswordCommand<CommandID::DISABLE_CRYPTED_PARI> {};
+            class DisableHiddenEncryptedPartition : public PasswordCommand<CommandID::DISABLE_HIDDEN_CRYPTED_PARI> {};
+
             class EnableFirmwareUpdate : public PasswordCommand<CommandID::ENABLE_FIRMWARE_UPDATE> {};
 
             class ChangeUpdatePassword : Command<CommandID::CHANGE_UPDATE_PIN> {
@@ -123,6 +129,9 @@ namespace nitrokey {
                     StorageCommandResponsePayload::TransmissionData transmission_data;
 
                     uint16_t MagicNumber_StickConfig_u16;
+                  /**
+                   * READ_WRITE_ACTIVE = ReadWriteFlagUncryptedVolume_u8 == 0;
+                   */
                     uint8_t ReadWriteFlagUncryptedVolume_u8;
                     uint8_t ReadWriteFlagCryptedVolume_u8;
 
@@ -130,18 +139,36 @@ namespace nitrokey {
                     uint8_t VersionInfo_au8[4];
                         struct {
                             uint8_t __unused;
-                            uint8_t major;
-                            uint8_t __unused2;
                             uint8_t minor;
+                            uint8_t __unused2;
+                            uint8_t major;
                         } __packed versionInfo;
-                    };
+                    } __packed;
 
                     uint8_t ReadWriteFlagHiddenVolume_u8;
                     uint8_t FirmwareLocked_u8;
-                    uint8_t NewSDCardFound_u8;
+
+                    union{
+                      uint8_t NewSDCardFound_u8;
+                      struct {
+                        bool NewCard :1;
+                        uint8_t Counter :7;
+                      } __packed NewSDCardFound_st;
+                    } __packed;
+
+                    /**
+                     * SD card FILLED with random chars
+                     */
                     uint8_t SDFillWithRandomChars_u8;
                     uint32_t ActiveSD_CardID_u32;
-                    uint8_t VolumeActiceFlag_u8;
+                    union{
+                      uint8_t VolumeActiceFlag_u8;
+                        struct {
+                            bool unencrypted :1;
+                            bool encrypted :1;
+                            bool hidden :1;
+                        } __packed VolumeActiceFlag_st;
+                    } __packed;
                     uint8_t NewSmartCardFound_u8;
                     uint8_t UserPwRetryCount;
                     uint8_t AdminPwRetryCount;
@@ -308,10 +335,12 @@ namespace nitrokey {
                 typedef Transaction<command_id(), struct EmptyPayload, struct ResponsePayload>
                     CommandTransaction;
             };
+
         }
     }
 }
 
 #undef print_to_ss
+#pragma pack (pop)
 
 #endif

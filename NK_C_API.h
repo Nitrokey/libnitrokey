@@ -244,7 +244,7 @@ NK_C_API int NK_totp_get_time();
  * @param new_PIN char[25](Pro) new PIN
  * @return command processing error code
  */
-NK_C_API int NK_change_admin_PIN(char *current_PIN, char *new_PIN);
+NK_C_API int NK_change_admin_PIN(const char *current_PIN, const char *new_PIN);
 
 /**
  * Change user PIN
@@ -252,7 +252,7 @@ NK_C_API int NK_change_admin_PIN(char *current_PIN, char *new_PIN);
  * @param new_PIN char[25](Pro) new PIN
  * @return command processing error code
 */
-NK_C_API int NK_change_user_PIN(char *current_PIN, char *new_PIN);
+NK_C_API int NK_change_user_PIN(const char *current_PIN, const char *new_PIN);
 
 
 /**

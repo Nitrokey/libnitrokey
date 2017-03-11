@@ -24,8 +24,8 @@ TEST_CASE("Check retry count", "[BASIC]") {
 }
 
 TEST_CASE("Check long strings", "[STANDARD]") {
-  char* longPin = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-  char *pin = "123123123";
+  const char* longPin = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  const char* pin = "123123123";
   auto result = NK_change_user_PIN(longPin, pin);
   REQUIRE(result == TOO_LONG_STRING);
   result = NK_change_user_PIN(pin, longPin);

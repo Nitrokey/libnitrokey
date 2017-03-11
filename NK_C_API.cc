@@ -279,14 +279,14 @@ NK_C_API int NK_totp_get_time(){
     });
 }
 
-NK_C_API int NK_change_admin_PIN(char *current_PIN, char *new_PIN){
+NK_C_API int NK_change_admin_PIN(const char *current_PIN, const char *new_PIN){
     auto m = NitrokeyManager::instance();
     return get_without_result([&](){
         m->change_admin_PIN(current_PIN, new_PIN);
     });
 }
 
-NK_C_API int NK_change_user_PIN(char *current_PIN, char *new_PIN){
+NK_C_API int NK_change_user_PIN(const char *current_PIN, const char *new_PIN){
     auto m = NitrokeyManager::instance();
     return get_without_result([&](){
         m->change_user_PIN(current_PIN, new_PIN);

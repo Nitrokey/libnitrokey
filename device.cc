@@ -49,10 +49,12 @@ bool Device::_disconnect() {
 
   hid_close(mp_devhandle);
   mp_devhandle = nullptr;
+#ifndef __APPLE__
   if (instances_count == 1){
     LOG(std::string("Calling hid_exit"), Loglevel::DEBUG_L2);
     hid_exit();
   }
+#endif
   return true;
 }
 

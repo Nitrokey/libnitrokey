@@ -15,6 +15,13 @@ namespace nitrokey{
     std::mutex mex_dev_com;
 
 
+  /**
+   * Copies string from pointer to fixed size C-style array. Src needs to be a valid C-string - eg. ended with '\0'.
+   * Throws when source is bigger than destination.
+   * @tparam T type of destination array
+   * @param dest fixed size destination array
+   * @param src pointer to source c-style valid string
+   */
     template <typename T>
     void strcpyT(T& dest, const char* src){
 

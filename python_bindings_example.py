@@ -4,7 +4,7 @@ from enum import Enum
 
 """
 This example will print 10 HOTP codes from just written HOTP#2 slot.
-For more examples of use please refer to unittest/test_bindings.py file.
+For more examples of use please refer to unittest/test_*.py files.
 """
 
 ffi = cffi.FFI()
@@ -27,19 +27,38 @@ def get_library():
 
     a = iter(declarations)
     for declaration in a:
-        if declaration.startswith('extern') and not '"C"' in declaration:
-            declaration = declaration.replace('extern', '').strip()
+        if declaration.startswith('NK_C_API'):
+            declaration = declaration.replace('NK_C_API', '').strip()
             while not ';' in declaration:
                 declaration += (next(a)).strip()
-            # print(declaration)
-            ffi.cdef(declaration)
+            #print(declaration)
+            ffi.cdef(declaration, override=True)
 
-    C = ffi.dlopen("build/libnitrokey.so")  # path to built library
+    C = None
+    import os, sys
+    path_build = os.path.join(".", "build")
+    paths = [ os.path.join(path_build,"libnitrokey-log.so"),
+              os.path.join(path_build,"libnitrokey.so")]
+    for p in paths:
+        print p
+        if os.path.exists(p):
+            C = ffi.dlopen(p)
+            break
+        else:
+            print("File does not exist: " + p)
+            print("Trying another")
+    if not C:
+        print("No library file found")
+        sys.exit(1)
+
     return C
 
 
 def get_hotp_code(lib, i):
     return lib.NK_get_hotp_code(i)
+
+def to_hex(ss):
+    return ''.join([ format(ord(s),'02x') for s in ss ])
 
 print('Warning!')
 print('This example will change your configuration on inserted stick and overwrite your HOTP#2 slot.')
@@ -52,11 +71,12 @@ if not a == 'continue':
 ADMIN = raw_input('Please enter your admin PIN (empty string uses 12345678)')
 ADMIN = ADMIN or '12345678'  # use default if empty string
 
+show_log = raw_input('Should log messages be shown (please write "yes" to enable)?') == 'yes'
 libnitrokey = get_library()
-libnitrokey.NK_set_debug(False)  # do not show debug messages
+libnitrokey.NK_set_debug(show_log)  # do not show debug messages
 
 ADMIN_TEMP = '123123123'
-RFC_SECRET = '12345678901234567890'
+RFC_SECRET = to_hex('12345678901234567890')
 
 # libnitrokey.NK_login('S')  # connect only to Nitrokey Storage device
 # libnitrokey.NK_login('P')  # connect only to Nitrokey Pro device

@@ -1,10 +1,1 @@
-
-OTP autorization
-cleanup in C API cc
 use strings instead of char* and vectors instead of others
-add tests for SLOT config options
-* fix tests so they could run in random order
-
-NK Storage:
-TOTP - check setting time function
-HOTP - counter is send via string, not number

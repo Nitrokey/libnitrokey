@@ -63,8 +63,9 @@ set(SOURCE_FILES
         DeviceCommunicationExceptions.cpp)
 
 IF(APPLE)
-	#include_directories(hidapi/hidapi)
-	#add_library(hidapi-libusb STATIC hidapi/mac/hid.c )
+	include_directories(hidapi/hidapi)
+	add_library(hidapi-libusb STATIC hidapi/mac/hid.c )
+	target_link_libraries(hidapi-libusb "-framework CoreFoundation" "-framework IOKit")
 ELSEIF(UNIX)
 #	add_library(hidapi-libusb STATIC hidapi/libusb/hid.c )
 ELSEIF(WIN32)
@@ -84,10 +85,8 @@ ELSE()
 	SET(LIBNAME nitrokey-static)
 ENDIF()
 
-IF(NOT APPLE)
-    target_link_libraries(${LIBNAME} hidapi-libusb)
-    target_link_libraries(${LIBNAME}-log hidapi-libusb)
-ENDIF()
+target_link_libraries(${LIBNAME} hidapi-libusb)
+target_link_libraries(${LIBNAME}-log hidapi-libusb)
 
 SET_TARGET_PROPERTIES(${LIBNAME} PROPERTIES COMPILE_DEFINITIONS "NO_LOG")
 

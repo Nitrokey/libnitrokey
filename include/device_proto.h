@@ -371,7 +371,7 @@ namespace nitrokey {
                     resp.command_id, resp.device_status, resp.storage_status.progress_bar_value);
               }
 
-              if (!resp.isValid()) throw DeviceReceivingFailure("Invalid incoming packet");
+              if (!resp.isValid()) throw InvalidCRCReceived("Invalid incoming packet");
               if (receiving_retry_counter <= 0)
                 throw DeviceReceivingFailure(
                     "Maximum receiving_retry_counter count reached for receiving response from the device!");

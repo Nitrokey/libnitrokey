@@ -36,5 +36,10 @@ public:
   DeviceReceivingFailure(std::string msg) : DeviceCommunicationException(msg){}
 };
 
+class InvalidCRCReceived: public DeviceReceivingFailure {
+public:
+  InvalidCRCReceived(std::string msg) : DeviceReceivingFailure(msg){}
+};
+
 
 #endif //LIBNITROKEY_DEVICECOMMUNICATIONEXCEPTIONS_H

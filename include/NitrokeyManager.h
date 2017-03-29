@@ -167,10 +167,11 @@ namespace nitrokey {
                                          uint64_t counter_or_interval,
                                          bool use_8_digits, bool use_enter, bool use_tokenID, const char *token_ID,
                                          const char *temporary_password) const;
-
       bool _disconnect_no_lock();
 
+    public:
       bool set_current_device_speed(int retry_delay, int send_receive_delay);
+      void set_loglevel(Loglevel loglevel);
     };
 }
 

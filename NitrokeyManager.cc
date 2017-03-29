@@ -157,6 +157,10 @@ namespace nitrokey{
     return false;
   }
 
+    void NitrokeyManager::set_loglevel(Loglevel loglevel) {
+      Log::instance().set_loglevel(loglevel);
+    }
+
     void NitrokeyManager::set_debug(bool state) {
         if (state){
             Log::instance().set_loglevel(Loglevel::DEBUG);
@@ -844,5 +848,6 @@ namespace nitrokey{
     auto data = stick20::ProductionTest::CommandTransaction::run(device);
     return data.data().SD_Card_Size_u8;
   }
+
 
 }

@@ -8,6 +8,7 @@
 #include "include/log.h"
 #include <mutex>
 #include "DeviceCommunicationExceptions.h"
+#include "device.h"
 
 std::mutex mex_dev_com;
 
@@ -16,6 +17,7 @@ using namespace nitrokey::log;
 using namespace std::chrono;
 
 std::atomic_int Device::instances_count{0};
+std::chrono::milliseconds Device::default_delay {0} ;
 
 Device::Device(const uint16_t vid, const uint16_t pid, const DeviceModel model,
                const milliseconds send_receive_delay, const int retry_receiving_count,
@@ -172,14 +174,33 @@ Device::~Device() {
   instances_count--;
 }
 
+void Device::set_default_device_speed(int delay) {
+  default_delay = std::chrono::duration<int, std::milli>(delay);
+}
+
+
+void Device::set_receiving_delay(const std::chrono::milliseconds delay){
+  std::lock_guard<std::mutex> lock(mex_dev_com);
+  m_send_receive_delay = delay;
+}
+
+void Device::set_retry_delay(const std::chrono::milliseconds delay){
+  std::lock_guard<std::mutex> lock(mex_dev_com);
+  m_retry_timeout = delay;
+}
+
 Stick10::Stick10():
   Device(0x20a0, 0x4108, DeviceModel::PRO, 100ms, 5, 100ms)
-  {}
+  {
+    setDefaultDelay();
+  }
 
 
 Stick20::Stick20():
   Device(0x20a0, 0x4109, DeviceModel::STORAGE, 20ms, 20, 20ms)
-  {}
+  {
+    setDefaultDelay();
+  }
 
 #include <sstream>
 #define p(x) ss << #x << " " << x << ", ";
@@ -206,4 +227,16 @@ std::string Device::ErrorCounters::get_as_string() {
   p(receiving_error);
   return ss.str();
 }
+
+void Device::setDefaultDelay() {
+  LOG(__FUNCTION__, Loglevel::DEBUG_L2);
+
+  auto count = default_delay.count();
+  if (count != 0){
+    LOG("Setting default delay to " + std::to_string(count), Loglevel::DEBUG_L2);
+      m_retry_timeout = default_delay;
+      m_send_receive_delay = default_delay;
+    }
+}
+
 #undef p

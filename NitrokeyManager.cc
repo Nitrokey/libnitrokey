@@ -69,6 +69,14 @@ namespace nitrokey{
     NitrokeyManager::~NitrokeyManager() {
     }
 
+    bool NitrokeyManager::set_current_device_speed(int retry_delay, int send_receive_delay){
+      std::lock_guard<std::mutex> lock(mex_dev_com);
+      if(device != nullptr){
+        device->set_receiving_delay(std::chrono::duration<int, std::milli>(send_receive_delay));
+        device->set_retry_delay(std::chrono::duration<int, std::milli>(retry_delay));
+      }
+    }
+
     bool NitrokeyManager::connect() {
         std::lock_guard<std::mutex> lock(mex_dev_com);
         vector< shared_ptr<Device> > devices = { make_shared<Stick10>(), make_shared<Stick20>() };
@@ -80,6 +88,9 @@ namespace nitrokey{
         return device != nullptr;
     }
 
+    bool NitrokeyManager::set_default_commands_delay(int delay){
+      Device::set_default_device_speed(delay);
+    }
 
     bool NitrokeyManager::connect(const char *device_model) {
       std::lock_guard<std::mutex> lock(mex_dev_com);

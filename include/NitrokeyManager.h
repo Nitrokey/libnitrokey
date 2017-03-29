@@ -45,6 +45,7 @@ namespace nitrokey {
         bool disconnect();
         bool is_connected() throw() ;
         bool could_current_device_be_enumerated();
+      bool set_default_commands_delay(int delay);
 
       DeviceModel get_connected_device_model() const;
           void set_debug(bool state);
@@ -169,6 +170,7 @@ namespace nitrokey {
 
       bool _disconnect_no_lock();
 
+      bool set_current_device_speed(int retry_delay, int send_receive_delay);
     };
 }
 

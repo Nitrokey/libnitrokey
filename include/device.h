@@ -96,6 +96,11 @@ public:
   void set_last_command_status(uint8_t _err) { last_command_status = _err;} ;
   bool last_command_sucessfull() const {return last_command_status == 0;};
   DeviceModel get_device_model() const {return m_model;}
+  void set_receiving_delay(std::chrono::milliseconds delay);
+  void set_retry_delay(std::chrono::milliseconds delay);
+  static void set_default_device_speed(int delay);
+  void setDefaultDelay();
+
 private:
   std::atomic<uint8_t> last_command_status;
   void _reconnect();
@@ -114,18 +119,21 @@ protected:
    */
   const int m_retry_sending_count;
   const int m_retry_receiving_count;
-  const std::chrono::milliseconds m_retry_timeout;
-  const std::chrono::milliseconds m_send_receive_delay;
+  std::chrono::milliseconds m_retry_timeout;
+  std::chrono::milliseconds m_send_receive_delay;
 
   std::atomic<hid_device *>mp_devhandle;
 
 
   static std::atomic_int instances_count;
+
+  static std::chrono::milliseconds default_delay ;
 };
 
 class Stick10 : public Device {
  public:
   Stick10();
+
 };
 
 class Stick20 : public Device {

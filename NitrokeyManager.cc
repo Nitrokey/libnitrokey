@@ -70,11 +70,18 @@ namespace nitrokey{
     }
 
     bool NitrokeyManager::set_current_device_speed(int retry_delay, int send_receive_delay){
-      std::lock_guard<std::mutex> lock(mex_dev_com);
-      if(device != nullptr){
-        device->set_receiving_delay(std::chrono::duration<int, std::milli>(send_receive_delay));
-        device->set_retry_delay(std::chrono::duration<int, std::milli>(retry_delay));
+      if (retry_delay < 20 || send_receive_delay < 20){
+        LOG("Delay set too low: " + to_string(retry_delay) +" "+ to_string(send_receive_delay), Loglevel::WARNING);
+        return false;
       }
+
+      std::lock_guard<std::mutex> lock(mex_dev_com);
+      if(device == nullptr) {
+        return false;
+      }
+      device->set_receiving_delay(std::chrono::duration<int, std::milli>(send_receive_delay));
+      device->set_retry_delay(std::chrono::duration<int, std::milli>(retry_delay));
+      return true;
     }
 
     bool NitrokeyManager::connect() {
@@ -89,7 +96,12 @@ namespace nitrokey{
     }
 
     bool NitrokeyManager::set_default_commands_delay(int delay){
+      if (delay < 20){
+        LOG("Delay set too low: " + to_string(delay), Loglevel::WARNING);
+        return false;
+      }
       Device::set_default_device_speed(delay);
+      return true;
     }
 
     bool NitrokeyManager::connect(const char *device_model) {

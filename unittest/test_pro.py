@@ -295,7 +295,7 @@ def check_HOTP_RFC_codes(C, func, prep=None, use_8_digits=False):
             prep()
         r = func(1)
         code = str(code)[-8:] if use_8_digits else str(code)[-6:]
-        assert int(code) == r
+        assert code == r
 
 
 @pytest.mark.parametrize("use_8_digits", [False, True, ])
@@ -306,11 +306,11 @@ def test_HOTP_RFC_use8digits_usepin(C, use_8_digits, use_pin_protection):
                              DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     if use_pin_protection:
         check_HOTP_RFC_codes(C,
-                             lambda x: C.NK_get_hotp_code_PIN(x, DefaultPasswords.USER_TEMP),
+                             lambda x: gs(C.NK_get_hotp_code_PIN(x, DefaultPasswords.USER_TEMP)),
                              lambda: C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP),
                              use_8_digits=use_8_digits)
     else:
-        check_HOTP_RFC_codes(C, C.NK_get_hotp_code, use_8_digits=use_8_digits)
+        check_HOTP_RFC_codes(C, lambda x: gs(C.NK_get_hotp_code(x)), use_8_digits=use_8_digits)
 
 
 def test_HOTP_token(C):
@@ -326,8 +326,8 @@ def test_HOTP_token(C):
     assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, False, False, True, token_ID,
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     for i in range(5):
-        hotp_code = C.NK_get_hotp_code(1)
-        assert hotp_code != 0
+        hotp_code = gs(C.NK_get_hotp_code(1))
+        assert hotp_code != ""
         assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
 
@@ -349,9 +349,9 @@ def test_HOTP_counters(C):
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         assert C.NK_write_hotp_slot(slot_number, 'python_test', RFC_SECRET, counter, use_8_digits, False, False, "",
                                     DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-        r = C.NK_get_hotp_code(slot_number)
+        r = gs(C.NK_get_hotp_code(slot_number))
         code = str(code)[-8:] if use_8_digits else str(code)[-6:]
-        assert int(code) == r
+        assert code == r
 
 
 INT32_MAX = 2 ** 31 - 1
@@ -373,8 +373,7 @@ def test_HOTP_64bit_counter(C):
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         assert C.NK_write_hotp_slot(slot_number, 'python_test', RFC_SECRET, t, use_8_digits, False, False, "",
                                     DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-        code_device = str(C.NK_get_hotp_code(slot_number))
-        code_device = '0'+code_device if len(code_device) < 6 else code_device
+        code_device = gs(C.NK_get_hotp_code(slot_number))
         dev_res += (t, code_device)
         lib_res += (t, lib_at(t))
     assert dev_res == lib_res
@@ -399,8 +398,7 @@ def test_TOTP_64bit_time(C):
     for t in range(INT32_MAX - 5, INT32_MAX + 5, 1):
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         assert C.NK_totp_set_time(t) == DeviceErrorCode.STATUS_OK
-        code_device = str((C.NK_get_totp_code(slot_number, T, 0, 30)))
-        code_device = '0'+code_device if len(code_device) < 6 else code_device
+        code_device = gs((C.NK_get_totp_code(slot_number, T, 0, 30)))
         dev_res += (t, code_device)
         lib_res += (t, lib_at(t))
     assert dev_res == lib_res
@@ -425,9 +423,9 @@ def test_TOTP_RFC_usepin(C, PIN_protection):
 
     get_func = None
     if PIN_protection:
-        get_func = lambda x, y, z, r: C.NK_get_totp_code_PIN(x, y, z, r, DefaultPasswords.USER_TEMP)
+        get_func = lambda x, y, z, r: gs(C.NK_get_totp_code_PIN(x, y, z, r, DefaultPasswords.USER_TEMP))
     else:
-        get_func = C.NK_get_totp_code
+        get_func = lambda x: gs(C.NK_get_totp_code)
 
     # Mode: Sha1, time step X=30
     test_data = [
@@ -476,13 +474,13 @@ def test_get_OTP_codes(C):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     for i in range(15):
-        code = C.NK_get_totp_code(i, 0, 0, 0)
-        if code == 0:
+        code = gs(C.NK_get_totp_code(i, 0, 0, 0))
+        if code == "":
             assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
 
     for i in range(3):
-        code = C.NK_get_hotp_code(i)
-        if code == 0:
+        code = gs(C.NK_get_hotp_code(i))
+        if code == "":
             assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
 
 
@@ -494,12 +492,12 @@ def test_get_OTP_code_from_not_programmed_slot(C):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_erase_totp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
 
-    code = C.NK_get_hotp_code(0)
-    assert code == 0
+    code = gs(C.NK_get_hotp_code(0))
+    assert code == ""
     assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
 
-    code = C.NK_get_totp_code(0, 0, 0, 0)
-    assert code == 0
+    code = gs(C.NK_get_totp_code(0, 0, 0, 0))
+    assert code == ""
     assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
 
 
@@ -512,14 +510,14 @@ def test_get_code_user_authorize(C):
     # TODO create convinience function on C API side to enable/disable OTP USER_PIN protection
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, True, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    code = C.NK_get_totp_code(0, 0, 0, 0)
-    assert code == 0
+    code = gs(C.NK_get_totp_code(0, 0, 0, 0))
+    assert code == ""
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_NOT_AUTHORIZED
     # disable PIN protection with write_config
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    code = C.NK_get_totp_code(0, 0, 0, 0)
-    assert code != 0
+    code = gs(C.NK_get_totp_code(0, 0, 0, 0))
+    assert code != ""
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
 
@@ -556,10 +554,10 @@ def test_factory_reset(C):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_hotp_slot(1, 'python_test', RFC_SECRET, 0, False, False, False, "",
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_get_hotp_code(1) == 755224
+    assert gs(C.NK_get_hotp_code(1)) == "755224"
     assert C.NK_factory_reset(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     wait(10)
-    assert C.NK_get_hotp_code(1) != 287082
+    assert gs(C.NK_get_hotp_code(1)) != "287082"
     assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
     # restore AES key
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -608,8 +606,7 @@ def test_OTP_secret_started_from_null(C, secret):
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         assert C.NK_write_hotp_slot(slot_number, 'null_secret', secret, t, use_8_digits, False, False, "",
                                     DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-        code_device = str(C.NK_get_hotp_code(slot_number))
-        code_device = '0'+code_device if len(code_device) < 6 else code_device
+        code_device = gs(C.NK_get_hotp_code(slot_number))
         dev_res += (t, code_device)
         lib_res += (t, lib_at(t))
     assert dev_res == lib_res
@@ -641,8 +638,7 @@ def test_HOTP_slots_read_write_counter(C, counter):
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         assert C.NK_write_hotp_slot(slot_number, 'HOTP rw' + str(slot_number), secret, counter, use_8_digits, False, False, "",
                                     DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-        code_device = str(C.NK_get_hotp_code(slot_number))
-        code_device = '0'+code_device if len(code_device) < 6 else code_device
+        code_device = gs(C.NK_get_hotp_code(slot_number))
         dev_res += (counter, code_device)
         lib_res += (counter, lib_at(counter))
     assert dev_res == lib_res
@@ -672,8 +668,7 @@ def test_TOTP_slots_read_write_at_time_period(C, time, period):
                                     DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         assert C.NK_totp_set_time(time) == DeviceErrorCode.STATUS_OK
-        code_device = str(C.NK_get_totp_code(slot_number, T, 0, period))
-        code_device = '0'+code_device if len(code_device) < 6 else code_device
+        code_device = gs(C.NK_get_totp_code(slot_number, T, 0, period))
         dev_res += (time, code_device)
         lib_res += (time, lib_at(time))
     assert dev_res == lib_res
@@ -705,8 +700,7 @@ def test_TOTP_secrets(C, secret):
     assert C.NK_write_totp_slot(slot_number, 'secret' + str(len(secret)), secret, period, use_8_digits, False, False, "",
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_totp_set_time(time) == DeviceErrorCode.STATUS_OK
-    code_device = str(C.NK_get_totp_code(slot_number, T, 0, period))
-    code_device = '0'+code_device if len(code_device) < 6 else code_device
+    code_device = gs(C.NK_get_totp_code(slot_number, T, 0, period))
     dev_res += (time, code_device)
     lib_res += (time, lib_at(time))
     assert dev_res == lib_res
@@ -735,8 +729,7 @@ def test_HOTP_secrets(C, secret):
     lib_res = []
     assert C.NK_write_hotp_slot(slot_number, 'secret' + str(len(secret)), secret, counter, use_8_digits, False, False, "",
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    code_device = str(C.NK_get_hotp_code(slot_number))
-    code_device = '0'+code_device if len(code_device) < 6 else code_device
+    code_device = gs(C.NK_get_hotp_code(slot_number))
     dev_res += (counter, code_device)
     lib_res += (counter, lib_at(counter))
     assert dev_res == lib_res
@@ -784,13 +777,13 @@ def test_edit_OTP_slot(C):
     assert gs(C.NK_get_hotp_slot_name(slot_number)) == first_name
 
 
-    first_code = C.NK_get_hotp_code(slot_number)
+    first_code = gs(C.NK_get_hotp_code(slot_number))
     changed_name = 'changedname'
     empty_secret = ''
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_hotp_slot(slot_number, changed_name, empty_secret, counter, use_8_digits, False, False, "",
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    second_code = C.NK_get_hotp_code(slot_number)
+    second_code = gs(C.NK_get_hotp_code(slot_number))
     assert first_code == second_code
     assert gs(C.NK_get_hotp_slot_name(slot_number)) == changed_name
 
@@ -808,8 +801,7 @@ def test_TOTP_codes_from_nitrokeyapp(secret, C):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
                              DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    code_device = str(C.NK_get_totp_code(slot_number, 0, 0, period))
-    code_device = '0'+code_device if len(code_device) < 6 else code_device
+    code_device = gs(C.NK_get_totp_code(slot_number, 0, 0, period))
 
     oath = pytest.importorskip("oath")
     lib_at = lambda : oath.totp(secret, period=period)

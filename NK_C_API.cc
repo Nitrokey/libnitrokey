@@ -187,27 +187,33 @@ NK_C_API const char * NK_device_serial_number(){
     });
 }
 
-NK_C_API uint32_t NK_get_hotp_code(uint8_t slot_number) {
+NK_C_API const char * NK_get_hotp_code(uint8_t slot_number) {
     return NK_get_hotp_code_PIN(slot_number, "");
 }
 
-NK_C_API uint32_t NK_get_hotp_code_PIN(uint8_t slot_number, const char* user_temporary_password){
+NK_C_API const char * NK_get_hotp_code_PIN(uint8_t slot_number, const char *user_temporary_password){
     auto m = NitrokeyManager::instance();
-    return get_with_result([&](){
-        return m->get_HOTP_code(slot_number, user_temporary_password);
+    return get_with_string_result([&](){
+      string && s = m->get_HOTP_code(slot_number, user_temporary_password);
+      char * rs = strdup(s.c_str());
+      clear_string(s);
+      return rs;
     });
 }
 
-NK_C_API uint32_t NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
-                                 uint8_t last_interval){
+NK_C_API const char * NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
+                                       uint8_t last_interval){
     return NK_get_totp_code_PIN(slot_number, challenge, last_totp_time, last_interval, "");
 }
 
-NK_C_API uint32_t NK_get_totp_code_PIN(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
-                                 uint8_t last_interval, const char* user_temporary_password){
+NK_C_API const char * NK_get_totp_code_PIN(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
+                                           uint8_t last_interval, const char *user_temporary_password){
     auto m = NitrokeyManager::instance();
-    return get_with_result([&](){
-        return m->get_TOTP_code(slot_number, challenge, last_totp_time, last_interval, user_temporary_password);
+    return get_with_string_result([&](){
+      string && s = m->get_TOTP_code(slot_number, challenge, last_totp_time, last_interval, user_temporary_password);
+      char * rs = strdup(s.c_str());
+      clear_string(s);
+      return rs;
     });
 }
 

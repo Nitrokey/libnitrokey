@@ -195,7 +195,7 @@ NK_C_API int NK_write_totp_slot(uint8_t slot_number, const char *slot_name, cons
  * @param slot_number HOTP slot number, slot_number<3
  * @return HOTP code
  */
-NK_C_API uint32_t NK_get_hotp_code(uint8_t slot_number);
+NK_C_API const char * NK_get_hotp_code(uint8_t slot_number);
 
 /**
  * Get HOTP code from the device (PIN protected)
@@ -204,7 +204,7 @@ NK_C_API uint32_t NK_get_hotp_code(uint8_t slot_number);
  * otherwise should be set to empty string - ''
  * @return HOTP code
  */
-NK_C_API uint32_t NK_get_hotp_code_PIN(uint8_t slot_number, const char* user_temporary_password);
+NK_C_API const char * NK_get_hotp_code_PIN(uint8_t slot_number, const char *user_temporary_password);
 
 /**
  * Get TOTP code from the device
@@ -214,7 +214,8 @@ NK_C_API uint32_t NK_get_hotp_code_PIN(uint8_t slot_number, const char* user_tem
  * @param last_interval last interval
  * @return TOTP code
  */
-NK_C_API uint32_t NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time, uint8_t last_interval);
+NK_C_API const char * NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
+                                       uint8_t last_interval);
 
 /**
  * Get TOTP code from the device (PIN protected)
@@ -226,8 +227,9 @@ NK_C_API uint32_t NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint
  * otherwise should be set to empty string - ''
  * @return TOTP code
  */
-NK_C_API uint32_t NK_get_totp_code_PIN(uint8_t slot_number, uint64_t challenge,
-                                     uint64_t last_totp_time, uint8_t last_interval, const char* user_temporary_password);
+NK_C_API const char * NK_get_totp_code_PIN(uint8_t slot_number, uint64_t challenge,
+                                           uint64_t last_totp_time, uint8_t last_interval,
+                                           const char *user_temporary_password);
 
 /**
  * Set time on the device (for TOTP requests)

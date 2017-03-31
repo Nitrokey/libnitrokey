@@ -216,7 +216,13 @@ namespace nitrokey{
         return response.data().dissect();
     }
 
-    uint32_t NitrokeyManager::get_HOTP_code(uint8_t slot_number, const char *user_temporary_password) {
+    string getFilledOTPCode(uint32_t code, bool use_8_digits){
+      stringstream s;
+      s << std::right << std::setw(use_8_digits ? 8 : 6) << std::setfill('0') << code;
+      return s.str();
+    }
+
+    string NitrokeyManager::get_HOTP_code(uint8_t slot_number, const char *user_temporary_password) {
       if (!is_valid_hotp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
 
       if (is_authorization_command_supported()){
@@ -226,7 +232,7 @@ namespace nitrokey{
             authorize_packet<GetHOTP, UserAuthorize>(gh, user_temporary_password, device);
         }
         auto resp = GetHOTP::CommandTransaction::run(device, gh);
-        return resp.data().code;
+        return getFilledOTPCode(resp.data().code, resp.data().use_8_digits);
       } else {
         auto gh = get_payload<stick10_08::GetHOTP>();
         gh.slot_number = get_internal_slot_number_for_hotp(slot_number);
@@ -234,19 +240,21 @@ namespace nitrokey{
           strcpyT(gh.temporary_user_password, user_temporary_password);
         }
         auto resp = stick10_08::GetHOTP::CommandTransaction::run(device, gh);
-        return resp.data().code;
+        return getFilledOTPCode(resp.data().code, resp.data().use_8_digits);
       }
+      return "";
     }
-
 
     bool NitrokeyManager::is_valid_hotp_slot_number(uint8_t slot_number) const { return slot_number < 3; }
     bool NitrokeyManager::is_valid_totp_slot_number(uint8_t slot_number) const { return slot_number < 0x10-1; } //15
     uint8_t NitrokeyManager::get_internal_slot_number_for_totp(uint8_t slot_number) const { return (uint8_t) (0x20 + slot_number); }
     uint8_t NitrokeyManager::get_internal_slot_number_for_hotp(uint8_t slot_number) const { return (uint8_t) (0x10 + slot_number); }
 
-    uint32_t NitrokeyManager::get_TOTP_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
-                                            uint8_t last_interval,
-                                            const char *user_temporary_password) {
+
+
+    string NitrokeyManager::get_TOTP_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
+                                          uint8_t last_interval,
+                                          const char *user_temporary_password) {
         if(!is_valid_totp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         slot_number = get_internal_slot_number_for_totp(slot_number);
 
@@ -261,15 +269,15 @@ namespace nitrokey{
               authorize_packet<GetTOTP, UserAuthorize>(gt, user_temporary_password, device);
           }
           auto resp = GetTOTP::CommandTransaction::run(device, gt);
-          return resp.data().code;
+          return getFilledOTPCode(resp.data().code, resp.data().use_8_digits);
         } else {
           auto gt = get_payload<stick10_08::GetTOTP>();
           strcpyT(gt.temporary_user_password, user_temporary_password);
           gt.slot_number = slot_number;
           auto resp = stick10_08::GetTOTP::CommandTransaction::run(device, gt);
-          return resp.data().code;
+          return getFilledOTPCode(resp.data().code, resp.data().use_8_digits);
         }
-
+      return "";
     }
 
     bool NitrokeyManager::erase_slot(uint8_t slot_number, const char *temporary_password) {
@@ -830,7 +838,7 @@ namespace nitrokey{
       }
     }
 
-  uint32_t NitrokeyManager::get_TOTP_code(uint8_t slot_number, const char *user_temporary_password) {
+  string NitrokeyManager::get_TOTP_code(uint8_t slot_number, const char *user_temporary_password) {
     return get_TOTP_code(slot_number, 0, 0, 0, user_temporary_password);
   }
 

@@ -28,13 +28,6 @@ set(CMAKE_CXX_STANDARD 14)
 
 OPTION(LIBNITROKEY_STATIC "Build libnitrokey statically" TRUE)
 
-OPTION(ERROR_ON_WARNING "Stop compilation on warning found (not supported for MSVC)" ON)
-if (NOT MSVC)
-    add_compile_options(-Wall -Wno-unused-function -Wcast-qual -Woverloaded-virtual)
-    if (ERROR_ON_WARNING)
-        add_compile_options(-Werror)
-    endif()
-endif()
 
 OPTION(COMPILE_TESTS "Compile tests" FALSE)
 IF (NOT CMAKE_BUILD_TYPE)
@@ -82,6 +75,14 @@ ELSEIF(WIN32)
 	target_link_libraries(hidapi-libusb setupapi)
 ENDIF()
 
+OPTION(ERROR_ON_WARNING "Stop compilation on warning found (not supported for MSVC)" ON)
+if (NOT MSVC)
+    add_compile_options(-Wall -Wno-unused-function -Wcast-qual -Woverloaded-virtual)
+    if (ERROR_ON_WARNING)
+        add_compile_options(-Werror)
+    endif()
+endif()
+
 IF (NOT LIBNITROKEY_STATIC)
     add_library(nitrokey SHARED ${SOURCE_FILES})
     add_library(nitrokey-log SHARED ${SOURCE_FILES})
@@ -92,6 +93,7 @@ ELSE()
     add_library(nitrokey-static-log STATIC ${SOURCE_FILES})
 	SET(LIBNAME nitrokey-static)
 ENDIF()
+
 
 target_link_libraries(${LIBNAME} hidapi-libusb)
 target_link_libraries(${LIBNAME}-log hidapi-libusb)

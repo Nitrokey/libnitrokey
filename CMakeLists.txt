@@ -75,13 +75,6 @@ ELSEIF(WIN32)
 	target_link_libraries(hidapi-libusb setupapi)
 ENDIF()
 
-OPTION(ERROR_ON_WARNING "Stop compilation on warning found (not supported for MSVC)" ON)
-if (NOT MSVC)
-    add_compile_options(-Wall -Wno-unused-function -Wcast-qual -Woverloaded-virtual)
-    if (ERROR_ON_WARNING)
-        add_compile_options(-Werror)
-    endif()
-endif()
 
 IF (NOT LIBNITROKEY_STATIC)
     add_library(nitrokey SHARED ${SOURCE_FILES})
@@ -98,6 +91,15 @@ ENDIF()
 target_link_libraries(${LIBNAME} hidapi-libusb)
 target_link_libraries(${LIBNAME}-log hidapi-libusb)
 
+OPTION(ERROR_ON_WARNING "Stop compilation on warning found (not supported for MSVC)" ON)
+if (NOT MSVC)
+    set(COMPILE_FLAGS "-Wall -Wno-unused-function -Wcast-qual -Woverloaded-virtual")
+    if (ERROR_ON_WARNING)
+        set(COMPILE_FLAGS "${COMPILE_FLAGS} -Werror")
+    endif()
+    SET_TARGET_PROPERTIES(${LIBNAME} ${LIBNAME}-log PROPERTIES COMPILE_FLAGS ${COMPILE_FLAGS} )
+endif()
+
 SET_TARGET_PROPERTIES(${LIBNAME} PROPERTIES COMPILE_DEFINITIONS "NO_LOG")
 
 
@@ -108,7 +110,7 @@ IF (COMPILE_TESTS)
     include_directories(unittest/Catch/include)
 
     add_library(catch SHARED unittest/catch_main.cpp )
-	
+
     add_executable (test_C_API unittest/test_C_API.cpp)
     target_link_libraries (test_C_API ${EXTRA_LIBS} ${LIBNAME} catch)
 

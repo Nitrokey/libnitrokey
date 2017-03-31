@@ -28,6 +28,14 @@ set(CMAKE_CXX_STANDARD 14)
 
 OPTION(LIBNITROKEY_STATIC "Build libnitrokey statically" TRUE)
 
+OPTION(ERROR_ON_WARNING "Stop compilation on warning found (not supported for MSVC)" ON)
+if (NOT MSVC)
+    add_compile_options(-Wall -Wno-unused-function -Wcast-qual -Woverloaded-virtual)
+    if (ERROR_ON_WARNING)
+        add_compile_options(-Werror)
+    endif()
+endif()
+
 OPTION(COMPILE_TESTS "Compile tests" FALSE)
 IF (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE RelWithDebInfo)
@@ -120,6 +128,8 @@ IF (COMPILE_TESTS)
     include (CTest)
     add_test (runs test_C_API)
 ENDIF()
+
+
 
 
 #SET(CPACK_GENERATOR

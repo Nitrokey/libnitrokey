@@ -47,7 +47,7 @@ namespace misc {
 
   for (const char *pend = p + size; p < pend;) {
       if (print_header){
-          snprintf(formatbuf, 128, "%04dx\t", static_cast<int> (p - pstart));
+          snprintf(formatbuf, 128, "%04x\t", static_cast<int> (p - pstart));
           out << formatbuf;
       }
 

@@ -138,9 +138,9 @@ namespace nitrokey {
                     union{
                     uint8_t VersionInfo_au8[4];
                         struct {
-                            uint8_t __unused;
+                            uint8_t __reserved;
                             uint8_t minor;
-                            uint8_t __unused2;
+                            uint8_t __reserved2;
                             uint8_t major;
                         } __packed versionInfo;
                     } __packed;

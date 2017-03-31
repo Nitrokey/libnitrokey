@@ -121,12 +121,9 @@ protected:
   const int m_retry_receiving_count;
   std::chrono::milliseconds m_retry_timeout;
   std::chrono::milliseconds m_send_receive_delay;
-
   std::atomic<hid_device *>mp_devhandle;
 
-
   static std::atomic_int instances_count;
-
   static std::chrono::milliseconds default_delay ;
 };
 

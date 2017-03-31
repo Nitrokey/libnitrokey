@@ -197,6 +197,7 @@ namespace nitrokey{
         }
           break;
       }
+      return "NA";
     }
 
     stick10::GetStatus::ResponsePayload NitrokeyManager::get_status(){

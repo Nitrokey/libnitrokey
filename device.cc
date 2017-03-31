@@ -22,15 +22,16 @@ std::chrono::milliseconds Device::default_delay {0} ;
 Device::Device(const uint16_t vid, const uint16_t pid, const DeviceModel model,
                const milliseconds send_receive_delay, const int retry_receiving_count,
                const milliseconds retry_timeout)
-    : m_vid(vid),
+    :
+      last_command_status(0),
+      m_vid(vid),
       m_pid(pid),
+      m_model(model),
       m_retry_sending_count(3),
       m_retry_receiving_count(retry_receiving_count),
       m_retry_timeout(retry_timeout),
-      mp_devhandle(nullptr),
-      last_command_status(0),
-      m_model(model),
-      m_send_receive_delay(send_receive_delay)
+      m_send_receive_delay(send_receive_delay),
+      mp_devhandle(nullptr)
 {
   instances_count++;
 }

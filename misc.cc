@@ -23,7 +23,7 @@ namespace misc {
     data.reserve(d_size);
 
     char buf[2];
-    for(int i=0; i<s_size; i++){
+    for(size_t i=0; i<s_size; i++){
 
         char c = hexString[i];
         bool char_from_range = (('0' <= c && c <='9') || ('A' <= c && c <= 'F') || ('a' <= c && c<= 'f'));
@@ -47,7 +47,7 @@ namespace misc {
 
   for (const char *pend = p + size; p < pend;) {
       if (print_header){
-          snprintf(formatbuf, 128, "%04lx\t", p - pstart);
+          snprintf(formatbuf, 128, "%04dx\t", static_cast<int> (p - pstart));
           out << formatbuf;
       }
 

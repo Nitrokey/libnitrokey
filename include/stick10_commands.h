@@ -476,7 +476,7 @@ class GetPasswordSafeSlotName : Command<CommandID::GET_PW_SAFE_SLOT_NAME> {
     bool isValid() const { return true; }
     std::string dissect() const {
       std::stringstream ss;
-      ss << " slot_name\t" << (char*)slot_name << std::endl;
+      ss << " slot_name\t" << (const char*) slot_name << std::endl;
       return ss.str();
     }
   } __packed;
@@ -505,7 +505,7 @@ class GetPasswordSafeSlotPassword
     bool isValid() const { return true; }
     std::string dissect() const {
       std::stringstream ss;
-      ss << " slot_password\t" << (char*)slot_password << std::endl;
+      ss << " slot_password\t" << (const char*) slot_password << std::endl;
       return ss.str();
     }
   } __packed;
@@ -534,7 +534,7 @@ class GetPasswordSafeSlotLogin
     bool isValid() const { return true; }
     std::string dissect() const {
       std::stringstream ss;
-      ss << " slot_login\t" << (char*)slot_login << std::endl;
+      ss << " slot_login\t" << (const char*) slot_login << std::endl;
       return ss.str();
     }
   } __packed;
@@ -554,8 +554,8 @@ class SetPasswordSafeSlotData : Command<CommandID::SET_PW_SAFE_SLOT_DATA_1> {
       std::string dissect() const {
           std::stringstream ss;
           ss << " slot_number\t" << (int)slot_number << std::endl;
-          ss << " slot_name\t" << (char*)slot_name << std::endl;
-          ss << " slot_password\t" << (char*)slot_password << std::endl;
+          ss << " slot_name\t" << (const char*) slot_name << std::endl;
+          ss << " slot_password\t" << (const char*) slot_password << std::endl;
           return ss.str();
       }
   } __packed;
@@ -574,7 +574,7 @@ class SetPasswordSafeSlotData2 : Command<CommandID::SET_PW_SAFE_SLOT_DATA_2> {
       std::string dissect() const {
           std::stringstream ss;
           ss << " slot_number\t" << (int)slot_number << std::endl;
-          ss << " slot_login_name\t" << (char*)slot_login_name << std::endl;
+          ss << " slot_login_name\t" << (const char*) slot_login_name << std::endl;
           return ss.str();
       }
   } __packed;
@@ -609,7 +609,7 @@ class EnablePasswordSafe : Command<CommandID::PW_SAFE_ENABLE> {
     bool isValid() const { return true; }
     std::string dissect() const {
       std::stringstream ss;
-      ss << " user_password\t" << (char*) user_password << std::endl;
+      ss << " user_password\t" << (const char*)  user_password << std::endl;
       return ss.str();
     }
   } __packed;

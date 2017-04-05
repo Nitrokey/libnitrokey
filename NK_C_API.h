@@ -1,15 +1,16 @@
 #ifndef LIBNITROKEY_NK_C_API_H
 #define LIBNITROKEY_NK_C_API_H
 
-#include <iostream>
-#include <string>
-#include "include/NitrokeyManager.h"
-#include "include/inttypes.h"
+#include <inttypes.h>
+#include <stdbool.h>
 
 #define NK_C_API
 
+#ifdef __cplusplus
 extern "C"
 {
+#endif
+
 /**
  * Set debug level of messages written on stderr
  * @param state state=True - all messages, state=False - only errors level
@@ -467,7 +468,9 @@ NK_C_API const char* NK_get_SD_usage_data_as_string();
  */
 NK_C_API int NK_get_progress_bar_value();
 
+#ifdef __cplusplus
 }
+#endif
 
 
 #endif //LIBNITROKEY_NK_C_API_H

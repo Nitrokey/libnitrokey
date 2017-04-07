@@ -4,6 +4,8 @@
 #include <iomanip>
 #include "log.h"
 
+#include <sstream>
+
 namespace nitrokey {
   namespace log {
 
@@ -38,6 +40,22 @@ namespace nitrokey {
       std::clog << "[" << loglevel_to_str(lvl) << "] ["
                 << std::put_time(&tm, "%c %z")
                 << "]\t" << str << std::endl;
+    }
+
+    void FunctionalLogHandler::print(const std::string &str, Loglevel lvl) {
+      std::time_t t = std::time(nullptr);
+      std::tm tm = *std::localtime(&t);
+
+      std::stringstream s;
+      s << "[" << loglevel_to_str(lvl) << "] ["
+                << std::put_time(&tm, "%c %z")
+                << "]\t" << str << std::endl;
+
+      log_function(s.str());
+    }
+
+    FunctionalLogHandler::FunctionalLogHandler(std::function<void(std::string)> _log_function) {
+      log_function = _log_function;
     }
   }
 }

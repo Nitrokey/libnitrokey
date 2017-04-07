@@ -139,6 +139,7 @@ namespace nitrokey {
         int get_minor_firmware_version();
 
         explicit NitrokeyManager();
+        void set_log_function(std::function<void(std::string)> log_function);
     private:
 
         static shared_ptr <NitrokeyManager> _instance;

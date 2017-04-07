@@ -8,7 +8,7 @@
 #include "include/misc.h"
 #include <mutex>
 #include "include/cxx_semantics.h"
-
+#include <functional>
 
 namespace nitrokey{
 
@@ -93,6 +93,12 @@ namespace nitrokey{
             }
         }
         return device != nullptr;
+    }
+
+
+    void NitrokeyManager::set_log_function(std::function<void(std::string)> log_function){
+      static nitrokey::log::FunctionalLogHandler handler(log_function);
+      nitrokey::log::Log::instance().set_handler(&handler);
     }
 
     bool NitrokeyManager::set_default_commands_delay(int delay){

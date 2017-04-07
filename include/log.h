@@ -4,6 +4,8 @@
 #include <string>
 #include <cstddef>
 
+#include <functional>
+
 namespace nitrokey {
   namespace log {
 
@@ -27,6 +29,14 @@ namespace nitrokey {
     class StdlogHandler : public LogHandler {
     public:
       virtual void print(const std::string &, Loglevel lvl);
+    };
+
+    class FunctionalLogHandler : public LogHandler {
+      std::function<void(std::string)> log_function;
+    public:
+      FunctionalLogHandler(std::function<void(std::string)> _log_function);
+      virtual void print(const std::string &, Loglevel lvl);
+
     };
 
     extern StdlogHandler stdlog_handler;
@@ -56,8 +66,10 @@ namespace nitrokey {
 
 #ifdef NO_LOG
 #define LOG(string, level) while(false){}
+#define LOGD(string, level) while(false){}
 #else
 #define LOG(string, level) nitrokey::log::Log::instance()((string), (level))
+#define LOGD(string) nitrokey::log::Log::instance()((string), (nitrokey::log::Loglevel::DEBUG_L2))
 #endif
 
 #endif

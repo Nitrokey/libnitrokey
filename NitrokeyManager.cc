@@ -472,11 +472,13 @@ namespace nitrokey{
         return get_slot_name(slot_number);
     }
 
-    const char * NitrokeyManager::get_slot_name(uint8_t slot_number)  {
+  static const int max_string_field_length = 100;
+
+  const char * NitrokeyManager::get_slot_name(uint8_t slot_number)  {
         auto payload = get_payload<GetSlotName>();
         payload.slot_number = slot_number;
         auto resp = GetSlotName::CommandTransaction::run(device, payload);
-        return strdup((const char *) resp.data().slot_name);
+        return strndup((const char *) resp.data().slot_name, max_string_field_length);
     }
 
     bool NitrokeyManager::first_authenticate(const char *pin, const char *temporary_password) {
@@ -583,7 +585,7 @@ namespace nitrokey{
         auto p = get_payload<GetPasswordSafeSlotName>();
         p.slot_number = slot_number;
         auto response = GetPasswordSafeSlotName::CommandTransaction::run(device, p);
-        return strdup((const char *) response.data().slot_name);
+        return strndup((const char *) response.data().slot_name, max_string_field_length);
     }
 
     bool NitrokeyManager::is_valid_password_safe_slot_number(uint8_t slot_number) const { return slot_number < 16; }
@@ -593,7 +595,7 @@ namespace nitrokey{
         auto p = get_payload<GetPasswordSafeSlotLogin>();
         p.slot_number = slot_number;
         auto response = GetPasswordSafeSlotLogin::CommandTransaction::run(device, p);
-        return strdup((const char *) response.data().slot_login);
+        return strndup((const char *) response.data().slot_login, max_string_field_length);
     }
 
     const char *NitrokeyManager::get_password_safe_slot_password(uint8_t slot_number) {
@@ -601,7 +603,7 @@ namespace nitrokey{
         auto p = get_payload<GetPasswordSafeSlotPassword>();
         p.slot_number = slot_number;
         auto response = GetPasswordSafeSlotPassword::CommandTransaction::run(device, p);
-        return strdup((const char *) response.data().slot_password); //FIXME use secure way
+        return strndup((const char *) response.data().slot_password, max_string_field_length); //FIXME use secure way
     }
 
     void NitrokeyManager::write_password_safe_slot(uint8_t slot_number, const char *slot_name, const char *slot_login,
@@ -816,7 +818,7 @@ namespace nitrokey{
 
     const char * NitrokeyManager::get_status_storage_as_string(){
       auto p = stick20::GetDeviceStatus::CommandTransaction::run(device);
-      return strdup(p.data().dissect().c_str());
+      return strndup(p.data().dissect().c_str(), max_string_field_length);
     }
 
     stick20::DeviceConfigurationResponsePacket::ResponsePayload NitrokeyManager::get_status_storage(){
@@ -826,7 +828,7 @@ namespace nitrokey{
 
     const char * NitrokeyManager::get_SD_usage_data_as_string(){
       auto p = stick20::GetSDCardOccupancy::CommandTransaction::run(device);
-      return strdup(p.data().dissect().c_str());
+      return strndup(p.data().dissect().c_str(), max_string_field_length);
     }
 
     std::pair<uint8_t,uint8_t> NitrokeyManager::get_SD_usage_data(){

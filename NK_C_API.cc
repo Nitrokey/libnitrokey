@@ -6,6 +6,8 @@
 using namespace nitrokey;
 
 static uint8_t NK_last_command_status = 0;
+static const int max_string_field_length = 100;
+
 
 template <typename T>
 T* duplicate_vector_and_clear(std::vector<T> &v){
@@ -171,7 +173,7 @@ NK_C_API const char * NK_status() {
     auto m = NitrokeyManager::instance();
     return get_with_string_result([&](){
         string && s = m->get_status_as_string();
-        char * rs = strdup(s.c_str());
+        char * rs = strndup(s.c_str(), max_string_field_length);
         clear_string(s);
         return rs;
     });
@@ -181,7 +183,7 @@ NK_C_API const char * NK_device_serial_number(){
     auto m = NitrokeyManager::instance();
     return get_with_string_result([&](){
         string && s = m->get_serial_number();
-        char * rs = strdup(s.c_str());
+        char * rs = strndup(s.c_str(), max_string_field_length);
         clear_string(s);
         return rs;
     });
@@ -195,7 +197,7 @@ NK_C_API const char * NK_get_hotp_code_PIN(uint8_t slot_number, const char *user
     auto m = NitrokeyManager::instance();
     return get_with_string_result([&](){
       string && s = m->get_HOTP_code(slot_number, user_temporary_password);
-      char * rs = strdup(s.c_str());
+      char * rs = strndup(s.c_str(), max_string_field_length);
       clear_string(s);
       return rs;
     });
@@ -211,7 +213,7 @@ NK_C_API const char * NK_get_totp_code_PIN(uint8_t slot_number, uint64_t challen
     auto m = NitrokeyManager::instance();
     return get_with_string_result([&](){
       string && s = m->get_TOTP_code(slot_number, challenge, last_totp_time, last_interval, user_temporary_password);
-      char * rs = strdup(s.c_str());
+      char * rs = strndup(s.c_str(), max_string_field_length);
       clear_string(s);
       return rs;
     });

@@ -860,7 +860,13 @@ namespace nitrokey{
   }
 
   stick10::ReadSlot::ResponsePayload NitrokeyManager::get_HOTP_slot_data(const uint8_t slot_number) {
-    return get_OTP_slot_data(get_internal_slot_number_for_hotp(slot_number));
+    auto slot_data = get_OTP_slot_data(get_internal_slot_number_for_hotp(slot_number));
+    if (device->get_device_model() == DeviceModel::STORAGE){
+      //convert counter from string to ull
+      auto counter_s = std::string(slot_data.slot_counter_s, slot_data.slot_counter_s+sizeof(slot_data.slot_counter_s));
+      slot_data.slot_counter = std::stoull(counter_s);
+    }
+    return slot_data;
   }
 
   void NitrokeyManager::lock_encrypted_volume() {

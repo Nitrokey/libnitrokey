@@ -652,7 +652,12 @@ using nitrokey::misc::strcpyT;
     void NitrokeyManager::factory_reset(const char *admin_password) {
         auto p = get_payload<FactoryReset>();
         strcpyT(p.admin_password, admin_password);
+      try{
         FactoryReset::CommandTransaction::run(device, p);
+      }
+      catch(InvalidCRCReceived){
+        LOG("Invalid CRC in received packet for " + std::string(__FUNCTION__), Loglevel::WARNING);
+      }
     }
 
     void NitrokeyManager::unlock_user_password(const char *admin_password, const char *new_user_password) {

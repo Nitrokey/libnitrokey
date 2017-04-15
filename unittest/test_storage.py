@@ -22,6 +22,7 @@ def get_dict_from_dissect(status):
     return d
 
 
+@pytest.mark.xfail(reason="Not tested lately, needs dict conversion adjust")
 def test_get_status_storage(C):
     skip_if_device_version_lower_than({'S': 43})
     status_pointer = C.NK_get_status_storage_as_string()
@@ -205,11 +206,15 @@ def test_password_safe_slot_name_corruption(C):
     check_PWS_correctness(C)
 
 def test_hidden_volume_corruption(C):
+    hidden_volume_password = 'hiddenpassword'
+    p = lambda i: hidden_volume_password + str(i)
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    for i in range(4):
+        assert C.NK_create_hidden_volume(i, 20+i*10, 20+i*10+i+1, p(i)) == DeviceErrorCode.STATUS_OK
     # bug: this should return error without unlocking encrypted volume each hidden volume lock, but it does not
     assert C.NK_lock_encrypted_volume() == DeviceErrorCode.STATUS_OK
     assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
-    hidden_volume_password = 'hiddenpassword'
-    p = lambda i: hidden_volume_password + str(i)
     for i in range(4):
         assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
         assert C.NK_unlock_hidden_volume(p(i)) == DeviceErrorCode.STATUS_OK

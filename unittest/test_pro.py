@@ -759,8 +759,8 @@ def test_edit_OTP_slot(C):
     """
     should change slots counter and name without changing its secret (using null secret for second update)
     """
-    # counter is not getting updated under Storage v0.43 - #TOREPORT
-    skip_if_device_version_lower_than({'S': 44, 'P': 7})
+    # counter is not getting updated under Storage v0.43 - #REPORTED
+    skip_if_device_version_lower_than({'S': 45, 'P': 7})
 
     secret = RFC_SECRET
     counter = 0

@@ -9,8 +9,8 @@ static const char *const default_user_pin = "123456";
 #include <NitrokeyManager.h>
 #include "device_proto.h"
 #include "log.h"
-//#include "stick10_commands.h"
-#include "stick20_commands.h"
+//#include "NKPro_commands.h"
+#include "NKStorage_commands.h"
 
 using namespace std;
 using namespace nitrokey::device;

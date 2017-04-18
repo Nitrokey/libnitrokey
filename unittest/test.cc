@@ -4,7 +4,7 @@
 #include <string.h>
 #include "device_proto.h"
 #include "log.h"
-#include "stick10_commands.h"
+#include "NKPro_commands.h"
 
 using namespace std;
 using namespace nitrokey::device;

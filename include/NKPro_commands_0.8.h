@@ -12,7 +12,7 @@
 #include <cstdint>
 #include "command.h"
 #include "device_proto.h"
-#include "stick10_commands.h"
+#include "NKPro_commands.h"
 
 #pragma pack (push,1)
 

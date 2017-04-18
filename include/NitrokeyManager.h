@@ -4,9 +4,9 @@
 #include "device.h"
 #include "log.h"
 #include "device_proto.h"
-#include "stick10_commands.h"
-#include "stick10_commands_0.8.h"
-#include "stick20_commands.h"
+#include "NKPro_commands.h"
+#include "NKPro_commands_0.8.h"
+#include "NKStorage_commands.h"
 #include <vector>
 #include <memory>
 

@@ -4,7 +4,7 @@
 #include "include/LibraryException.h"
 #include <algorithm>
 #include <unordered_map>
-#include <stick20_commands.h>
+#include <NKStorage_commands.h>
 #include "include/misc.h"
 #include <mutex>
 #include "include/cxx_semantics.h"

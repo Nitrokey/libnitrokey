@@ -2,7 +2,7 @@
 #include <iostream>
 #include "device_proto.h"
 #include "log.h"
-#include "stick10_commands.h"
+#include "NKPro_commands.h"
 #include <cstdlib>
 #include "misc.h"
 

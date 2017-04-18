@@ -120,7 +120,7 @@ namespace nitrokey {
                     uint8_t _storage_status_padding[storage_status_padding_size];
                     uint8_t command_counter;
                     uint8_t command_id;
-                    uint8_t device_status; //@see stick20::device_status
+                    uint8_t device_status; //@see NKStorage::device_status
                     uint8_t progress_bar_value;
                 } __packed storage_status;
             } __packed;
@@ -268,24 +268,24 @@ namespace nitrokey {
                   status = dev->recv(&resp);
 
                   if (dev->get_device_model() == DeviceModel::STORAGE &&
-                      resp.command_id >= stick20::CMD_START_VALUE &&
-                      resp.command_id < stick20::CMD_END_VALUE ) {
+                      resp.command_id >= NKStorage::CMD_START_VALUE &&
+                      resp.command_id < NKStorage::CMD_END_VALUE ) {
                     LOG(std::string("Detected storage device cmd, status: ") +
                                     std::to_string(resp.storage_status.device_status), Loglevel::DEBUG_L2);
 
-                    resp.last_command_status = static_cast<uint8_t>(stick10::command_status::ok);
-                    switch (static_cast<stick20::device_status>(resp.storage_status.device_status)) {
-                      case stick20::device_status::idle :
-                      case stick20::device_status::ok:
-                        resp.device_status = static_cast<uint8_t>(stick10::device_status::ok);
+                    resp.last_command_status = static_cast<uint8_t>(NKPro::command_status::ok);
+                    switch (static_cast<NKStorage::device_status>(resp.storage_status.device_status)) {
+                      case NKStorage::device_status::idle :
+                      case NKStorage::device_status::ok:
+                        resp.device_status = static_cast<uint8_t>(NKPro::device_status::ok);
                         break;
-                      case stick20::device_status::busy:
-                      case stick20::device_status::busy_progressbar: //TODO this will be modified later for getting progressbar status
-                        resp.device_status = static_cast<uint8_t>(stick10::device_status::busy);
+                      case NKStorage::device_status::busy:
+                      case NKStorage::device_status::busy_progressbar: //TODO this will be modified later for getting progressbar status
+                        resp.device_status = static_cast<uint8_t>(NKPro::device_status::busy);
                         break;
-                      case stick20::device_status::wrong_password:
-                        resp.last_command_status = static_cast<uint8_t>(stick10::command_status::wrong_password);
-                        resp.device_status = static_cast<uint8_t>(stick10::device_status::ok);
+                      case NKStorage::device_status::wrong_password:
+                        resp.last_command_status = static_cast<uint8_t>(NKPro::command_status::wrong_password);
+                        resp.device_status = static_cast<uint8_t>(NKPro::device_status::ok);
                         break;
                       default:
                         LOG(std::string("Unknown storage device status, cannot translate: ") +
@@ -298,12 +298,12 @@ namespace nitrokey {
                   //SENDPASSWORD gives wrong CRC , for now rely on !=0 (TODO report)
 //                  if (resp.device_status == 0 && resp.last_command_crc == outp.crc && resp.isCRCcorrect()) break;
                   auto CRC_equal_awaited = resp.last_command_crc == outp.crc;
-                  if (resp.device_status == static_cast<uint8_t>(stick10::device_status::ok) &&
+                  if (resp.device_status == static_cast<uint8_t>(NKPro::device_status::ok) &&
                       CRC_equal_awaited && resp.isValid()){
                     successful_communication = true;
                     break;
                   }
-                  if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy)) {
+                  if (resp.device_status == static_cast<uint8_t>(NKPro::device_status::busy)) {
                     dev->m_counters.busy++;
                     if (busy_counter++<10) {
                       receiving_retry_counter++;
@@ -317,9 +317,9 @@ namespace nitrokey {
                           + std::to_string(retry_timeout.count()), Loglevel::DEBUG);
                     }
                   }
-                  if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy) &&
-                      static_cast<stick20::device_status>(resp.storage_status.device_status)
-                      == stick20::device_status::busy_progressbar){
+                  if (resp.device_status == static_cast<uint8_t>(NKPro::device_status::busy) &&
+                      static_cast<NKStorage::device_status>(resp.storage_status.device_status)
+                      == NKStorage::device_status::busy_progressbar){
                     successful_communication = true;
                     break;
                   }
@@ -363,9 +363,9 @@ namespace nitrokey {
               LOG(std::string("receiving_retry_counter count: ") + std::to_string(receiving_retry_counter),
                               Loglevel::DEBUG);
 
-              if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy) &&
-                  static_cast<stick20::device_status>(resp.storage_status.device_status)
-                  == stick20::device_status::busy_progressbar){
+              if (resp.device_status == static_cast<uint8_t>(NKPro::device_status::busy) &&
+                  static_cast<NKStorage::device_status>(resp.storage_status.device_status)
+                  == NKStorage::device_status::busy_progressbar){
                 dev->m_counters.busy_progressbar++;
                 throw LongOperationInProgressException(
                     resp.command_id, resp.device_status, resp.storage_status.progress_bar_value);
@@ -377,7 +377,7 @@ namespace nitrokey {
                     "Maximum receiving_retry_counter count reached for receiving response from the device!");
               dev->m_counters.communication_successful++;
 
-              if (resp.last_command_status != static_cast<uint8_t>(stick10::command_status::ok)){
+              if (resp.last_command_status != static_cast<uint8_t>(NKPro::command_status::ok)){
                 dev->m_counters.command_result_not_equal_0_recv++;
                 throw CommandFailedException(resp.command_id, resp.last_command_status);
               }
@@ -385,8 +385,8 @@ namespace nitrokey {
               dev->m_counters.command_successful_recv++;
 
               if (dev->get_device_model() == DeviceModel::STORAGE &&
-                  resp.command_id >= stick20::CMD_START_VALUE &&
-                  resp.command_id < stick20::CMD_END_VALUE ) {
+                  resp.command_id >= NKStorage::CMD_START_VALUE &&
+                  resp.command_id < NKStorage::CMD_END_VALUE ) {
                 dev->m_counters.successful_storage_commands++;
               }
 

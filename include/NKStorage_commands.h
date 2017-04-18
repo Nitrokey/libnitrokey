@@ -19,7 +19,7 @@ namespace nitrokey {
 *	a superset (almost) of STICK10
 */
 #define print_to_ss(x) ( ss << " " << (#x) <<":\t" << (x) << std::endl );
-        namespace stick20 {
+        namespace NKStorage {
 
             class ChangeAdminUserPin20Current :
                 public PasswordCommand<CommandID::SEND_PASSWORD, PasswordKind::Admin> {};

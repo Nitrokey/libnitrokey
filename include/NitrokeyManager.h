@@ -13,8 +13,8 @@
 namespace nitrokey {
     using namespace nitrokey::device;
     using namespace std;
-    using namespace nitrokey::proto::stick10;
-    using namespace nitrokey::proto::stick20;
+    using namespace nitrokey::proto::NKPro;
+    using namespace nitrokey::proto::NKStorage;
     using namespace nitrokey::proto;
     using namespace nitrokey::log;
 
@@ -34,8 +34,8 @@ namespace nitrokey {
                              uint8_t last_interval,
                              const char *user_temporary_password);
         string get_TOTP_code(uint8_t slot_number, const char *user_temporary_password);
-        stick10::ReadSlot::ResponsePayload get_TOTP_slot_data(const uint8_t slot_number);
-        stick10::ReadSlot::ResponsePayload get_HOTP_slot_data(const uint8_t slot_number);
+        NKPro::ReadSlot::ResponsePayload get_TOTP_slot_data(const uint8_t slot_number);
+        NKPro::ReadSlot::ResponsePayload get_HOTP_slot_data(const uint8_t slot_number);
 
         bool set_time(uint64_t time);
         bool get_time(uint64_t time = 0);
@@ -50,7 +50,7 @@ namespace nitrokey {
 
       DeviceModel get_connected_device_model() const;
           void set_debug(bool state);
-        stick10::GetStatus::ResponsePayload get_status();
+        NKPro::GetStatus::ResponsePayload get_status();
         string get_status_as_string();
         string get_serial_number();
 
@@ -121,7 +121,7 @@ namespace nitrokey {
         void send_startup(uint64_t seconds_from_epoch);
 
         const char * get_status_storage_as_string();
-        stick20::DeviceConfigurationResponsePacket::ResponsePayload get_status_storage();
+        NKStorage::DeviceConfigurationResponsePacket::ResponsePayload get_status_storage();
 
         const char *get_SD_usage_data_as_string();
         std::pair<uint8_t,uint8_t> get_SD_usage_data();
@@ -145,7 +145,7 @@ namespace nitrokey {
         static shared_ptr <NitrokeyManager> _instance;
         std::shared_ptr<Device> device;
 
-      stick10::ReadSlot::ResponsePayload get_OTP_slot_data(const uint8_t slot_number);
+      NKPro::ReadSlot::ResponsePayload get_OTP_slot_data(const uint8_t slot_number);
       bool is_valid_hotp_slot_number(uint8_t slot_number) const;
         bool is_valid_totp_slot_number(uint8_t slot_number) const;
         bool is_valid_password_safe_slot_number(uint8_t slot_number) const;

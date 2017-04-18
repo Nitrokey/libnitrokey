@@ -8,7 +8,7 @@
 
 using namespace std;
 using namespace nitrokey::device;
-using namespace nitrokey::proto::stick10;
+using namespace nitrokey::proto::NKPro;
 using namespace nitrokey::log;
 using namespace nitrokey::misc;
 

@@ -20,32 +20,32 @@ namespace nitrokey {
 /*
  *	Stick10 protocol definition
  */
-        namespace stick10_08 {
-            using stick10::FirstAuthenticate;
-            using stick10::UserAuthenticate;
-            using stick10::SetTime;
-            using stick10::GetStatus;
-            using stick10::BuildAESKey;
-            using stick10::ChangeAdminPin;
-            using stick10::ChangeUserPin;
-            using stick10::EnablePasswordSafe;
-            using stick10::ErasePasswordSafeSlot;
-            using stick10::FactoryReset;
-            using stick10::GetPasswordRetryCount;
-            using stick10::GetUserPasswordRetryCount;
-            using stick10::GetPasswordSafeSlotLogin;
-            using stick10::GetPasswordSafeSlotName;
-            using stick10::GetPasswordSafeSlotPassword;
-            using stick10::GetPasswordSafeSlotStatus;
-            using stick10::GetSlotName;
-            using stick10::IsAESSupported;
-            using stick10::LockDevice;
-            using stick10::PasswordSafeInitKey;
-            using stick10::PasswordSafeSendSlotViaHID;
-            using stick10::SetPasswordSafeSlotData;
-            using stick10::SetPasswordSafeSlotData2;
-            using stick10::UnlockUserPassword;
-            using stick10::ReadSlot;
+        namespace NKPro_08 {
+            using NKPro::FirstAuthenticate;
+            using NKPro::UserAuthenticate;
+            using NKPro::SetTime;
+            using NKPro::GetStatus;
+            using NKPro::BuildAESKey;
+            using NKPro::ChangeAdminPin;
+            using NKPro::ChangeUserPin;
+            using NKPro::EnablePasswordSafe;
+            using NKPro::ErasePasswordSafeSlot;
+            using NKPro::FactoryReset;
+            using NKPro::GetPasswordRetryCount;
+            using NKPro::GetUserPasswordRetryCount;
+            using NKPro::GetPasswordSafeSlotLogin;
+            using NKPro::GetPasswordSafeSlotName;
+            using NKPro::GetPasswordSafeSlotPassword;
+            using NKPro::GetPasswordSafeSlotStatus;
+            using NKPro::GetSlotName;
+            using NKPro::IsAESSupported;
+            using NKPro::LockDevice;
+            using NKPro::PasswordSafeInitKey;
+            using NKPro::PasswordSafeSendSlotViaHID;
+            using NKPro::SetPasswordSafeSlotData;
+            using NKPro::SetPasswordSafeSlotData2;
+            using NKPro::UnlockUserPassword;
+            using NKPro::ReadSlot;
 
             class EraseSlot : Command<CommandID::ERASE_SLOT> {
             public:

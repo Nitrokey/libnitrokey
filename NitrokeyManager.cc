@@ -198,7 +198,7 @@ namespace nitrokey{
 
         case DeviceModel::STORAGE:
         {
-          auto response = stick20::GetDeviceStatus::CommandTransaction::run(device);
+          auto response = NKStorage::GetDeviceStatus::CommandTransaction::run(device);
           return nitrokey::misc::toHex(response.data().ActiveSmartCardID_u32);
         }
           break;
@@ -206,7 +206,7 @@ namespace nitrokey{
       return "NA";
     }
 
-    stick10::GetStatus::ResponsePayload NitrokeyManager::get_status(){
+    NKPro::GetStatus::ResponsePayload NitrokeyManager::get_status(){
       try{
         auto response = GetStatus::CommandTransaction::run(device);
         return response.data();
@@ -240,12 +240,12 @@ namespace nitrokey{
         auto resp = GetHOTP::CommandTransaction::run(device, gh);
         return getFilledOTPCode(resp.data().code, resp.data().use_8_digits);
       } else {
-        auto gh = get_payload<stick10_08::GetHOTP>();
+        auto gh = get_payload<NKPro_08::GetHOTP>();
         gh.slot_number = get_internal_slot_number_for_hotp(slot_number);
         if(user_temporary_password != nullptr && strlen(user_temporary_password)!=0) {
           strcpyT(gh.temporary_user_password, user_temporary_password);
         }
-        auto resp = stick10_08::GetHOTP::CommandTransaction::run(device, gh);
+        auto resp = NKPro_08::GetHOTP::CommandTransaction::run(device, gh);
         return getFilledOTPCode(resp.data().code, resp.data().use_8_digits);
       }
       return "";
@@ -277,10 +277,10 @@ namespace nitrokey{
           auto resp = GetTOTP::CommandTransaction::run(device, gt);
           return getFilledOTPCode(resp.data().code, resp.data().use_8_digits);
         } else {
-          auto gt = get_payload<stick10_08::GetTOTP>();
+          auto gt = get_payload<NKPro_08::GetTOTP>();
           strcpyT(gt.temporary_user_password, user_temporary_password);
           gt.slot_number = slot_number;
-          auto resp = stick10_08::GetTOTP::CommandTransaction::run(device, gt);
+          auto resp = NKPro_08::GetTOTP::CommandTransaction::run(device, gt);
           return getFilledOTPCode(resp.data().code, resp.data().use_8_digits);
         }
       return "";
@@ -293,10 +293,10 @@ namespace nitrokey{
         authorize_packet<EraseSlot, Authorize>(p, temporary_password, device);
         auto resp = EraseSlot::CommandTransaction::run(device,p);
       } else {
-        auto p = get_payload<stick10_08::EraseSlot>();
+        auto p = get_payload<NKPro_08::EraseSlot>();
         p.slot_number = slot_number;
         strcpyT(p.temporary_admin_password, temporary_password);
-        auto resp = stick10_08::EraseSlot::CommandTransaction::run(device,p);
+        auto resp = NKPro_08::EraseSlot::CommandTransaction::run(device,p);
       }
         return true;
     }
@@ -406,11 +406,11 @@ namespace nitrokey{
                                                       bool use_tokenID, const char *token_ID,
                                                       const char *temporary_password) const {
 
-      auto payload2 = get_payload<stick10_08::SendOTPData>();
+      auto payload2 = get_payload<NKPro_08::SendOTPData>();
       strcpyT(payload2.temporary_admin_password, temporary_password);
       strcpyT(payload2.data, slot_name);
       payload2.setTypeName();
-      stick10_08::SendOTPData::CommandTransaction::run(device, payload2);
+      NKPro_08::SendOTPData::CommandTransaction::run(device, payload2);
 
       payload2.setTypeSecret();
       payload2.id = 0;
@@ -426,12 +426,12 @@ namespace nitrokey{
         const auto start = secret_bin.size() - remaining_secret_length;
         memset(payload2.data, 0, sizeof(payload2.data));
         vector_copy_ranged(payload2.data, secret_bin, start, bytesToCopy);
-        stick10_08::SendOTPData::CommandTransaction::run(device, payload2);
+        NKPro_08::SendOTPData::CommandTransaction::run(device, payload2);
         remaining_secret_length -= bytesToCopy;
         payload2.id++;
       }
 
-      auto payload = get_payload<stick10_08::WriteToOTPSlot>();
+      auto payload = get_payload<NKPro_08::WriteToOTPSlot>();
       strcpyT(payload.temporary_admin_password, temporary_password);
       strcpyT(payload.slot_token_id, token_ID);
       payload.use_8_digits = use_8_digits;
@@ -439,7 +439,7 @@ namespace nitrokey{
       payload.use_tokenID = use_tokenID;
       payload.slot_counter_or_interval = counter_or_interval;
       payload.slot_number = internal_slot_number;
-      stick10_08::WriteToOTPSlot::CommandTransaction::run(device, payload);
+      NKPro_08::WriteToOTPSlot::CommandTransaction::run(device, payload);
     }
 
     void NitrokeyManager::write_TOTP_slot_authorize(uint8_t slot_number, const char *slot_name, const char *secret,
@@ -562,7 +562,7 @@ namespace nitrokey{
 
     uint8_t NitrokeyManager::get_user_retry_count() {
         if(device->get_device_model() == DeviceModel::STORAGE){
-          stick20::GetDeviceStatus::CommandTransaction::run(device);
+          NKStorage::GetDeviceStatus::CommandTransaction::run(device);
         }
         auto response = GetUserPasswordRetryCount::CommandTransaction::run(device);
         return response.data().password_retry_count;
@@ -570,7 +570,7 @@ namespace nitrokey{
 
     uint8_t NitrokeyManager::get_admin_retry_count() {
         if(device->get_device_model() == DeviceModel::STORAGE){
-          stick20::GetDeviceStatus::CommandTransaction::run(device);
+          NKStorage::GetDeviceStatus::CommandTransaction::run(device);
         }
         auto response = GetPasswordRetryCount::CommandTransaction::run(device);
         return response.data().password_retry_count;
@@ -644,10 +644,10 @@ namespace nitrokey{
                 break;
             }
             case DeviceModel::STORAGE : {
-                auto p = get_payload<stick20::CreateNewKeys>();
+                auto p = get_payload<NKStorage::CreateNewKeys>();
                 strcpyT(p.password, admin_password);
                 p.set_defaults();
-                stick20::CreateNewKeys::CommandTransaction::run(device, p);
+                NKStorage::CreateNewKeys::CommandTransaction::run(device, p);
                 break;
             }
         }
@@ -662,10 +662,10 @@ namespace nitrokey{
     void NitrokeyManager::unlock_user_password(const char *admin_password, const char *new_user_password) {
       switch (device->get_device_model()){
         case DeviceModel::PRO: {
-          auto p = get_payload<stick10::UnlockUserPassword>();
+          auto p = get_payload<NKPro::UnlockUserPassword>();
           strcpyT(p.admin_password, admin_password);
           strcpyT(p.user_new_password, new_user_password);
-          stick10::UnlockUserPassword::CommandTransaction::run(device, p);
+          NKPro::UnlockUserPassword::CommandTransaction::run(device, p);
           break;
         }
         case DeviceModel::STORAGE : {
@@ -673,10 +673,10 @@ namespace nitrokey{
           p2.set_defaults();
           strcpyT(p2.password, admin_password);
           ChangeAdminUserPin20Current::CommandTransaction::run(device, p2);
-          auto p3 = get_payload<stick20::UnlockUserPin>();
+          auto p3 = get_payload<NKStorage::UnlockUserPin>();
           p3.set_defaults();
           strcpyT(p3.password, new_user_password);
-          stick20::UnlockUserPin::CommandTransaction::run(device, p3);
+          NKStorage::UnlockUserPin::CommandTransaction::run(device, p3);
           break;
         }
       }
@@ -685,18 +685,18 @@ namespace nitrokey{
 
     void NitrokeyManager::write_config(uint8_t numlock, uint8_t capslock, uint8_t scrolllock, bool enable_user_password,
                                        bool delete_user_password, const char *admin_temporary_password) {
-        auto p = get_payload<stick10_08::WriteGeneralConfig>();
+        auto p = get_payload<NKPro_08::WriteGeneralConfig>();
         p.numlock = (uint8_t) numlock;
         p.capslock = (uint8_t) capslock;
         p.scrolllock = (uint8_t) scrolllock;
         p.enable_user_password = (uint8_t) enable_user_password;
         p.delete_user_password = (uint8_t) delete_user_password;
         if (is_authorization_command_supported()){
-          authorize_packet<stick10_08::WriteGeneralConfig, Authorize>(p, admin_temporary_password, device);
+          authorize_packet<NKPro_08::WriteGeneralConfig, Authorize>(p, admin_temporary_password, device);
         } else {
           strcpyT(p.temporary_admin_password, admin_temporary_password);
         }
-        stick10_08::WriteGeneralConfig::CommandTransaction::run(device, p);
+        NKPro_08::WriteGeneralConfig::CommandTransaction::run(device, p);
     }
 
     vector<uint8_t> NitrokeyManager::read_config() {
@@ -739,7 +739,7 @@ namespace nitrokey{
           return status_p.data().firmware_version; //7 or 8
         }
         case DeviceModel::STORAGE:{
-          auto status = stick20::GetDeviceStatus::CommandTransaction::run(device);
+          auto status = NKStorage::GetDeviceStatus::CommandTransaction::run(device);
           return status.data().versionInfo.minor;
         }
       }
@@ -756,89 +756,89 @@ namespace nitrokey{
     //storage commands
 
     void NitrokeyManager::send_startup(uint64_t seconds_from_epoch){
-      auto p = get_payload<stick20::SendStartup>();
+      auto p = get_payload<NKStorage::SendStartup>();
 //      p.set_defaults(); //set current time
       p.localtime = seconds_from_epoch;
-      stick20::SendStartup::CommandTransaction::run(device, p);
+      NKStorage::SendStartup::CommandTransaction::run(device, p);
     }
 
     void NitrokeyManager::unlock_encrypted_volume(const char* user_pin){
-      misc::execute_password_command<stick20::EnableEncryptedPartition>(device, user_pin);
+      misc::execute_password_command<NKStorage::EnableEncryptedPartition>(device, user_pin);
     }
 
     void NitrokeyManager::unlock_hidden_volume(const char* hidden_volume_password) {
-      misc::execute_password_command<stick20::EnableHiddenEncryptedPartition>(device, hidden_volume_password);
+      misc::execute_password_command<NKStorage::EnableHiddenEncryptedPartition>(device, hidden_volume_password);
     }
 
     //TODO check is encrypted volume unlocked before execution
     //if not return library exception
     void NitrokeyManager::create_hidden_volume(uint8_t slot_nr, uint8_t start_percent, uint8_t end_percent,
                                                const char *hidden_volume_password) {
-      auto p = get_payload<stick20::SetupHiddenVolume>();
+      auto p = get_payload<NKStorage::SetupHiddenVolume>();
       p.SlotNr_u8 = slot_nr;
       p.StartBlockPercent_u8 = start_percent;
       p.EndBlockPercent_u8 = end_percent;
       strcpyT(p.HiddenVolumePassword_au8, hidden_volume_password);
-      stick20::SetupHiddenVolume::CommandTransaction::run(device, p);
+      NKStorage::SetupHiddenVolume::CommandTransaction::run(device, p);
     }
 
     void NitrokeyManager::set_unencrypted_read_only(const char* user_pin) {
-      misc::execute_password_command<stick20::SendSetReadonlyToUncryptedVolume>(device, user_pin);
+      misc::execute_password_command<NKStorage::SendSetReadonlyToUncryptedVolume>(device, user_pin);
     }
 
     void NitrokeyManager::set_unencrypted_read_write(const char* user_pin) {
-      misc::execute_password_command<stick20::SendSetReadwriteToUncryptedVolume>(device, user_pin);
+      misc::execute_password_command<NKStorage::SendSetReadwriteToUncryptedVolume>(device, user_pin);
     }
 
     void NitrokeyManager::export_firmware(const char* admin_pin) {
-      misc::execute_password_command<stick20::ExportFirmware>(device, admin_pin);
+      misc::execute_password_command<NKStorage::ExportFirmware>(device, admin_pin);
     }
 
     void NitrokeyManager::enable_firmware_update(const char* firmware_pin) {
-      misc::execute_password_command<stick20::EnableFirmwareUpdate>(device, firmware_pin);
+      misc::execute_password_command<NKStorage::EnableFirmwareUpdate>(device, firmware_pin);
     }
 
     void NitrokeyManager::clear_new_sd_card_warning(const char* admin_pin) {
-      misc::execute_password_command<stick20::SendClearNewSdCardFound>(device, admin_pin);
+      misc::execute_password_command<NKStorage::SendClearNewSdCardFound>(device, admin_pin);
     }
 
     void NitrokeyManager::fill_SD_card_with_random_data(const char* admin_pin) {
-      auto p = get_payload<stick20::FillSDCardWithRandomChars>();
+      auto p = get_payload<NKStorage::FillSDCardWithRandomChars>();
       p.set_defaults();
       strcpyT(p.admin_pin, admin_pin);
-      stick20::FillSDCardWithRandomChars::CommandTransaction::run(device, p);
+      NKStorage::FillSDCardWithRandomChars::CommandTransaction::run(device, p);
     }
 
     void NitrokeyManager::change_update_password(const char* current_update_password, const char* new_update_password) {
-      auto p = get_payload<stick20::ChangeUpdatePassword>();
+      auto p = get_payload<NKStorage::ChangeUpdatePassword>();
       strcpyT(p.current_update_password, current_update_password);
       strcpyT(p.new_update_password, new_update_password);
-      stick20::ChangeUpdatePassword::CommandTransaction::run(device, p);
+      NKStorage::ChangeUpdatePassword::CommandTransaction::run(device, p);
     }
 
     const char * NitrokeyManager::get_status_storage_as_string(){
-      auto p = stick20::GetDeviceStatus::CommandTransaction::run(device);
+      auto p = NKStorage::GetDeviceStatus::CommandTransaction::run(device);
       return strndup(p.data().dissect().c_str(), max_string_field_length);
     }
 
-    stick20::DeviceConfigurationResponsePacket::ResponsePayload NitrokeyManager::get_status_storage(){
-      auto p = stick20::GetDeviceStatus::CommandTransaction::run(device);
+    NKStorage::DeviceConfigurationResponsePacket::ResponsePayload NitrokeyManager::get_status_storage(){
+      auto p = NKStorage::GetDeviceStatus::CommandTransaction::run(device);
       return p.data();
     }
 
     const char * NitrokeyManager::get_SD_usage_data_as_string(){
-      auto p = stick20::GetSDCardOccupancy::CommandTransaction::run(device);
+      auto p = NKStorage::GetSDCardOccupancy::CommandTransaction::run(device);
       return strndup(p.data().dissect().c_str(), max_string_field_length);
     }
 
     std::pair<uint8_t,uint8_t> NitrokeyManager::get_SD_usage_data(){
-      auto p = stick20::GetSDCardOccupancy::CommandTransaction::run(device);
+      auto p = NKStorage::GetSDCardOccupancy::CommandTransaction::run(device);
       return std::make_pair(p.data().WriteLevelMin, p.data().WriteLevelMax);
     }
 
     int NitrokeyManager::get_progress_bar_value(){
       try{
-        stick20::GetDeviceStatus::CommandTransaction::run(device);
+        NKStorage::GetDeviceStatus::CommandTransaction::run(device);
         return -1;
       }
       catch (LongOperationInProgressException &e){
@@ -850,18 +850,18 @@ namespace nitrokey{
     return get_TOTP_code(slot_number, 0, 0, 0, user_temporary_password);
   }
 
-  stick10::ReadSlot::ResponsePayload NitrokeyManager::get_OTP_slot_data(const uint8_t slot_number) {
-    auto p = get_payload<stick10::ReadSlot>();
+  NKPro::ReadSlot::ResponsePayload NitrokeyManager::get_OTP_slot_data(const uint8_t slot_number) {
+    auto p = get_payload<NKPro::ReadSlot>();
     p.slot_number = slot_number;
-    auto data = stick10::ReadSlot::CommandTransaction::run(device, p);
+    auto data = NKPro::ReadSlot::CommandTransaction::run(device, p);
     return data.data();
   }
 
-  stick10::ReadSlot::ResponsePayload NitrokeyManager::get_TOTP_slot_data(const uint8_t slot_number) {
+  NKPro::ReadSlot::ResponsePayload NitrokeyManager::get_TOTP_slot_data(const uint8_t slot_number) {
     return get_OTP_slot_data(get_internal_slot_number_for_totp(slot_number));
   }
 
-  stick10::ReadSlot::ResponsePayload NitrokeyManager::get_HOTP_slot_data(const uint8_t slot_number) {
+  NKPro::ReadSlot::ResponsePayload NitrokeyManager::get_HOTP_slot_data(const uint8_t slot_number) {
     auto slot_data = get_OTP_slot_data(get_internal_slot_number_for_hotp(slot_number));
     if (device->get_device_model() == DeviceModel::STORAGE){
       //convert counter from string to ull
@@ -872,15 +872,15 @@ namespace nitrokey{
   }
 
   void NitrokeyManager::lock_encrypted_volume() {
-    misc::execute_password_command<stick20::DisableEncryptedPartition>(device, "");
+    misc::execute_password_command<NKStorage::DisableEncryptedPartition>(device, "");
   }
 
   void NitrokeyManager::lock_hidden_volume() {
-    misc::execute_password_command<stick20::DisableHiddenEncryptedPartition>(device, "");
+    misc::execute_password_command<NKStorage::DisableHiddenEncryptedPartition>(device, "");
   }
 
   uint8_t NitrokeyManager::get_SD_card_size() {
-    auto data = stick20::ProductionTest::CommandTransaction::run(device);
+    auto data = NKStorage::ProductionTest::CommandTransaction::run(device);
     return data.data().SD_Card_Size_u8;
   }
 

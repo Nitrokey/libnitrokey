@@ -4,7 +4,7 @@
 
 namespace nitrokey {
 namespace proto {
-    namespace stick20 {
+    namespace NKStorage {
       enum class device_status : uint8_t {
         idle = 0,
         ok,
@@ -19,7 +19,7 @@ namespace proto {
       const int CMD_START_VALUE = 0x20;
       const int CMD_END_VALUE = 0x60;
     }
-    namespace stick10 {
+    namespace NKPro {
       enum class command_status : uint8_t {
           ok = 0,
           wrong_CRC,

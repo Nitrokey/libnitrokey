@@ -17,7 +17,7 @@ namespace proto {
 
 
 /*
- *	Stick10 protocol definition
+ *	Device_NKPro protocol definition
  */
 namespace NKPro {
 class GetSlotName : public Command<CommandID::READ_SLOT_NAME> {

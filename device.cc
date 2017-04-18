@@ -190,14 +190,14 @@ void Device::set_retry_delay(const std::chrono::milliseconds delay){
   m_retry_timeout = delay;
 }
 
-Stick10::Stick10():
+Device_NKPro::Device_NKPro():
   Device(0x20a0, 0x4108, DeviceModel::PRO, 100ms, 5, 100ms)
   {
     setDefaultDelay();
   }
 
 
-Stick20::Stick20():
+Device_NKStorage::Device_NKStorage():
   Device(0x20a0, 0x4109, DeviceModel::STORAGE, 20ms, 20, 20ms)
   {
     setDefaultDelay();

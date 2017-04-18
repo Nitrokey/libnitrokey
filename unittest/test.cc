@@ -12,7 +12,7 @@ using namespace nitrokey::proto::NKPro;
 using namespace nitrokey::log;
 using namespace nitrokey::misc;
 
-using Dev10 = std::shared_ptr<Stick10>;
+using Dev10 = std::shared_ptr<Device_NKPro>;
 
 std::string getSlotName(Dev10 stick, int slotNo) {
   auto slot_req = get_payload<ReadSlot>();
@@ -23,7 +23,7 @@ std::string getSlotName(Dev10 stick, int slotNo) {
 }
 
 TEST_CASE("Slot names are correct", "[slotNames]") {
-  auto stick = make_shared<Stick10>();
+  auto stick = make_shared<Device_NKPro>();
   bool connected = stick->connect();
   REQUIRE(connected == true);
 

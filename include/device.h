@@ -127,15 +127,15 @@ protected:
   static std::chrono::milliseconds default_delay ;
 };
 
-class Stick10 : public Device {
+class Device_NKPro : public Device {
  public:
-  Stick10();
+  Device_NKPro();
 
 };
 
-class Stick20 : public Device {
+class Device_NKStorage : public Device {
  public:
-  Stick20();
+  Device_NKStorage();
 };
 }
 }

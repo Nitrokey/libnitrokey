@@ -47,7 +47,7 @@ void SKIP_TEST() {
 TEST_CASE("long operation test", "[test_long]") {
   SKIP_TEST();
 
-  auto stick = make_shared<Stick20>();
+  auto stick = make_shared<Device_NKStorage>();
   bool connected = stick->connect();
   REQUIRE(connected == true);
   Log::instance().set_loglevel(Loglevel::DEBUG);
@@ -123,7 +123,7 @@ TEST_CASE("test device commands ids", "[fast]") {
 }
 
 TEST_CASE("test device internal status with various commands", "[fast]") {
-  auto stick = make_shared<Stick20>();
+  auto stick = make_shared<Device_NKStorage>();
   bool connected = stick->connect();
   REQUIRE(connected == true);
 
@@ -147,7 +147,7 @@ TEST_CASE("test device internal status with various commands", "[fast]") {
 }
 
 TEST_CASE("setup hidden volume test", "[hidden]") {
-  auto stick = make_shared<Stick20>();
+  auto stick = make_shared<Device_NKStorage>();
   bool connected = stick->connect();
   REQUIRE(connected == true);
   Log::instance().set_loglevel(Loglevel::DEBUG);
@@ -170,7 +170,7 @@ TEST_CASE("setup hidden volume test", "[hidden]") {
 }
 
 TEST_CASE("setup multiple hidden volumes", "[hidden]") {
-  auto stick = make_shared<Stick20>();
+  auto stick = make_shared<Device_NKStorage>();
   bool connected = stick->connect();
   REQUIRE(connected == true);
   Log::instance().set_loglevel(Loglevel::DEBUG);
@@ -207,7 +207,7 @@ TEST_CASE("setup multiple hidden volumes", "[hidden]") {
 TEST_CASE("update password change", "[dangerous]") {
   SKIP_TEST();
 
-  auto stick = make_shared<Stick20>();
+  auto stick = make_shared<Device_NKStorage>();
   bool connected = stick->connect();
   REQUIRE(connected == true);
   Log::instance().set_loglevel(Loglevel::DEBUG);
@@ -228,7 +228,7 @@ TEST_CASE("update password change", "[dangerous]") {
 }
 
 TEST_CASE("general test", "[test]") {
-  auto stick = make_shared<Stick20>();
+  auto stick = make_shared<Device_NKStorage>();
   bool connected = stick->connect();
   REQUIRE(connected == true);
 

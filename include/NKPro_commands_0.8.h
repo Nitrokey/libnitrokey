@@ -18,7 +18,7 @@ namespace nitrokey {
     namespace proto {
 
 /*
- *	Stick10 protocol definition
+ *	Device_NKPro protocol definition
  */
         namespace NKPro_08 {
             using NKPro::FirstAuthenticate;

@@ -27,7 +27,7 @@ namespace nitrokey {
             }
         };
 
-namespace stick20{
+namespace NKStorage{
         enum class PasswordKind : uint8_t {
             User = 'P',
             Admin = 'A',

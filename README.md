@@ -131,7 +131,7 @@ All available functions for C and Python are listed in [NK_C_API.h](NK_C_API.h).
 
 ## Documentation
 The documentation of C API is included in the sources (could be  generated with doxygen if requested).
-Please check NK_C_API.h (C API) for high level commands and include/NitrokeyManager.h (C++ API). All devices' commands are listed along with packet format in include/stick10_commands.h and include/stick20_commands.h respectively for Nitrokey Pro and Nitrokey Storage products.
+Please check NK_C_API.h (C API) for high level commands and include/NitrokeyManager.h (C++ API). All devices' commands are listed along with packet format in include/NKPro_commands.h and include/NKStorage_commands.h respectively for Nitrokey Pro and Nitrokey Storage products.
 
 # Tests
 Warning! Before you run unittests please either change both your Admin and User PINs on your Nitrostick to defaults (`12345678` and `123456` respectively) or change the values in tests source code. If you do not change them the tests might lock your device. If it's too late, you can always reset your Nitrokey using instructions from [homepage](https://www.nitrokey.com/de/documentation/how-reset-nitrokey).

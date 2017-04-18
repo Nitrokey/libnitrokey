@@ -19,7 +19,7 @@ namespace proto {
 /*
  *	Stick10 protocol definition
  */
-namespace stick10 {
+namespace NKPro {
 class GetSlotName : public Command<CommandID::READ_SLOT_NAME> {
  public:
   // reachable as a typedef in Transaction

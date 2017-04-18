@@ -18,8 +18,7 @@ namespace nitrokey {
 *	STICK20 protocol command ids
 *	a superset (almost) of STICK10
 */
-
-        namespace stick20 {
+        namespace NKStorage {
 
             class ChangeAdminUserPin20Current :
                 public PasswordCommand<CommandID::SEND_PASSWORD, PasswordKind::Admin> {};

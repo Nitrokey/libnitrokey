@@ -33,7 +33,7 @@ TEST_CASE("test secret", "[functions]") {
 }
 
 TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
-    std::shared_ptr<Stick10> stick = make_shared<Stick10>();
+    std::shared_ptr<Device_NKPro> stick = make_shared<Device_NKPro>();
     bool connected = stick->connect();
 
   REQUIRE(connected == true);

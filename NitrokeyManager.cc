@@ -75,7 +75,7 @@ using nitrokey::misc::strcpyT;
 
     bool NitrokeyManager::connect() {
         std::lock_guard<std::mutex> lock(mex_dev_com_manager);
-        vector< shared_ptr<Device> > devices = { make_shared<Stick10>(), make_shared<Stick20>() };
+        vector< shared_ptr<Device> > devices = { make_shared<Device_NKPro>(), make_shared<Device_NKStorage>() };
         for( auto & d : devices ){
             if (d->connect()){
                 device = std::shared_ptr<Device>(d);
@@ -104,10 +104,10 @@ using nitrokey::misc::strcpyT;
       LOG(__FUNCTION__, nitrokey::log::Loglevel::DEBUG_L2);
       switch (device_model[0]){
             case 'P':
-                device = make_shared<Stick10>();
+                device = make_shared<Device_NKPro>();
                 break;
             case 'S':
-                device = make_shared<Stick20>();
+                device = make_shared<Device_NKStorage>();
                 break;
             default:
                 throw std::runtime_error("Unknown model");

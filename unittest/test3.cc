@@ -21,7 +21,7 @@ using namespace nitrokey::proto::NKPro_08;
 using namespace nitrokey::log;
 using namespace nitrokey::misc;
 
-using Dev = Stick10;
+using Dev = Device_NKPro;
 using Dev10 = std::shared_ptr<Dev>;
 
 void connect_and_setup(Dev10 stick) {

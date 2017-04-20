@@ -1,5 +1,5 @@
-#ifndef STICK10_COMMANDS_H
-#define STICK10_COMMANDS_H
+#ifndef NKPRO_COMMANDS_H
+#define NKPRO_COMMANDS_H
 
 #include <bitset>
 #include <iomanip>

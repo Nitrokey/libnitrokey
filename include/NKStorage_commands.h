@@ -1,5 +1,5 @@
-#ifndef STICK20_COMMANDS_H
-#define STICK20_COMMANDS_H
+#ifndef NKSTORAGE_COMMANDS_H
+#define NKSTORAGE_COMMANDS_H
 
 
 
@@ -15,8 +15,8 @@ namespace nitrokey {
     namespace proto {
 
 /*
-*	STICK20 protocol command ids
-*	a superset (almost) of STICK10
+*	NKSTORAGE protocol command ids
+*	a superset (almost) of NKPRO
 */
 #define print_to_ss(x) ( ss << " " << (#x) <<":\t" << (x) << std::endl );
         namespace NKStorage {

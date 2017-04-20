@@ -2,8 +2,8 @@
 // Created by sz on 08.11.16.
 //
 
-#ifndef LIBNITROKEY_STICK10_COMMANDS_0_8_H
-#define LIBNITROKEY_STICK10_COMMANDS_0_8_H
+#ifndef LIBNITROKEY_NKPRO_COMMANDS_0_8_H
+#define LIBNITROKEY_NKPRO_COMMANDS_0_8_H
 
 #include <bitset>
 #include <iomanip>
@@ -309,4 +309,4 @@ namespace nitrokey {
         }
     }
 }
-#endif //LIBNITROKEY_STICK10_COMMANDS_0_8_H
+#endif //LIBNITROKEY_NKPRO_COMMANDS_0_8_H

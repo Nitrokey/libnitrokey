@@ -17,8 +17,8 @@
 #include "CommandFailedException.h"
 #include "LongOperationInProgressException.h"
 
-#define STICK20_UPDATE_MODE_VID 0x03EB
-#define STICK20_UPDATE_MODE_PID 0x2FF1
+#define NKSTORAGE_UPDATE_MODE_VID 0x03EB
+#define NKSTORAGE_UPDATE_MODE_PID 0x2FF1
 
 #define PAYLOAD_SIZE 53
 #define PWS_SLOT_COUNT 16

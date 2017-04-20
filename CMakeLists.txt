@@ -41,6 +41,29 @@ include(GNUInstallDirs)
 
 OPTION(LIBNITROKEY_STATIC "Build libnitrokey statically" FALSE)
 
+# Getter for the library version
+#
+# If a git tag is available, we use it.
+# Else, we use a git version and we raise a warning.
+#
+exec_program(
+  "git"
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ARGS "describe"
+  OUTPUT_VARIABLE GIT_VERSION)
+
+IF(${GIT_TAG} MATCHES "fatal:.*")
+MESSAGE(WARNING "Unable to find a git tag. Using git version instead.")
+exec_program(
+  "git"
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ARGS "rev-parse HEAD"
+  OUTPUT_VARIABLE GIT_VERSION)
+ENDIF()
+
+MESSAGE("LIBRARY VERSION: ${GIT_VERSION} ")
+ADD_DEFINITIONS(-DVERSION="${GIT_VERSION}")
+
 
 IF (NOT CMAKE_BUILD_TYPE)
     IF(APPLE)

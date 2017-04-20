@@ -532,6 +532,10 @@ extern "C" {
 	}
 
 
+	NK_C_API const char * NK_version() {
+	   return VERSION;
+	}
+
 #ifdef __cplusplus
 }
 #endif

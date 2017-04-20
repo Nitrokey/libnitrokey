@@ -169,6 +169,10 @@ void clear_string(std::string &s){
     std::fill(s.begin(), s.end(), ' ');
 }
 
+NK_C_API const char * NK_version() {
+   return VERSION;
+}
+
 NK_C_API const char * NK_status() {
     auto m = NitrokeyManager::instance();
     return get_with_string_result([&](){

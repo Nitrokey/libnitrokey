@@ -26,6 +26,29 @@ project(libnitrokey)
 SET(PROJECT_VERSION "3.0-alpha")
 set(CMAKE_CXX_STANDARD 14)
 
+# Getter for the library version
+#
+# If a git tag is available, we use it.
+# Else, we use a git version and we raise a warning.
+#
+exec_program(
+  "git"
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ARGS "describe"
+  OUTPUT_VARIABLE GIT_VERSION)
+
+IF(${GIT_TAG} MATCHES "fatal:.*")
+MESSAGE(WARNING "Unable to find a git tag. Using git version instead.")
+exec_program(
+  "git"
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ARGS "rev-parse HEAD"
+  OUTPUT_VARIABLE GIT_VERSION)
+ENDIF()
+
+MESSAGE("LIBRARY VERSION: ${GIT_VERSION} ")
+ADD_DEFINITIONS(-DVERSION="${GIT_VERSION}")
+
 OPTION(LIBNITROKEY_STATIC "Build libnitrokey statically" TRUE)
 
 

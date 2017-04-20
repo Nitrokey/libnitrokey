@@ -36,6 +36,14 @@ NK_C_API int NK_login_auto();
 NK_C_API int NK_logout();
 
 /**
+ * Return the version of the library.
+ * If a git tag is available, return it else return the git version.
+ * This value is defined at the compilation time.
+ * @return the version of the library
+ */
+NK_C_API const char * NK_version();
+
+/**
  * Return the debug status string. Debug purposes.
  * @return command processing error code
  */

@@ -1,5 +1,5 @@
-#ifndef STICK10_COMMANDS_H
-#define STICK10_COMMANDS_H
+#ifndef NKPRO_COMMANDS_H
+#define NKPRO_COMMANDS_H
 
 #include <bitset>
 #include <iomanip>
@@ -17,9 +17,9 @@ namespace proto {
 
 
 /*
- *	Stick10 protocol definition
+ *	Device_NKPro protocol definition
  */
-namespace stick10 {
+namespace NKPro {
 class GetSlotName : public Command<CommandID::READ_SLOT_NAME> {
  public:
   // reachable as a typedef in Transaction

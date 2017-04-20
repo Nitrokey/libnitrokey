@@ -43,12 +43,12 @@ template <CommandID id, class HIDPacket>
 class ResponseDissector : semantics::non_constructible {
  public:
     static std::string status_translate_device(int status){
-      auto enum_status = static_cast<proto::stick10::device_status>(status);
+      auto enum_status = static_cast<proto::NKPro::device_status>(status);
       switch (enum_status){
-        case stick10::device_status::ok: return "OK";
-        case stick10::device_status::busy: return "BUSY";
-        case stick10::device_status::error: return "ERROR";
-        case stick10::device_status::received_report: return "RECEIVED_REPORT";
+        case NKPro::device_status::ok: return "OK";
+        case NKPro::device_status::busy: return "BUSY";
+        case NKPro::device_status::error: return "ERROR";
+        case NKPro::device_status::received_report: return "RECEIVED_REPORT";
       }
       return std::string("UNKNOWN: ") + std::to_string(status);
     }
@@ -58,20 +58,20 @@ class ResponseDissector : semantics::non_constructible {
       return str;
     }
     static std::string status_translate_command(int status){
-      auto enum_status = static_cast<proto::stick10::command_status >(status);
+      auto enum_status = static_cast<proto::NKPro::command_status >(status);
       switch (enum_status) {
 #define p(X) case X: return to_upper(std::string(#X));
-        p(stick10::command_status::ok)
-        p(stick10::command_status::wrong_CRC)
-        p(stick10::command_status::wrong_slot)
-        p(stick10::command_status::slot_not_programmed)
-        p(stick10::command_status::wrong_password)
-        p(stick10::command_status::not_authorized)
-        p(stick10::command_status::timestamp_warning)
-        p(stick10::command_status::no_name_error)
-        p(stick10::command_status::not_supported)
-        p(stick10::command_status::unknown_command)
-        p(stick10::command_status::AES_dec_failed)
+        p(NKPro::command_status::ok)
+        p(NKPro::command_status::wrong_CRC)
+        p(NKPro::command_status::wrong_slot)
+        p(NKPro::command_status::slot_not_programmed)
+        p(NKPro::command_status::wrong_password)
+        p(NKPro::command_status::not_authorized)
+        p(NKPro::command_status::timestamp_warning)
+        p(NKPro::command_status::no_name_error)
+        p(NKPro::command_status::not_supported)
+        p(NKPro::command_status::unknown_command)
+        p(NKPro::command_status::AES_dec_failed)
 #undef p
       }
       return std::string("UNKNOWN: ") + std::to_string(status);

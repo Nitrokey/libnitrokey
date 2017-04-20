@@ -19,7 +19,7 @@ namespace nitrokey {
         };
 
 #define print_to_ss(x) ( ss << " " << (#x) <<":\t" << (x) << std::endl );
-namespace stick20{
+namespace NKStorage{
         enum class PasswordKind : uint8_t {
             User = 'P',
             Admin = 'A',

@@ -48,12 +48,12 @@ set(SOURCE_FILES
     include/log.h
     include/misc.h
     include/NitrokeyManager.h
-    include/stick10_commands.h
-    include/stick20_commands.h
+    include/NKPro_commands.h
+    include/NKStorage_commands.h
     include/CommandFailedException.h
     include/LibraryException.h
     include/LongOperationInProgressException.h
-    include/stick10_commands_0.8.h
+    include/NKPro_commands_0.8.h
     command_id.cc
     device.cc
     log.cc

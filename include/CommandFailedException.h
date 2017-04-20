@@ -10,7 +10,7 @@
 #include "log.h"
 #include "command_id.h"
 
-using cs = nitrokey::proto::stick10::command_status;
+using cs = nitrokey::proto::NKPro::command_status;
 
 class CommandFailedException : public std::exception {
 public:

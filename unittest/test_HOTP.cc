@@ -2,13 +2,13 @@
 #include <iostream>
 #include "device_proto.h"
 #include "log.h"
-#include "stick10_commands.h"
+#include "NKPro_commands.h"
 #include <cstdlib>
 #include "misc.h"
 
 using namespace std;
 using namespace nitrokey::device;
-using namespace nitrokey::proto::stick10;
+using namespace nitrokey::proto::NKPro;
 using namespace nitrokey::log;
 using namespace nitrokey::misc;
 
@@ -33,7 +33,7 @@ TEST_CASE("test secret", "[functions]") {
 }
 
 TEST_CASE("Test HOTP codes according to RFC", "[HOTP]") {
-    std::shared_ptr<Stick10> stick = make_shared<Stick10>();
+    std::shared_ptr<Device_NKPro> stick = make_shared<Device_NKPro>();
     bool connected = stick->connect();
 
   REQUIRE(connected == true);

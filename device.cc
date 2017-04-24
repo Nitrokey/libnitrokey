@@ -145,16 +145,18 @@ bool Device::could_be_enumerated() {
   if (mp_devhandle==nullptr){
     return false;
   }
+#ifndef __APPLE__
   auto pInfo = hid_enumerate(m_vid, m_pid);
   if (pInfo != nullptr){
     hid_free_enumeration(pInfo);
     return true;
   }
   return false;
-
-//  alternative:
-//  unsigned char buf[1];
-//  return hid_read_timeout(mp_devhandle, buf, sizeof(buf), 20) != -1;
+#else
+//  alternative for OSX
+  unsigned char buf[1];
+  return hid_read_timeout(mp_devhandle, buf, sizeof(buf), 20) != -1;
+#endif
 }
 
 void Device::show_stats() {

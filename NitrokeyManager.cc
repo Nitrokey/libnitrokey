@@ -201,6 +201,7 @@ char * strndup(const char* str, size_t maxlen){
 
 
     string NitrokeyManager::get_serial_number() {
+        if (device == nullptr) { return ""; };
       switch (device->get_device_model()) {
         case DeviceModel::PRO: {
           auto response = GetStatus::CommandTransaction::run(device);

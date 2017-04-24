@@ -12,7 +12,7 @@
 
 namespace nitrokey{
 
-    std::mutex mex_dev_com;
+    std::mutex mex_dev_com_manager;
 
 #ifdef __WIN32
 #pragma message "Using own strndup"
@@ -87,7 +87,7 @@ char * strndup(const char* str, size_t maxlen){
         return false;
       }
 
-      std::lock_guard<std::mutex> lock(mex_dev_com);
+      std::lock_guard<std::mutex> lock(mex_dev_com_manager);
       if(device == nullptr) {
         return false;
       }
@@ -97,7 +97,7 @@ char * strndup(const char* str, size_t maxlen){
     }
 
     bool NitrokeyManager::connect() {
-        std::lock_guard<std::mutex> lock(mex_dev_com);
+        std::lock_guard<std::mutex> lock(mex_dev_com_manager);
         vector< shared_ptr<Device> > devices = { make_shared<Stick10>(), make_shared<Stick20>() };
         for( auto & d : devices ){
             if (d->connect()){
@@ -123,7 +123,7 @@ char * strndup(const char* str, size_t maxlen){
     }
 
     bool NitrokeyManager::connect(const char *device_model) {
-      std::lock_guard<std::mutex> lock(mex_dev_com);
+      std::lock_guard<std::mutex> lock(mex_dev_com_manager);
       LOG(__FUNCTION__, nitrokey::log::Loglevel::DEBUG_L2);
       switch (device_model[0]){
             case 'P':
@@ -150,7 +150,7 @@ char * strndup(const char* str, size_t maxlen){
 
 
     bool NitrokeyManager::disconnect() {
-      std::lock_guard<std::mutex> lock(mex_dev_com);
+      std::lock_guard<std::mutex> lock(mex_dev_com_manager);
       return _disconnect_no_lock();
     }
 
@@ -166,7 +166,7 @@ char * strndup(const char* str, size_t maxlen){
   }
 
   bool NitrokeyManager::is_connected() throw(){
-      std::lock_guard<std::mutex> lock(mex_dev_com);
+      std::lock_guard<std::mutex> lock(mex_dev_com_manager);
       if(device != nullptr){
         auto connected = device->could_be_enumerated();
         if(connected){
@@ -180,7 +180,7 @@ char * strndup(const char* str, size_t maxlen){
   }
 
   bool NitrokeyManager::could_current_device_be_enumerated() {
-    std::lock_guard<std::mutex> lock(mex_dev_com);
+    std::lock_guard<std::mutex> lock(mex_dev_com_manager);
     if (device != nullptr) {
       return device->could_be_enumerated();
     }

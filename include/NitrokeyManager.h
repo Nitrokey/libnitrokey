@@ -18,6 +18,11 @@ namespace nitrokey {
     using namespace nitrokey::proto;
     using namespace nitrokey::log;
 
+
+#ifdef __WIN32
+char * strndup(const char* str, size_t maxlen);
+#endif
+
     class NitrokeyManager {
     public:
         static shared_ptr <NitrokeyManager> instance();

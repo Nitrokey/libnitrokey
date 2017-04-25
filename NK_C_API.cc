@@ -1,5 +1,7 @@
-#include <cstring>
 #include "NK_C_API.h"
+#include <iostream>
+#include "include/NitrokeyManager.h"
+#include <cstring>
 #include "include/LibraryException.h"
 #include "include/cxx_semantics.h"
 
@@ -7,7 +9,6 @@ using namespace nitrokey;
 
 static uint8_t NK_last_command_status = 0;
 static const int max_string_field_length = 100;
-
 
 template <typename T>
 T* duplicate_vector_and_clear(std::vector<T> &v){
@@ -168,6 +169,7 @@ NK_C_API uint8_t* NK_read_config(){
 void clear_string(std::string &s){
     std::fill(s.begin(), s.end(), ' ');
 }
+
 
 NK_C_API const char * NK_status() {
     auto m = NitrokeyManager::instance();

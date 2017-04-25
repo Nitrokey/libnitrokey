@@ -1,10 +1,7 @@
 #ifndef LIBNITROKEY_NK_C_API_H
 #define LIBNITROKEY_NK_C_API_H
 
-#include <iostream>
-#include <string>
-#include "include/NitrokeyManager.h"
-#include "include/inttypes.h"
+#include <stdint.h>
 
 #define NK_C_API
 

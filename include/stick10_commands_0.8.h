@@ -14,6 +14,8 @@
 #include "device_proto.h"
 #include "stick10_commands.h"
 
+#pragma pack (push,1)
+
 namespace nitrokey {
     namespace proto {
 
@@ -309,4 +311,6 @@ namespace nitrokey {
         }
     }
 }
+#pragma pack (pop)
+
 #endif //LIBNITROKEY_STICK10_COMMANDS_0_8_H

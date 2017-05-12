@@ -30,31 +30,32 @@ namespace nitrokey {
 
     void Log::operator()(const std::string &logstr, Loglevel lvl) {
       if (mp_loghandler != nullptr)
-        if ((int) lvl >= (int) m_loglevel) mp_loghandler->print(logstr, lvl);
+        if ((int) lvl <= (int) m_loglevel) mp_loghandler->print(logstr, lvl);
     }
 
     void StdlogHandler::print(const std::string &str, Loglevel lvl) {
-      std::time_t t = std::time(nullptr);
-      std::tm tm = *std::localtime(&t);
-
-      std::clog << "[" << loglevel_to_str(lvl) << "] ["
-                << std::put_time(&tm, "%c %z")
-                << "]\t" << str << std::endl;
+      std::string s = format_message_to_string(str, lvl);
+      std::clog << s;
     }
 
     void FunctionalLogHandler::print(const std::string &str, Loglevel lvl) {
-      std::time_t t = std::time(nullptr);
-      std::tm tm = *std::localtime(&t);
-
-      std::stringstream s;
-      s << "[" << loglevel_to_str(lvl) << "] ["
-                << std::put_time(&tm, "%c %z")
-                << "]\t" << str << std::endl;
-
-      log_function(s.str());
+      std::string s = format_message_to_string(str, lvl);
+      log_function(s);
     }
 
-    FunctionalLogHandler::FunctionalLogHandler(std::function<void(std::string)> _log_function) {
+    std::string LogHandler::format_message_to_string(const std::string &str, const Loglevel &lvl) {
+      time_t t = time(nullptr);
+      tm tm = *localtime(&t);
+
+      std::stringstream s;
+      s
+          << "[" << std::put_time(&tm, "%c") << "]"
+          << "[" << loglevel_to_str(lvl) << "]\t"
+          << str << std::endl;
+      return s.str();
+    }
+
+    FunctionalLogHandler::FunctionalLogHandler(log_function_type _log_function) {
       log_function = _log_function;
     }
   }

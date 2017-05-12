@@ -179,6 +179,8 @@ char * strndup(const char* str, size_t maxlen);
     public:
       bool set_current_device_speed(int retry_delay, int send_receive_delay);
       void set_loglevel(Loglevel loglevel);
+
+      void set_loglevel(int loglevel);
     };
 }
 

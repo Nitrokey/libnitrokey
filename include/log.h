@@ -16,7 +16,11 @@ namespace nitrokey {
 
 
     enum class Loglevel : int {
-      DEBUG_L2, DEBUG, INFO, WARNING, ERROR
+      ERROR,
+      WARNING,
+      INFO,
+      DEBUG,
+      DEBUG_L2
     };
 
     class LogHandler {
@@ -24,6 +28,8 @@ namespace nitrokey {
       virtual void print(const std::string &, Loglevel lvl) = 0;
     protected:
       std::string loglevel_to_str(Loglevel);
+      std::string format_message_to_string(const std::string &str, const Loglevel &lvl);
+
     };
 
     class StdlogHandler : public LogHandler {
@@ -32,9 +38,10 @@ namespace nitrokey {
     };
 
     class FunctionalLogHandler : public LogHandler {
-      std::function<void(std::string)> log_function;
+      using log_function_type = std::function<void(std::string)>;
+      log_function_type log_function;
     public:
-      FunctionalLogHandler(std::function<void(std::string)> _log_function);
+      FunctionalLogHandler(log_function_type _log_function);
       virtual void print(const std::string &, Loglevel lvl);
 
     };

@@ -187,6 +187,12 @@ char * strndup(const char* str, size_t maxlen){
     return false;
   }
 
+    void NitrokeyManager::set_loglevel(int loglevel) {
+      loglevel = max(loglevel, static_cast<int>(Loglevel::ERROR));
+      loglevel = min(loglevel, static_cast<int>(Loglevel::DEBUG_L2));
+      Log::instance().set_loglevel(static_cast<Loglevel>(loglevel));
+    }
+
     void NitrokeyManager::set_loglevel(Loglevel loglevel) {
       Log::instance().set_loglevel(loglevel);
     }

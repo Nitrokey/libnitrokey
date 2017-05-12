@@ -90,8 +90,12 @@ namespace nitrokey {
                       ss << "temporary_admin_password:\t" << temporary_admin_password << std::endl;
                       ss << "type:\t" << type << std::endl;
                       ss << "id:\t" << (int)id << std::endl;
+#ifdef LOG_VOLATILE_DATA
                       ss << "data:" << std::endl
                          << ::nitrokey::misc::hexdump((const char *) (&data), sizeof data);
+#else
+                      ss << " Volatile data not logged" << std::endl;
+#endif
                       return ss.str();
                     }
                 } __packed;
@@ -105,8 +109,12 @@ namespace nitrokey {
                     bool isValid() const { return true; }
                     std::string dissect() const {
                       std::stringstream ss;
+#ifdef LOG_VOLATILE_DATA
                       ss << "data:" << std::endl
                          << ::nitrokey::misc::hexdump((const char *) (&data), sizeof data);
+#else
+                      ss << " Volatile data not logged" << std::endl;
+#endif
                       return ss.str();
                     }
                 } __packed;

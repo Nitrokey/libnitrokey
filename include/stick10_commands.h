@@ -119,8 +119,7 @@ class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
         std::stringstream ss;
         ss << "slot_number:\t" << (int)(slot_number) << std::endl;
         ss << "slot_name:\t" << slot_name << std::endl;
-        ss << "slot_secret:" << std::endl
-           << ::nitrokey::misc::hexdump((const char *)(&slot_secret), sizeof slot_secret);
+        print_to_ss_volatile(slot_secret);
         ss << "slot_config:\t" << std::bitset<8>((int)_slot_config) << std::endl;
         ss << "\tuse_8_digits(0):\t" << use_8_digits << std::endl;
         ss << "\tuse_enter(1):\t" << use_enter << std::endl;
@@ -171,7 +170,7 @@ class WriteToTOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
           std::stringstream ss;
           ss << "slot_number:\t" << (int)(slot_number) << std::endl;
           ss << "slot_name:\t" << slot_name << std::endl;
-          ss << "slot_secret:\t" << slot_secret << std::endl;
+          print_to_ss_volatile(slot_secret);
           ss << "slot_config:\t" << std::bitset<8>((int)_slot_config) << std::endl;
           ss << "slot_token_id:\t";
           for (auto i : slot_token_id)
@@ -505,7 +504,7 @@ class GetPasswordSafeSlotPassword
     bool isValid() const { return true; }
     std::string dissect() const {
       std::stringstream ss;
-      ss << " slot_password\t" << (const char*) slot_password << std::endl;
+      print_to_ss_volatile(slot_password);
       return ss.str();
     }
   } __packed;
@@ -534,7 +533,7 @@ class GetPasswordSafeSlotLogin
     bool isValid() const { return true; }
     std::string dissect() const {
       std::stringstream ss;
-      ss << " slot_login\t" << (const char*) slot_login << std::endl;
+      print_to_ss_volatile(slot_login);
       return ss.str();
     }
   } __packed;
@@ -555,7 +554,7 @@ class SetPasswordSafeSlotData : Command<CommandID::SET_PW_SAFE_SLOT_DATA_1> {
           std::stringstream ss;
           ss << " slot_number\t" << (int)slot_number << std::endl;
           ss << " slot_name\t" << (const char*) slot_name << std::endl;
-          ss << " slot_password\t" << (const char*) slot_password << std::endl;
+          print_to_ss_volatile(slot_password);
           return ss.str();
       }
   } __packed;
@@ -572,10 +571,10 @@ class SetPasswordSafeSlotData2 : Command<CommandID::SET_PW_SAFE_SLOT_DATA_2> {
 
     bool isValid() const { return !(slot_number & 0xF0); }
       std::string dissect() const {
-          std::stringstream ss;
-          ss << " slot_number\t" << (int)slot_number << std::endl;
-          ss << " slot_login_name\t" << (const char*) slot_login_name << std::endl;
-          return ss.str();
+        std::stringstream ss;
+        ss << " slot_number\t" << (int)slot_number << std::endl;
+        print_to_ss_volatile(slot_login_name);
+        return ss.str();
       }
   } __packed;
 
@@ -609,7 +608,7 @@ class EnablePasswordSafe : Command<CommandID::PW_SAFE_ENABLE> {
     bool isValid() const { return true; }
     std::string dissect() const {
       std::stringstream ss;
-      ss << " user_password\t" << (const char*)  user_password << std::endl;
+      print_to_ss_volatile(user_password);
       return ss.str();
     }
   } __packed;
@@ -683,7 +682,7 @@ class FirstAuthenticate : Command<CommandID::FIRST_AUTHENTICATE> {
 
     std::string dissect() const {
       std::stringstream ss;
-      ss << "card_password:\t" << card_password << std::endl;
+      print_to_ss_volatile(card_password);
       ss << "temporary_password:\t" << temporary_password << std::endl;
       return ss.str();
     }
@@ -701,10 +700,10 @@ class UserAuthenticate : Command<CommandID::USER_AUTHENTICATE> {
 
     bool isValid() const { return true; }
       std::string dissect() const {
-          std::stringstream ss;
-          ss << "card_password:\t" << card_password << std::endl;
-          ss << "temporary_password:\t" << temporary_password << std::endl;
-          return ss.str();
+        std::stringstream ss;
+        print_to_ss_volatile(card_password);
+        ss << "temporary_password:\t" << temporary_password << std::endl;
+        return ss.str();
       }
   } __packed;
 
@@ -753,9 +752,10 @@ class UnlockUserPassword : Command<CommandID::UNLOCK_USER_PASSWORD> {
     uint8_t admin_password[25];
     uint8_t user_new_password[25];
       std::string dissect() const {
-          std::stringstream ss;
-          ss << " admin_password:\t" <<  admin_password<< std::endl;
-          return ss.str();
+        std::stringstream ss;
+        print_to_ss_volatile(admin_password);
+        print_to_ss_volatile(user_new_password);
+        return ss.str();
       }
   } __packed;
 
@@ -769,10 +769,10 @@ class ChangeUserPin : Command<CommandID::CHANGE_USER_PIN> {
     uint8_t old_pin[25];
     uint8_t new_pin[25];
       std::string dissect() const {
-          std::stringstream ss;
-          ss << " old_pin:\t" <<  old_pin<< std::endl;
-          ss << " new_pin:\t" << new_pin<< std::endl;
-          return ss.str();
+        std::stringstream ss;
+        print_to_ss_volatile(old_pin);
+        print_to_ss_volatile(new_pin);
+        return ss.str();
       }
   } __packed;
 
@@ -785,9 +785,9 @@ class IsAESSupported : Command<CommandID::DETECT_SC_AES> {
   struct CommandPayload {
     uint8_t user_password[20];
       std::string dissect() const {
-          std::stringstream ss;
-          ss << " user_password:\t" <<  user_password<< std::endl;
-          return ss.str();
+        std::stringstream ss;
+        print_to_ss_volatile(user_password);
+        return ss.str();
       }
   } __packed;
 
@@ -795,16 +795,17 @@ class IsAESSupported : Command<CommandID::DETECT_SC_AES> {
       CommandTransaction;
 };
 
+
 class ChangeAdminPin : Command<CommandID::CHANGE_ADMIN_PIN> {
  public:
   struct CommandPayload {
     uint8_t old_pin[25];
     uint8_t new_pin[25];
       std::string dissect() const {
-          std::stringstream ss;
-          ss << " old_pin:\t" <<  old_pin<< std::endl;
-          ss << " new_pin:\t" << new_pin<< std::endl;
-          return ss.str();
+        std::stringstream ss;
+        print_to_ss_volatile(old_pin);
+        print_to_ss_volatile(new_pin);
+        return ss.str();
       }
   } __packed;
 
@@ -823,9 +824,9 @@ class FactoryReset : Command<CommandID::FACTORY_RESET> {
   struct CommandPayload {
     uint8_t admin_password[20];
       std::string dissect() const {
-          std::stringstream ss;
-          ss << " admin_password:\t" <<  admin_password<< std::endl;
-          return ss.str();
+        std::stringstream ss;
+        print_to_ss_volatile(admin_password);
+        return ss.str();
       }
   } __packed;
 
@@ -838,9 +839,9 @@ class BuildAESKey : Command<CommandID::NEW_AES_KEY> {
   struct CommandPayload {
     uint8_t admin_password[20];
       std::string dissect() const {
-          std::stringstream ss;
-          ss << " admin_password:\t" <<  admin_password<< std::endl;
-          return ss.str();
+        std::stringstream ss;
+        print_to_ss_volatile(admin_password);
+        return ss.str();
       }
   } __packed;
 

@@ -20,8 +20,10 @@ class QueryDissector : semantics::non_constructible {
   static std::string dissect(const HIDPacket &pod) {
     std::stringstream out;
 
+#ifdef LOG_VOLATILE_DATA
     out << "Raw HID packet:" << std::endl;
     out << ::nitrokey::misc::hexdump((const char *)(&pod), sizeof pod);
+#endif
 
     out << "Contents:" << std::endl;
     out << "Command ID:\t" << commandid_to_string((CommandID)(pod.command_id))
@@ -83,8 +85,10 @@ class ResponseDissector : semantics::non_constructible {
     // FIXME use values from firmware (possibly generate separate
     // header automatically)
 
+#ifdef LOG_VOLATILE_DATA
     out << "Raw HID packet:" << std::endl;
     out << ::nitrokey::misc::hexdump((const char *)(&pod), sizeof pod);
+#endif
 
     out << "Device status:\t" << pod.device_status + 0 << " "
         << status_translate_device(pod.device_status) << std::endl;

@@ -3,7 +3,7 @@
 
 
 
-#include <stdint.h>
+#include <cstdint>
 #include "command.h"
 #include <string>
 #include <sstream>
@@ -18,7 +18,7 @@ namespace nitrokey {
 *	STICK20 protocol command ids
 *	a superset (almost) of STICK10
 */
-#define print_to_ss(x) ( ss << " " << (#x) <<":\t" << (x) << std::endl );
+
         namespace stick20 {
 
             class ChangeAdminUserPin20Current :
@@ -46,8 +46,8 @@ namespace nitrokey {
                     uint8_t new_update_password[20];
                     std::string dissect() const {
                       std::stringstream ss;
-                      print_to_ss( current_update_password );
-                      print_to_ss( new_update_password );
+                      print_to_ss_volatile( current_update_password );
+                      print_to_ss_volatile( new_update_password );
                       return ss.str();
                     }
                 };
@@ -78,7 +78,7 @@ namespace nitrokey {
                       std::stringstream ss;
                       print_to_ss( (int) volume_flag );
                       print_to_ss( kind );
-                      print_to_ss(admin_pin);
+                      print_to_ss_volatile(admin_pin);
                       return ss.str();
                     }
                     void set_kind_user() {
@@ -274,7 +274,7 @@ namespace nitrokey {
                       print_to_ss((int) SlotNr_u8);
                       print_to_ss((int) StartBlockPercent_u8);
                       print_to_ss((int) EndBlockPercent_u8);
-                      print_to_ss(HiddenVolumePassword_au8);
+                      print_to_ss_volatile(HiddenVolumePassword_au8);
                       return ss.str();
                     }
                 } __packed;

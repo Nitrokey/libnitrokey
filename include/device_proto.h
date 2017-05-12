@@ -236,6 +236,7 @@ namespace nitrokey {
               outp.payload = payload;
               outp.update_CRC();
 
+              LOG("-------------------", Loglevel::DEBUG);
               LOG("Outgoing HID packet:", Loglevel::DEBUG);
               LOG(static_cast<std::string>(outp), Loglevel::DEBUG);
 
@@ -334,7 +335,7 @@ namespace nitrokey {
 
                   LOG(
                       "Device is not ready or received packet's last CRC is not equal to sent CRC packet, retrying...",
-                      Loglevel::DEBUG);
+                      Loglevel::DEBUG_L2);
                   LOG("Invalid incoming HID packet:", Loglevel::DEBUG_L2);
                   LOG(static_cast<std::string>(resp), Loglevel::DEBUG_L2);
                   dev->m_counters.total_retries++;

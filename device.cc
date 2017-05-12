@@ -72,7 +72,7 @@ bool Device::_connect() {
 
 //   hid_init(); // done automatically on hid_open
   mp_devhandle = hid_open(m_vid, m_pid, nullptr);
-  const auto success = mp_devhandle != nullptr;
+  const bool success = mp_devhandle != nullptr;
   LOG(std::string("Connection success: ") + std::to_string(success), Loglevel::DEBUG_L2);
   return success;
 }

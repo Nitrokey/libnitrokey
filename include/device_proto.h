@@ -362,7 +362,7 @@ namespace nitrokey {
               LOG("Incoming HID packet:", Loglevel::DEBUG);
               LOG(static_cast<std::string>(resp), Loglevel::DEBUG);
               LOG(std::string("receiving_retry_counter count: ") + std::to_string(receiving_retry_counter),
-                              Loglevel::DEBUG);
+                              Loglevel::DEBUG_L2);
 
               if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy) &&
                   static_cast<stick20::device_status>(resp.storage_status.device_status)

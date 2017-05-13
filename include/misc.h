@@ -21,6 +21,13 @@ namespace misc {
       return oss.str();
     }
 
+  /**
+   * Copies string from pointer to fixed size C-style array. Src needs to be a valid C-string - eg. ended with '\0'.
+   * Throws when source is bigger than destination.
+   * @tparam T type of destination array
+   * @param dest fixed size destination array
+   * @param src pointer to source c-style valid string
+   */
     template <typename T>
     void strcpyT(T& dest, const char* src){
 
@@ -31,7 +38,7 @@ namespace misc {
         LOG(std::string("strcpyT sizes dest src ")
                                        +std::to_string(s_dest)+ " "
                                        +std::to_string(strlen(src))+ " "
-            ,nitrokey::log::Loglevel::DEBUG);
+            ,nitrokey::log::Loglevel::DEBUG_L2);
         if (strlen(src) > s_dest){
             throw TooLongStringException(strlen(src), s_dest, src);
         }

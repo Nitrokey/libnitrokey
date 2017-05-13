@@ -39,9 +39,9 @@ class GetSlotName : public Command<CommandID::READ_SLOT_NAME> {
 
     bool isValid() const { return true; }
       std::string dissect() const {
-          std::stringstream ss;
-          ss << "slot_name:\t" << slot_name << std::endl;
-          return ss.str();
+        std::stringstream ss;
+        print_to_ss_volatile(slot_name);
+        return ss.str();
       }
   } __packed;
 
@@ -118,7 +118,7 @@ class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
     std::string dissect() const {
         std::stringstream ss;
         ss << "slot_number:\t" << (int)(slot_number) << std::endl;
-        ss << "slot_name:\t" << slot_name << std::endl;
+        print_to_ss_volatile(slot_name);
         print_to_ss_volatile(slot_secret);
         ss << "slot_config:\t" << std::bitset<8>((int)_slot_config) << std::endl;
         ss << "\tuse_8_digits(0):\t" << use_8_digits << std::endl;
@@ -169,7 +169,7 @@ class WriteToTOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
       std::string dissect() const {
           std::stringstream ss;
           ss << "slot_number:\t" << (int)(slot_number) << std::endl;
-          ss << "slot_name:\t" << slot_name << std::endl;
+          print_to_ss_volatile(slot_name);
           print_to_ss_volatile(slot_secret);
           ss << "slot_config:\t" << std::bitset<8>((int)_slot_config) << std::endl;
           ss << "slot_token_id:\t";
@@ -323,7 +323,7 @@ class ReadSlot : Command<CommandID::READ_SLOT> {
 
     std::string dissect() const {
       std::stringstream ss;
-      ss << "slot_name:\t" << slot_name << std::endl;
+      print_to_ss_volatile(slot_name);
       ss << "slot_config:\t" << std::bitset<8>((int)_slot_config) << std::endl;
       ss << "\tuse_8_digits(0):\t" << use_8_digits << std::endl;
       ss << "\tuse_enter(1):\t" << use_enter << std::endl;
@@ -475,7 +475,7 @@ class GetPasswordSafeSlotName : Command<CommandID::GET_PW_SAFE_SLOT_NAME> {
     bool isValid() const { return true; }
     std::string dissect() const {
       std::stringstream ss;
-      ss << " slot_name\t" << (const char*) slot_name << std::endl;
+      print_to_ss_volatile(slot_name);
       return ss.str();
     }
   } __packed;
@@ -553,7 +553,7 @@ class SetPasswordSafeSlotData : Command<CommandID::SET_PW_SAFE_SLOT_DATA_1> {
       std::string dissect() const {
           std::stringstream ss;
           ss << " slot_number\t" << (int)slot_number << std::endl;
-          ss << " slot_name\t" << (const char*) slot_name << std::endl;
+          print_to_ss_volatile(slot_name);
           print_to_ss_volatile(slot_password);
           return ss.str();
       }

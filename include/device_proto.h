@@ -352,6 +352,13 @@ namespace nitrokey {
 
               clear_packet(outp);
 
+              if (!resp.isCRCcorrect())
+                LOGD(std::string("Accepting response from device with invalid CRC. ")
+                     + "Command ID: " + std::to_string(resp.command_id) + " " +
+                         commandid_to_string(static_cast<CommandID>(resp.command_id))
+                );
+
+
               if (status <= 0) {
                 dev->m_counters.receiving_error++;
                 throw DeviceReceivingFailure( //FIXME replace with CriticalErrorException

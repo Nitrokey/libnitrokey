@@ -683,7 +683,7 @@ class FirstAuthenticate : Command<CommandID::FIRST_AUTHENTICATE> {
     std::string dissect() const {
       std::stringstream ss;
       print_to_ss_volatile(card_password);
-      ss << "temporary_password:\t" << temporary_password << std::endl;
+      hexdump_to_ss(temporary_password);
       return ss.str();
     }
   } __packed;
@@ -702,7 +702,7 @@ class UserAuthenticate : Command<CommandID::USER_AUTHENTICATE> {
       std::string dissect() const {
         std::stringstream ss;
         print_to_ss_volatile(card_password);
-        ss << "temporary_password:\t" << temporary_password << std::endl;
+        hexdump_to_ss(temporary_password);
         return ss.str();
       }
   } __packed;
@@ -720,7 +720,7 @@ class Authorize : Command<CommandID::AUTHORIZE> {
       std::string dissect() const {
       std::stringstream ss;
       ss << " crc_to_authorize:\t" << std::hex << std::setw(2) << std::setfill('0') << crc_to_authorize<< std::endl;
-      ss << " temporary_password:\t" << temporary_password<< std::endl;
+      hexdump_to_ss(temporary_password);
       return ss.str();
     }
   } __packed;
@@ -737,7 +737,7 @@ class UserAuthorize : Command<CommandID::USER_AUTHORIZE> {
     std::string dissect() const {
       std::stringstream ss;
       ss << " crc_to_authorize:\t" <<  crc_to_authorize<< std::endl;
-      ss << " temporary_password:\t" << temporary_password<< std::endl;
+      hexdump_to_ss(temporary_password);
       return ss.str();
     }
   } __packed;

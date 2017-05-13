@@ -6,10 +6,12 @@
 
 #define print_to_ss(x) ( ss << " " << (#x) <<":\t" << (x) << std::endl );
 #ifdef LOG_VOLATILE_DATA
-#define print_to_ss_volatile(x) ( ss << " " << (#x) <<":\t" << (x) << std::endl );
+#define print_to_ss_volatile(x) print_to_ss(x);
 #else
 #define print_to_ss_volatile(x) ( ss << " " << (#x) <<":\t" << "***********" << std::endl );
 #endif
+#define hexdump_to_ss(x) (ss << #x":\n"\
+                          << ::nitrokey::misc::hexdump((const char *) (&x), sizeof x, false));
 
 namespace nitrokey {
     namespace proto {

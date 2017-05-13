@@ -9,12 +9,13 @@
 #include <iomanip>
 #include <string>
 #include <sstream>
-#include <stdint.h>
+#include <cstdint>
 #include "command.h"
 #include "device_proto.h"
 #include "stick10_commands.h"
 
 #pragma pack (push,1)
+
 
 namespace nitrokey {
     namespace proto {
@@ -59,6 +60,7 @@ namespace nitrokey {
                     std::string dissect() const {
                       std::stringstream ss;
                       ss << "slot_number:\t" << (int)(slot_number) << std::endl;
+                      hexdump_to_ss(temporary_admin_password);
                       return ss.str();
                     }
                 } __packed;
@@ -87,11 +89,15 @@ namespace nitrokey {
 
                     std::string dissect() const {
                       std::stringstream ss;
-                      ss << "temporary_admin_password:\t" << temporary_admin_password << std::endl;
+                      hexdump_to_ss(temporary_admin_password);
                       ss << "type:\t" << type << std::endl;
                       ss << "id:\t" << (int)id << std::endl;
+#ifdef LOG_VOLATILE_DATA
                       ss << "data:" << std::endl
                          << ::nitrokey::misc::hexdump((const char *) (&data), sizeof data);
+#else
+                      ss << " Volatile data not logged" << std::endl;
+#endif
                       return ss.str();
                     }
                 } __packed;
@@ -105,8 +111,12 @@ namespace nitrokey {
                     bool isValid() const { return true; }
                     std::string dissect() const {
                       std::stringstream ss;
+#ifdef LOG_VOLATILE_DATA
                       ss << "data:" << std::endl
                          << ::nitrokey::misc::hexdump((const char *) (&data), sizeof data);
+#else
+                      ss << " Volatile data not logged" << std::endl;
+#endif
                       return ss.str();
                     }
                 } __packed;
@@ -148,7 +158,7 @@ namespace nitrokey {
 
                     std::string dissect() const {
                       std::stringstream ss;
-                      ss << "temporary_admin_password:\t" << temporary_admin_password << std::endl;
+                      hexdump_to_ss(temporary_admin_password);
                       ss << "slot_config:\t" << std::bitset<8>((int) _slot_config) << std::endl;
                       ss << "\tuse_8_digits(0):\t" << use_8_digits << std::endl;
                       ss << "\tuse_enter(1):\t" << use_enter << std::endl;
@@ -184,7 +194,7 @@ namespace nitrokey {
                     bool isValid() const { return (slot_number & 0xF0); }
                     std::string dissect() const {
                       std::stringstream ss;
-                      ss << "temporary_user_password:\t" << temporary_user_password << std::endl;
+                      hexdump_to_ss(temporary_user_password);
                       ss << "slot_number:\t" << (int)(slot_number) << std::endl;
                       return ss.str();
                     }
@@ -236,7 +246,7 @@ namespace nitrokey {
                     bool isValid() const { return !(slot_number & 0xF0); }
                     std::string dissect() const {
                       std::stringstream ss;
-                      ss << "temporary_user_password:\t" << temporary_user_password << std::endl;
+                      hexdump_to_ss(temporary_user_password);
                       ss << "slot_number:\t" << (int)(slot_number) << std::endl;
                       ss << "challenge:\t" << (challenge) << std::endl;
                       ss << "last_totp_time:\t" << (last_totp_time) << std::endl;

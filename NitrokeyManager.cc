@@ -26,30 +26,7 @@ char * strndup(const char* str, size_t maxlen){
 #endif
 
 
-
-  /**
-   * Copies string from pointer to fixed size C-style array. Src needs to be a valid C-string - eg. ended with '\0'.
-   * Throws when source is bigger than destination.
-   * @tparam T type of destination array
-   * @param dest fixed size destination array
-   * @param src pointer to source c-style valid string
-   */
-    template <typename T>
-    void strcpyT(T& dest, const char* src){
-
-      if (src == nullptr)
-//            throw EmptySourceStringException(slot_number);
-            return;
-        const size_t s_dest = sizeof dest;
-      LOG(std::string("strcpyT sizes dest src ")
-                                     +std::to_string(s_dest)+ " "
-                                     +std::to_string(strlen(src))+ " "
-          ,nitrokey::log::Loglevel::DEBUG_L2);
-        if (strlen(src) > s_dest){
-            throw TooLongStringException(strlen(src), s_dest, src);
-        }
-        strncpy((char*) &dest, src, s_dest);
-    }
+using nitrokey::misc::strcpyT;
 
     template <typename T>
     typename T::CommandPayload get_payload(){

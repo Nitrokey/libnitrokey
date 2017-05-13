@@ -236,6 +236,7 @@ namespace nitrokey {
               outp.payload = payload;
               outp.update_CRC();
 
+              LOG("-------------------", Loglevel::DEBUG);
               LOG("Outgoing HID packet:", Loglevel::DEBUG);
               LOG(static_cast<std::string>(outp), Loglevel::DEBUG);
 
@@ -334,7 +335,7 @@ namespace nitrokey {
 
                   LOG(
                       "Device is not ready or received packet's last CRC is not equal to sent CRC packet, retrying...",
-                      Loglevel::DEBUG);
+                      Loglevel::DEBUG_L2);
                   LOG("Invalid incoming HID packet:", Loglevel::DEBUG_L2);
                   LOG(static_cast<std::string>(resp), Loglevel::DEBUG_L2);
                   dev->m_counters.total_retries++;
@@ -351,6 +352,13 @@ namespace nitrokey {
 
               clear_packet(outp);
 
+              if (!resp.isCRCcorrect())
+                LOGD(std::string("Accepting response from device with invalid CRC. ")
+                     + "Command ID: " + std::to_string(resp.command_id) + " " +
+                         commandid_to_string(static_cast<CommandID>(resp.command_id))
+                );
+
+
               if (status <= 0) {
                 dev->m_counters.receiving_error++;
                 throw DeviceReceivingFailure( //FIXME replace with CriticalErrorException
@@ -361,7 +369,7 @@ namespace nitrokey {
               LOG("Incoming HID packet:", Loglevel::DEBUG);
               LOG(static_cast<std::string>(resp), Loglevel::DEBUG);
               LOG(std::string("receiving_retry_counter count: ") + std::to_string(receiving_retry_counter),
-                              Loglevel::DEBUG);
+                              Loglevel::DEBUG_L2);
 
               if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy) &&
                   static_cast<stick20::device_status>(resp.storage_status.device_status)

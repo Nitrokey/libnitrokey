@@ -4,6 +4,15 @@
 #include "command_id.h"
 #include "cxx_semantics.h"
 
+#define print_to_ss(x) ( ss << " " << (#x) <<":\t" << (x) << std::endl );
+#ifdef LOG_VOLATILE_DATA
+#define print_to_ss_volatile(x) print_to_ss(x);
+#else
+#define print_to_ss_volatile(x) ( ss << " " << (#x) <<":\t" << "***********" << std::endl );
+#endif
+#define hexdump_to_ss(x) (ss << #x":\n"\
+                          << ::nitrokey::misc::hexdump((const char *) (&x), sizeof x, false));
+
 namespace nitrokey {
     namespace proto {
 
@@ -18,7 +27,6 @@ namespace nitrokey {
             }
         };
 
-#define print_to_ss(x) ( ss << " " << (#x) <<":\t" << (x) << std::endl );
 namespace stick20{
         enum class PasswordKind : uint8_t {
             User = 'P',
@@ -37,7 +45,7 @@ namespace stick20{
                 std::string dissect() const {
                   std::stringstream ss;
                   print_to_ss( kind );
-                  print_to_ss(password);
+                  print_to_ss_volatile(password);
                   return ss.str();
                 }
                 void set_kind_admin() {
@@ -79,6 +87,5 @@ namespace stick20{
     }
     }
 }
-#undef print_to_ss
 
 #endif

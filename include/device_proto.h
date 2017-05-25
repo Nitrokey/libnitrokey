@@ -352,12 +352,6 @@ namespace nitrokey {
 
               clear_packet(outp);
 
-              if (!resp.isCRCcorrect())
-                LOGD(std::string("Accepting response from device with invalid CRC. ")
-                     + "Command ID: " + std::to_string(resp.command_id) + " " +
-                         commandid_to_string(static_cast<CommandID>(resp.command_id))
-                );
-
 
               if (status <= 0) {
                 dev->m_counters.receiving_error++;
@@ -397,6 +391,14 @@ namespace nitrokey {
                   resp.command_id < stick20::CMD_END_VALUE ) {
                 dev->m_counters.successful_storage_commands++;
               }
+
+              if (!resp.isCRCcorrect())
+                LOG(std::string("Accepting response from device with invalid CRC. ")
+                     + "Command ID: " + std::to_string(resp.command_id) + " " +
+                         commandid_to_string(static_cast<CommandID>(resp.command_id)) + "  "
+			+ "Reported and calculated: " + std::to_string(resp.crc) + "!=" + std::to_string(resp.calculate_CRC()),
+			Loglevel::WARNING
+                );
 
               // See: DeviceResponse
               return resp;

@@ -114,19 +114,22 @@ IF (COMPILE_TESTS)
     add_library(catch SHARED unittest/catch_main.cpp )
 
     add_executable (test_C_API unittest/test_C_API.cpp)
-    target_link_libraries (test_C_API ${EXTRA_LIBS} ${LIBNAME} catch)
+    target_link_libraries (test_C_API ${EXTRA_LIBS} ${LIBNAME}-log catch)
 
     add_executable (test2 unittest/test2.cc)
-    target_link_libraries (test2 ${EXTRA_LIBS} ${LIBNAME} catch)
+    target_link_libraries (test2 ${EXTRA_LIBS} ${LIBNAME}-log catch)
 
     add_executable (test3 unittest/test3.cc)
-    target_link_libraries (test3 ${EXTRA_LIBS} ${LIBNAME} catch)
+    target_link_libraries (test3 ${EXTRA_LIBS} ${LIBNAME}-log catch)
 
     add_executable (test_HOTP unittest/test_HOTP.cc)
-    target_link_libraries (test_HOTP ${EXTRA_LIBS} ${LIBNAME} catch)
+    target_link_libraries (test_HOTP ${EXTRA_LIBS} ${LIBNAME}-log catch)
 
     add_executable (test1 unittest/test.cc)
-    target_link_libraries (test1 ${EXTRA_LIBS} ${LIBNAME} catch)
+    target_link_libraries (test1 ${EXTRA_LIBS} ${LIBNAME}-log catch)
+
+    add_executable (test_issues unittest/test_issues.cc)
+    target_link_libraries (test_issues ${EXTRA_LIBS} ${LIBNAME}-log catch)
 
     #run with 'make test' or 'ctest'
     #needs connected PRO device for success

@@ -14,6 +14,7 @@ namespace nitrokey{
 
     std::mutex mex_dev_com_manager;
 
+#ifndef strndup
 #ifdef _WIN32
 #pragma message "Using own strndup"
 char * strndup(const char* str, size_t maxlen){
@@ -24,7 +25,7 @@ char * strndup(const char* str, size_t maxlen){
   return dup;
 }
 #endif
-
+#endif
 
 using nitrokey::misc::strcpyT;
 

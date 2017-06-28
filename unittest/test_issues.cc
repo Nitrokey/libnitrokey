@@ -15,7 +15,7 @@ using namespace nitrokey;
 
 bool test_36(){
   auto i = NitrokeyManager::instance();
-  i->set_debug(true);
+  i->set_loglevel(3);
   REQUIRE(i->connect());
 
   for (int j = 0; j < 200; ++j) {
@@ -28,7 +28,7 @@ bool test_36(){
 
 bool test_31(){
   auto i = NitrokeyManager::instance();
-  i->set_debug(true);
+  i->set_loglevel(3);
   REQUIRE(i->connect());
 
 //  i->unlock_encrypted_volume(default_user_pin);

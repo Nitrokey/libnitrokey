@@ -39,20 +39,20 @@ namespace misc {
 };
 
 #include <cctype>
-::std::string hexdump(const char *p, size_t size, bool print_header,
+::std::string hexdump(const uint8_t *p, size_t size, bool print_header,
         bool print_ascii, bool print_empty) {
   ::std::stringstream out;
   char formatbuf[128];
-  const char *pstart = p;
+  const uint8_t *pstart = p;
 
-  for (const char *pend = p + size; p < pend;) {
+  for (const uint8_t *pend = p + size; p < pend;) {
       if (print_header){
           snprintf(formatbuf, 128, "%04x\t", static_cast<int> (p - pstart));
           out << formatbuf;
       }
 
-    const char* pp = p;
-    for (const char *le = p + 16; p < le; p++) {
+    const uint8_t* pp = p;
+    for (const uint8_t *le = p + 16; p < le; p++) {
       if (p < pend){
         snprintf(formatbuf, 128, "%02x ", uint8_t(*p));
         out << formatbuf;
@@ -63,8 +63,8 @@ namespace misc {
 
     }
       if(print_ascii){
-        out << "\t";
-        for (const char *le = pp + 16; pp < le && pp < pend; pp++) {
+        out << "  ";
+        for (const uint8_t *le = pp + 16; pp < le && pp < pend; pp++) {
           if (std::isgraph(*pp))
             out << uint8_t(*pp);
           else

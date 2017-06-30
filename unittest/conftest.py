@@ -24,7 +24,7 @@ def C(request):
     for declaration in a:
         if declaration.startswith('NK_C_API'):
             declaration = declaration.replace('NK_C_API', '').strip()
-            while not ';' in declaration:
+            while ';' not in declaration:
                 declaration += (next(a)).strip()
             print(declaration)
             ffi.cdef(declaration, override=True)
@@ -32,11 +32,19 @@ def C(request):
     C = None
     import os, sys
     path_build = os.path.join("..", "build")
-    paths = [ os.path.join(path_build,"libnitrokey-log.so"),
-              os.path.join(path_build,"libnitrokey.so")]
+    paths = [
+            os.path.join(path_build,"libnitrokey-log.so"),
+            os.path.join(path_build,"libnitrokey.so"),
+            os.path.join(path_build,"libnitrokey-log.dll"),
+            os.path.join(path_build,"libnitrokey.dll"),
+            os.path.join(path_build,"nitrokey-log.dll"),
+            os.path.join(path_build,"nitrokey.dll"),
+    ]
     for p in paths:
-        print p
+        print(p)
+        p = os.path.abspath(p)
         if os.path.exists(p):
+            print("Found: "+p)
             C = ffi.dlopen(p)
             break
         else:

@@ -147,6 +147,7 @@ def test_regenerate_aes_key(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.skip
 def test_enable_password_safe_after_factory_reset(C):
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     if is_storage(C):
@@ -548,6 +549,7 @@ def test_read_write_config(C):
     assert config == (255, 255, 255, False, True)
 
 
+@pytest.mark.skip
 def test_factory_reset(C):
     C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK

@@ -22,7 +22,7 @@ def C(request):
 
     a = iter(declarations)
     for declaration in a:
-        if declaration.startswith('NK_C_API'):
+        if declaration.strip().startswith('NK_C_API'):
             declaration = declaration.replace('NK_C_API', '').strip()
             while ';' not in declaration:
                 declaration += (next(a)).strip()

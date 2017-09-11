@@ -312,6 +312,7 @@ namespace nitrokey {
                                       std::to_string(receiving_retry_counter), Loglevel::DEBUG_L2);
                     } else {
                       retry_timeout *= 2;
+                      retry_timeout = std::min(retry_timeout, 500ms);
                       busy_counter = 0;
                       LOG("Status busy, decreasing receiving_retry_counter counter: " +
                                       std::to_string(receiving_retry_counter) + ", current delay:"

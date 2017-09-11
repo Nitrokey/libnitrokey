@@ -93,7 +93,7 @@ int Device::send(const void *packet) {
         mp_devhandle, (const unsigned char *)(packet), HID_REPORT_SIZE);
     if (send_feature_report < 0) _reconnect();
     //add thread sleep?
-    LOG(std::string("Sending attempt: ")+std::to_string(i) + " / 3" , Loglevel::DEBUG_L2);
+    LOG(std::string("Sending attempt: ")+std::to_string(i+1) + " / 3" , Loglevel::DEBUG_L2);
   }
   return send_feature_report;
 }

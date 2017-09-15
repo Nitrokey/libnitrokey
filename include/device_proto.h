@@ -37,6 +37,9 @@
 
 namespace nitrokey {
     namespace proto {
+      extern std::mutex send_receive_mtx;
+
+
 /*
  *	POD types for HID proto commands
  *	Instances are meant to be __packed.
@@ -215,7 +218,6 @@ namespace nitrokey {
               using namespace ::nitrokey::log;
               using namespace std::chrono_literals;
 
-              static std::mutex send_receive_mtx;
               std::lock_guard<std::mutex> guard(send_receive_mtx);
 
               LOG(__FUNCTION__, Loglevel::DEBUG_L2);

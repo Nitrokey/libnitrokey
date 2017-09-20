@@ -1,17 +1,13 @@
 # Created by and for Qt Creator. This file was created for editing the project sources only.
 # You may attempt to use it for building too, by modifying this file here.
 
-#TARGET = libnitrokey
-
-CONFIG   += c++14 staticlib
-#QT       =
+CONFIG   += c++14 shared debug
 
 TEMPLATE     = lib
 TARGET = nitrokey
 
 HEADERS = \
    $$PWD/hidapi/hidapi/hidapi.h \
-#   $$PWD/include/hidapi/hidapi.h \
    $$PWD/include/command.h \
    $$PWD/include/command_id.h \
    $$PWD/include/CommandFailedException.h \
@@ -52,11 +48,13 @@ tests {
 }
 
 unix:!macx{
-    SOURCES += $$PWD/hidapi/linux/hid.c
+#   SOURCES += $$PWD/hidapi/linux/hid.c
+    LIBS += -lhidapi-libusb
 }
 
-unix{
+macx{
     SOURCES += $$PWD/hidapi/mac/hid.c
+    LIBS+= -framework IOKit -framework CoreFoundation
 }
 
 win32 {

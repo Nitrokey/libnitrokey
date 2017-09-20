@@ -5,7 +5,8 @@ from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET
 from misc import ffi, gs, wait, cast_pointer_to_tuple
 from misc import is_pro_rtm_07, is_pro_rtm_08, is_storage
 
-
+@pytest.mark.lock_device
+@pytest.mark.PWS
 def test_enable_password_safe(C):
     """
     All Password Safe tests depend on AES keys being initialized. They will fail otherwise.
@@ -14,7 +15,8 @@ def test_enable_password_safe(C):
     assert C.NK_enable_password_safe('wrong_password') == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
-
+@pytest.mark.lock_device
+@pytest.mark.PWS
 def test_write_password_safe_slot(C):
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_write_password_safe_slot(0, 'slotname1', 'login1', 'pass1') == DeviceErrorCode.STATUS_NOT_AUTHORIZED
@@ -22,6 +24,8 @@ def test_write_password_safe_slot(C):
     assert C.NK_write_password_safe_slot(0, 'slotname1', 'login1', 'pass1') == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.lock_device
+@pytest.mark.PWS
 @pytest.mark.slowtest
 def test_write_all_password_safe_slots_and_read_10_times(C):
     def fill(s, wid):
@@ -57,6 +61,8 @@ def test_write_all_password_safe_slots_and_read_10_times(C):
             assert gs(C.NK_get_password_safe_slot_password(i)) == get_pass(iss)
 
 
+@pytest.mark.lock_device
+@pytest.mark.PWS
 @pytest.mark.slowtest
 @pytest.mark.xfail(reason="This test should be run directly after test_write_all_password_safe_slots_and_read_10_times")
 def test_read_all_password_safe_slots_10_times(C):
@@ -88,6 +94,8 @@ def test_read_all_password_safe_slots_10_times(C):
             assert gs(C.NK_get_password_safe_slot_password(i)) == get_pass(iss)
 
 
+@pytest.mark.lock_device
+@pytest.mark.PWS
 def test_get_password_safe_slot_name(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_password_safe_slot(0, 'slotname1', 'login1', 'pass1') == DeviceErrorCode.STATUS_OK
@@ -100,6 +108,7 @@ def test_get_password_safe_slot_name(C):
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.PWS
 def test_get_password_safe_slot_login_password(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_password_safe_slot(0, 'slotname1', 'login1', 'pass1') == DeviceErrorCode.STATUS_OK
@@ -111,6 +120,7 @@ def test_get_password_safe_slot_login_password(C):
     assert slot_password == 'pass1'
 
 
+@pytest.mark.PWS
 def test_erase_password_safe_slot(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert C.NK_erase_password_safe_slot(0) == DeviceErrorCode.STATUS_OK
@@ -118,6 +128,7 @@ def test_erase_password_safe_slot(C):
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK  # TODO CHECK shouldn't this be DeviceErrorCode.NOT_PROGRAMMED ?
 
 
+@pytest.mark.PWS
 def test_password_safe_slot_status(C):
     C.NK_set_debug(True)
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
@@ -131,6 +142,7 @@ def test_password_safe_slot_status(C):
     assert is_slot_programmed[1] == 1
 
 
+@pytest.mark.aes
 def test_issue_device_locks_on_second_key_generation_in_sequence(C):
     if is_pro_rtm_07(C) or is_pro_rtm_08(C):
         pytest.skip("issue to register: device locks up "
@@ -139,6 +151,7 @@ def test_issue_device_locks_on_second_key_generation_in_sequence(C):
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.aes
 def test_regenerate_aes_key(C):
     C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -146,6 +159,9 @@ def test_regenerate_aes_key(C):
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.lock_device
+@pytest.mark.aes
+@pytest.mark.factory_reset
 def test_enable_password_safe_after_factory_reset(C):
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     if is_storage(C):
@@ -161,7 +177,8 @@ def test_enable_password_safe_after_factory_reset(C):
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
-
+@pytest.mark.lock_device
+@pytest.mark.aes
 @pytest.mark.xfail(reason="NK Pro firmware bug: regenerating AES key command not always results in cleared slot data")
 def test_destroy_password_safe(C):
     """
@@ -196,6 +213,7 @@ def test_destroy_password_safe(C):
     assert is_slot_programmed[0] == 0
 
 
+@pytest.mark.aes
 def test_is_AES_supported(C):
     if is_storage(C):
         pytest.skip("Storage does not implement this command")
@@ -205,6 +223,7 @@ def test_is_AES_supported(C):
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.pin
 def test_admin_PIN_change(C):
     new_password = '123123123'
     assert C.NK_change_admin_PIN('wrong_password', new_password) == DeviceErrorCode.WRONG_PASSWORD
@@ -212,6 +231,7 @@ def test_admin_PIN_change(C):
     assert C.NK_change_admin_PIN(new_password, DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.pin
 def test_user_PIN_change(C):
     new_password = '123123123'
     assert C.NK_change_user_PIN('wrong_password', new_password) == DeviceErrorCode.WRONG_PASSWORD
@@ -219,6 +239,8 @@ def test_user_PIN_change(C):
     assert C.NK_change_user_PIN(new_password, DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.lock_device
+@pytest.mark.pin
 def test_admin_retry_counts(C):
     default_admin_retry_count = 3
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
@@ -229,6 +251,8 @@ def test_admin_retry_counts(C):
     assert C.NK_get_admin_retry_count() == default_admin_retry_count
 
 
+@pytest.mark.lock_device
+@pytest.mark.pin
 def test_user_retry_counts_change_PIN(C):
     assert C.NK_change_user_PIN(DefaultPasswords.USER, DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     wrong_password = 'wrong_password'
@@ -240,6 +264,9 @@ def test_user_retry_counts_change_PIN(C):
     assert C.NK_change_user_PIN(DefaultPasswords.USER, DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert C.NK_get_user_retry_count() == default_user_retry_count
 
+
+@pytest.mark.lock_device
+@pytest.mark.pin
 def test_user_retry_counts_PWSafe(C):
     default_user_retry_count = 3
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
@@ -250,6 +277,7 @@ def test_user_retry_counts_PWSafe(C):
     assert C.NK_get_user_retry_count() == default_user_retry_count
 
 
+@pytest.mark.pin
 def test_unlock_user_password(C):
     C.NK_set_debug(True)
     default_user_retry_count = 3
@@ -269,16 +297,19 @@ def test_unlock_user_password(C):
     assert C.NK_get_admin_retry_count() == default_admin_retry_count
 
 
+@pytest.mark.pin
 def test_admin_auth(C):
     assert C.NK_first_authenticate('wrong_password', DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.pin
 def test_user_auth(C):
     assert C.NK_user_authenticate('wrong_password', DefaultPasswords.USER_TEMP) == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP) == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.otp
 def check_HOTP_RFC_codes(C, func, prep=None, use_8_digits=False):
     """
     # https://tools.ietf.org/html/rfc4226#page-32
@@ -298,6 +329,7 @@ def check_HOTP_RFC_codes(C, func, prep=None, use_8_digits=False):
         assert code == r
 
 
+@pytest.mark.otp
 @pytest.mark.parametrize("use_8_digits", [False, True, ])
 @pytest.mark.parametrize("use_pin_protection", [False, True, ])
 def test_HOTP_RFC_use8digits_usepin(C, use_8_digits, use_pin_protection):
@@ -313,6 +345,7 @@ def test_HOTP_RFC_use8digits_usepin(C, use_8_digits, use_pin_protection):
         check_HOTP_RFC_codes(C, lambda x: gs(C.NK_get_hotp_code(x)), use_8_digits=use_8_digits)
 
 
+@pytest.mark.otp
 def test_HOTP_token(C):
     """
     Check HOTP routine with written token ID to slot.
@@ -331,6 +364,7 @@ def test_HOTP_token(C):
         assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.otp
 def test_HOTP_counters(C):
     """
     # https://tools.ietf.org/html/rfc4226#page-32
@@ -355,6 +389,7 @@ def test_HOTP_counters(C):
 
 
 INT32_MAX = 2 ** 31 - 1
+@pytest.mark.otp
 def test_HOTP_64bit_counter(C):
     if is_storage(C):
         pytest.xfail('bug in NK Storage HOTP firmware - counter is set with a 8 digits string, '
@@ -379,6 +414,7 @@ def test_HOTP_64bit_counter(C):
     assert dev_res == lib_res
 
 
+@pytest.mark.otp
 def test_TOTP_64bit_time(C):
     if is_storage(C):
         pytest.xfail('bug in NK Storage TOTP firmware')
@@ -404,6 +440,7 @@ def test_TOTP_64bit_time(C):
     assert dev_res == lib_res
 
 
+@pytest.mark.otp
 @pytest.mark.xfail(reason="NK Pro: Test fails in 50% of cases due to test vectors set 1 second before interval count change"
                           "Here time is changed on seconds side only and miliseconds part is not being reset apparently"
                           "This results in available time to test of half a second on average, thus 50% failed cases"
@@ -452,6 +489,7 @@ def test_TOTP_RFC_usepin(C, PIN_protection):
     assert data == responses or correct == len(test_data)
 
 
+@pytest.mark.otp
 def test_get_slot_names(C):
     C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -470,6 +508,7 @@ def test_get_slot_names(C):
             assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
 
 
+@pytest.mark.otp
 def test_get_OTP_codes(C):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -484,6 +523,7 @@ def test_get_OTP_codes(C):
             assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
 
 
+@pytest.mark.otp
 def test_get_OTP_code_from_not_programmed_slot(C):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -501,6 +541,7 @@ def test_get_OTP_code_from_not_programmed_slot(C):
     assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
 
 
+@pytest.mark.otp
 def test_get_code_user_authorize(C):
     C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -546,7 +587,8 @@ def test_read_write_config(C):
     config = cast_pointer_to_tuple(config_raw_data, 'uint8_t', 5)
     assert config == (255, 255, 255, False, True)
 
-
+@pytest.mark.lock_device
+@pytest.mark.factory_reset
 def test_factory_reset(C):
     C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -568,12 +610,13 @@ def test_factory_reset(C):
        assert C.NK_clear_new_sd_card_warning(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.status
 def test_get_status(C):
     status = C.NK_status()
     s = gs(status)
     assert len(s) > 0
 
-
+@pytest.mark.status
 def test_get_serial_number(C):
     sn = C.NK_device_serial_number()
     sn = gs(sn)
@@ -581,6 +624,7 @@ def test_get_serial_number(C):
     print(('Serial number of the device: ', sn))
 
 
+@pytest.mark.otp
 @pytest.mark.parametrize("secret", ['000001', '00'*10+'ff', '00'*19+'ff', '000102',
                                     '00'*29+'ff', '00'*39+'ff', '002EF43F51AFA97BA2B46418768123C9E1809A5B' ])
 def test_OTP_secret_started_from_null(C, secret):
@@ -612,6 +656,7 @@ def test_OTP_secret_started_from_null(C, secret):
     assert dev_res == lib_res
 
 
+@pytest.mark.otp
 @pytest.mark.parametrize("counter", [0, 3, 7, 0xffff,
                                      0xffffffff,
                                      0xffffffffffffffff] )
@@ -644,6 +689,7 @@ def test_HOTP_slots_read_write_counter(C, counter):
     assert dev_res == lib_res
 
 
+@pytest.mark.otp
 @pytest.mark.parametrize("period", [30,60] )
 @pytest.mark.parametrize("time", range(21,70,20) )
 def test_TOTP_slots_read_write_at_time_period(C, time, period):
@@ -674,6 +720,7 @@ def test_TOTP_slots_read_write_at_time_period(C, time, period):
     assert dev_res == lib_res
 
 
+@pytest.mark.otp
 @pytest.mark.parametrize("secret", [RFC_SECRET, 2*RFC_SECRET, '12'*10, '12'*30] )
 def test_TOTP_secrets(C, secret):
     '''
@@ -706,6 +753,7 @@ def test_TOTP_secrets(C, secret):
     assert dev_res == lib_res
 
 
+@pytest.mark.otp
 @pytest.mark.parametrize("secret", [RFC_SECRET, 2*RFC_SECRET, '12'*10, '12'*30] )
 def test_HOTP_secrets(C, secret):
     """
@@ -757,6 +805,7 @@ def test_special_double_press(C):
     # requires manual check
 
 
+@pytest.mark.otp
 def test_edit_OTP_slot(C):
     """
     should change slots counter and name without changing its secret (using null secret for second update)
@@ -790,6 +839,7 @@ def test_edit_OTP_slot(C):
     assert gs(C.NK_get_hotp_slot_name(slot_number)) == changed_name
 
 
+@pytest.mark.otp
 @pytest.mark.skip
 @pytest.mark.parametrize("secret", ['31323334353637383930'*2,'31323334353637383930'*4] )
 def test_TOTP_codes_from_nitrokeyapp(secret, C):

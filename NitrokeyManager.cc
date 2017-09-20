@@ -10,6 +10,8 @@
 #include "include/cxx_semantics.h"
 #include <functional>
 
+std::mutex nitrokey::proto::send_receive_mtx;
+
 namespace nitrokey{
 
     std::mutex mex_dev_com_manager;

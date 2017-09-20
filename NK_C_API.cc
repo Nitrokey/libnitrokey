@@ -76,6 +76,12 @@ uint8_t get_without_result(T func){
     catch (LibraryException & libraryException){
         NK_last_command_status = libraryException.exception_id();
     }
+    catch (const InvalidCRCReceived &invalidCRCException){
+	;;;
+    }
+    catch (const DeviceCommunicationException &deviceException){
+        NK_last_command_status = -1;
+    }
     return NK_last_command_status;
 }
 

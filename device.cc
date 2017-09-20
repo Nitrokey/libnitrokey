@@ -27,7 +27,7 @@ Device::Device(const uint16_t vid, const uint16_t pid, const DeviceModel model,
       m_vid(vid),
       m_pid(pid),
       m_model(model),
-      m_retry_sending_count(3),
+      m_retry_sending_count(1),
       m_retry_receiving_count(retry_receiving_count),
       m_retry_timeout(retry_timeout),
       m_send_receive_delay(send_receive_delay),
@@ -93,7 +93,7 @@ int Device::send(const void *packet) {
         mp_devhandle, (const unsigned char *)(packet), HID_REPORT_SIZE);
     if (send_feature_report < 0) _reconnect();
     //add thread sleep?
-    LOG(std::string("Sending attempt: ")+std::to_string(i) + " / 3" , Loglevel::DEBUG_L2);
+    LOG(std::string("Sending attempt: ")+std::to_string(i+1) + " / 3" , Loglevel::DEBUG_L2);
   }
   return send_feature_report;
 }
@@ -200,7 +200,7 @@ Stick10::Stick10():
 
 
 Stick20::Stick20():
-  Device(0x20a0, 0x4109, DeviceModel::STORAGE, 20ms, 20, 20ms)
+  Device(0x20a0, 0x4109, DeviceModel::STORAGE, 20ms, 10, 20ms)
   {
     setDefaultDelay();
   }

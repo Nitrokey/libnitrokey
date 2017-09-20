@@ -727,6 +727,8 @@ def test_HOTP_secrets(C, secret):
                              DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     dev_res = []
     lib_res = []
+    # repeat authentication for Pro 0.7
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_hotp_slot(slot_number, 'secret' + str(len(secret)), secret, counter, use_8_digits, False, False, "",
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     code_device = gs(C.NK_get_hotp_code(slot_number))

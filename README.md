@@ -29,7 +29,19 @@ Following libraries are needed to use libnitrokey on Linux (names of the package
 
 
 ## Compilation
-libnitrokey uses CMake as its build system. To compile please run following sequence of commands:
+libnitrokey uses CMake as its main build system. As a secondary option it offers building through Qt's qMake.
+### Qt
+A .pro project file is provided for direct compilation and for inclusion to other projects.
+
+### Windows MS Visual Studio 2017
+Lately Visual Studio has started handling CMake files directly. After opening the project's directory it should recognize it and initialize build system. Afterwards please run:
+1. `CMake -> Cache -> View Cache CMakeLists.txt -> CMakeLists.txt` to edit settings
+2. `CMake -> Build All` to build
+
+It is possible too to use CMake GUI directly with its settings editor.
+
+### Linux CLI
+To compile please run following sequence of commands:
 ```bash
 # assuming current dir is ./libnitrokey/
 mkdir -p build
@@ -50,7 +62,7 @@ Other build options (all take either `ON` or `OFF`):
 
 
 
-# Using with Python
+# Using libnitrokey with Python
 To use libnitrokey with Python a [CFFI](http://cffi.readthedocs.io/en/latest/overview.html) library is required (either 2.7+ or 3.0+). It can be installed with:
 ```bash
 pip install --user cffi # for python 2.x
@@ -137,7 +149,7 @@ Please check NK_C_API.h (C API) for high level commands and include/NitrokeyMana
 Warning! Before you run unittests please either change both your Admin and User PINs on your Nitrostick to defaults (`12345678` and `123456` respectively) or change the values in tests source code. If you do not change them the tests might lock your device. If it's too late, you can always reset your Nitrokey using instructions from [homepage](https://www.nitrokey.com/de/documentation/how-reset-nitrokey).
 
 ## Python tests
-Libnitrokey has a great suite of tests written in Python under the path: `unittest/test_*.py`: 
+Libnitrokey has a great suite of tests written in Python 3 under the path: `unittest/test_*.py`: 
 * `test_pro.py` - contains tests of OTP, Password Safe and PIN control functionality. Could be run on both Pro and Storage devices.
 * `test_storage.py` - contains tests of Encrypted Volumes functionality. Could be run only on Storage.
 The tests themselves show how to handle common requests to device.

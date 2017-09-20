@@ -111,7 +111,7 @@ namespace nitrokey {
                   std::string dissect() const {
                     std::stringstream ss;
                     ss << "_padding:" << std::endl
-                       << ::nitrokey::misc::hexdump((const char *) (_padding),
+                       << ::nitrokey::misc::hexdump((const uint8_t *) (_padding),
                                                     sizeof _padding);
                     print_to_ss((int) SendCounter_u8);
                     print_to_ss((int) SendDataType_u8);
@@ -138,9 +138,9 @@ namespace nitrokey {
                     union{
                     uint8_t VersionInfo_au8[4];
                         struct {
-                            uint8_t __reserved;
+                            uint8_t _reserved;
                             uint8_t minor;
-                            uint8_t __reserved2;
+                            uint8_t _reserved2;
                             uint8_t major;
                         } __packed versionInfo;
                     } __packed;

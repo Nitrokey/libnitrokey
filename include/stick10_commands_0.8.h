@@ -94,7 +94,7 @@ namespace nitrokey {
                       ss << "id:\t" << (int)id << std::endl;
 #ifdef LOG_VOLATILE_DATA
                       ss << "data:" << std::endl
-                         << ::nitrokey::misc::hexdump((const char *) (&data), sizeof data);
+                         << ::nitrokey::misc::hexdump((const uint8_t *) (&data), sizeof data);
 #else
                       ss << " Volatile data not logged" << std::endl;
 #endif
@@ -113,7 +113,7 @@ namespace nitrokey {
                       std::stringstream ss;
 #ifdef LOG_VOLATILE_DATA
                       ss << "data:" << std::endl
-                         << ::nitrokey::misc::hexdump((const char *) (&data), sizeof data);
+                         << ::nitrokey::misc::hexdump((const uint8_t *) (&data), sizeof data);
 #else
                       ss << " Volatile data not logged" << std::endl;
 #endif
@@ -165,7 +165,7 @@ namespace nitrokey {
                       ss << "\tuse_tokenID(2):\t" << use_tokenID << std::endl;
                       ss << "slot_number:\t" << (int) (slot_number) << std::endl;
                       ss << "slot_counter_or_interval:\t[" << (int) slot_counter_or_interval << "]\t"
-                         << ::nitrokey::misc::hexdump((const char *) (&slot_counter_or_interval), sizeof slot_counter_or_interval, false);
+                         << ::nitrokey::misc::hexdump((const uint8_t *) (&slot_counter_or_interval), sizeof slot_counter_or_interval, false);
 
                       ss << "slot_token_id:\t";
                       for (auto i : slot_token_id)

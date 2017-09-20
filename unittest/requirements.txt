@@ -1,5 +1,4 @@
 cffi
 pytest-repeat
 pytest-randomly
-enum
 oath

@@ -59,10 +59,10 @@ unix{
     SOURCES += $$PWD/hidapi/mac/hid.c
 }
 
-#win32 {
+win32 {
     SOURCES += $$PWD/hidapi/windows/hid.c
     LIBS += -lsetupapi
-#}
+}
 
 INCLUDEPATH = \
     $$PWD/. \

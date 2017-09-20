@@ -11,7 +11,7 @@
 #define print_to_ss_volatile(x) ( ss << " " << (#x) <<":\t" << "***********" << std::endl );
 #endif
 #define hexdump_to_ss(x) (ss << #x":\n"\
-                          << ::nitrokey::misc::hexdump((const char *) (&x), sizeof x, false));
+                          << ::nitrokey::misc::hexdump((const uint8_t *) (&x), sizeof x, false));
 
 namespace nitrokey {
     namespace proto {

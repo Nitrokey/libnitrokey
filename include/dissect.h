@@ -22,7 +22,7 @@ class QueryDissector : semantics::non_constructible {
 
 #ifdef LOG_VOLATILE_DATA
     out << "Raw HID packet:" << std::endl;
-    out << ::nitrokey::misc::hexdump((const char *)(&pod), sizeof pod);
+    out << ::nitrokey::misc::hexdump((const uint8_t *)(&pod), sizeof pod);
 #endif
 
     out << "Contents:" << std::endl;
@@ -87,7 +87,7 @@ class ResponseDissector : semantics::non_constructible {
 
 #ifdef LOG_VOLATILE_DATA
     out << "Raw HID packet:" << std::endl;
-    out << ::nitrokey::misc::hexdump((const char *)(&pod), sizeof pod);
+    out << ::nitrokey::misc::hexdump((const uint8_t *)(&pod), sizeof pod);
 #endif
 
     out << "Device status:\t" << pod.device_status + 0 << " "

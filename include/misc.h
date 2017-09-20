@@ -62,7 +62,7 @@ typename T::CommandPayload get_payload(){
         CMDTYPE::CommandTransaction::run(stick, p);
     }
 
-    std::string hexdump(const char *p, size_t size, bool print_header=true, bool print_ascii=true,
+    std::string hexdump(const uint8_t *p, size_t size, bool print_header=true, bool print_ascii=true,
         bool print_empty=true);
     uint32_t stm_crc32(const uint8_t *data, size_t size);
     std::vector<uint8_t> hex_string_to_byte(const char* hexString);

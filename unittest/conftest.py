@@ -33,11 +33,9 @@ def C(request):
     import os, sys
     path_build = os.path.join("..", "build")
     paths = [
-            os.path.join(path_build,"libnitrokey-log.so"),
             os.path.join(path_build,"libnitrokey.so"),
-            os.path.join(path_build,"libnitrokey-log.dll"),
+            os.path.join(path_build,"libnitrokey.dylib"),
             os.path.join(path_build,"libnitrokey.dll"),
-            os.path.join(path_build,"nitrokey-log.dll"),
             os.path.join(path_build,"nitrokey.dll"),
     ]
     for p in paths:

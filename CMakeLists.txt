@@ -83,18 +83,15 @@ ENDIF()
 
 IF (NOT LIBNITROKEY_STATIC)
     add_library(nitrokey SHARED ${SOURCE_FILES})
-    add_library(nitrokey-log SHARED ${SOURCE_FILES})
     install (TARGETS nitrokey DESTINATION "lib")
 	SET(LIBNAME nitrokey)
 ELSE()
     add_library(nitrokey-static STATIC ${SOURCE_FILES})    
-    add_library(nitrokey-static-log STATIC ${SOURCE_FILES})
 	SET(LIBNAME nitrokey-static)
 ENDIF()
 
 
 target_link_libraries(${LIBNAME} hidapi-libusb)
-target_link_libraries(${LIBNAME}-log hidapi-libusb)
 
 OPTION(ERROR_ON_WARNING "Stop compilation on warning found (not supported for MSVC)" ON)
 if (NOT MSVC)
@@ -104,10 +101,13 @@ if (NOT MSVC)
             set(COMPILE_FLAGS "${COMPILE_FLAGS} -Werror")
         endif()
     ENDIF()
-    SET_TARGET_PROPERTIES(${LIBNAME} ${LIBNAME}-log PROPERTIES COMPILE_FLAGS ${COMPILE_FLAGS} )
+    SET_TARGET_PROPERTIES(${LIBNAME} PROPERTIES COMPILE_FLAGS ${COMPILE_FLAGS} )
 endif()
 
-SET_TARGET_PROPERTIES(${LIBNAME} PROPERTIES COMPILE_DEFINITIONS "NO_LOG")
+OPTION(NO_LOG "Compile without logging functionality and its strings (decreases size)" OFF)
+IF (NO_LOG)
+    SET_TARGET_PROPERTIES(${LIBNAME} PROPERTIES COMPILE_DEFINITIONS "NO_LOG")
+ENDIF()
 
 
 file(GLOB LIB_INCLUDES "include/libnitrokey/*.h")
@@ -119,22 +119,22 @@ IF (COMPILE_TESTS)
     add_library(catch STATIC unittest/catch_main.cpp )
 
     add_executable (test_C_API unittest/test_C_API.cpp)
-    target_link_libraries (test_C_API ${EXTRA_LIBS} ${LIBNAME}-log catch)
+    target_link_libraries (test_C_API ${EXTRA_LIBS} ${LIBNAME} catch)
 
     add_executable (test2 unittest/test2.cc)
-    target_link_libraries (test2 ${EXTRA_LIBS} ${LIBNAME}-log catch)
+    target_link_libraries (test2 ${EXTRA_LIBS} ${LIBNAME} catch)
 
     add_executable (test3 unittest/test3.cc)
-    target_link_libraries (test3 ${EXTRA_LIBS} ${LIBNAME}-log catch)
+    target_link_libraries (test3 ${EXTRA_LIBS} ${LIBNAME} catch)
 
     add_executable (test_HOTP unittest/test_HOTP.cc)
-    target_link_libraries (test_HOTP ${EXTRA_LIBS} ${LIBNAME}-log catch)
+    target_link_libraries (test_HOTP ${EXTRA_LIBS} ${LIBNAME} catch)
 
     add_executable (test1 unittest/test.cc)
-    target_link_libraries (test1 ${EXTRA_LIBS} ${LIBNAME}-log catch)
+    target_link_libraries (test1 ${EXTRA_LIBS} ${LIBNAME} catch)
 
     add_executable (test_issues unittest/test_issues.cc)
-    target_link_libraries (test_issues ${EXTRA_LIBS} ${LIBNAME}-log catch)
+    target_link_libraries (test_issues ${EXTRA_LIBS} ${LIBNAME} catch)
 
     #run with 'make test' or 'ctest'
     #needs connected PRO device for success

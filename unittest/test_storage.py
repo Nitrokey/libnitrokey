@@ -3,7 +3,7 @@ import pprint
 import pytest
 
 from conftest import skip_if_device_version_lower_than
-from constants import DefaultPasswords, DeviceErrorCode
+from constants import DefaultPasswords, DeviceErrorCode, bb
 from misc import gs, wait
 pprint = pprint.PrettyPrinter(indent=4).pprint
 
@@ -28,7 +28,7 @@ def test_get_status_storage(C):
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     status_string = gs(status_pointer)
     assert len(status_string) > 0
-    status_dict = get_dict_from_dissect(status_string)
+    status_dict = get_dict_from_dissect(status_string.decode('ascii'))
     default_admin_password_retry_count = 3
     assert int(status_dict['AdminPwRetryCount']) == default_admin_password_retry_count
 
@@ -39,7 +39,7 @@ def test_sd_card_usage(C):
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     data_string = gs(data_pointer)
     assert len(data_string) > 0
-    data_dict = get_dict_from_dissect(data_string)
+    data_dict = get_dict_from_dissect(data_string.decode("ascii"))
     assert int(data_dict['WriteLevelMax']) <= 100
 
 
@@ -51,7 +51,7 @@ def test_encrypted_volume_unlock(C):
 
 def test_encrypted_volume_unlock_hidden(C):
     skip_if_device_version_lower_than({'S': 43})
-    hidden_volume_password = 'hiddenpassword'
+    hidden_volume_password = b'hiddenpassword'
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert C.NK_create_hidden_volume(0, 20, 21, hidden_volume_password) == DeviceErrorCode.STATUS_OK
@@ -61,8 +61,8 @@ def test_encrypted_volume_unlock_hidden(C):
 def test_encrypted_volume_setup_multiple_hidden_lock(C):
     import random
     skip_if_device_version_lower_than({'S': 45}) #hangs device on lower version
-    hidden_volume_password = 'hiddenpassword' + str(random.randint(0,100))
-    p = lambda i: hidden_volume_password + str(i)
+    hidden_volume_password = b'hiddenpassword' + bb(str(random.randint(0,100)))
+    p = lambda i: hidden_volume_password + bb(str(i))
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     for i in range(4):
@@ -76,8 +76,8 @@ def test_encrypted_volume_setup_multiple_hidden_lock(C):
 @pytest.mark.parametrize("volumes_to_setup", range(1, 5))
 def test_encrypted_volume_setup_multiple_hidden_no_lock_device_volumes(C, volumes_to_setup):
     skip_if_device_version_lower_than({'S': 43})
-    hidden_volume_password = 'hiddenpassword'
-    p = lambda i: hidden_volume_password + str(i)
+    hidden_volume_password = b'hiddenpassword'
+    p = lambda i: hidden_volume_password + bb(str(i))
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     for i in range(volumes_to_setup):
@@ -95,8 +95,8 @@ def test_encrypted_volume_setup_multiple_hidden_no_lock_device_volumes(C, volume
 @pytest.mark.parametrize("volumes_to_setup", range(1, 5))
 def test_encrypted_volume_setup_multiple_hidden_no_lock_device_volumes_unlock_at_once(C, volumes_to_setup):
     skip_if_device_version_lower_than({'S': 43})
-    hidden_volume_password = 'hiddenpassword'
-    p = lambda i: hidden_volume_password + str(i)
+    hidden_volume_password = b'hiddenpassword'
+    p = lambda i: hidden_volume_password + bb(str(i))
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     for i in range(volumes_to_setup):
@@ -116,8 +116,8 @@ def test_encrypted_volume_setup_multiple_hidden_no_lock_device_volumes_unlock_at
 @pytest.mark.parametrize("use_slot", range(4))
 def test_encrypted_volume_setup_one_hidden_no_lock_device_slot(C, use_slot):
     skip_if_device_version_lower_than({'S': 43})
-    hidden_volume_password = 'hiddenpassword'
-    p = lambda i: hidden_volume_password + str(i)
+    hidden_volume_password = b'hiddenpassword'
+    p = lambda i: hidden_volume_password + bb(str(i))
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     i = use_slot
@@ -143,7 +143,7 @@ def test_password_safe_slot_name_corruption(C):
         numbers = '1234567890' * 4
         s += numbers[:wid - len(s)]
         assert len(s) == wid
-        return s
+        return bb(s)
 
     def get_pass(suffix):
         return fill('pass' + suffix, 20)
@@ -170,8 +170,8 @@ def test_password_safe_slot_name_corruption(C):
             assert gs(C.NK_get_password_safe_slot_login(i)) == get_loginname(iss)
             assert gs(C.NK_get_password_safe_slot_password(i)) == get_pass(iss)
 
-    hidden_volume_password = 'hiddenpassword'
-    p = lambda i: hidden_volume_password + str(i)
+    hidden_volume_password = b'hiddenpassword'
+    p = lambda i: hidden_volume_password + bb(str(i))
     def check_volumes_correctness(C):
         for i in range(volumes_to_setup):
             assert C.NK_unlock_hidden_volume(p(i)) == DeviceErrorCode.STATUS_OK
@@ -208,8 +208,8 @@ def test_hidden_volume_corruption(C):
     # bug: this should return error without unlocking encrypted volume each hidden volume lock, but it does not
     assert C.NK_lock_encrypted_volume() == DeviceErrorCode.STATUS_OK
     assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
-    hidden_volume_password = 'hiddenpassword'
-    p = lambda i: hidden_volume_password + str(i)
+    hidden_volume_password = b'hiddenpassword'
+    p = lambda i: hidden_volume_password + bb(str(i))
     for i in range(4):
         assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
         assert C.NK_unlock_hidden_volume(p(i)) == DeviceErrorCode.STATUS_OK
@@ -261,7 +261,7 @@ def test_get_busy_progress_on_idle(C):
 
 def test_change_update_password(C):
     skip_if_device_version_lower_than({'S': 43})
-    wrong_password = 'aaaaaaaaaaa'
+    wrong_password = b'aaaaaaaaaaa'
     assert C.NK_change_update_password(wrong_password, DefaultPasswords.UPDATE_TEMP) == DeviceErrorCode.WRONG_PASSWORD
     assert C.NK_change_update_password(DefaultPasswords.UPDATE, DefaultPasswords.UPDATE_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_change_update_password(DefaultPasswords.UPDATE_TEMP, DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK

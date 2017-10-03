@@ -37,6 +37,9 @@
 
 namespace nitrokey {
     namespace proto {
+      extern std::mutex send_receive_mtx;
+
+
 /*
  *	POD types for HID proto commands
  *	Instances are meant to be __packed.
@@ -215,7 +218,6 @@ namespace nitrokey {
               using namespace ::nitrokey::log;
               using namespace std::chrono_literals;
 
-              static std::mutex send_receive_mtx;
               std::lock_guard<std::mutex> guard(send_receive_mtx);
 
               LOG(__FUNCTION__, Loglevel::DEBUG_L2);
@@ -306,12 +308,13 @@ namespace nitrokey {
                   }
                   if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy)) {
                     dev->m_counters.busy++;
-                    if (busy_counter++<10) {
+                    if (busy_counter++<3) {
                       receiving_retry_counter++;
                       LOG("Status busy, not decreasing receiving_retry_counter counter: " +
                                       std::to_string(receiving_retry_counter), Loglevel::DEBUG_L2);
                     } else {
                       retry_timeout *= 2;
+                      retry_timeout = std::min(retry_timeout, 300ms);
                       busy_counter = 0;
                       LOG("Status busy, decreasing receiving_retry_counter counter: " +
                                       std::to_string(receiving_retry_counter) + ", current delay:"
@@ -352,12 +355,6 @@ namespace nitrokey {
 
               clear_packet(outp);
 
-              if (!resp.isCRCcorrect())
-                LOGD(std::string("Accepting response from device with invalid CRC. ")
-                     + "Command ID: " + std::to_string(resp.command_id) + " " +
-                         commandid_to_string(static_cast<CommandID>(resp.command_id))
-                );
-
 
               if (status <= 0) {
                 dev->m_counters.receiving_error++;
@@ -397,6 +394,14 @@ namespace nitrokey {
                   resp.command_id < stick20::CMD_END_VALUE ) {
                 dev->m_counters.successful_storage_commands++;
               }
+
+              if (!resp.isCRCcorrect())
+                LOG(std::string("Accepting response from device with invalid CRC. ")
+                     + "Command ID: " + std::to_string(resp.command_id) + " " +
+                         commandid_to_string(static_cast<CommandID>(resp.command_id)) + "  "
+			+ "Reported and calculated: " + std::to_string(resp.crc) + "!=" + std::to_string(resp.calculate_CRC()),
+			Loglevel::WARNING
+                );
 
               // See: DeviceResponse
               return resp;

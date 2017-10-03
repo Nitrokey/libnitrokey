@@ -130,7 +130,7 @@ class WriteToHOTPSlot : Command<CommandID::WRITE_TO_SLOT> {
             ss << std::hex << std::setw(2) << std::setfill('0')<< (int) i << " " ;
         ss << std::endl;
         ss << "slot_counter:\t[" << (int)slot_counter << "]\t"
-         << ::nitrokey::misc::hexdump((const char *)(&slot_counter), sizeof slot_counter, false);
+         << ::nitrokey::misc::hexdump((const uint8_t *)(&slot_counter), sizeof slot_counter, false);
 
       return ss.str();
     }
@@ -334,7 +334,7 @@ class ReadSlot : Command<CommandID::READ_SLOT> {
         ss << std::hex << std::setw(2) << std::setfill('0')<< (int) i << " " ;
       ss << std::endl;
       ss << "slot_counter:\t[" << (int)slot_counter << "]\t"
-         << ::nitrokey::misc::hexdump((const char *)(&slot_counter), sizeof slot_counter, false);
+         << ::nitrokey::misc::hexdump((const uint8_t *)(&slot_counter), sizeof slot_counter, false);
       return ss.str();
     }
   } __packed;
@@ -372,13 +372,13 @@ class GetStatus : Command<CommandID::GET_STATUS> {
       ss  << "firmware_version:\t"
           << "[" << firmware_version << "]" << "\t"
           << ::nitrokey::misc::hexdump(
-          (const char *)(&firmware_version), sizeof firmware_version, false);
+          (const uint8_t *)(&firmware_version), sizeof firmware_version, false);
       ss << "card_serial_u32:\t" << std::hex << card_serial_u32 << std::endl;
       ss << "card_serial:\t"
-         << ::nitrokey::misc::hexdump((const char *)(card_serial),
+         << ::nitrokey::misc::hexdump((const uint8_t *)(card_serial),
                                       sizeof card_serial, false);
       ss << "general_config:\t"
-         << ::nitrokey::misc::hexdump((const char *)(general_config),
+         << ::nitrokey::misc::hexdump((const uint8_t *)(general_config),
                                       sizeof general_config, false);
         ss << "numlock:\t" << (int)numlock << std::endl;
         ss << "capslock:\t" << (int)capslock << std::endl;

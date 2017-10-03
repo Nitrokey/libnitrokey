@@ -111,7 +111,7 @@ namespace nitrokey {
                   std::string dissect() const {
                     std::stringstream ss;
                     ss << "_padding:" << std::endl
-                       << ::nitrokey::misc::hexdump((const char *) (_padding),
+                       << ::nitrokey::misc::hexdump((const uint8_t *) (_padding),
                                                     sizeof _padding);
                     print_to_ss((int) SendCounter_u8);
                     print_to_ss((int) SendDataType_u8);
@@ -138,9 +138,9 @@ namespace nitrokey {
                     union{
                     uint8_t VersionInfo_au8[4];
                         struct {
-                            uint8_t __reserved;
+                            uint8_t _reserved;
                             uint8_t minor;
-                            uint8_t __reserved2;
+                            uint8_t _reserved2;
                             uint8_t major;
                         } __packed versionInfo;
                     } __packed;
@@ -184,14 +184,19 @@ namespace nitrokey {
                       print_to_ss( MagicNumber_StickConfig_u16 );
                       print_to_ss((int) ReadWriteFlagUncryptedVolume_u8 );
                       print_to_ss((int) ReadWriteFlagCryptedVolume_u8 );
+                      print_to_ss((int) ReadWriteFlagHiddenVolume_u8 );
                       print_to_ss((int) VersionInfo_au8[1] );
                       print_to_ss((int) VersionInfo_au8[3] );
-                      print_to_ss((int) ReadWriteFlagHiddenVolume_u8 );
                       print_to_ss((int) FirmwareLocked_u8 );
                       print_to_ss((int) NewSDCardFound_u8 );
+                      print_to_ss((int) NewSDCardFound_st.NewCard );
+                      print_to_ss((int) NewSDCardFound_st.Counter );
                       print_to_ss((int) SDFillWithRandomChars_u8 );
                       print_to_ss( ActiveSD_CardID_u32 );
                       print_to_ss((int) VolumeActiceFlag_u8 );
+                      print_to_ss((int) VolumeActiceFlag_st.unencrypted );
+                      print_to_ss((int) VolumeActiceFlag_st.encrypted );
+                      print_to_ss((int) VolumeActiceFlag_st.hidden);
                       print_to_ss((int) NewSmartCardFound_u8 );
                       print_to_ss((int) UserPwRetryCount );
                       print_to_ss((int) AdminPwRetryCount );

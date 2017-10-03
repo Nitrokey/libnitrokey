@@ -1,3 +1,8 @@
+# https://cmake.org/pipermail/cmake/2011-May/044166.html
+    IF(NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
+      SET(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS ON)
+    ENDIF()
+
 cmake_minimum_required(VERSION 3.1)
 IF (UNIX)
     OPTION(USE_CLANG "Use CLang" FALSE)
@@ -111,7 +116,7 @@ install (FILES ${LIB_INCLUDES} DESTINATION "include")
 IF (COMPILE_TESTS)
     include_directories(unittest/Catch/include)
 
-    add_library(catch SHARED unittest/catch_main.cpp )
+    add_library(catch STATIC unittest/catch_main.cpp )
 
     add_executable (test_C_API unittest/test_C_API.cpp)
     target_link_libraries (test_C_API ${EXTRA_LIBS} ${LIBNAME}-log catch)

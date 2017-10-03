@@ -10,11 +10,14 @@
 #include "include/cxx_semantics.h"
 #include <functional>
 
+std::mutex nitrokey::proto::send_receive_mtx;
+
 namespace nitrokey{
 
     std::mutex mex_dev_com_manager;
 
-#ifdef __WIN32
+#ifndef strndup
+#ifdef _WIN32
 #pragma message "Using own strndup"
 char * strndup(const char* str, size_t maxlen){
   size_t len = strnlen(str, maxlen);
@@ -24,7 +27,7 @@ char * strndup(const char* str, size_t maxlen){
   return dup;
 }
 #endif
-
+#endif
 
 using nitrokey::misc::strcpyT;
 

@@ -219,11 +219,19 @@ def test_password_safe_slot_name_corruption(C):
 @pytest.mark.hidden
 def test_hidden_volume_corruption(C):
     # bug: this should return error without unlocking encrypted volume each hidden volume lock, but it does not
-    assert C.NK_lock_encrypted_volume() == DeviceErrorCode.STATUS_OK
-    assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    skip_if_device_version_lower_than({'S': 43})
     hidden_volume_password = b'hiddenpassword'
     p = lambda i: hidden_volume_password + bb(str(i))
-    for i in range(4):
+    volumes_to_setup = 4
+    for i in range(volumes_to_setup):
+        assert C.NK_create_hidden_volume(i, 20 + i * 10, 20 + i * 10 + i + 1, p(i)) == DeviceErrorCode.STATUS_OK
+        assert C.NK_unlock_hidden_volume(p(i)) == DeviceErrorCode.STATUS_OK
+        assert C.NK_lock_hidden_volume() == DeviceErrorCode.STATUS_OK
+
+    assert C.NK_lock_encrypted_volume() == DeviceErrorCode.STATUS_OK
+
+    assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+    for i in range(volumes_to_setup):
         assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
         assert C.NK_unlock_hidden_volume(p(i)) == DeviceErrorCode.STATUS_OK
         wait(2)

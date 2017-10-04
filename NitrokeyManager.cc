@@ -471,7 +471,7 @@ using nitrokey::misc::strcpyT;
         return get_slot_name(slot_number);
     }
 
-  static const int max_string_field_length = 100;
+  static const int max_string_field_length = 2*1024; //storage's status string is ~1k
 
   const char * NitrokeyManager::get_slot_name(uint8_t slot_number)  {
         auto payload = get_payload<GetSlotName>();

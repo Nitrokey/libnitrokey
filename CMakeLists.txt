@@ -150,11 +150,14 @@ IF (COMPILE_TESTS)
     add_executable (test_issues unittest/test_issues.cc)
     target_link_libraries (test_issues ${EXTRA_LIBS} ${LIBNAME}-log catch)
 
+    add_executable (test_offline unittest/test_offline.cc)
+    target_link_libraries (test_offline ${EXTRA_LIBS} ${LIBNAME}-log catch)
+
     #run with 'make test' or 'ctest'
     #needs connected PRO device for success
     #warning: it may delete data on the device
     include (CTest)
-    add_test (runs test_C_API)
+    add_test (runs test_offline)
 ENDIF()
 
 

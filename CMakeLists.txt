@@ -39,7 +39,7 @@ set(LIBNK_VERSION ${LIBNK_VERSION_MAJOR}.${LIBNK_VERSION_MINOR}.${LIBNK_VERSION_
 
 include(GNUInstallDirs)
 
-OPTION(LIBNITROKEY_STATIC "Build libnitrokey statically" TRUE)
+OPTION(LIBNITROKEY_STATIC "Build libnitrokey statically" FALSE)
 
 
 OPTION(COMPILE_TESTS "Compile tests" FALSE)

@@ -31,6 +31,8 @@ project(libnitrokey)
 SET(PROJECT_VERSION "3.0-alpha")
 set(CMAKE_CXX_STANDARD 14)
 
+include(GNUInstallDirs)
+
 OPTION(LIBNITROKEY_STATIC "Build libnitrokey statically" TRUE)
 
 
@@ -84,7 +86,7 @@ ENDIF()
 IF (NOT LIBNITROKEY_STATIC)
     add_library(nitrokey SHARED ${SOURCE_FILES})
     add_library(nitrokey-log SHARED ${SOURCE_FILES})
-    install (TARGETS nitrokey DESTINATION "lib")
+    install (TARGETS nitrokey DESTINATION ${CMAKE_INSTALL_LIBDIR})
 	SET(LIBNAME nitrokey)
 ELSE()
     add_library(nitrokey-static STATIC ${SOURCE_FILES})    
@@ -111,7 +113,7 @@ SET_TARGET_PROPERTIES(${LIBNAME} PROPERTIES COMPILE_DEFINITIONS "NO_LOG")
 
 
 file(GLOB LIB_INCLUDES "include/libnitrokey/*.h")
-install (FILES ${LIB_INCLUDES} DESTINATION "include")
+install (FILES ${LIB_INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 IF (COMPILE_TESTS)
     include_directories(unittest/Catch/include)

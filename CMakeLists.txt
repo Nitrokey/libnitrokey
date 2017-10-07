@@ -31,6 +31,12 @@ project(libnitrokey)
 SET(PROJECT_VERSION "3.0-alpha")
 set(CMAKE_CXX_STANDARD 14)
 
+set(LIBNK_VERSION_MAJOR 3) #  reminder: incompatible API changes
+set(LIBNK_VERSION_MINOR 0) #  add functionality in a backwards-compatible manner
+set(LIBNK_VERSION_PATCH 0) #  make backwards-compatible bug fixes
+set(LIBNK_VERSION ${LIBNK_VERSION_MAJOR}.${LIBNK_VERSION_MINOR}.${LIBNK_VERSION_PATCH} )
+
+
 include(GNUInstallDirs)
 
 OPTION(LIBNITROKEY_STATIC "Build libnitrokey statically" TRUE)
@@ -97,6 +103,11 @@ ENDIF()
 
 target_link_libraries(${LIBNAME} hidapi-libusb)
 target_link_libraries(${LIBNAME}-log hidapi-libusb)
+
+set_target_properties(${LIBNAME} PROPERTIES VERSION ${LIBNK_VERSION}
+        SOVERSION ${LIBNK_VERSION_MAJOR} )
+set_target_properties(${LIBNAME}-log PROPERTIES VERSION ${LIBNK_VERSION}
+        SOVERSION ${LIBNK_VERSION_MAJOR} )
 
 OPTION(ERROR_ON_WARNING "Stop compilation on warning found (not supported for MSVC)" ON)
 if (NOT MSVC)

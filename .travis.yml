@@ -13,7 +13,7 @@ matrix:
     - osx_image: xcode8.2
     - os: linux
       dist: trusty
-      env: COMPILER_NAME=gcc CXX=g++-5 CC=gcc-5 CF=-DCOMPILE_TESTS=ON
+      env: COMPILER_NAME=gcc CXX=g++-5 CC=gcc-5
       addons:
         apt:
           packages:
@@ -24,7 +24,7 @@ matrix:
             - ubuntu-toolchain-r-test
     - os: linux
       dist: trusty
-      env: COMPILER_NAME=gcc CXX=g++-6 CC=gcc-6 CF=-DCOMPILE_TESTS=ON
+      env: COMPILER_NAME=gcc CXX=g++-6 CC=gcc-6
       addons:
         apt:
           packages:
@@ -34,7 +34,7 @@ matrix:
           sources: *sources
     - os: linux
       dist: trusty
-      env: COMPILER_NAME=clang CXX=clang++-3.8 CC=clang-3.8 CF=-DCOMPILE_TESTS=ON
+      env: COMPILER_NAME=clang CXX=clang++-3.8 CC=clang-3.8
       addons:
         apt:
           packages:
@@ -55,4 +55,4 @@ install:
 
 script:
   - make -j2
-#  - make test # TODO add library device-less tests
+  - ctest -VV

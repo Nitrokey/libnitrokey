@@ -127,11 +127,18 @@ install (FILES ${LIB_INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libnitrok
 install (TARGETS ${LIBNAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install (TARGETS ${LIBNAME}-log DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
+
+include_directories(unittest/Catch/include)
+add_library(catch STATIC unittest/catch_main.cpp )
+add_executable (test_offline unittest/test_offline.cc)
+target_link_libraries (test_offline ${EXTRA_LIBS} ${LIBNAME}-log catch)
+#run with 'make test' or 'ctest'
+include (CTest)
+add_test (runs test_offline)
+
 IF (COMPILE_TESTS)
-    include_directories(unittest/Catch/include)
-
-    add_library(catch STATIC unittest/catch_main.cpp )
-
+    #needs connected PRO device for success
+    #warning: it may delete data on the device
     add_executable (test_C_API unittest/test_C_API.cpp)
     target_link_libraries (test_C_API ${EXTRA_LIBS} ${LIBNAME}-log catch)
 
@@ -150,11 +157,6 @@ IF (COMPILE_TESTS)
     add_executable (test_issues unittest/test_issues.cc)
     target_link_libraries (test_issues ${EXTRA_LIBS} ${LIBNAME}-log catch)
 
-    #run with 'make test' or 'ctest'
-    #needs connected PRO device for success
-    #warning: it may delete data on the device
-    include (CTest)
-    add_test (runs test_C_API)
 ENDIF()
 
 

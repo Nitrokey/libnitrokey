@@ -1,7 +1,7 @@
 language: generic
 sudo: false
 os: osx
-env: CF=
+env: CF=-DCOMPILE_TESTS=ON
 
 matrix:
   include:

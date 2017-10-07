@@ -31,7 +31,15 @@ project(libnitrokey)
 SET(PROJECT_VERSION "3.0-alpha")
 set(CMAKE_CXX_STANDARD 14)
 
-OPTION(LIBNITROKEY_STATIC "Build libnitrokey statically" TRUE)
+set(LIBNK_VERSION_MAJOR 3) #  reminder: incompatible API changes
+set(LIBNK_VERSION_MINOR 0) #  add functionality in a backwards-compatible manner
+set(LIBNK_VERSION_PATCH 0) #  make backwards-compatible bug fixes
+set(LIBNK_VERSION ${LIBNK_VERSION_MAJOR}.${LIBNK_VERSION_MINOR}.${LIBNK_VERSION_PATCH} )
+
+
+include(GNUInstallDirs)
+
+OPTION(LIBNITROKEY_STATIC "Build libnitrokey statically" FALSE)
 
 
 OPTION(COMPILE_TESTS "Compile tests" FALSE)
@@ -84,8 +92,7 @@ ENDIF()
 IF (NOT LIBNITROKEY_STATIC)
     add_library(nitrokey SHARED ${SOURCE_FILES})
     add_library(nitrokey-log SHARED ${SOURCE_FILES})
-    install (TARGETS nitrokey DESTINATION "lib")
-	SET(LIBNAME nitrokey)
+    SET(LIBNAME nitrokey)
 ELSE()
     add_library(nitrokey-static STATIC ${SOURCE_FILES})    
     add_library(nitrokey-static-log STATIC ${SOURCE_FILES})
@@ -95,6 +102,11 @@ ENDIF()
 
 target_link_libraries(${LIBNAME} hidapi-libusb)
 target_link_libraries(${LIBNAME}-log hidapi-libusb)
+
+set_target_properties(${LIBNAME} PROPERTIES VERSION ${LIBNK_VERSION}
+        SOVERSION ${LIBNK_VERSION_MAJOR} )
+set_target_properties(${LIBNAME}-log PROPERTIES VERSION ${LIBNK_VERSION}
+        SOVERSION ${LIBNK_VERSION_MAJOR} )
 
 OPTION(ERROR_ON_WARNING "Stop compilation on warning found (not supported for MSVC)" ON)
 if (NOT MSVC)
@@ -110,8 +122,10 @@ endif()
 SET_TARGET_PROPERTIES(${LIBNAME} PROPERTIES COMPILE_DEFINITIONS "NO_LOG")
 
 
-file(GLOB LIB_INCLUDES "include/libnitrokey/*.h")
-install (FILES ${LIB_INCLUDES} DESTINATION "include")
+file(GLOB LIB_INCLUDES "include/*.h")
+install (FILES ${LIB_INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libnitrokey)
+install (TARGETS ${LIBNAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install (TARGETS ${LIBNAME}-log DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 IF (COMPILE_TESTS)
     include_directories(unittest/Catch/include)

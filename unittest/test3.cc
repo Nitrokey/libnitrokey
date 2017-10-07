@@ -113,7 +113,7 @@ TEST_CASE("write general config", "[pronew]") {
   auto p = get_payload<WriteGeneralConfig>();
   p.enable_user_password = 1;
   REQUIRE_THROWS(
-      WriteGeneralConfig::CommandTransaction::run(stick, p);
+      WriteGeneralConfig::CommandTransaction::run(stick, p)
   );
   strcpyT(p.temporary_admin_password, temporary_password);
   WriteGeneralConfig::CommandTransaction::run(stick, p);
@@ -154,7 +154,7 @@ TEST_CASE("authorize user HOTP", "[pronew]") {
   auto p3 = get_payload<GetHOTP>();
   p3.slot_number = 0 + 0x10;
   REQUIRE_THROWS(
-      GetHOTP::CommandTransaction::run(stick, p3);
+      GetHOTP::CommandTransaction::run(stick, p3)
   );
   strcpyT(p3.temporary_user_password, temporary_password);
   auto code_response = GetHOTP::CommandTransaction::run(stick, p3);
@@ -205,7 +205,7 @@ TEST_CASE("authorize user TOTP", "[pronew]") {
   p_get_totp.slot_number = 0 + 0x20;
 
   REQUIRE_THROWS(
-      GetTOTP::CommandTransaction::run(stick, p_get_totp);
+      GetTOTP::CommandTransaction::run(stick, p_get_totp)
   );
   strcpyT(p_get_totp.temporary_user_password, temporary_password);
 

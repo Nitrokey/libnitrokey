@@ -55,4 +55,4 @@ install:
 
 script:
   - make -j2
-#  - make test # TODO add library device-less tests
+  - make test

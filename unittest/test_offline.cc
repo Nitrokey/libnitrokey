@@ -90,9 +90,10 @@ TEST_CASE("Test helper function - hex_string_to_byte", "[fast]") {
   using namespace nitrokey::misc;
   std::vector<uint8_t> v;
   REQUIRE_NOTHROW(v = hex_string_to_byte("00112233445566"));
-  const uint8_t test_data[] = "\x00\x11\x22\x33\x44\x55\x66";
-  REQUIRE(v.size() == sizeof(test_data)-1);
+  const uint8_t test_data[] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66};
+  REQUIRE(v.size() == sizeof(test_data));
   for (int i = 0; i < v.size(); ++i) {
+    INFO("Position i: " << i);
     REQUIRE(v.data()[i] == test_data[i]);
   }
 }

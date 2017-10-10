@@ -328,8 +328,8 @@ namespace nitrokey {
                     break;
                   }
                   LOG(std::string("Retry status - dev status, awaited cmd crc, correct packet CRC: ")
-                                  + std::to_string(resp.device_status) + " " +
-                                  std::to_string(CRC_equal_awaited) +
+                                  + std::to_string(resp.device_status) +
+                                  " " + std::to_string(CRC_equal_awaited) +
                                   " " + std::to_string(resp.isCRCcorrect()), Loglevel::DEBUG_L2);
 
                   if (!resp.isCRCcorrect()) dev->m_counters.wrong_CRC++;

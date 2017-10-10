@@ -298,9 +298,9 @@ namespace nitrokey {
                     };
                   }
 
-                  //SENDPASSWORD gives wrong CRC , for now rely on !=0 (TODO report)
-//                  if (resp.device_status == 0 && resp.last_command_crc == outp.crc && resp.isCRCcorrect()) break;
-                  auto CRC_equal_awaited = resp.last_command_crc == outp.crc;
+                  //Some of the commands return wrong CRC, for now skip checking it (TODO list and report)
+                  //if (resp.device_status == 0 && resp.last_command_crc == outp.crc && resp.isCRCcorrect()) break;
+                  auto CRC_equal_awaited = true; // resp.last_command_crc == outp.crc;
                   if (resp.device_status == static_cast<uint8_t>(stick10::device_status::ok) &&
                       CRC_equal_awaited && resp.isValid()){
                     successful_communication = true;

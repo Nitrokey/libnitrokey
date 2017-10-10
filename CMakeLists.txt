@@ -91,7 +91,6 @@ ENDIF()
 
 IF (NOT LIBNITROKEY_STATIC)
     add_library(nitrokey SHARED ${SOURCE_FILES})
-    add_library(nitrokey-log SHARED ${SOURCE_FILES})
     SET(LIBNAME nitrokey)
 ELSE()
     add_library(nitrokey-static STATIC ${SOURCE_FILES})    
@@ -102,8 +101,6 @@ ENDIF()
 target_link_libraries(${LIBNAME} hidapi-libusb)
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION ${LIBNK_VERSION}
-        SOVERSION ${LIBNK_VERSION_MAJOR} )
-set_target_properties(${LIBNAME}-log PROPERTIES VERSION ${LIBNK_VERSION}
         SOVERSION ${LIBNK_VERSION_MAJOR} )
 
 OPTION(ERROR_ON_WARNING "Stop compilation on warning found (not supported for MSVC)" ON)
@@ -126,7 +123,6 @@ ENDIF()
 file(GLOB LIB_INCLUDES "include/*.h")
 install (FILES ${LIB_INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libnitrokey)
 install (TARGETS ${LIBNAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install (TARGETS ${LIBNAME}-log DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 
 include_directories(unittest/Catch/include)

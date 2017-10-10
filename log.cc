@@ -14,6 +14,8 @@ namespace nitrokey {
 
     std::string LogHandler::loglevel_to_str(Loglevel lvl) {
       switch (lvl) {
+        case Loglevel::DEBUG_L1:
+          return std::string("DEBUG_L1");
         case Loglevel::DEBUG_L2:
           return std::string("DEBUG_L2");
         case Loglevel::DEBUG:

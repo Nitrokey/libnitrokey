@@ -20,14 +20,17 @@ def C(request):
     with open(fp, 'r') as f:
         declarations = f.readlines()
 
+    cnt = 0
     a = iter(declarations)
     for declaration in a:
         if declaration.strip().startswith('NK_C_API'):
             declaration = declaration.replace('NK_C_API', '').strip()
             while ';' not in declaration:
                 declaration += (next(a)).strip()
-            print(declaration)
+            # print(declaration)
             ffi.cdef(declaration, override=True)
+            cnt +=1
+    print('Imported {} declarations'.format(cnt))
 
     C = None
     import os, sys
@@ -73,6 +76,7 @@ def C(request):
         print('Finished')
 
     request.addfinalizer(fin)
-    C.NK_set_debug(True)
+    # C.NK_set_debug(True)
+    C.NK_set_debug_level(3)
 
     return C

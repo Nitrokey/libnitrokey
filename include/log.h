@@ -19,6 +19,7 @@ namespace nitrokey {
       ERROR,
       WARNING,
       INFO,
+      DEBUG_L1,
       DEBUG,
       DEBUG_L2
     };

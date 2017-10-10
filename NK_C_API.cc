@@ -296,6 +296,12 @@ extern "C" {
 		m->set_debug(state);
 	}
 
+
+	NK_C_API void NK_set_debug_level(const int level) {
+		auto m = NitrokeyManager::instance();
+		m->set_loglevel(level);
+	}
+
 	NK_C_API int NK_totp_set_time(uint64_t time) {
 		auto m = NitrokeyManager::instance();
 		return get_without_result([&]() {

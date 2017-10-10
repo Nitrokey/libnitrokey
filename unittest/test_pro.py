@@ -130,7 +130,6 @@ def test_erase_password_safe_slot(C):
 
 @pytest.mark.PWS
 def test_password_safe_slot_status(C):
-    C.NK_set_debug(True)
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     assert C.NK_erase_password_safe_slot(0) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_password_safe_slot(1, b'slotname2', b'login2', b'pass2') == DeviceErrorCode.STATUS_OK
@@ -153,7 +152,6 @@ def test_issue_device_locks_on_second_key_generation_in_sequence(C):
 
 @pytest.mark.aes
 def test_regenerate_aes_key(C):
-    C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
@@ -185,7 +183,6 @@ def test_destroy_password_safe(C):
     Sometimes fails on NK Pro - slot name is not cleared ergo key generation has not succeed despite the success result
     returned from the device
     """
-    C.NK_set_debug(True)
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     # write password safe slot
     assert C.NK_write_password_safe_slot(0, b'slotname1', b'login1', b'pass1') == DeviceErrorCode.STATUS_OK
@@ -279,7 +276,6 @@ def test_user_retry_counts_PWSafe(C):
 
 @pytest.mark.pin
 def test_unlock_user_password(C):
-    C.NK_set_debug(True)
     default_user_retry_count = 3
     default_admin_retry_count = 3
     new_password = b'123123123'
@@ -491,7 +487,6 @@ def test_TOTP_RFC_usepin(C, PIN_protection):
 
 @pytest.mark.otp
 def test_get_slot_names(C):
-    C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_erase_totp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # erasing slot invalidates temporary password, so requesting authentication
@@ -543,7 +538,6 @@ def test_get_OTP_code_from_not_programmed_slot(C):
 
 @pytest.mark.otp
 def test_get_code_user_authorize(C):
-    C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_totp_slot(0, b'python_otp_auth', bbRFC_SECRET, 30, True, False, False, b'',
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -569,8 +563,6 @@ def cast_pointer_to_tuple(obj, typen, len):
 
 
 def test_read_write_config(C):
-    C.NK_set_debug(True)
-
     # let's set sample config with pin protection and disabled scrolllock
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(0, 1, 2, True, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -591,7 +583,6 @@ def test_read_write_config(C):
 @pytest.mark.lock_device
 @pytest.mark.factory_reset
 def test_factory_reset(C):
-    C.NK_set_debug(True)
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK

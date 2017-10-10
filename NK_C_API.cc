@@ -90,10 +90,10 @@ uint8_t get_without_result(T func){
         NK_last_command_status = libraryException.exception_id();
     }
     catch (const InvalidCRCReceived &invalidCRCException){
-	;;;
+      ;
     }
     catch (const DeviceCommunicationException &deviceException){
-        NK_last_command_status = -1;
+        NK_last_command_status = 256-deviceException.getType();
     }
     return NK_last_command_status;
 }

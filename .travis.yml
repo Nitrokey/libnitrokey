@@ -58,3 +58,4 @@ install:
 script:
   - make -j2
   - ctest -VV
+  - mkdir install && make install DESTDIR=install

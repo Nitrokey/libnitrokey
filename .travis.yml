@@ -1,7 +1,7 @@
 language: generic
 sudo: false
 os: osx
-env: CF=
+env: CF=-DCOMPILE_OFFLINE_TESTS=1
 
 matrix:
   include:
@@ -9,7 +9,7 @@ matrix:
 #      before_install: &brew
 #      - brew update
 #      - brew install hidapi
-    - osx_image: xcode6.4
+    - osx_image: xcode9.1
     - osx_image: xcode8.2
     - os: linux
       dist: trusty

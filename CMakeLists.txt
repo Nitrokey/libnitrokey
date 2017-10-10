@@ -42,7 +42,6 @@ include(GNUInstallDirs)
 OPTION(LIBNITROKEY_STATIC "Build libnitrokey statically" FALSE)
 
 
-OPTION(COMPILE_TESTS "Compile tests" FALSE)
 IF (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE RelWithDebInfo)
 ENDIF()
@@ -124,14 +123,21 @@ file(GLOB LIB_INCLUDES "include/*.h")
 install (FILES ${LIB_INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libnitrokey)
 install (TARGETS ${LIBNAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
+OPTION(COMPILE_TESTS "Compile tests" FALSE)
+OPTION(COMPILE_OFFLINE_TESTS "Compile offline tests" FALSE)
 
-include_directories(unittest/Catch/include)
-add_library(catch STATIC unittest/catch_main.cpp )
-add_executable (test_offline unittest/test_offline.cc)
-target_link_libraries (test_offline ${EXTRA_LIBS} ${LIBNAME}-log catch)
-#run with 'make test' or 'ctest'
-include (CTest)
-add_test (runs test_offline)
+IF(COMPILE_OFFLINE_TESTS OR COMPILE_TESTS)
+    include_directories(unittest/Catch/include)
+    add_library(catch SHARED unittest/catch_main.cpp )
+ENDIF()
+
+IF(COMPILE_OFFLINE_TESTS)
+    add_executable (test_offline unittest/test_offline.cc)
+    target_link_libraries (test_offline ${EXTRA_LIBS} ${LIBNAME} catch)
+    #run with 'make test' or 'ctest'
+    include (CTest)
+    add_test (runs test_offline)
+ENDIF()
 
 IF (COMPILE_TESTS)
     #needs connected PRO device for success
@@ -155,7 +161,6 @@ IF (COMPILE_TESTS)
     target_link_libraries (test_issues ${EXTRA_LIBS} ${LIBNAME} catch)
 
 ENDIF()
-
 
 
 

@@ -1,7 +1,9 @@
 language: generic
 sudo: false
 os: osx
-env: CF=-DCOMPILE_OFFLINE_TESTS=1
+env:
+  global:
+    - CF=-DCOMPILE_OFFLINE_TESTS=1
 
 matrix:
   include:

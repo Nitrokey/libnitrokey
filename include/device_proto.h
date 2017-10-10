@@ -300,6 +300,9 @@ namespace nitrokey {
                         resp.last_command_status = static_cast<uint8_t>(stick10::command_status::wrong_password);
                         resp.device_status = static_cast<uint8_t>(stick10::device_status::ok);
                         break;
+                      case stick20::device_status::no_user_password_unlock:
+                        resp.last_command_status = static_cast<uint8_t>(stick10::command_status::AES_dec_failed);
+                        resp.device_status = static_cast<uint8_t>(stick10::device_status::ok);
                       default:
                         LOG(std::string("Unknown storage device status, cannot translate: ") +
                                         std::to_string(resp.storage_status.device_status), Loglevel::DEBUG);

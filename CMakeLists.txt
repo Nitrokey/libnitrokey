@@ -28,11 +28,11 @@ IF (UNIX)
 ENDIF()
 
 project(libnitrokey)
-SET(PROJECT_VERSION "3.0-alpha")
+SET(PROJECT_VERSION "3.1")
 set(CMAKE_CXX_STANDARD 14)
 
 set(LIBNK_VERSION_MAJOR 3) #  reminder: incompatible API changes
-set(LIBNK_VERSION_MINOR 0) #  add functionality in a backwards-compatible manner
+set(LIBNK_VERSION_MINOR 1) #  add functionality in a backwards-compatible manner
 set(LIBNK_VERSION_PATCH 0) #  make backwards-compatible bug fixes
 set(LIBNK_VERSION ${LIBNK_VERSION_MAJOR}.${LIBNK_VERSION_MINOR}.${LIBNK_VERSION_PATCH} )
 

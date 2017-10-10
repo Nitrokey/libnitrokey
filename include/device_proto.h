@@ -274,9 +274,6 @@ namespace nitrokey {
                 int busy_counter = 0;
                 auto retry_timeout = dev->get_retry_timeout();
                 while (receiving_retry_counter-- > 0) {
-                  LOG(std::string("receiving_retry_counter count: ") + std::to_string(receiving_retry_counter),
-                      Loglevel::DEBUG_L1);
-
                   dev->m_counters.recv_executed++;
                   status = dev->recv(&resp);
 
@@ -321,13 +318,7 @@ namespace nitrokey {
                   }
                   if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy)) {
                     dev->m_counters.busy++;
-                    LOG(std::string("Busy retry ")
-                        + std::to_string(resp.storage_status.device_status)
-                        + " "
-                        + std::to_string(retry_timeout.count())
-                        + " "
-                        + std::to_string(receiving_retry_counter)
-                    , Loglevel::DEBUG_L1);
+
                     if (busy_counter++<10) {
                       receiving_retry_counter++;
                       LOG("Status busy, not decreasing receiving_retry_counter counter: " +
@@ -339,6 +330,13 @@ namespace nitrokey {
                       LOG("Status busy, decreasing receiving_retry_counter counter: " +
                                       std::to_string(receiving_retry_counter) + ", current delay:"
                           + std::to_string(retry_timeout.count()), Loglevel::DEBUG);
+                      LOG(std::string("Busy retry ")
+                          + std::to_string(resp.storage_status.device_status)
+                          + " "
+                          + std::to_string(retry_timeout.count())
+                          + " "
+                          + std::to_string(receiving_retry_counter)
+                      , Loglevel::DEBUG_L1);
                     }
                   }
                   if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy) &&
@@ -362,6 +360,7 @@ namespace nitrokey {
                   LOG("Invalid incoming HID packet:", Loglevel::DEBUG_L2);
                   LOG(static_cast<std::string>(resp), Loglevel::DEBUG_L2);
                   dev->m_counters.total_retries++;
+                  LOG(".", Loglevel::DEBUG_L1);
                   std::this_thread::sleep_for(retry_timeout);
                   continue;
                 }
@@ -369,6 +368,15 @@ namespace nitrokey {
                 LOG(std::string("Resending (outer loop) "), Loglevel::DEBUG_L2);
                 LOG(std::string("sending_retry_counter count: ") + std::to_string(sending_retry_counter),
                                 Loglevel::DEBUG);
+              }
+
+              if(resp.last_command_crc != outp.crc){
+                LOG(std::string("Accepting response with CRC other than expected ")
+                    + "Command ID: " + std::to_string(resp.command_id) + " " +
+                    commandid_to_string(static_cast<CommandID>(resp.command_id)) + "  "
+                    + "Reported by response and expected: " + std::to_string(resp.last_command_crc) + "!=" + std::to_string(outp.crc),
+                    Loglevel::WARNING
+                );
               }
 
               dev->set_last_command_status(resp.last_command_status); // FIXME should be handled on device.recv
@@ -394,8 +402,11 @@ namespace nitrokey {
 
               LOG("Incoming HID packet:", Loglevel::DEBUG);
               LOG(static_cast<std::string>(resp), Loglevel::DEBUG);
-              LOG(std::string("receiving_retry_counter count: ") + std::to_string(receiving_retry_counter),
-                              Loglevel::DEBUG_L1);
+              if (dev->get_retry_receiving_count() - receiving_retry_counter > 2) {
+                LOG(std::string("Packet received with receiving_retry_counter count: ") +
+                    std::to_string(receiving_retry_counter),
+                    Loglevel::DEBUG_L1);
+              }
 
               if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy) &&
                   static_cast<stick20::device_status>(resp.storage_status.device_status)

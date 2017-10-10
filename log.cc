@@ -14,6 +14,8 @@ namespace nitrokey {
 
     std::string LogHandler::loglevel_to_str(Loglevel lvl) {
       switch (lvl) {
+        case Loglevel::DEBUG_L1:
+          return std::string("DEBUG_L1");
         case Loglevel::DEBUG_L2:
           return std::string("DEBUG_L2");
         case Loglevel::DEBUG:
@@ -44,14 +46,21 @@ namespace nitrokey {
     }
 
     std::string LogHandler::format_message_to_string(const std::string &str, const Loglevel &lvl) {
+      static bool last_short = false;
+      if (str.length() == 1){
+        last_short = true;
+        return str;
+      }
       time_t t = time(nullptr);
       tm tm = *localtime(&t);
 
       std::stringstream s;
       s
+          << (last_short? "\n" : "")
           << "[" << std::put_time(&tm, "%c") << "]"
           << "[" << loglevel_to_str(lvl) << "]\t"
           << str << std::endl;
+      last_short = false;
       return s.str();
     }
 

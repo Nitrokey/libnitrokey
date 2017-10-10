@@ -90,10 +90,10 @@ uint8_t get_without_result(T func){
         NK_last_command_status = libraryException.exception_id();
     }
     catch (const InvalidCRCReceived &invalidCRCException){
-	;;;
+      ;
     }
     catch (const DeviceCommunicationException &deviceException){
-        NK_last_command_status = -1;
+        NK_last_command_status = 256-deviceException.getType();
     }
     return NK_last_command_status;
 }
@@ -294,6 +294,12 @@ extern "C" {
 	NK_C_API void NK_set_debug(bool state) {
 		auto m = NitrokeyManager::instance();
 		m->set_debug(state);
+	}
+
+
+	NK_C_API void NK_set_debug_level(const int level) {
+		auto m = NitrokeyManager::instance();
+		m->set_loglevel(level);
 	}
 
 	NK_C_API int NK_totp_set_time(uint64_t time) {

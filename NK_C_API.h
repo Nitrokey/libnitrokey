@@ -14,9 +14,15 @@ extern "C" {
 #endif
 	/**
 	 * Set debug level of messages written on stderr
-	 * @param state state=True - all messages, state=False - only errors level
+	 * @param state state=True - most messages, state=False - only errors level
 	 */
 	NK_C_API void NK_set_debug(bool state);
+
+	/**
+	 * Set debug level of messages written on stderr
+	 * @param level (int) 0-lowest verbosity, 5-highest verbosity
+	 */
+  NK_C_API void NK_set_debug_level(const int level);
 
 	/**
 	 * Connect to device of given model. Currently library can be connected only to one device at once.

@@ -95,13 +95,11 @@ IF (NOT LIBNITROKEY_STATIC)
     SET(LIBNAME nitrokey)
 ELSE()
     add_library(nitrokey-static STATIC ${SOURCE_FILES})    
-    add_library(nitrokey-static-log STATIC ${SOURCE_FILES})
 	SET(LIBNAME nitrokey-static)
 ENDIF()
 
 
 target_link_libraries(${LIBNAME} hidapi-libusb)
-target_link_libraries(${LIBNAME}-log hidapi-libusb)
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION ${LIBNK_VERSION}
         SOVERSION ${LIBNK_VERSION_MAJOR} )
@@ -116,10 +114,13 @@ if (NOT MSVC)
             set(COMPILE_FLAGS "${COMPILE_FLAGS} -Werror")
         endif()
     ENDIF()
-    SET_TARGET_PROPERTIES(${LIBNAME} ${LIBNAME}-log PROPERTIES COMPILE_FLAGS ${COMPILE_FLAGS} )
+    SET_TARGET_PROPERTIES(${LIBNAME} PROPERTIES COMPILE_FLAGS ${COMPILE_FLAGS} )
 endif()
 
-SET_TARGET_PROPERTIES(${LIBNAME} PROPERTIES COMPILE_DEFINITIONS "NO_LOG")
+OPTION(NO_LOG "Compile without logging functionality and its strings (decreases size)" OFF)
+IF (NO_LOG)
+    SET_TARGET_PROPERTIES(${LIBNAME} PROPERTIES COMPILE_DEFINITIONS "NO_LOG")
+ENDIF()
 
 
 file(GLOB LIB_INCLUDES "include/*.h")
@@ -140,22 +141,22 @@ IF (COMPILE_TESTS)
     #needs connected PRO device for success
     #warning: it may delete data on the device
     add_executable (test_C_API unittest/test_C_API.cpp)
-    target_link_libraries (test_C_API ${EXTRA_LIBS} ${LIBNAME}-log catch)
+    target_link_libraries (test_C_API ${EXTRA_LIBS} ${LIBNAME} catch)
 
     add_executable (test2 unittest/test2.cc)
-    target_link_libraries (test2 ${EXTRA_LIBS} ${LIBNAME}-log catch)
+    target_link_libraries (test2 ${EXTRA_LIBS} ${LIBNAME} catch)
 
     add_executable (test3 unittest/test3.cc)
-    target_link_libraries (test3 ${EXTRA_LIBS} ${LIBNAME}-log catch)
+    target_link_libraries (test3 ${EXTRA_LIBS} ${LIBNAME} catch)
 
     add_executable (test_HOTP unittest/test_HOTP.cc)
-    target_link_libraries (test_HOTP ${EXTRA_LIBS} ${LIBNAME}-log catch)
+    target_link_libraries (test_HOTP ${EXTRA_LIBS} ${LIBNAME} catch)
 
     add_executable (test1 unittest/test.cc)
-    target_link_libraries (test1 ${EXTRA_LIBS} ${LIBNAME}-log catch)
+    target_link_libraries (test1 ${EXTRA_LIBS} ${LIBNAME} catch)
 
     add_executable (test_issues unittest/test_issues.cc)
-    target_link_libraries (test_issues ${EXTRA_LIBS} ${LIBNAME}-log catch)
+    target_link_libraries (test_issues ${EXTRA_LIBS} ${LIBNAME} catch)
 
 ENDIF()
 

@@ -223,6 +223,7 @@ namespace nitrokey {
               LOG(__FUNCTION__, Loglevel::DEBUG_L2);
 
               if (dev == nullptr){
+                LOG(std::string("Throw: Device not initialized"), Loglevel::DEBUG_L1);
                 throw DeviceNotConnected("Device not initialized");
               }
               dev->m_counters.total_comm_runs++;
@@ -241,8 +242,13 @@ namespace nitrokey {
               LOG("-------------------", Loglevel::DEBUG);
               LOG("Outgoing HID packet:", Loglevel::DEBUG);
               LOG(static_cast<std::string>(outp), Loglevel::DEBUG);
+              LOG(std::string("=> ") + std::string(commandid_to_string(static_cast<CommandID>(outp.command_id))), Loglevel::DEBUG_L1);
 
-              if (!outp.isValid()) throw DeviceSendingFailure("Invalid outgoing packet");
+
+              if (!outp.isValid()) {
+                LOG(std::string("Throw: Invalid outgoing packet"), Loglevel::DEBUG_L1);
+                throw DeviceSendingFailure("Invalid outgoing packet");
+              }
 
               bool successful_communication = false;
               int receiving_retry_counter = 0;
@@ -255,6 +261,7 @@ namespace nitrokey {
 //                  LOG("Encountered communication error, disconnecting device", Loglevel::DEBUG_L2);
 //                  dev->disconnect();
                   dev->m_counters.sending_error++;
+                  LOG(std::string("Throw: Device error while sending command "), Loglevel::DEBUG_L1);
                   throw DeviceSendingFailure(
                       std::string("Device error while sending command ") +
                       std::to_string(status));
@@ -267,6 +274,9 @@ namespace nitrokey {
                 int busy_counter = 0;
                 auto retry_timeout = dev->get_retry_timeout();
                 while (receiving_retry_counter-- > 0) {
+                  LOG(std::string("receiving_retry_counter count: ") + std::to_string(receiving_retry_counter),
+                      Loglevel::DEBUG_L1);
+
                   dev->m_counters.recv_executed++;
                   status = dev->recv(&resp);
 
@@ -308,6 +318,13 @@ namespace nitrokey {
                   }
                   if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy)) {
                     dev->m_counters.busy++;
+                    LOG(std::string("Busy retry ")
+                        + std::to_string(resp.storage_status.device_status)
+                        + " "
+                        + std::to_string(retry_timeout.count())
+                        + " "
+                        + std::to_string(receiving_retry_counter)
+                    , Loglevel::DEBUG_L1);
                     if (busy_counter++<10) {
                       receiving_retry_counter++;
                       LOG("Status busy, not decreasing receiving_retry_counter counter: " +
@@ -358,32 +375,49 @@ namespace nitrokey {
 
               if (status <= 0) {
                 dev->m_counters.receiving_error++;
+                LOG(std::string("Throw: Device error while executing command "), Loglevel::DEBUG_L1);
                 throw DeviceReceivingFailure( //FIXME replace with CriticalErrorException
                     std::string("Device error while executing command ") +
                     std::to_string(status));
               }
 
+              LOG(std::string("<= ") +
+                      std::string(
+                          commandid_to_string(static_cast<CommandID>(resp.command_id))
+                          + std::string(" ")
+                          + std::to_string(resp.storage_status.device_status)
+//                          + std::to_string( status_translate_command(resp.storage_status.device_status))
+                      ), Loglevel::DEBUG_L1);
+
               LOG("Incoming HID packet:", Loglevel::DEBUG);
               LOG(static_cast<std::string>(resp), Loglevel::DEBUG);
               LOG(std::string("receiving_retry_counter count: ") + std::to_string(receiving_retry_counter),
-                              Loglevel::DEBUG_L2);
+                              Loglevel::DEBUG_L1);
 
               if (resp.device_status == static_cast<uint8_t>(stick10::device_status::busy) &&
                   static_cast<stick20::device_status>(resp.storage_status.device_status)
                   == stick20::device_status::busy_progressbar){
                 dev->m_counters.busy_progressbar++;
+                LOG(std::string("Throw: Long operation in progress exception"), Loglevel::DEBUG_L1);
                 throw LongOperationInProgressException(
                     resp.command_id, resp.device_status, resp.storage_status.progress_bar_value);
               }
 
-              if (!resp.isValid()) throw InvalidCRCReceived("Invalid incoming packet");
-              if (receiving_retry_counter <= 0)
+              if (!resp.isValid()) {
+                LOG(std::string("Throw: Invalid incoming packet"), Loglevel::DEBUG_L1);
+                throw InvalidCRCReceived("Invalid incoming packet");
+              }
+              if (receiving_retry_counter <= 0){
+                LOG(std::string("Throw: \"Maximum receiving_retry_counter count reached for receiving response from the device!\""
+                + std::to_string(receiving_retry_counter)), Loglevel::DEBUG_L1);
                 throw DeviceReceivingFailure(
                     "Maximum receiving_retry_counter count reached for receiving response from the device!");
+              }
               dev->m_counters.communication_successful++;
 
               if (resp.last_command_status != static_cast<uint8_t>(stick10::command_status::ok)){
                 dev->m_counters.command_result_not_equal_0_recv++;
+                LOG(std::string("Throw: CommandFailedException"), Loglevel::DEBUG_L1);
                 throw CommandFailedException(resp.command_id, resp.last_command_status);
               }
 

@@ -28,11 +28,11 @@ IF (UNIX)
 ENDIF()
 
 project(libnitrokey)
-SET(PROJECT_VERSION "3.0-alpha")
+SET(PROJECT_VERSION "3.1")
 set(CMAKE_CXX_STANDARD 14)
 
 set(LIBNK_VERSION_MAJOR 3) #  reminder: incompatible API changes
-set(LIBNK_VERSION_MINOR 0) #  add functionality in a backwards-compatible manner
+set(LIBNK_VERSION_MINOR 1) #  add functionality in a backwards-compatible manner
 set(LIBNK_VERSION_PATCH 0) #  make backwards-compatible bug fixes
 set(LIBNK_VERSION ${LIBNK_VERSION_MAJOR}.${LIBNK_VERSION_MINOR}.${LIBNK_VERSION_PATCH} )
 
@@ -42,7 +42,6 @@ include(GNUInstallDirs)
 OPTION(LIBNITROKEY_STATIC "Build libnitrokey statically" FALSE)
 
 
-OPTION(COMPILE_TESTS "Compile tests" FALSE)
 IF (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE RelWithDebInfo)
 ENDIF()
@@ -91,7 +90,6 @@ ENDIF()
 
 IF (NOT LIBNITROKEY_STATIC)
     add_library(nitrokey SHARED ${SOURCE_FILES})
-    add_library(nitrokey-log SHARED ${SOURCE_FILES})
     SET(LIBNAME nitrokey)
 ELSE()
     add_library(nitrokey-static STATIC ${SOURCE_FILES})    
@@ -102,8 +100,6 @@ ENDIF()
 target_link_libraries(${LIBNAME} hidapi-libusb)
 
 set_target_properties(${LIBNAME} PROPERTIES VERSION ${LIBNK_VERSION}
-        SOVERSION ${LIBNK_VERSION_MAJOR} )
-set_target_properties(${LIBNAME}-log PROPERTIES VERSION ${LIBNK_VERSION}
         SOVERSION ${LIBNK_VERSION_MAJOR} )
 
 OPTION(ERROR_ON_WARNING "Stop compilation on warning found (not supported for MSVC)" ON)
@@ -126,16 +122,22 @@ ENDIF()
 file(GLOB LIB_INCLUDES "include/*.h")
 install (FILES ${LIB_INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libnitrokey)
 install (TARGETS ${LIBNAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install (TARGETS ${LIBNAME}-log DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
+OPTION(COMPILE_TESTS "Compile tests" FALSE)
+OPTION(COMPILE_OFFLINE_TESTS "Compile offline tests" FALSE)
 
-include_directories(unittest/Catch/include)
-add_library(catch STATIC unittest/catch_main.cpp )
-add_executable (test_offline unittest/test_offline.cc)
-target_link_libraries (test_offline ${EXTRA_LIBS} ${LIBNAME}-log catch)
-#run with 'make test' or 'ctest'
-include (CTest)
-add_test (runs test_offline)
+IF(COMPILE_OFFLINE_TESTS OR COMPILE_TESTS)
+    include_directories(unittest/Catch/include)
+    add_library(catch SHARED unittest/catch_main.cpp )
+ENDIF()
+
+IF(COMPILE_OFFLINE_TESTS)
+    add_executable (test_offline unittest/test_offline.cc)
+    target_link_libraries (test_offline ${EXTRA_LIBS} ${LIBNAME} catch)
+    #run with 'make test' or 'ctest'
+    include (CTest)
+    add_test (runs test_offline)
+ENDIF()
 
 IF (COMPILE_TESTS)
     #needs connected PRO device for success
@@ -159,7 +161,6 @@ IF (COMPILE_TESTS)
     target_link_libraries (test_issues ${EXTRA_LIBS} ${LIBNAME} catch)
 
 ENDIF()
-
 
 
 

@@ -43,7 +43,12 @@ OPTION(LIBNITROKEY_STATIC "Build libnitrokey statically" FALSE)
 
 
 IF (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE RelWithDebInfo)
+    IF(APPLE)
+        # Issues occur when build with enabled optimizations
+        set(CMAKE_BUILD_TYPE Debug)
+    ELSE()
+        set(CMAKE_BUILD_TYPE RelWithDebInfo)
+    ENDIF()
 ENDIF()
 MESSAGE("${PROJECT_NAME}: Build type: ${CMAKE_BUILD_TYPE}")
 
@@ -116,6 +121,11 @@ endif()
 OPTION(NO_LOG "Compile without logging functionality and its strings (decreases size)" OFF)
 IF (NO_LOG)
     SET_TARGET_PROPERTIES(${LIBNAME} PROPERTIES COMPILE_DEFINITIONS "NO_LOG")
+ENDIF()
+
+OPTION(LOG_VOLATILE_DATA "Log volatile data (debug)" OFF)
+IF (LOG_VOLATILE_DATA)
+    SET_TARGET_PROPERTIES(${LIBNAME} PROPERTIES COMPILE_DEFINITIONS "LOG_VOLATILE_DATA")
 ENDIF()
 
 

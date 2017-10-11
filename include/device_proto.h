@@ -393,12 +393,14 @@ namespace nitrokey {
               }
 
               LOG(std::string("<= ") +
-                      std::string(
-                          commandid_to_string(static_cast<CommandID>(resp.command_id))
-                          + std::string(" ")
-                          + std::to_string(resp.storage_status.device_status)
+                  std::string(
+                      commandid_to_string(static_cast<CommandID>(resp.command_id))
+                      + std::string(" ")
+                      + std::to_string(resp.device_status)
+                      + std::string(" ")
+                      + std::to_string(resp.storage_status.device_status)
 //                          + std::to_string( status_translate_command(resp.storage_status.device_status))
-                      ), Loglevel::DEBUG_L1);
+                  ), Loglevel::DEBUG_L1);
 
               LOG("Incoming HID packet:", Loglevel::DEBUG);
               LOG(static_cast<std::string>(resp), Loglevel::DEBUG);

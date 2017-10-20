@@ -15,7 +15,7 @@ public:
   DeviceCommunicationException(std::string _msg): std::runtime_error(_msg), message(_msg){
     ++occurred;
   }
-    const uint8_t getType() const {return 1;};
+  uint8_t getType() const {return 1;};
 //  virtual const char* what() const throw() override {
 //    return message.c_str();
 //  }
@@ -26,26 +26,25 @@ public:
 class DeviceNotConnected: public DeviceCommunicationException {
 public:
   DeviceNotConnected(std::string msg) : DeviceCommunicationException(msg){}
-    const uint8_t getType(){return 2;};
-
+  uint8_t getType() const {return 2;};
 };
 
 class DeviceSendingFailure: public DeviceCommunicationException {
 public:
   DeviceSendingFailure(std::string msg) : DeviceCommunicationException(msg){}
-    const uint8_t getType(){return 3;};
+  uint8_t getType() const {return 3;};
 };
 
 class DeviceReceivingFailure: public DeviceCommunicationException {
 public:
   DeviceReceivingFailure(std::string msg) : DeviceCommunicationException(msg){}
-    const uint8_t getType(){return 4;};
+  uint8_t getType() const {return 4;};
 };
 
 class InvalidCRCReceived: public DeviceReceivingFailure {
 public:
   InvalidCRCReceived(std::string msg) : DeviceReceivingFailure(msg){}
-    const uint8_t getType(){return 5;};
+  uint8_t getType() const {return 5;};
 };
 
 

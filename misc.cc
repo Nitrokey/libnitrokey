@@ -13,8 +13,8 @@ namespace misc {
 
 
 ::std::vector<uint8_t> hex_string_to_byte(const char* hexString){
-    const size_t big_string_size = 256; //arbitrary 'big' number
-    const size_t s_size = strlen(hexString);
+    constexpr size_t big_string_size = 256; //arbitrary 'big' number
+    const size_t s_size = strnlen(hexString, big_string_size+1);
     const size_t d_size = s_size/2;
     if (s_size%2!=0 || s_size>big_string_size){
         throw InvalidHexString(0);
@@ -25,8 +25,8 @@ namespace misc {
     char buf[2];
     for(size_t i=0; i<s_size; i++){
 
-        char c = hexString[i];
-        bool char_from_range = (('0' <= c && c <='9') || ('A' <= c && c <= 'F') || ('a' <= c && c<= 'f'));
+        const char c = hexString[i];
+        const bool char_from_range = (('0' <= c && c <='9') || ('A' <= c && c <= 'F') || ('a' <= c && c<= 'f'));
         if (!char_from_range){
             throw InvalidHexString(c);
         }

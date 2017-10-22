@@ -11,6 +11,15 @@ using namespace nitrokey;
 
 //This test suite assumes no Pro or Storage devices are connected
 
+#include <string.h>
+TEST_CASE("Get version", "[BASIC]") {
+  const char * v = NK_version();
+  CAPTURE(v);
+  REQUIRE( strnlen(v, 200) > 0 );
+  free((void*)v);
+}
+
+
 TEST_CASE("Return false on no device connected", "[fast]") {
   INFO("This test case assumes no Pro or Storage devices are connected");
   auto stick = make_shared<Stick20>();

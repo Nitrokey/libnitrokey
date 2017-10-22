@@ -4,6 +4,7 @@
 #include <cstring>
 #include "include/LibraryException.h"
 #include "include/cxx_semantics.h"
+#include "version.h"
 
 #ifdef _MSC_VER
 #ifdef _WIN32
@@ -97,6 +98,7 @@ uint8_t get_without_result(T func){
     }
     return NK_last_command_status;
 }
+
 
 
 #ifdef __cplusplus
@@ -533,7 +535,12 @@ extern "C" {
 
 
 	NK_C_API const char * NK_version() {
-	   return VERSION;
+	  auto m = NitrokeyManager::instance();
+	  return get_with_string_result([&](){
+	    const std::string & s = Version::version;
+	    char * rs = strndup(s.c_str(), max_string_field_length);
+	    return rs;
+	  });
 	}
 
 #ifdef __cplusplus

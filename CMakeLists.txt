@@ -28,42 +28,18 @@ IF (UNIX)
 ENDIF()
 
 project(libnitrokey)
-SET(PROJECT_VERSION "3.1")
 set(CMAKE_CXX_STANDARD 14)
 
 set(LIBNK_VERSION_MAJOR 3) #  reminder: incompatible API changes
 set(LIBNK_VERSION_MINOR 1) #  add functionality in a backwards-compatible manner
 set(LIBNK_VERSION_PATCH 0) #  make backwards-compatible bug fixes
 set(LIBNK_VERSION ${LIBNK_VERSION_MAJOR}.${LIBNK_VERSION_MINOR}.${LIBNK_VERSION_PATCH} )
+SET(PROJECT_VERSION "${LIBNK_VERSION}")
 
 
 include(GNUInstallDirs)
 
 OPTION(LIBNITROKEY_STATIC "Build libnitrokey statically" FALSE)
-
-# Getter for the library version
-#
-# If a git tag is available, we use it.
-# Else, we use a git version and we raise a warning.
-#
-exec_program(
-  "git"
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ARGS "describe"
-  OUTPUT_VARIABLE GIT_VERSION)
-
-IF(${GIT_TAG} MATCHES "fatal:.*")
-MESSAGE(WARNING "Unable to find a git tag. Using git version instead.")
-exec_program(
-  "git"
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ARGS "rev-parse HEAD"
-  OUTPUT_VARIABLE GIT_VERSION)
-ENDIF()
-
-MESSAGE("LIBRARY VERSION: ${GIT_VERSION} ")
-ADD_DEFINITIONS(-DVERSION="${GIT_VERSION}")
-
 
 IF (NOT CMAKE_BUILD_TYPE)
     IF(APPLE)
@@ -98,6 +74,8 @@ set(SOURCE_FILES
     device.cc
     log.cc
     misc.cc
+    version.cc
+    version.h
     NitrokeyManager.cc
     NK_C_API.h
     NK_C_API.cc
@@ -195,6 +173,34 @@ IF (COMPILE_TESTS)
 
 ENDIF()
 
+
+# Getter for the library version
+exec_program(
+        "git"
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ARGS "describe --always --dirty=-modified"
+        OUTPUT_VARIABLE GIT_VERSION)
+
+get_target_property(COMPILE_DEFINITIONS ${LIBNAME} COMPILE_DEFINITIONS)
+get_target_property(COMPILE_FLAGS ${LIBNAME} COMPILE_FLAGS)
+SET(FULL_VERSION "${PROJECT_VERSION}/${GIT_VERSION}")
+SET(VERSION_MORE "${CMAKE_BUILD_TYPE}/${COMPILE_FLAGS}")
+IF(COMPILE_DEFINITIONS)
+	SET(VERSION_MORE "${VERSION_MORE}/${COMPILE_DEFINITIONS}")
+ENDIF()
+IF(ADD_TSAN)
+	SET(VERSION_MORE "${VERSION_MORE} TSAN")
+ENDIF()
+IF(ADD_ASAN)
+	SET(VERSION_MORE "${VERSION_MORE} ASAN")
+ENDIF()
+IF(LIBNITROKEY_STATIC)
+	SET(VERSION_MORE "${VERSION_MORE} STATIC")
+ENDIF()
+MESSAGE("${PROJECT_NAME}: Version set: ${FULL_VERSION}")
+MESSAGE("${PROJECT_NAME}: Version additional: ${VERSION_MORE}")
+
+configure_file(version.cc.in ${CMAKE_SOURCE_DIR}/version.cc)
 
 
 #SET(CPACK_GENERATOR

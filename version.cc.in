@@ -1,0 +1,4 @@
+#include "version.h"
+
+const std::string Version::version = "${FULL_VERSION}";
+const std::string Version::version_more = "${VERSION_MORE}";

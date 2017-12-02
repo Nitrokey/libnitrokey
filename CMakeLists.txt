@@ -120,6 +120,10 @@ file(GLOB LIB_INCLUDES "include/*.h")
 install (FILES ${LIB_INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
 install (TARGETS nitrokey DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
+# configure and install pkg-config file
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libnitrokey.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libnitrokey-1.pc @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libnitrokey-1.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
 OPTION(COMPILE_TESTS "Compile tests" FALSE)
 OPTION(COMPILE_OFFLINE_TESTS "Compile offline tests" FALSE)
 

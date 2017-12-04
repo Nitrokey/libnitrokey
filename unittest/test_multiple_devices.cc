@@ -78,15 +78,35 @@ TEST_CASE("Use API", "[BASIC]") {
                           << " " << status_storage.ActiveSD_CardID_u32
                           << std::endl;
 
-                nm->fill_SD_card_with_random_data("12345678");
+//                nm->fill_SD_card_with_random_data("12345678");
             }
             catch (const LongOperationInProgressException &e){
                 std::cout << "long operation in progress on " << a
                         << " " << std::to_string(e.progress_bar_value) << std::endl;
-                this_thread::sleep_for(1000ms);
+//                this_thread::sleep_for(1000ms);
             }
         }
         std::cout <<"Iteration: " << i << std::endl;
     }
 
+}
+
+
+TEST_CASE("Use API ID", "[BASIC]") {
+    auto nm = NitrokeyManager::instance();
+    nm->set_loglevel(2);
+
+    auto v = nm->list_devices_by_cpuID();
+    REQUIRE(v.size() > 0);
+
+    for(int i=0; i<1000; i++) {
+        auto v = nm->list_devices_by_cpuID();
+        REQUIRE(v.size() > 0);
+        for (auto i : v) {
+            nm->connect_with_ID(i);
+            auto retry_count = nm->get_admin_retry_count();
+            std::cout << i << " " << to_string(retry_count) << std::endl;
+        }
+    }
+    std::cout << "finished" << std::endl;
 }

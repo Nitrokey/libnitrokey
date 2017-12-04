@@ -43,6 +43,7 @@ TEST_CASE("C API connect", "[BASIC]") {
 
 TEST_CASE("Check retry count", "[BASIC]") {
   REQUIRE(login != 0);
+  NK_set_debug_level(3);
   REQUIRE(NK_get_admin_retry_count() == 3);
   REQUIRE(NK_get_user_retry_count() == 3);
 }
@@ -56,4 +57,31 @@ TEST_CASE("Check long strings", "[STANDARD]") {
   result = NK_change_user_PIN(pin, longPin);
   REQUIRE(result == TOO_LONG_STRING);
   CAPTURE(result);
+}
+
+#include <string.h>
+
+TEST_CASE("multiple devices with ID", "[BASIC]") {
+  NK_logout();
+  NK_set_debug_level(3);
+  auto s = NK_list_devices_by_cpuID();
+  REQUIRE(s!=nullptr);
+  REQUIRE(strnlen(s, 4096) < 4096);
+  REQUIRE(strnlen(s, 4096) > 2*4);
+  std::cout << s << std::endl;
+
+  char *string, *token;
+  int t;
+
+  string = strndup(s, 4096);
+  free ( (void*) s);
+
+  while ((token = strsep(&string, ";")) != nullptr){
+    if (strnlen(token, 4096) < 3) continue;
+    std::cout << token << " connecting: ";
+    std::cout << (t=NK_connect_with_ID(token)) << std::endl;
+    REQUIRE(t == 1);
+  }
+
+  free (string);
 }

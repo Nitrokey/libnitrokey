@@ -568,6 +568,12 @@ extern "C" {
 	 */
 	NK_C_API int NK_get_progress_bar_value();
 
+
+	NK_C_API const char* NK_list_devices_by_cpuID();
+	NK_C_API int NK_connect_with_ID(const char* id);
+
+
+
 #ifdef __cplusplus
 }
 #endif

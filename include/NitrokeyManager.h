@@ -69,6 +69,8 @@ char * strndup(const char* str, size_t maxlen);
         bool erase_totp_slot(uint8_t slot_number, const char *temporary_password);
         bool erase_hotp_slot(uint8_t slot_number, const char *temporary_password);
         std::vector<std::string> list_devices();
+        std::vector<std::string> list_devices_by_cpuID();
+        bool connect_with_ID(const std::string id);
         bool connect_with_path (std::string path);
         bool connect(const char *device_model);
         bool connect();
@@ -202,6 +204,7 @@ char * strndup(const char* str, size_t maxlen);
         static shared_ptr <NitrokeyManager> _instance;
         std::shared_ptr<Device> device;
         std::unordered_map<std::string, shared_ptr<Device> > connected_devices;
+        std::unordered_map<std::string, shared_ptr<Device> > connected_devices_byID;
 
 
         stick10::ReadSlot::ResponsePayload get_OTP_slot_data(const uint8_t slot_number);

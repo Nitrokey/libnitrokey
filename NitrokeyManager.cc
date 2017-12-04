@@ -81,6 +81,8 @@ using nitrokey::misc::strcpyT;
         set_debug(true);
     }
     NitrokeyManager::~NitrokeyManager() {
+        std::lock_guard<std::mutex> lock(mex_dev_com_manager);
+
         for (auto d : connected_devices){
             if (d.second == nullptr) continue;
             d.second->disconnect();
@@ -104,27 +106,98 @@ using nitrokey::misc::strcpyT;
     }
 
     std::vector<std::string> NitrokeyManager::list_devices(){
+        std::lock_guard<std::mutex> lock(mex_dev_com_manager);
+
         auto p = make_shared<Stick20>();
         return p->enumerate(); // make static
     }
 
-    bool NitrokeyManager::connect_with_path(std::string path) {
+    std::vector<std::string> NitrokeyManager::list_devices_by_cpuID(){
         std::lock_guard<std::mutex> lock(mex_dev_com_manager);
 
-        if(connected_devices.find(path) != connected_devices.end()
-                && connected_devices[path] != nullptr) {
-            device = connected_devices[path];
-            return true;
-        }
+        std::vector<std::string> res;
+        auto d = make_shared<Stick20>();
+        const auto v = d->enumerate();
+        for (auto & p: v){
+            d = make_shared<Stick20>();
+            d->set_path(p);
+            try{
+                if (d->connect()){
+                    device = d;
+                    const auto status = get_status_storage();
+                    const auto sc_id = status.ActiveSmartCardID_u32;
+                    const auto sd_id = status.ActiveSD_CardID_u32;
 
+                    auto id = std::to_string(sc_id) + ":" + std::to_string(sd_id);
+                    connected_devices_byID[id] = d;
+                    res.push_back(id);
+                } else{
+                    std::cout << "Could not connect to: " + p << std::endl;
+                }
+            }
+            catch (const DeviceCommunicationException &e){
+                //ignore
+                std::cout << p << ": " << " Exception encountered" << std::endl;
+            }
+        }
+        return res;
+    }
+/**
+ * Connect to the device using unique smartcard:datacard id.
+ * Needs list_device_by_cpuID run first
+ * @param id
+ * @return
+ */
+    bool NitrokeyManager::connect_with_ID(const std::string id) {
+        std::lock_guard<std::mutex> lock(mex_dev_com_manager);
+
+        auto position = connected_devices_byID.find(id);
+        if (position == connected_devices_byID.end()) return false;
+
+        auto d = connected_devices_byID[id];
+        device = d;
+
+        try{
+            get_status();
+        }
+        catch (const DeviceCommunicationException &){
+            d->disconnect();
+            connected_devices_byID[id] = nullptr;
+            connected_devices_byID.erase(position);
+            return false;
+        }
+        return true;
+    }
+
+        /**
+         * Connects device to path.
+         * Assumes devices are not being disconnected and caches connections (param cache_connections).
+         * @param path os-dependent device path
+         * @return false, when could not connect, true otherwise
+         */
+    bool NitrokeyManager::connect_with_path(std::string path) {
+        const bool cache_connections = false;
+
+        std::lock_guard<std::mutex> lock(mex_dev_com_manager);
+
+        if (cache_connections){
+            if(connected_devices.find(path) != connected_devices.end()
+                    && connected_devices[path] != nullptr) {
+                device = connected_devices[path];
+                return true;
+            }
+        }
 
         auto p = make_shared<Stick20>();
         p->set_path(path);
 
         if(!p->connect()) return false;
 
-        connected_devices [path] = p;
-        device = p;
+        if(cache_connections){
+            connected_devices [path] = p;
+        }
+
+        device = p; //previous device will be disconnected automatically
         return true;
     }
 

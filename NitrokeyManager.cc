@@ -81,6 +81,11 @@ using nitrokey::misc::strcpyT;
         set_debug(true);
     }
     NitrokeyManager::~NitrokeyManager() {
+        for (auto d : connected_devices){
+            if (d.second == nullptr) continue;
+            d.second->disconnect();
+            connected_devices[d.first] = nullptr;
+        }
     }
 
     bool NitrokeyManager::set_current_device_speed(int retry_delay, int send_receive_delay){
@@ -96,6 +101,31 @@ using nitrokey::misc::strcpyT;
       device->set_receiving_delay(std::chrono::duration<int, std::milli>(send_receive_delay));
       device->set_retry_delay(std::chrono::duration<int, std::milli>(retry_delay));
       return true;
+    }
+
+    std::vector<std::string> NitrokeyManager::list_devices(){
+        auto p = make_shared<Stick20>();
+        return p->enumerate(); // make static
+    }
+
+    bool NitrokeyManager::connect_with_path(std::string path) {
+        std::lock_guard<std::mutex> lock(mex_dev_com_manager);
+
+        if(connected_devices.find(path) != connected_devices.end()
+                && connected_devices[path] != nullptr) {
+            device = connected_devices[path];
+            return true;
+        }
+
+
+        auto p = make_shared<Stick20>();
+        p->set_path(path);
+
+        if(!p->connect()) return false;
+
+        connected_devices [path] = p;
+        device = p;
+        return true;
     }
 
     bool NitrokeyManager::connect() {

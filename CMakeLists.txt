@@ -191,6 +191,9 @@ IF (COMPILE_TESTS)
     add_executable (test_issues unittest/test_issues.cc)
     target_link_libraries (test_issues ${EXTRA_LIBS} nitrokey catch)
 
+    add_executable (test_multiple_devices unittest/test_multiple_devices.cc)
+    target_link_libraries (test_multiple_devices ${EXTRA_LIBS} ${LIBNAME} catch)
+
 ENDIF()
 
 

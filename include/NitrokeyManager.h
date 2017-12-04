@@ -30,6 +30,7 @@
 #include "stick20_commands.h"
 #include <vector>
 #include <memory>
+#include <unordered_map>
 
 namespace nitrokey {
     using namespace nitrokey::device;
@@ -67,6 +68,8 @@ char * strndup(const char* str, size_t maxlen);
         bool get_time(uint64_t time = 0);
         bool erase_totp_slot(uint8_t slot_number, const char *temporary_password);
         bool erase_hotp_slot(uint8_t slot_number, const char *temporary_password);
+        std::vector<std::string> list_devices();
+        bool connect_with_path (std::string path);
         bool connect(const char *device_model);
         bool connect();
         bool disconnect();
@@ -198,8 +201,10 @@ char * strndup(const char* str, size_t maxlen);
 
         static shared_ptr <NitrokeyManager> _instance;
         std::shared_ptr<Device> device;
+        std::unordered_map<std::string, shared_ptr<Device> > connected_devices;
 
-      stick10::ReadSlot::ResponsePayload get_OTP_slot_data(const uint8_t slot_number);
+
+        stick10::ReadSlot::ResponsePayload get_OTP_slot_data(const uint8_t slot_number);
       bool is_valid_hotp_slot_number(uint8_t slot_number) const;
         bool is_valid_totp_slot_number(uint8_t slot_number) const;
         bool is_valid_password_safe_slot_number(uint8_t slot_number) const;

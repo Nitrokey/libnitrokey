@@ -25,6 +25,7 @@
 #include "hidapi/hidapi.h"
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #define HID_REPORT_SIZE 65
 
@@ -105,8 +106,10 @@ public:
    * @return true if visible by OS
    */
   bool could_be_enumerated();
+  std::vector<std::string> enumerate();
 
-  void show_stats();
+
+        void show_stats();
 //  ErrorCounters get_stats(){ return m_counters; }
   int get_retry_receiving_count() const { return m_retry_receiving_count; };
   int get_retry_sending_count() const { return m_retry_sending_count; };
@@ -121,8 +124,10 @@ public:
   void set_retry_delay(std::chrono::milliseconds delay);
   static void set_default_device_speed(int delay);
   void setDefaultDelay();
+  void set_path(const std::string path);
 
-private:
+
+        private:
   std::atomic<uint8_t> last_command_status;
   void _reconnect();
   bool _connect();
@@ -143,6 +148,7 @@ protected:
   std::chrono::milliseconds m_retry_timeout;
   std::chrono::milliseconds m_send_receive_delay;
   std::atomic<hid_device *>mp_devhandle;
+  std::string m_path;
 
   static std::atomic_int instances_count;
   static std::chrono::milliseconds default_delay ;

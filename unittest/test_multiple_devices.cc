@@ -8,7 +8,6 @@ const char * RFC_SECRET = "12345678901234567890";
 
 #include <iostream>
 #include <NitrokeyManager.h>
-#include <iostream>
 #include <stick20_commands.h>
 
 using namespace nitrokey;
@@ -99,13 +98,43 @@ TEST_CASE("Use API ID", "[BASIC]") {
     auto v = nm->list_devices_by_cpuID();
     REQUIRE(v.size() > 0);
 
-    for(int i=0; i<1000; i++) {
+    //no refresh - should not reconnect to new devices
+    for (int j = 0; j < 100; j++) {
+        for (auto i : v) {
+            if (!nm->connect_with_ID(i)) continue;
+            int retry_count = 99;
+            try {
+                retry_count = nm->get_admin_retry_count();
+                std::cout << j << " " << i << " " << to_string(retry_count) << std::endl;
+            }
+            catch (...) {
+                retry_count = 99;
+                //pass
+            }
+        }
+    }
+    std::cout << "finished" << std::endl;
+}
+
+TEST_CASE("Use API ID refresh", "[BASIC]") {
+    auto nm = NitrokeyManager::instance();
+    nm->set_loglevel(2);
+
+    //refresh in each iteration - should reconnect to new devices
+    for(int j=0; j<100; j++) {
         auto v = nm->list_devices_by_cpuID();
         REQUIRE(v.size() > 0);
         for (auto i : v) {
             nm->connect_with_ID(i);
-            auto retry_count = nm->get_admin_retry_count();
-            std::cout << i << " " << to_string(retry_count) << std::endl;
+            int retry_count = 99;
+            try {
+                retry_count = nm->get_admin_retry_count();
+                std::cout << j <<" " << i << " " << to_string(retry_count) << std::endl;
+            }
+            catch (...){
+                retry_count = 99;
+                //pass
+            }
         }
     }
     std::cout << "finished" << std::endl;

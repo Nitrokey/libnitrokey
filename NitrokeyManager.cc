@@ -113,13 +113,25 @@ using nitrokey::misc::strcpyT;
     }
 
     std::vector<std::string> NitrokeyManager::list_devices_by_cpuID(){
-        std::lock_guard<std::mutex> lock(mex_dev_com_manager);
+        //disconnect default device
+        disconnect();
 
+        std::lock_guard<std::mutex> lock(mex_dev_com_manager);
+        LOGD1("Disconnecting registered devices");
+        for (auto & kv : connected_devices_byID){
+            if (kv.second != nullptr)
+                kv.second->disconnect();
+        }
+        connected_devices_byID.clear();
+
+        LOGD1("Enumerating devices");
         std::vector<std::string> res;
         auto d = make_shared<Stick20>();
         const auto v = d->enumerate();
+        LOGD1("Discovering IDs");
         for (auto & p: v){
             d = make_shared<Stick20>();
+            LOGD1( std::string("Found: ") + p );
             d->set_path(p);
             try{
                 if (d->connect()){
@@ -131,13 +143,13 @@ using nitrokey::misc::strcpyT;
                     auto id = std::to_string(sc_id) + ":" + std::to_string(sd_id);
                     connected_devices_byID[id] = d;
                     res.push_back(id);
+                    LOGD1( std::string("Found: ") + p + " => " + id);
                 } else{
-                    std::cout << "Could not connect to: " + p << std::endl;
+                    LOGD1( std::string("Could not connect to: ") + p);
                 }
             }
             catch (const DeviceCommunicationException &e){
-                //ignore
-                std::cout << p << ": " << " Exception encountered" << std::endl;
+                LOGD1( std::string("Exception encountered: ") + p);
             }
         }
         return res;
@@ -157,6 +169,7 @@ using nitrokey::misc::strcpyT;
         auto d = connected_devices_byID[id];
         device = d;
 
+        //validate connection
         try{
             get_status();
         }

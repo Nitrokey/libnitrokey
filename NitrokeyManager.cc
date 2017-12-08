@@ -136,11 +136,18 @@ using nitrokey::misc::strcpyT;
             try{
                 if (d->connect()){
                     device = d;
-                    const auto status = get_status_storage();
-                    const auto sc_id = status.ActiveSmartCardID_u32;
-                    const auto sd_id = status.ActiveSD_CardID_u32;
+                    std::string id;
+                    try {
+                        const auto status = get_status_storage();
+                        const auto sc_id = status.ActiveSmartCardID_u32;
+                        const auto sd_id = status.ActiveSD_CardID_u32;
+                        id = std::to_string(sc_id) + ":" + std::to_string(sd_id);
+                    }
+                    catch (const LongOperationInProgressException &e) {
+                        LOGD1(std::string("Long operation in progress, setting ID to: ") + p);
+                        id = p;
+                    }
 
-                    auto id = std::to_string(sc_id) + ":" + std::to_string(sd_id);
                     connected_devices_byID[id] = d;
                     res.push_back(id);
                     LOGD1( std::string("Found: ") + p + " => " + id);
@@ -172,6 +179,9 @@ using nitrokey::misc::strcpyT;
         //validate connection
         try{
             get_status();
+        }
+        catch (const LongOperationInProgressException &){
+            //ignore
         }
         catch (const DeviceCommunicationException &){
             d->disconnect();

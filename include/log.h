@@ -98,6 +98,7 @@ namespace nitrokey {
 #define LOGD(string) while(false){}
 #else
 #define LOG(string, level) nitrokey::log::Log::instance()((string), (level))
+#define LOGD1(string) nitrokey::log::Log::instance()((string), (nitrokey::log::Loglevel::DEBUG_L1))
 #define LOGD(string) nitrokey::log::Log::instance()((string), (nitrokey::log::Loglevel::DEBUG_L2))
 #endif
 

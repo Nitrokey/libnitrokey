@@ -3,7 +3,7 @@ sudo: false
 os: osx
 env:
   global:
-    - CF=-DCOMPILE_OFFLINE_TESTS=1
+    - CF="-DCOMPILE_OFFLINE_TESTS=1 -DERROR_ON_WARNING=ON"
 
 matrix:
   include:

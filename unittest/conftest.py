@@ -56,7 +56,8 @@ def C(request):
         print("No library file found")
         sys.exit(1)
 
-    C.NK_set_debug(False)
+    C.NK_set_debug(True)
+    C.NK_set_debug_level(4)
     nk_login = C.NK_login_auto()
     if nk_login != 1:
         print('No devices detected!')
@@ -77,7 +78,7 @@ def C(request):
         print('Finished')
 
     request.addfinalizer(fin)
-    # C.NK_set_debug(True)
-    C.NK_set_debug_level(3)
+    C.NK_set_debug(True)
+    C.NK_set_debug_level(4)
 
     return C

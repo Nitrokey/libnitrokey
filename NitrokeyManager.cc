@@ -12,6 +12,8 @@
 
 std::mutex nitrokey::proto::send_receive_mtx;
 
+nitrokey::proto::retry_type nitrokey::proto::on_retry = [](int){return 0;};
+
 namespace nitrokey{
 
     std::mutex mex_dev_com_manager;
@@ -59,6 +61,10 @@ using nitrokey::misc::strcpyT;
         set_debug(true);
     }
     NitrokeyManager::~NitrokeyManager() {
+    }
+
+    void NitrokeyManager::set_retry_function(const nitrokey::proto::retry_type retry_func){
+      nitrokey::proto::on_retry = retry_func;
     }
 
     bool NitrokeyManager::set_current_device_speed(int retry_delay, int send_receive_delay){

@@ -1,6 +1,7 @@
 #ifndef DEVICE_PROTO_H
 #define DEVICE_PROTO_H
 
+#include <functional>
 #include <utility>
 #include <thread>
 #include <type_traits>
@@ -38,6 +39,8 @@
 namespace nitrokey {
     namespace proto {
       extern std::mutex send_receive_mtx;
+      using retry_type = std::function <int(int)>;
+      extern retry_type on_retry;
 
 
 /*
@@ -362,6 +365,8 @@ namespace nitrokey {
                   dev->m_counters.total_retries++;
                   LOG(".", Loglevel::DEBUG_L1);
                   std::this_thread::sleep_for(retry_timeout);
+                  if (on_retry(receiving_retry_counter) == -1)
+                    throw DeviceReceivingFailure("User canceled");
                   continue;
                 }
                 if (successful_communication) break;

@@ -77,7 +77,8 @@ def C(request):
         print("No library file found")
         sys.exit(1)
 
-    C.NK_set_debug(False)
+    C.NK_set_debug_level(int(os.environ.get('LIBNK_DEBUG', 2)))
+
     nk_login = C.NK_login_auto()
     if nk_login != 1:
         print('No devices detected!')
@@ -86,6 +87,7 @@ def C(request):
     firmware_version = C.NK_get_minor_firmware_version()
     model = 'P' if firmware_version in [7,8] else 'S'
     device_type = (model, firmware_version)
+    print('Connected device: {} {}'.format(model, firmware_version))
 
     # assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # assert C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP) == DeviceErrorCode.STATUS_OK
@@ -99,6 +101,6 @@ def C(request):
 
     request.addfinalizer(fin)
     # C.NK_set_debug(True)
-    C.NK_set_debug_level(3)
+    C.NK_set_debug_level(int(os.environ.get('LIBNK_DEBUG', 3)))
 
     return C

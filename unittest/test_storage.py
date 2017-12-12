@@ -53,6 +53,8 @@ def test_get_status_storage(C):
     status_dict = get_dict_from_dissect(status_string.decode('ascii'))
     default_admin_password_retry_count = 3
     assert int(status_dict['AdminPwRetryCount']) == default_admin_password_retry_count
+    print('C.NK_get_major_firmware_version(): {}'.format(C.NK_get_major_firmware_version()))
+    print('C.NK_get_minor_firmware_version(): {}'.format(C.NK_get_minor_firmware_version()))
 
 
 @pytest.mark.other

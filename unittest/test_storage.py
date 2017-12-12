@@ -289,6 +289,20 @@ def test_unencrypted_volume_set_read_write(C):
     assert C.NK_set_unencrypted_read_write(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.encrypted
+def test_encrypted_volume_set_read_only(C):
+    skip_if_device_version_lower_than({'S': 49})
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_set_encrypted_read_only(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+
+
+@pytest.mark.encrypted
+def test_encrypted_volume_set_read_write(C):
+    skip_if_device_version_lower_than({'S': 49})
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_set_encrypted_read_write(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+
+
 @pytest.mark.other
 def test_export_firmware(C):
     skip_if_device_version_lower_than({'S': 43})

@@ -83,7 +83,7 @@ def C(request):
         print('No devices detected!')
     assert nk_login != 0  # returns 0 if not connected or wrong model or 1 when connected
     global device_type
-    firmware_version = C.NK_get_major_firmware_version()
+    firmware_version = C.NK_get_minor_firmware_version()
     model = 'P' if firmware_version in [7,8] else 'S'
     device_type = (model, firmware_version)
 

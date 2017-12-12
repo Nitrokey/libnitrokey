@@ -569,6 +569,13 @@ extern "C" {
 	NK_C_API int NK_get_major_firmware_version() {
 		auto m = NitrokeyManager::instance();
 		return get_with_result([&]() {
+			return m->get_major_firmware_version();
+		});
+	}
+
+  NK_C_API int NK_get_minor_firmware_version() {
+		auto m = NitrokeyManager::instance();
+		return get_with_result([&]() {
 			return m->get_minor_firmware_version();
 		});
 	}

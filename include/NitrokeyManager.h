@@ -210,6 +210,8 @@ char * strndup(const char* str, size_t maxlen);
         void set_unencrypted_read_write_admin_pin(const char *admin_pin);
 
         void set_unencrypted_read_only_admin_pin(const char *admin_pin);
+
+      int get_major_firmware_version();
     };
 }
 

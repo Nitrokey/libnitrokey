@@ -755,11 +755,25 @@ using nitrokey::misc::strcpyT;
       switch(device->get_device_model()){
         case DeviceModel::PRO:{
           auto status_p = GetStatus::CommandTransaction::run(device);
-          return status_p.data().firmware_version; //7 or 8
+          return status_p.data().firmware_version_st.minor; //7 or 8
         }
         case DeviceModel::STORAGE:{
           auto status = stick20::GetDeviceStatus::CommandTransaction::run(device);
-          return status.data().versionInfo.minor;
+          auto test_firmware = status.data().versionInfo.build_iteration != 0;
+          return status.data().versionInfo.minor + (test_firmware? 1 : 0);
+        }
+      }
+      return 0;
+    }
+    int NitrokeyManager::get_major_firmware_version(){
+      switch(device->get_device_model()){
+        case DeviceModel::PRO:{
+          auto status_p = GetStatus::CommandTransaction::run(device);
+          return status_p.data().firmware_version_st.major; //0
+        }
+        case DeviceModel::STORAGE:{
+          auto status = stick20::GetDeviceStatus::CommandTransaction::run(device);
+          return status.data().versionInfo.major;
         }
       }
       return 0;

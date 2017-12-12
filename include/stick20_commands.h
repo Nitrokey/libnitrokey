@@ -168,10 +168,10 @@ namespace nitrokey {
                     union{
                     uint8_t VersionInfo_au8[4];
                         struct {
-                            uint8_t _reserved;
+                            uint8_t major;
                             uint8_t minor;
                             uint8_t _reserved2;
-                            uint8_t major;
+                            uint8_t build_iteration;
                         } __packed versionInfo;
                     } __packed;
 
@@ -215,8 +215,9 @@ namespace nitrokey {
                       print_to_ss((int) ReadWriteFlagUncryptedVolume_u8 );
                       print_to_ss((int) ReadWriteFlagCryptedVolume_u8 );
                       print_to_ss((int) ReadWriteFlagHiddenVolume_u8 );
-                      print_to_ss((int) VersionInfo_au8[1] );
-                      print_to_ss((int) VersionInfo_au8[3] );
+                      print_to_ss((int) versionInfo.major );
+                      print_to_ss((int) versionInfo.minor );
+                      print_to_ss((int) versionInfo.build_iteration );
                       print_to_ss((int) FirmwareLocked_u8 );
                       print_to_ss((int) NewSDCardFound_u8 );
                       print_to_ss((int) NewSDCardFound_st.NewCard );

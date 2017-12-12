@@ -360,9 +360,15 @@ extern "C" {
 
 	/**
 	 * Get device's major firmware version
-	 * @return 7,8 for Pro and major for Storage
+	 * @return major part of the version number (e.g. 0 from 0.48, 0 from 0.7 etc.)
 	 */
 	NK_C_API int NK_get_major_firmware_version();
+
+	/**
+	 * Get device's minor firmware version
+	 * @return minor part of the version number (e.g. 7 from 0.7, 48 from 0.48 etc.)
+	 */
+	NK_C_API int NK_get_minor_firmware_version();
 
 
 

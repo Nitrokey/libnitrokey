@@ -824,23 +824,19 @@ using nitrokey::misc::strcpyT;
     }
 
     void NitrokeyManager::set_unencrypted_read_only(const char* user_pin) {
-        //available until 0.48
-      misc::execute_password_command<stick20::SendSetReadonlyToUncryptedVolume>(device, user_pin);
+      //until 0.48 User PIN was sufficient, from 0.49 it needs Admin PIN
+      if (get_minor_firmware_version()<=48)
+        misc::execute_password_command<stick20::SendSetReadonlyToUncryptedVolume>(device, user_pin);
+      else
+        misc::execute_password_command<stick20::SetUnencryptedVolumeReadOnlyAdmin>(device, user_pin);
     }
 
     void NitrokeyManager::set_unencrypted_read_write(const char* user_pin) {
-        //available until 0.48
-      misc::execute_password_command<stick20::SendSetReadwriteToUncryptedVolume>(device, user_pin);
-    }
-
-    void NitrokeyManager::set_unencrypted_read_only_admin_pin(const char* admin_pin) {
-        //available from 0.49
-      misc::execute_password_command<stick20::SetUnencryptedVolumeReadOnlyAdmin>(device, admin_pin);
-    }
-
-    void NitrokeyManager::set_unencrypted_read_write_admin_pin(const char* admin_pin) {
-        //available from 0.49
-      misc::execute_password_command<stick20::SetUnencryptedVolumeReadWriteAdmin>(device, admin_pin);
+        //until 0.48 User PIN was sufficient, from 0.49 it needs Admin PIN
+      if (get_minor_firmware_version()<=48)
+        misc::execute_password_command<stick20::SendSetReadwriteToUncryptedVolume>(device, user_pin);
+      else
+        misc::execute_password_command<stick20::SetUnencryptedVolumeReadWriteAdmin>(device, user_pin);
     }
 
     void NitrokeyManager::export_firmware(const char* admin_pin) {

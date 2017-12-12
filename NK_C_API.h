@@ -445,6 +445,29 @@ extern "C" {
 	NK_C_API int NK_set_unencrypted_read_write(const char* user_pin);
 
 	/**
+	 * Make encrypted volume read-only.
+	 * Device hides encrypted volume for a second therefore make sure
+	 * buffers are flushed before running.
+	 * Storage only
+	 * @param admin_pin 20 characters
+	 * @return command processing error code
+	 */
+	NK_C_API int NK_set_encrypted_read_only(const char* admin_pin);
+
+	/**
+	 * Make encrypted volume read-write.
+	 * Device hides encrypted volume for a second therefore make sure
+	 * buffers are flushed before running.
+	 * Storage only
+	 * @param admin_pin 20 characters
+	 * @return command processing error code
+	 */
+	NK_C_API int NK_set_encrypted_read_write(const char* admin_pin);
+
+
+
+
+	/**
 	 * Exports device's firmware to unencrypted volume.
 	 * Storage only
 	 * @param admin_pin 20 characters

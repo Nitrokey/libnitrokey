@@ -509,6 +509,20 @@ extern "C" {
 		});
 	}
 
+	NK_C_API int NK_set_encrypted_read_only(const char* admin_pin) {
+		auto m = NitrokeyManager::instance();
+		return get_without_result([&]() {
+			m->set_encrypted_volume_read_only(admin_pin);
+		});
+	}
+
+	NK_C_API int NK_set_encrypted_read_write(const char* admin_pin) {
+		auto m = NitrokeyManager::instance();
+		return get_without_result([&]() {
+			m->set_encrypted_volume_read_write(admin_pin);
+		});
+	}
+
 	NK_C_API int NK_export_firmware(const char* admin_pin) {
 		auto m = NitrokeyManager::instance();
 		return get_without_result([&]() {

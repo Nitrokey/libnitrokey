@@ -126,9 +126,9 @@ char * strndup(const char* str, size_t maxlen);
         void unlock_hidden_volume(const char *hidden_volume_password);
         void lock_hidden_volume();
 
-        void set_unencrypted_read_only(const char *user_pin);
+        void set_unencrypted_read_only(const char *user_admin_pin);
 
-        void set_unencrypted_read_write(const char *user_pin);
+        void set_unencrypted_read_write(const char *user_admin_pin);
 
         void export_firmware(const char *admin_pin);
         void enable_firmware_update(const char *firmware_pin);

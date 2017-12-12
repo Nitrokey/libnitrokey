@@ -428,21 +428,23 @@ extern "C" {
 	 * Make unencrypted volume read-only.
 	 * Device hides unencrypted volume for a second therefore make sure
 	 * buffers are flushed before running.
+	 * Accepts: User PIN for Storage v0.48 and below, Admin PIN for Storage v0.49+
 	 * Storage only
-	 * @param user_pin 20 characters
+	 * @param user_admin_pin 20 characters
 	 * @return command processing error code
 	 */
-	NK_C_API int NK_set_unencrypted_read_only(const char* user_pin);
+	NK_C_API int NK_set_unencrypted_read_only(const char* user_admin_pin);
 
 	/**
 	 * Make unencrypted volume read-write.
 	 * Device hides unencrypted volume for a second therefore make sure
 	 * buffers are flushed before running.
+	 * Accepts: User PIN for Storage v0.48 and below, Admin PIN for Storage v0.49+
 	 * Storage only
-	 * @param user_pin 20 characters
+	 * @param user_admin_pin 20 characters
 	 * @return command processing error code
 	 */
-	NK_C_API int NK_set_unencrypted_read_write(const char* user_pin);
+	NK_C_API int NK_set_unencrypted_read_write(const char* user_admin_pin);
 
 	/**
 	 * Make encrypted volume read-only.

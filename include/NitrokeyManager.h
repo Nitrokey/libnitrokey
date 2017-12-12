@@ -202,6 +202,14 @@ char * strndup(const char* str, size_t maxlen);
       void set_loglevel(Loglevel loglevel);
 
       void set_loglevel(int loglevel);
+
+        void set_encrypted_volume_read_only(const char *admin_pin);
+
+        void set_encrypted_volume_read_write(const char *admin_pin);
+
+        void set_unencrypted_read_write_admin_pin(const char *admin_pin);
+
+        void set_unencrypted_read_only_admin_pin(const char *admin_pin);
     };
 }
 

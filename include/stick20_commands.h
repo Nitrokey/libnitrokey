@@ -52,6 +52,15 @@ namespace nitrokey {
             class EnableEncryptedPartition : public PasswordCommand<CommandID::ENABLE_CRYPTED_PARI> {};
             class EnableHiddenEncryptedPartition : public PasswordCommand<CommandID::ENABLE_HIDDEN_CRYPTED_PARI> {};
 
+            class SetUnencryptedVolumeReadOnlyAdmin :
+                    public PasswordCommand<CommandID::ENABLE_ADMIN_READONLY_UNCRYPTED_LUN, PasswordKind::Admin> {};
+            class SetUnencryptedVolumeReadWriteAdmin :
+                    public PasswordCommand<CommandID::ENABLE_ADMIN_READWRITE_UNCRYPTED_LUN, PasswordKind::Admin> {};
+            class SetEncryptedVolumeReadOnly :
+                    public PasswordCommand<CommandID::ENABLE_ADMIN_READONLY_ENCRYPTED_LUN, PasswordKind::Admin> {};
+            class SetEncryptedVolumeReadWrite :
+                    public PasswordCommand<CommandID::ENABLE_ADMIN_READWRITE_ENCRYPTED_LUN, PasswordKind::Admin> {};
+
             //FIXME the volume disabling commands do not need password
             class DisableEncryptedPartition : public PasswordCommand<CommandID::DISABLE_CRYPTED_PARI> {};
             class DisableHiddenEncryptedPartition : public PasswordCommand<CommandID::DISABLE_HIDDEN_CRYPTED_PARI> {};
@@ -262,6 +271,12 @@ namespace nitrokey {
                 using ResponsePayload = DeviceConfigurationResponsePacket::ResponsePayload;
 
                 typedef Transaction<command_id(), struct EmptyPayload, ResponsePayload>
+                    CommandTransaction;
+            };
+
+            class CheckSmartcardUsage : Command<CommandID::CHECK_SMARTCARD_USAGE> {
+            public:
+                typedef Transaction<command_id(), struct EmptyPayload, EmptyPayload>
                     CommandTransaction;
             };
 

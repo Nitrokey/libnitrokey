@@ -789,6 +789,14 @@ using nitrokey::misc::strcpyT;
       misc::execute_password_command<stick20::EnableHiddenEncryptedPartition>(device, hidden_volume_password);
     }
 
+    void NitrokeyManager::set_encrypted_volume_read_only(const char* admin_pin) {
+        misc::execute_password_command<stick20::SetEncryptedVolumeReadOnly>(device, admin_pin);
+    }
+
+    void NitrokeyManager::set_encrypted_volume_read_write(const char* admin_pin) {
+        misc::execute_password_command<stick20::SetEncryptedVolumeReadWrite>(device, admin_pin);
+    }
+
     //TODO check is encrypted volume unlocked before execution
     //if not return library exception
     void NitrokeyManager::create_hidden_volume(uint8_t slot_nr, uint8_t start_percent, uint8_t end_percent,
@@ -802,11 +810,23 @@ using nitrokey::misc::strcpyT;
     }
 
     void NitrokeyManager::set_unencrypted_read_only(const char* user_pin) {
+        //available until 0.48
       misc::execute_password_command<stick20::SendSetReadonlyToUncryptedVolume>(device, user_pin);
     }
 
     void NitrokeyManager::set_unencrypted_read_write(const char* user_pin) {
+        //available until 0.48
       misc::execute_password_command<stick20::SendSetReadwriteToUncryptedVolume>(device, user_pin);
+    }
+
+    void NitrokeyManager::set_unencrypted_read_only_admin_pin(const char* admin_pin) {
+        //available from 0.49
+      misc::execute_password_command<stick20::SetUnencryptedVolumeReadOnlyAdmin>(device, admin_pin);
+    }
+
+    void NitrokeyManager::set_unencrypted_read_write_admin_pin(const char* admin_pin) {
+        //available from 0.49
+      misc::execute_password_command<stick20::SetUnencryptedVolumeReadWriteAdmin>(device, admin_pin);
     }
 
     void NitrokeyManager::export_firmware(const char* admin_pin) {

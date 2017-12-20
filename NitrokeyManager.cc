@@ -752,6 +752,16 @@ using nitrokey::misc::strcpyT;
       return device->get_device_model();
     }
 
+    bool NitrokeyManager::is_smartcard_in_use(){
+      try{
+        stick20::CheckSmartcardUsage::CommandTransaction::run(device);
+      }
+      catch(const CommandFailedException & e){
+        return e.reason_smartcard_busy();
+      }
+      return false;
+    }
+
     int NitrokeyManager::get_minor_firmware_version(){
       switch(device->get_device_model()){
         case DeviceModel::PRO:{

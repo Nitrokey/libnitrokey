@@ -208,6 +208,8 @@ char * strndup(const char* str, size_t maxlen);
         void set_encrypted_volume_read_write(const char *admin_pin);
 
       int get_major_firmware_version();
+
+      bool is_smartcard_in_use();
     };
 }
 

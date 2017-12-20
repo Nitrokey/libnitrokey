@@ -28,8 +28,10 @@ static const int TOO_LONG_STRING = 200;
 #include "log.h"
 #include "../NK_C_API.h"
 
+int login;
+
 TEST_CASE("C API connect", "[BASIC]") {
-  auto login = NK_login_auto();
+  login = NK_login_auto();
   REQUIRE(login != 0);
   NK_logout();
   login = NK_login_auto();
@@ -40,11 +42,13 @@ TEST_CASE("C API connect", "[BASIC]") {
 }
 
 TEST_CASE("Check retry count", "[BASIC]") {
+  REQUIRE(login != 0);
   REQUIRE(NK_get_admin_retry_count() == 3);
   REQUIRE(NK_get_user_retry_count() == 3);
 }
 
 TEST_CASE("Check long strings", "[STANDARD]") {
+  REQUIRE(login != 0);
   const char* longPin = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
   const char* pin = "123123123";
   auto result = NK_change_user_PIN(longPin, pin);

@@ -351,12 +351,14 @@ namespace nitrokey {
                       LOG("Status busy, decreasing receiving_retry_counter counter: " +
                                       std::to_string(receiving_retry_counter) + ", current delay:"
                           + std::to_string(retry_timeout.count()), Loglevel::DEBUG);
-                      LOG(std::string("Busy retry ")
+                      LOG(std::string("Busy retry: status ")
                           + std::to_string(resp.storage_status.device_status)
-                          + " "
+                          + ", "
                           + std::to_string(retry_timeout.count())
-                          + " "
+                          + "ms, counter "
                           + std::to_string(receiving_retry_counter)
+                            + ", progress: "
+                          + std::to_string(resp.storage_status.progress_bar_value)
                       , Loglevel::DEBUG_L1);
                     }
                   }

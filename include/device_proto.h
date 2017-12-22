@@ -456,7 +456,7 @@ namespace nitrokey {
 
               if (resp.last_command_status != static_cast<uint8_t>(stick10::command_status::ok)){
                 dev->m_counters.command_result_not_equal_0_recv++;
-                LOG(std::string("Throw: CommandFailedException"), Loglevel::DEBUG_L1);
+                LOG(std::string("Throw: CommandFailedException ") + std::to_string(resp.last_command_status), Loglevel::DEBUG_L1);
                 throw CommandFailedException(resp.command_id, resp.last_command_status);
               }
 

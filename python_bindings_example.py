@@ -25,14 +25,18 @@ def get_library():
     with open(fp, 'r') as f:
         declarations = f.readlines()
 
+    cnt = 0
     a = iter(declarations)
     for declaration in a:
-        if declaration.startswith('NK_C_API'):
+        if declaration.strip().startswith('NK_C_API'):
             declaration = declaration.replace('NK_C_API', '').strip()
-            while not ';' in declaration:
+            while ';' not in declaration:
                 declaration += (next(a)).strip()
-            #print(declaration)
+            # print(declaration)
             ffi.cdef(declaration, override=True)
+            cnt +=1
+    print('Imported {} declarations'.format(cnt))
+
 
     C = None
     import os, sys
@@ -68,10 +72,10 @@ a = raw_input()
 if not a == 'continue':
     exit()
 
-ADMIN = raw_input('Please enter your admin PIN (empty string uses 12345678)')
+ADMIN = raw_input('Please enter your admin PIN (empty string uses 12345678) ')
 ADMIN = ADMIN or '12345678'  # use default if empty string
 
-show_log = raw_input('Should log messages be shown (please write "yes" to enable)?') == 'yes'
+show_log = raw_input('Should log messages be shown (please write "yes" to enable)? ') == 'yes'
 libnitrokey = get_library()
 libnitrokey.NK_set_debug(show_log)  # do not show debug messages
 

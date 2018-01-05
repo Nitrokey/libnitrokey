@@ -82,9 +82,17 @@ if not a == 'continue':
 ADMIN = raw_input('Please enter your admin PIN (empty string uses 12345678) ')
 ADMIN = ADMIN or '12345678'  # use default if empty string
 
-show_log = raw_input('Should log messages be shown (please write "yes" to enable)? ') == 'yes'
+show_log = raw_input('Should log messages be shown (please write "yes" to enable; this will make harder reading script output) ') == 'yes'
 libnitrokey = get_library()
-libnitrokey.NK_set_debug(show_log)  # do not show debug messages
+
+if show_log:
+    log_level = raw_input('Please select verbosity level (0-5, 2 is library default, 3 will be selected on empty input) ')
+    log_level = log_level or '3'
+    log_level = int(log_level)
+    libnitrokey.NK_set_debug_level(log_level)
+else:
+    libnitrokey.NK_set_debug_level(2)
+
 
 ADMIN_TEMP = '123123123'
 RFC_SECRET = to_hex('12345678901234567890')

@@ -125,7 +125,7 @@ test_data = [
     1284755224, 1094287082, 137359152, 1726969429, 1640338314, 868254676, 1918287922, 82162583, 673399871,
     645520489,
 ]
-print('Getting HOTP code from Nitrokey Pro (RFC test, 8 digits): ')
+print('Getting HOTP code from Nitrokey Stick (RFC test, 8 digits): ')
 for i in range(10):
     hotp_slot_1_code = get_hotp_code(libnitrokey, 1)
     correct_str =  "correct!" if hotp_slot_1_code == str(test_data[i])[-8:] else  "not correct"

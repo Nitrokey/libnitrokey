@@ -41,16 +41,23 @@ def get_library():
     C = None
     import os, sys
     path_build = os.path.join(".", "build")
-    paths = [ os.path.join(path_build,"libnitrokey-log.so"),
-              os.path.join(path_build,"libnitrokey.so")]
+    paths = [
+            os.environ.get('LIBNK_PATH', None),
+            os.path.join(path_build,"libnitrokey.so"),
+            os.path.join(path_build,"libnitrokey.dylib"),
+            os.path.join(path_build,"libnitrokey.dll"),
+            os.path.join(path_build,"nitrokey.dll"),
+    ]
     for p in paths:
-        print p
+        if not p: continue
+        print("Trying " +p)
+        p = os.path.abspath(p)
         if os.path.exists(p):
+            print("Found: "+p)
             C = ffi.dlopen(p)
             break
         else:
             print("File does not exist: " + p)
-            print("Trying another")
     if not C:
         print("No library file found")
         sys.exit(1)

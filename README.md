@@ -1,5 +1,6 @@
-[![Stories in Ready](https://badge.waffle.io/Nitrokey/libnitrokey.png?label=ready&title=Ready)](https://waffle.io/Nitrokey/libnitrokey)
 [![Build Status](https://travis-ci.org/Nitrokey/libnitrokey.svg?branch=master)](https://travis-ci.org/Nitrokey/libnitrokey)
+[![Waffle.io - Columns and their card count](https://badge.waffle.io/Nitrokey/libnitrokey.svg?columns=ready,in%20progress,test,waiting%20for%20feedback)](https://waffle.io/Nitrokey/libnitrokey)
+
 # libnitrokey
 Libnitrokey is a project to communicate with Nitrokey Pro and Storage devices in a clean and easy manner. Written in C++14, testable with `py.test` and `Catch` frameworks, with C API, Python access (through CFFI and C API, in future with Pybind11).
 

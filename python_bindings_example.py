@@ -60,6 +60,8 @@ def get_library():
             print("File does not exist: " + p)
     if not C:
         print("No library file found")
+        print("Please set the path using LIBNK_PATH environment variable to existing library or compile it (see "
+              "README.md for details)")
         sys.exit(1)
 
     return C

@@ -1,5 +1,6 @@
-[![Stories in Ready](https://badge.waffle.io/Nitrokey/libnitrokey.png?label=ready&title=Ready)](https://waffle.io/Nitrokey/libnitrokey)
 [![Build Status](https://travis-ci.org/Nitrokey/libnitrokey.svg?branch=master)](https://travis-ci.org/Nitrokey/libnitrokey)
+[![Waffle.io - Columns and their card count](https://badge.waffle.io/Nitrokey/libnitrokey.svg?columns=ready,in%20progress,test,waiting%20for%20feedback)](https://waffle.io/Nitrokey/libnitrokey)
+
 # libnitrokey
 Libnitrokey is a project to communicate with Nitrokey Pro and Storage devices in a clean and easy manner. Written in C++14, testable with `py.test` and `Catch` frameworks, with C API, Python access (through CFFI and C API, in future with Pybind11).
 
@@ -7,7 +8,7 @@ The development of this project is aimed to make it itself a living documentatio
 
 A C++14 complying compiler is required due to heavy use of variable templates. For feature support tables please check [table 1](https://gcc.gnu.org/projects/cxx-status.html#cxx14) or [table 2](http://en.cppreference.com/w/cpp/compiler_support).
 
-Libnitrokey is developed and tested with the latest compilers: g++ 6.2, clang 3.8. We use Travis CI to test builds also on g++ 5.4 and under OSX compilers starting up from xcode 6.4 environment (OSX 10.10). 
+Libnitrokey is developed and tested with the latest compilers: g++ 6.2, clang 3.8. We use Travis CI to test builds also on g++ 5.4 and under OSX compilers starting up from xcode 8.2 environment. 
 
 ## Getting sources
 This repository uses `git submodules`.
@@ -31,7 +32,17 @@ Following libraries are needed to use libnitrokey on Linux (names of the package
 ## Compilation
 libnitrokey uses CMake as its main build system. As a secondary option it offers building through Qt's qMake.
 ### Qt
-A .pro project file is provided for direct compilation and for inclusion to other projects.
+A Qt's .pro project file is provided for direct compilation and for inclusion to other projects.
+Using it directly is not recommended due to lack of dependencies check and not implemented library versioning.
+Compilation is tested with Qt 5.6 and greater.
+
+Quick start example:
+```bash
+mkdir -p build
+cd build
+qmake ..
+make -j2
+```
 
 ### Windows MS Visual Studio 2017
 Lately Visual Studio has started handling CMake files directly. After opening the project's directory it should recognize it and initialize build system. Afterwards please run:
@@ -40,7 +51,7 @@ Lately Visual Studio has started handling CMake files directly. After opening th
 
 It is possible too to use CMake GUI directly with its settings editor.
 
-### Linux CLI
+### CMake
 To compile please run following sequence of commands:
 ```bash
 # assuming current dir is ./libnitrokey/
@@ -50,15 +61,19 @@ cmake .. <OPTIONS>
 make -j2
 ```
 
-By default (with empty `<OPTIONS>` string) this will create two static library files - build/libnitrokey-static.a and build/libnitrokey-static-log.a. If you wish to build another version (e.g. shared library to use with Python) you can use as `<OPTIONS>` string `-DLIBNITROKEY_STATIC=OFF`. All options could be listed with `cmake .. -L` or instead `cmake` a `ccmake ..` tool could be used for configuration (where `..` is the path with `CMakeLists.txt` file). `ccmake` shows also description of the build parameters.
+By default (with empty `<OPTIONS>` string) this will create in `build/` directory a shared library (.so, .dll or .dynlib). If you wish to build static version you can use as `<OPTIONS>` string `-DBUILD_SHARED_LIBS=OFF`. 
 
-If you have trouble compiling or running the library you can check [.travis.yml](.travis.yml) file for configuration details. This file is used by our CI service to make test builds on OSX and Ubuntu 14.04.
+All options could be listed with `cmake .. -L` or instead `cmake` a `ccmake ..` tool could be used for configuration (where `..` is the path to directory with `CMakeLists.txt` file). `ccmake` shows also description of the build parameters.
+
+If you have trouble compiling or running the library you can check [.travis.yml](.travis.yml) file for configuration details. This file is used by Travis CI service to make test builds on OSX and Ubuntu 14.04.
 
 Other build options (all take either `ON` or `OFF`):
 * ADD_ASAN - add tests for memory leaks and out-of-bounds access
 * ADD_TSAN - add tests for threads race, needs USE_CLANG
-* USE_CLANG - forces Clang as the compiler
 * COMPILE_TESTS - compile C++ tests
+* COMPILE_OFFLINE_TESTS - compile C++ tests, that do not require any device to be connected
+* LOG_VOLATILE_DATA (default: OFF) - include secrets in log (PWS passwords, PINs etc)
+* NO_LOG (default: OFF) - do not compile LOG statements - will make library smaller, but without any diagnostic messages
 
 
 
@@ -76,7 +91,6 @@ import cffi
 ffi = cffi.FFI()
 get_string = ffi.string
 
-
 def get_library():
     fp = 'NK_C_API.h'  # path to C API header
 
@@ -84,43 +98,42 @@ def get_library():
     with open(fp, 'r') as f:
         declarations = f.readlines()
 
+    cnt = 0
     a = iter(declarations)
     for declaration in a:
-        if declaration.startswith('NK_C_API'):
+        if declaration.strip().startswith('NK_C_API'):
             declaration = declaration.replace('NK_C_API', '').strip()
-            while not ';' in declaration:
+            while ';' not in declaration:
                 declaration += (next(a)).strip()
-            print(declaration)
+            # print(declaration)
             ffi.cdef(declaration, override=True)
+            cnt +=1
+    print('Imported {} declarations'.format(cnt))
+
 
     C = None
     import os, sys
     path_build = os.path.join(".", "build")
-    paths = [ os.path.join(path_build,"libnitrokey-log.so"),
-              os.path.join(path_build,"libnitrokey.so")]
+    paths = [
+            os.environ.get('LIBNK_PATH', None),
+            os.path.join(path_build,"libnitrokey.so"),
+            os.path.join(path_build,"libnitrokey.dylib"),
+            os.path.join(path_build,"libnitrokey.dll"),
+            os.path.join(path_build,"nitrokey.dll"),
+    ]
     for p in paths:
-        print p
+        if not p: continue
+        print("Trying " +p)
+        p = os.path.abspath(p)
         if os.path.exists(p):
+            print("Found: "+p)
             C = ffi.dlopen(p)
             break
         else:
             print("File does not exist: " + p)
-            print("Trying another")
     if not C:
         print("No library file found")
         sys.exit(1)
-
-    C.NK_set_debug(False)
-    nk_login = C.NK_login_auto() # try to connect firstly to Pro and then to Storage
-    if nk_login != 1:
-        print('No devices detected!')
-    assert nk_login != 0  # returns 0 if not connected or wrong model or 1 when connected
-    global device_type
-    firmware_version = C.NK_get_major_firmware_version()
-    model = 'P' if firmware_version in [7,8] else 'S'
-    device_type = (model, firmware_version)
-
-    C.NK_set_debug(True)
 
     return C
 
@@ -143,10 +156,10 @@ All available functions for C and Python are listed in [NK_C_API.h](NK_C_API.h).
 
 ## Documentation
 The documentation of C API is included in the sources (could be  generated with doxygen if requested).
-Please check NK_C_API.h (C API) for high level commands and include/NitrokeyManager.h (C++ API). All devices' commands are listed along with packet format in include/stick10_commands.h and include/stick20_commands.h respectively for Nitrokey Pro and Nitrokey Storage products.
+Please check [NK_C_API.h](NK_C_API.h) (C API) for high level commands and [include/NitrokeyManager.h](include/NitrokeyManager.h) (C++ API). All devices' commands are listed along with packet format in [include/stick10_commands.h](include/stick10_commands.h) and [include/stick20_commands.h](include/stick20_commands.h) respectively for Nitrokey Pro and Nitrokey Storage products.
 
 # Tests
-Warning! Before you run unittests please either change both your Admin and User PINs on your Nitrostick to defaults (`12345678` and `123456` respectively) or change the values in tests source code. If you do not change them the tests might lock your device. If it's too late, you can always reset your Nitrokey using instructions from [homepage](https://www.nitrokey.com/de/documentation/how-reset-nitrokey).
+Warning! Before you run unittests please either change both your Admin and User PINs on your Nitrostick to defaults (`12345678` and `123456` respectively) or change the values in tests source code. If you do not change them the tests might lock your device and lose your data. If it's too late, you can reset your Nitrokey using instructions from [homepage](https://www.nitrokey.com/de/documentation/how-reset-nitrokey).
 
 ## Python tests
 Libnitrokey has a great suite of tests written in Python 3 under the path: `unittest/test_*.py`: 
@@ -169,24 +182,24 @@ py.test -v test_<dev>.py -k <test_name> --count 5
 For additional documentation please check the following for [py.test installation](http://doc.pytest.org/en/latest/getting-started.html). For better coverage [randomly plugin](https://pypi.python.org/pypi/pytest-randomly) is installed - it randomizes the test order allowing to detect unseen dependencies between the tests.
 
 ## C++ tests
-There are also some unit tests implemented in C++, placed in unittest directory. They are not written as extensively as Python tests and are rather more a C++ low level interface check, often not using C++ API from NitrokeyManager.cc. Some of them are: [test_HOTP.cc](https://github.com/Nitrokey/libnitrokey/blob/master/unittest/test_HOTP.cc)
-[test.cc](https://github.com/Nitrokey/libnitrokey/blob/master/unittest/test.cc)
-Unit tests were written and tested on Ubuntu 16.04/16.10. To run them just execute binaries built in ./libnitrokey/build dir after enabling them by passing `-DCOMPILE_TESTS` option like in `cmake .. -DCOMPILE_TESTS && make`. 
+There are also some unit tests implemented in C++, placed in unittest directory. They are not written as extensively as Python tests and are rather more a C++ low level interface check, often not using C++ API from `NitrokeyManager.cc`. Some of them are: [test_HOTP.cc](https://github.com/Nitrokey/libnitrokey/blob/master/unittest/test_HOTP.cc),
+[test.cc](https://github.com/Nitrokey/libnitrokey/blob/master/unittest/test.cc).
+Unit tests were written and tested on Ubuntu 16.04/16.10/17.04. To run them just execute binaries built in ./libnitrokey/build dir after enabling them by passing `-DCOMPILE_TESTS` option like in `cmake .. -DCOMPILE_TESTS && make`. 
 
 
 The documentation of how it works could be found in nitrokey-app project's README on Github:
 [Nitrokey-app - internals](https://github.com/Nitrokey/nitrokey-app/blob/master/README.md#internals).
 
 To peek/debug communication with device running nitrokey-app (0.x branch) in debug mode (`-d` switch) and checking the logs
-(right click on tray icon and then 'Debug') might be helpful. Latest Nitrokey App (1.x branch) uses libnitrokey to communicate with device. Once linked with `libnitrokey-log` it will print all communication to the console. Additionally crosschecking with
+(right click on tray icon and then 'Debug') might be helpful. Latest Nitrokey App (1.x branch) uses libnitrokey to communicate with device. Once run with `--dl 3` (3 or higher; range 0-5) it will print all communication to the console. Additionally crosschecking with
 firmware code should show how things works:
 [report_protocol.c](https://github.com/Nitrokey/nitrokey-pro-firmware/blob/master/src/keyboard/report_protocol.c)
 (for Nitrokey Pro, for Storage similarly).
 
 # Known issues / tasks
-* Currently only one device can be connected at a time
+* Currently only one device can be connected at a time (experimental work could be found in `wip-multiple_devices` branch),
 * C++ API needs some reorganization to C++ objects (instead of pointers to arrays). This will be also preparing for integration with Pybind11,
-* Fix compilation warnings
+* Fix compilation warnings.
 
 Other tasks might be listed either in [TODO](TODO) file or on project's issues page.
 

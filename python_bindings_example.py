@@ -59,7 +59,7 @@ def get_library():
 
 
 def get_hotp_code(lib, i):
-    return lib.NK_get_hotp_code(i)
+    return get_string(lib.NK_get_hotp_code(i))
 
 def to_hex(ss):
     return ''.join([ format(ord(s),'02x') for s in ss ])
@@ -113,5 +113,6 @@ test_data = [
 print('Getting HOTP code from Nitrokey Pro (RFC test, 8 digits): ')
 for i in range(10):
     hotp_slot_1_code = get_hotp_code(libnitrokey, 1)
-    print('%d: %d, should be %s' % (i, hotp_slot_1_code, str(test_data[i])[-8:] ))
+    correct_str =  "correct!" if hotp_slot_1_code == str(test_data[i])[-8:] else  "not correct"
+    print('%d: %s, should be %s -> %s' % (i, hotp_slot_1_code, str(test_data[i])[-8:], correct_str))
 libnitrokey.NK_logout()  # disconnect device

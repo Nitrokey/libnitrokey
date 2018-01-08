@@ -88,7 +88,7 @@ pkg.generate(
 if get_option('tests') or get_option('offline-tests')
   # FIXME
   _inc_catch = include_directories('/usr/include/catch')
-  if not cxx.has_header('catch.hpp', args : '-I/usr/include/catch')
+  if not cxx.has_header('catch.hpp', include_directories : _inc_catch)
     error('Can\'t find catch.hpp')
   endif
   _catch = static_library(

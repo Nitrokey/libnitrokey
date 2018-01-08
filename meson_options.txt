@@ -1,0 +1,4 @@
+option('log', type : 'boolean', value : true, description : 'Logging functionality')
+option('log-volatile-data', type : 'boolean', value : false, description : 'Log volatile data (debug)')
+option('tests', type : 'boolean', value : false, description : 'Compile tests (needs connected PRO device)')
+option('offline-tests', type : 'boolean', value : false, description : 'Compile offline tests')

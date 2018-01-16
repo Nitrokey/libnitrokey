@@ -19,10 +19,6 @@
  * SPDX-License-Identifier: LGPL-3.0
  */
 
-//
-// Created by sz on 23.07.16.
-//
-
 #ifndef LIBNITROKEY_COMMANDFAILEDEXCEPTION_H
 #define LIBNITROKEY_COMMANDFAILEDEXCEPTION_H
 

@@ -19,9 +19,6 @@
  * SPDX-License-Identifier: LGPL-3.0
  */
 
-//
-// Created by sz on 08.11.16.
-//
 
 #ifndef LIBNITROKEY_STICK10_COMMANDS_0_8_H
 #define LIBNITROKEY_STICK10_COMMANDS_0_8_H

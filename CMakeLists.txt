@@ -50,7 +50,6 @@ set(SOURCE_FILES
     include/device.h
     include/device_proto.h
     include/dissect.h
-    include/inttypes.h
     include/log.h
     include/misc.h
     include/NitrokeyManager.h

@@ -16,7 +16,6 @@ HEADERS = \
    $$PWD/include/device_proto.h \
    $$PWD/include/DeviceCommunicationExceptions.h \
    $$PWD/include/dissect.h \
-   $$PWD/include/inttypes.h \
    $$PWD/include/LibraryException.h \
    $$PWD/include/log.h \
    $$PWD/include/LongOperationInProgressException.h \

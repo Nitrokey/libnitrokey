@@ -2,13 +2,13 @@
 [![Waffle.io - Columns and their card count](https://badge.waffle.io/Nitrokey/libnitrokey.svg?columns=ready,in%20progress,test,waiting%20for%20feedback)](https://waffle.io/Nitrokey/libnitrokey)
 
 # libnitrokey
-Libnitrokey is a project to communicate with Nitrokey Pro and Storage devices in a clean and easy manner. Written in C++14, testable with `py.test` and `Catch` frameworks, with C API, Python access (through CFFI and C API, in future with Pybind11).
+libnitrokey is a project to communicate with Nitrokey Pro and Storage devices in a clean and easy manner. Written in C++14, testable with `py.test` and `Catch` frameworks, with C API, Python access (through CFFI and C API, in future with Pybind11).
 
 The development of this project is aimed to make it itself a living documentation of communication protocol between host and the Nitrokey stick devices. The command packets' format is described here: [Pro v0.7](include/stick10_commands.h), [Pro v0.8](include/stick10_commands_0.8.h), [Storage](include/stick20_commands.h). Handling and additional operations are described here: [NitrokeyManager.cc](NitrokeyManager.cc).
 
 A C++14 complying compiler is required due to heavy use of variable templates. For feature support tables please check [table 1](https://gcc.gnu.org/projects/cxx-status.html#cxx14) or [table 2](http://en.cppreference.com/w/cpp/compiler_support).
 
-Libnitrokey is developed and tested with the latest compilers: g++ 6.2, clang 3.8. We use Travis CI to test builds also on g++ 5.4 and under OSX compilers starting up from xcode 8.2 environment. 
+libnitrokey is developed and tested with the latest compilers: g++ 6.2, clang 3.8. We use Travis CI to test builds also on g++ 5.4 and under OSX compilers starting up from xcode 8.2 environment. 
 
 ## Getting sources
 This repository uses `git submodules`.
@@ -83,9 +83,9 @@ To use libnitrokey with Python a [CFFI](http://cffi.readthedocs.io/en/latest/ove
 pip install --user cffi # for python 2.x
 pip3 install cffi # for python 3.x
 ```
-Just import it, read the C API header and it is done! You have access to the library. Here is an example printing HOTP code for Pro or Storage device, assuming it is run in root directory [(full example)](python_bindings_example.py):
+Just import it, read the C API header and it is done! You have access to the library. Here is an example (in Python 2) printing HOTP code for Pro or Storage device, assuming it is run in root directory [(full example)](python_bindings_example.py):
 ```python
-#!/usr/bin/env python
+#!/usr/bin/env python2
 import cffi
 
 ffi = cffi.FFI()
@@ -162,7 +162,7 @@ Please check [NK_C_API.h](NK_C_API.h) (C API) for high level commands and [inclu
 Warning! Before you run unittests please either change both your Admin and User PINs on your Nitrostick to defaults (`12345678` and `123456` respectively) or change the values in tests source code. If you do not change them the tests might lock your device and lose your data. If it's too late, you can reset your Nitrokey using instructions from [homepage](https://www.nitrokey.com/de/documentation/how-reset-nitrokey).
 
 ## Python tests
-Libnitrokey has a great suite of tests written in Python 3 under the path: `unittest/test_*.py`: 
+libnitrokey has a great suite of tests written in Python 3 under the path: `unittest/test_*.py`: 
 * `test_pro.py` - contains tests of OTP, Password Safe and PIN control functionality. Could be run on both Pro and Storage devices.
 * `test_storage.py` - contains tests of Encrypted Volumes functionality. Could be run only on Storage.
 The tests themselves show how to handle common requests to device.

@@ -6,6 +6,8 @@ CONFIG   += c++14 shared debug
 TEMPLATE     = lib
 TARGET = nitrokey
 
+VERSION = 3.2
+
 HEADERS = \
    $$PWD/hidapi/hidapi/hidapi.h \
    $$PWD/include/command.h \

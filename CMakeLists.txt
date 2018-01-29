@@ -127,7 +127,19 @@ OPTION(COMPILE_TESTS "Compile tests" FALSE)
 OPTION(COMPILE_OFFLINE_TESTS "Compile offline tests" FALSE)
 
 IF(COMPILE_OFFLINE_TESTS OR COMPILE_TESTS)
-    include_directories(unittest/Catch/include)
+    find_package(PkgConfig)
+    IF(PKG_CONFIG_FOUND)
+        pkg_check_modules(CATCH2 catch)
+    ENDIF()
+
+    if (CATCH2_FOUND)
+        message(STATUS "Found system Catch2, not using bundled version")
+        add_compile_options(${CATCH2_CFLAGS})
+    ELSE()
+        message(STATUS "Did NOT find system Catch2, instead using bundled version")
+        include_directories(unittest/Catch/single_include)
+    ENDIF()
+
     add_library(catch STATIC unittest/catch_main.cpp )
 ENDIF()
 

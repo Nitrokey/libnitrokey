@@ -115,7 +115,7 @@ TEST_CASE("Test helper function - hex_string_to_byte", "[fast]") {
   REQUIRE(v.size() == sizeof(test_data));
   for (int i = 0; i < v.size(); ++i) {
     INFO("Position i: " << i);
-    REQUIRE(v.data()[i] == test_data[i]);
+    REQUIRE(v[i] == test_data[i]);
   }
 }
 

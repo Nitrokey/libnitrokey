@@ -50,7 +50,7 @@ TEST_CASE("test secret", "[functions]") {
     slot_secret[20] = 0;
     const char* secretHex = "3132333435363738393031323334353637383930";
     hexStringToByte(slot_secret, secretHex);
-    CAPTURE(slot_secret);
+    INFO("Secret: " << slot_secret);
     REQUIRE(strcmp("12345678901234567890",reinterpret_cast<char *>(slot_secret) ) == 0 );
 }
 

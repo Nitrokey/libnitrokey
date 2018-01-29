@@ -87,6 +87,16 @@ bool test_31(){
 }
 
 TEST_CASE("issue 31", "[issue]"){
+  {
+    auto i = NitrokeyManager::instance();
+    i->set_loglevel(4);
+    REQUIRE(i->connect());
+
+    i->unlock_encrypted_volume(default_user_pin);
+    i->create_hidden_volume(0, 70, 80, hidden_volume_pass);
+    i->lock_device();
+  }
+
   for(int i=0; i<20; i++){
     REQUIRE(test_31());
   }

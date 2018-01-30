@@ -119,6 +119,25 @@ file(GLOB LIB_INCLUDES "include/*.h" "NK_C_API.h")
 install (FILES ${LIB_INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
 install (TARGETS nitrokey DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
+IF(NOT WIN32)
+    # Install Nitrokey udev rules
+    set(PKG_GET_UDEV_DIR ${PKG_CONFIG_EXECUTABLE} --variable=udevdir udev)
+    execute_process(COMMAND ${PKG_GET_UDEV_DIR} RESULT_VARIABLE ERR OUTPUT_VARIABLE UDEV_MAIN_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+    IF(${ERR})
+        set(UDEV_MAIN_DIR "lib/udev/rules.d")
+    ELSE()
+        set(UDEV_MAIN_DIR "${UDEV_MAIN_DIR}/rules.d")
+    ENDIF()
+    string(REGEX REPLACE "^/" "" UDEV_MAIN_DIR "${UDEV_MAIN_DIR}")
+    string(REGEX REPLACE "^usr/" "" UDEV_MAIN_DIR "${UDEV_MAIN_DIR}") # usual prefix is usr/local
+    message(STATUS "Setting udev rules dir to ${UDEV_MAIN_DIR}")
+
+    install(FILES
+            ${CMAKE_SOURCE_DIR}/data/41-nitrokey.rules
+            DESTINATION ${UDEV_MAIN_DIR}
+    )
+ENDIF()
+
 # configure and install pkg-config file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libnitrokey.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libnitrokey-1.pc @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libnitrokey-1.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)

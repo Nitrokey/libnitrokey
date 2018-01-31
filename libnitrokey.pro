@@ -3,6 +3,7 @@
 
 CONFIG   += c++14 shared debug
 
+
 TEMPLATE     = lib
 TARGET = nitrokey
 
@@ -31,6 +32,7 @@ HEADERS = \
    $$PWD/include/stick10_commands_0.8.h \
    $$PWD/include/stick20_commands.h \
    $$PWD/NK_C_API.h
+
 
 SOURCES = \
    $$PWD/command_id.cc \
@@ -77,3 +79,22 @@ INCLUDEPATH = \
 
 #DEFINES = 
 
+unix:!macx{
+        # Install rules for QMake (CMake is preffered though)
+        udevrules.path = $$system(pkg-config --variable=udevdir udev)
+        isEmpty(udevrules.path){
+            udevrules.path = "/lib/udev/"
+            message("Could not detect path for udev rules - setting default: " $$udevrules.path)
+        }
+        udevrules.path = $$udevrules.path"/rules.d"
+        udevrules.files = $$PWD/"data/41-nitrokey.rules"
+        message ($$udevrules.files)
+        INSTALLS +=udevrules
+
+        headers.files = $$HEADERS
+        headers.path = /usr/local/include/libnitrokey/
+        INSTALLS += headers
+
+        libbin.path = /usr/local/lib
+        INSTALLS += libbin
+}

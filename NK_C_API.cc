@@ -538,6 +538,13 @@ extern "C" {
 		});
 	}
 
+	NK_C_API int NK_enable_firmware_update(const char* update_password){
+		auto m = NitrokeyManager::instance();
+		return get_without_result([&]() {
+			m->enable_firmware_update(update_password);
+		});
+	}
+
 	NK_C_API const char* NK_get_status_storage_as_string() {
 		auto m = NitrokeyManager::instance();
 		return get_with_string_result([&]() {

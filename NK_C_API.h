@@ -479,8 +479,9 @@ extern "C" {
 	 * When device is in update mode it no longer accepts any HID commands until
 	 * firmware is launched (regardless of being updated or not).
 	 * Smartcard (through CCID interface) and its all volumes are not visible as well.
-	 * Its VID and PID are changed to factory-default to be detected by flashing software.
-	 * Result of this command can be reversed by using 'launch' command.
+	 * Its VID and PID are changed to factory-default (03eb:2ff1 Atmel Corp.)
+	 * to be detected by flashing software. Result of this command can be reversed
+	 * by using 'launch' command.
 	 * For dfu-programmer it would be: 'dfu-programmer at32uc3a3256s launch'.
 	 * Storage only
 	 * @param update_password 20 characters

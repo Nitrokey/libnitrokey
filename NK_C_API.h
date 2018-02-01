@@ -475,6 +475,20 @@ extern "C" {
 		const char* new_update_password);
 
 	/**
+	 * Enter update mode. Needs update password.
+	 * When device is in update mode it no longer accepts any HID commands until
+	 * firmware is launched (regardless of being updated or not).
+	 * Smartcard (through CCID interface) and its all volumes are not visible as well.
+	 * Its VID and PID are changed to factory-default to be detected by flashing software.
+	 * Result of this command can be reversed by using 'launch' command.
+	 * For dfu-programmer it would be: 'dfu-programmer at32uc3a3256s launch'.
+	 * Storage only
+	 * @param update_password 20 characters
+	 * @return command processing error code
+	 */
+	NK_C_API int NK_enable_firmware_update(const char* update_password);
+
+	/**
 	 * Get Storage stick status as string.
 	 * Storage only
 	 * @return string with devices attributes

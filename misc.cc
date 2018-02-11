@@ -43,7 +43,8 @@ namespace misc {
     auto data = ::std::vector<uint8_t>();
     data.reserve(d_size);
 
-    char buf[2];
+    char buf[3];
+    buf[2] = '\0';
     for(size_t i=0; i<s_size; i++){
 
         char c = hexString[i];

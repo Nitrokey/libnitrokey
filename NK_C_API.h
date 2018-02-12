@@ -22,6 +22,7 @@
 #ifndef LIBNITROKEY_NK_C_API_H
 #define LIBNITROKEY_NK_C_API_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #ifdef _MSC_VER

@@ -34,10 +34,10 @@ namespace misc {
 
 
 ::std::vector<uint8_t> hex_string_to_byte(const char* hexString){
-    const size_t big_string_size = 256; //arbitrary 'big' number
-    const size_t s_size = strlen(hexString);
+    const size_t big_string_size = 257; //arbitrary 'big' number
+    const size_t s_size = strnlen(hexString, big_string_size);
     const size_t d_size = s_size/2;
-    if (s_size%2!=0 || s_size>big_string_size){
+    if (s_size%2!=0 || s_size>=big_string_size){
         throw InvalidHexString(0);
     }
     auto data = ::std::vector<uint8_t>();

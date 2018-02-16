@@ -203,6 +203,11 @@ char * strndup(const char* str, size_t maxlen);
 
         static shared_ptr <NitrokeyManager> _instance;
         std::shared_ptr<Device> device;
+        std::string current_device_id;
+    public:
+        const string get_current_device_id() const;
+
+    private:
         std::unordered_map<std::string, shared_ptr<Device> > connected_devices;
         std::unordered_map<std::string, shared_ptr<Device> > connected_devices_byID;
 

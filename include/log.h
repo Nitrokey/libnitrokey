@@ -86,6 +86,11 @@ namespace nitrokey {
     private:
       LogHandler *mp_loghandler;
       Loglevel m_loglevel;
+      static std::string prefix;
+    public:
+      static void setPrefix(std::string prefix = std::string());
+
+    private:
 
       static Log *mp_instance;
     };

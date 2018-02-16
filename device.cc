@@ -248,7 +248,7 @@ Stick10::Stick10():
 
 
 Stick20::Stick20():
-  Device(0x20a0, 0x4109, DeviceModel::STORAGE, 40ms, 25, 40ms)
+  Device(0x20a0, 0x4109, DeviceModel::STORAGE, 40ms, 55, 40ms)
   {
     setDefaultDelay();
   }

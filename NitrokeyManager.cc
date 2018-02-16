@@ -171,10 +171,14 @@ using nitrokey::misc::strcpyT;
         std::lock_guard<std::mutex> lock(mex_dev_com_manager);
 
         auto position = connected_devices_byID.find(id);
-        if (position == connected_devices_byID.end()) return false;
+        if (position == connected_devices_byID.end()) {
+            LOGD1(std::string("Could not find device ")+id);
+            return false;
+        }
 
         auto d = connected_devices_byID[id];
         device = d;
+        current_device_id = id;
 
         //validate connection
         try{
@@ -185,10 +189,13 @@ using nitrokey::misc::strcpyT;
         }
         catch (const DeviceCommunicationException &){
             d->disconnect();
+            current_device_id = "";
             connected_devices_byID[id] = nullptr;
             connected_devices_byID.erase(position);
             return false;
         }
+        nitrokey::log::Log::setPrefix(id);
+        LOGD1("Device successfully changed");
         return true;
     }
 
@@ -221,6 +228,9 @@ using nitrokey::misc::strcpyT;
         }
 
         device = p; //previous device will be disconnected automatically
+        current_device_id = path;
+        nitrokey::log::Log::setPrefix(path);
+        LOGD1("Device successfully changed");
         return true;
     }
 
@@ -1104,6 +1114,10 @@ using nitrokey::misc::strcpyT;
     auto data = stick20::ProductionTest::CommandTransaction::run(device);
     return data.data().SD_Card_Size_u8;
   }
+
+    const string NitrokeyManager::get_current_device_id() const {
+        return current_device_id;
+    }
 
 
 }

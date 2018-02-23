@@ -276,29 +276,31 @@ def test_unencrypted_volume_set_read_write(C):
 
 
 @pytest.mark.unencrypted
-def test_unencrypted_volume_set_read_only(C):
-    skip_if_device_version_lower_than({'S': 49})
+def test_unencrypted_volume_set_read_only_admin(C):
+    skip_if_device_version_lower_than({'S': 51})
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
-    assert C.NK_set_unencrypted_read_only(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+    assert C.NK_set_unencrypted_read_only_admin(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
 
 
 @pytest.mark.unencrypted
-def test_unencrypted_volume_set_read_write(C):
-    skip_if_device_version_lower_than({'S': 49})
+def test_unencrypted_volume_set_read_write_admin(C):
+    skip_if_device_version_lower_than({'S': 51})
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
-    assert C.NK_set_unencrypted_read_write(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+    assert C.NK_set_unencrypted_read_write_admin(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
 
 
 @pytest.mark.encrypted
+@pytest.mark.skip(reason='not supported on recent firmware, except v0.49')
 def test_encrypted_volume_set_read_only(C):
-    skip_if_device_version_lower_than({'S': 49})
+    skip_if_device_version_lower_than({'S': 99})
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_set_encrypted_read_only(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
 
 
 @pytest.mark.encrypted
+@pytest.mark.skip(reason='not supported on recent firmware, except v0.49')
 def test_encrypted_volume_set_read_write(C):
-    skip_if_device_version_lower_than({'S': 49})
+    skip_if_device_version_lower_than({'S': 99})
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_set_encrypted_read_write(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
 

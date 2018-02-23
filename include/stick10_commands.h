@@ -367,7 +367,13 @@ class ReadSlot : Command<CommandID::READ_SLOT> {
 class GetStatus : Command<CommandID::GET_STATUS> {
  public:
   struct ResponsePayload {
-    uint16_t firmware_version;
+    union {
+      uint16_t firmware_version;
+      struct {
+        uint8_t minor;
+        uint8_t major;
+      } firmware_version_st;
+    };
     union{
       uint8_t card_serial[4];
       uint32_t card_serial_u32;

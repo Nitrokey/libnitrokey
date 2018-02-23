@@ -495,17 +495,45 @@ extern "C" {
 		});
 	}
 
-	NK_C_API int NK_set_unencrypted_read_only(const char* user_pin) {
+	NK_C_API int NK_set_unencrypted_read_only(const char *user_pin) {
 		auto m = NitrokeyManager::instance();
 		return get_without_result([&]() {
 			m->set_unencrypted_read_only(user_pin);
 		});
 	}
 
-	NK_C_API int NK_set_unencrypted_read_write(const char* user_pin) {
+	NK_C_API int NK_set_unencrypted_read_write(const char *user_pin) {
 		auto m = NitrokeyManager::instance();
 		return get_without_result([&]() {
 			m->set_unencrypted_read_write(user_pin);
+		});
+	}
+
+	NK_C_API int NK_set_unencrypted_read_only_admin(const char *admin_pin) {
+		auto m = NitrokeyManager::instance();
+		return get_without_result([&]() {
+			m->set_unencrypted_read_only_admin(admin_pin);
+		});
+	}
+
+	NK_C_API int NK_set_unencrypted_read_write_admin(const char *admin_pin) {
+		auto m = NitrokeyManager::instance();
+		return get_without_result([&]() {
+			m->set_unencrypted_read_write_admin(admin_pin);
+		});
+	}
+
+	NK_C_API int NK_set_encrypted_read_only(const char* admin_pin) {
+		auto m = NitrokeyManager::instance();
+		return get_without_result([&]() {
+			m->set_encrypted_volume_read_only(admin_pin);
+		});
+	}
+
+	NK_C_API int NK_set_encrypted_read_write(const char* admin_pin) {
+		auto m = NitrokeyManager::instance();
+		return get_without_result([&]() {
+			m->set_encrypted_volume_read_write(admin_pin);
 		});
 	}
 
@@ -567,6 +595,13 @@ extern "C" {
 	}
 
 	NK_C_API int NK_get_major_firmware_version() {
+		auto m = NitrokeyManager::instance();
+		return get_with_result([&]() {
+			return m->get_major_firmware_version();
+		});
+	}
+
+  NK_C_API int NK_get_minor_firmware_version() {
 		auto m = NitrokeyManager::instance();
 		return get_with_result([&]() {
 			return m->get_minor_firmware_version();

@@ -28,6 +28,7 @@
 #include "command_id.h"
 
 using cs = nitrokey::proto::stick10::command_status;
+using cs2 = nitrokey::proto::stick20::device_status;
 
 class CommandFailedException : public std::exception {
 public:
@@ -63,6 +64,10 @@ public:
 
     bool reason_wrong_password() const throw(){
       return last_command_status == static_cast<uint8_t>(cs::wrong_password);
+    }
+
+    bool reason_smartcard_busy() const throw(){
+      return last_command_status == static_cast<uint8_t>(cs2::smartcard_error);
     }
 
 };

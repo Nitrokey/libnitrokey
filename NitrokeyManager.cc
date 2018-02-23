@@ -30,6 +30,7 @@
 #include <mutex>
 #include "include/cxx_semantics.h"
 #include <functional>
+#include <stick10_commands.h>
 
 std::mutex nitrokey::proto::send_receive_mtx;
 
@@ -751,15 +752,41 @@ using nitrokey::misc::strcpyT;
       return device->get_device_model();
     }
 
+    bool NitrokeyManager::is_smartcard_in_use(){
+      try{
+        stick20::CheckSmartcardUsage::CommandTransaction::run(device);
+      }
+      catch(const CommandFailedException & e){
+        return e.reason_smartcard_busy();
+      }
+      return false;
+    }
+
     int NitrokeyManager::get_minor_firmware_version(){
       switch(device->get_device_model()){
         case DeviceModel::PRO:{
           auto status_p = GetStatus::CommandTransaction::run(device);
-          return status_p.data().firmware_version; //7 or 8
+          return status_p.data().firmware_version_st.minor; //7 or 8
         }
         case DeviceModel::STORAGE:{
           auto status = stick20::GetDeviceStatus::CommandTransaction::run(device);
-          return status.data().versionInfo.minor;
+          auto test_firmware = status.data().versionInfo.build_iteration != 0;
+          if (test_firmware)
+            LOG("Development firmware detected. Increasing minor version number.", nitrokey::log::Loglevel::WARNING);
+          return status.data().versionInfo.minor + (test_firmware? 1 : 0);
+        }
+      }
+      return 0;
+    }
+    int NitrokeyManager::get_major_firmware_version(){
+      switch(device->get_device_model()){
+        case DeviceModel::PRO:{
+          auto status_p = GetStatus::CommandTransaction::run(device);
+          return status_p.data().firmware_version_st.major; //0
+        }
+        case DeviceModel::STORAGE:{
+          auto status = stick20::GetDeviceStatus::CommandTransaction::run(device);
+          return status.data().versionInfo.major;
         }
       }
       return 0;
@@ -789,6 +816,14 @@ using nitrokey::misc::strcpyT;
       misc::execute_password_command<stick20::EnableHiddenEncryptedPartition>(device, hidden_volume_password);
     }
 
+    void NitrokeyManager::set_encrypted_volume_read_only(const char* admin_pin) {
+        misc::execute_password_command<stick20::SetEncryptedVolumeReadOnly>(device, admin_pin);
+    }
+
+    void NitrokeyManager::set_encrypted_volume_read_write(const char* admin_pin) {
+        misc::execute_password_command<stick20::SetEncryptedVolumeReadWrite>(device, admin_pin);
+    }
+
     //TODO check is encrypted volume unlocked before execution
     //if not return library exception
     void NitrokeyManager::create_hidden_volume(uint8_t slot_nr, uint8_t start_percent, uint8_t end_percent,
@@ -801,15 +836,56 @@ using nitrokey::misc::strcpyT;
       stick20::SetupHiddenVolume::CommandTransaction::run(device, p);
     }
 
-    void NitrokeyManager::set_unencrypted_read_only(const char* user_pin) {
+    void NitrokeyManager::set_unencrypted_read_only_admin(const char* admin_pin) {
+      //from v0.49, v0.51+ it needs Admin PIN
+      if (set_unencrypted_volume_rorw_pin_type_user()){
+        LOG("set_unencrypted_read_only_admin is not supported for this version of Storage device. "
+                "Please update firmware to v0.51+", nitrokey::log::Loglevel::WARNING);
+        return;
+      }
+      misc::execute_password_command<stick20::SetUnencryptedVolumeReadOnlyAdmin>(device, admin_pin);
+    }
+
+    void NitrokeyManager::set_unencrypted_read_only(const char *user_pin) {
+        //until v0.48 (incl. v0.50) User PIN was sufficient
+        LOG("set_unencrypted_read_only is deprecated. Use set_unencrypted_read_only_admin instead.",
+            nitrokey::log::Loglevel::WARNING);
+      if (!set_unencrypted_volume_rorw_pin_type_user()){
+        LOG("set_unencrypted_read_only is not supported for this version of Storage device. Doing nothing.",
+            nitrokey::log::Loglevel::WARNING);
+        return;
+      }
       misc::execute_password_command<stick20::SendSetReadonlyToUncryptedVolume>(device, user_pin);
     }
 
-    void NitrokeyManager::set_unencrypted_read_write(const char* user_pin) {
+    void NitrokeyManager::set_unencrypted_read_write_admin(const char* admin_pin) {
+      //from v0.49, v0.51+ it needs Admin PIN
+      if (set_unencrypted_volume_rorw_pin_type_user()){
+        LOG("set_unencrypted_read_write_admin is not supported for this version of Storage device. "
+                "Please update firmware to v0.51+.", nitrokey::log::Loglevel::WARNING);
+        return;
+      }
+      misc::execute_password_command<stick20::SetUnencryptedVolumeReadWriteAdmin>(device, admin_pin);
+    }
+
+    void NitrokeyManager::set_unencrypted_read_write(const char *user_pin) {
+        //until v0.48 (incl. v0.50) User PIN was sufficient
+      LOG("set_unencrypted_read_write is deprecated. Use set_unencrypted_read_write_admin instead.",
+          nitrokey::log::Loglevel::WARNING);
+      if (!set_unencrypted_volume_rorw_pin_type_user()){
+        LOG("set_unencrypted_read_write is not supported for this version of Storage device. Doing nothing.",
+            nitrokey::log::Loglevel::WARNING);
+        return;
+      }
       misc::execute_password_command<stick20::SendSetReadwriteToUncryptedVolume>(device, user_pin);
     }
 
-    void NitrokeyManager::export_firmware(const char* admin_pin) {
+    bool NitrokeyManager::set_unencrypted_volume_rorw_pin_type_user(){
+      auto minor_firmware_version = get_minor_firmware_version();
+      return minor_firmware_version <= 48 || minor_firmware_version == 50;
+    }
+
+  void NitrokeyManager::export_firmware(const char* admin_pin) {
       misc::execute_password_command<stick20::ExportFirmware>(device, admin_pin);
     }
 

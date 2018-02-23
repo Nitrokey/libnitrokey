@@ -52,6 +52,15 @@ namespace nitrokey {
             class EnableEncryptedPartition : public PasswordCommand<CommandID::ENABLE_CRYPTED_PARI> {};
             class EnableHiddenEncryptedPartition : public PasswordCommand<CommandID::ENABLE_HIDDEN_CRYPTED_PARI> {};
 
+            class SetUnencryptedVolumeReadOnlyAdmin :
+                    public PasswordCommand<CommandID::ENABLE_ADMIN_READONLY_UNCRYPTED_LUN, PasswordKind::Admin> {};
+            class SetUnencryptedVolumeReadWriteAdmin :
+                    public PasswordCommand<CommandID::ENABLE_ADMIN_READWRITE_UNCRYPTED_LUN, PasswordKind::Admin> {};
+            class SetEncryptedVolumeReadOnly :
+                    public PasswordCommand<CommandID::ENABLE_ADMIN_READONLY_ENCRYPTED_LUN, PasswordKind::Admin> {};
+            class SetEncryptedVolumeReadWrite :
+                    public PasswordCommand<CommandID::ENABLE_ADMIN_READWRITE_ENCRYPTED_LUN, PasswordKind::Admin> {};
+
             //FIXME the volume disabling commands do not need password
             class DisableEncryptedPartition : public PasswordCommand<CommandID::DISABLE_CRYPTED_PARI> {};
             class DisableHiddenEncryptedPartition : public PasswordCommand<CommandID::DISABLE_HIDDEN_CRYPTED_PARI> {};
@@ -159,10 +168,10 @@ namespace nitrokey {
                     union{
                     uint8_t VersionInfo_au8[4];
                         struct {
-                            uint8_t _reserved;
+                            uint8_t major;
                             uint8_t minor;
                             uint8_t _reserved2;
-                            uint8_t major;
+                            uint8_t build_iteration;
                         } __packed versionInfo;
                     } __packed;
 
@@ -206,8 +215,9 @@ namespace nitrokey {
                       print_to_ss((int) ReadWriteFlagUncryptedVolume_u8 );
                       print_to_ss((int) ReadWriteFlagCryptedVolume_u8 );
                       print_to_ss((int) ReadWriteFlagHiddenVolume_u8 );
-                      print_to_ss((int) VersionInfo_au8[1] );
-                      print_to_ss((int) VersionInfo_au8[3] );
+                      print_to_ss((int) versionInfo.major );
+                      print_to_ss((int) versionInfo.minor );
+                      print_to_ss((int) versionInfo.build_iteration );
                       print_to_ss((int) FirmwareLocked_u8 );
                       print_to_ss((int) NewSDCardFound_u8 );
                       print_to_ss((int) NewSDCardFound_st.NewCard );
@@ -262,6 +272,12 @@ namespace nitrokey {
                 using ResponsePayload = DeviceConfigurationResponsePacket::ResponsePayload;
 
                 typedef Transaction<command_id(), struct EmptyPayload, ResponsePayload>
+                    CommandTransaction;
+            };
+
+            class CheckSmartcardUsage : Command<CommandID::CHECK_SMARTCARD_USAGE> {
+            public:
+                typedef Transaction<command_id(), struct EmptyPayload, EmptyPayload>
                     CommandTransaction;
             };
 

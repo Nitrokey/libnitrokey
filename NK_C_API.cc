@@ -495,17 +495,31 @@ extern "C" {
 		});
 	}
 
-	NK_C_API int NK_set_unencrypted_read_only(const char* user_admin_pin) {
+	NK_C_API int NK_set_unencrypted_read_only(const char *user_pin) {
 		auto m = NitrokeyManager::instance();
 		return get_without_result([&]() {
-			m->set_unencrypted_read_only(user_admin_pin);
+			m->set_unencrypted_read_only(user_pin);
 		});
 	}
 
-	NK_C_API int NK_set_unencrypted_read_write(const char* user_admin_pin) {
+	NK_C_API int NK_set_unencrypted_read_write(const char *user_pin) {
 		auto m = NitrokeyManager::instance();
 		return get_without_result([&]() {
-			m->set_unencrypted_read_write(user_admin_pin);
+			m->set_unencrypted_read_write(user_pin);
+		});
+	}
+
+	NK_C_API int NK_set_unencrypted_read_only_admin(const char *admin_pin) {
+		auto m = NitrokeyManager::instance();
+		return get_without_result([&]() {
+			m->set_unencrypted_read_only_admin(admin_pin);
+		});
+	}
+
+	NK_C_API int NK_set_unencrypted_read_write_admin(const char *admin_pin) {
+		auto m = NitrokeyManager::instance();
+		return get_without_result([&]() {
+			m->set_unencrypted_read_write_admin(admin_pin);
 		});
 	}
 

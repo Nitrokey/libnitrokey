@@ -126,9 +126,37 @@ char * strndup(const char* str, size_t maxlen);
         void unlock_hidden_volume(const char *hidden_volume_password);
         void lock_hidden_volume();
 
-        void set_unencrypted_read_only(const char *user_admin_pin);
+        /**
+         * Sets unencrypted volume read-only.
+         * Works until v0.48 (incl. v0.50), where User PIN was sufficient
+         * Does nothing otherwise.
+         * @param user_pin User PIN
+         */
+        void set_unencrypted_read_only(const char *user_pin);
 
-        void set_unencrypted_read_write(const char *user_admin_pin);
+        /**
+         * Sets unencrypted volume read-only.
+         * Works from v0.49 (except v0.50) accepts Admin PIN
+         * Does nothing otherwise.
+         * @param admin_pin Admin PIN
+         */
+        void set_unencrypted_read_only_admin(const char *admin_pin);
+
+        /**
+         * Sets unencrypted volume read-write.
+         * Works until v0.48 (incl. v0.50), where User PIN was sufficient
+         * Does nothing otherwise.
+         * @param user_pin User PIN
+         */
+        void set_unencrypted_read_write(const char *user_pin);
+
+        /**
+         * Sets unencrypted volume read-write.
+         * Works from v0.49 (except v0.50) accepts Admin PIN
+         * Does nothing otherwise.
+         * @param admin_pin Admin PIN
+         */
+        void set_unencrypted_read_write_admin(const char *admin_pin);
 
         void export_firmware(const char *admin_pin);
         void enable_firmware_update(const char *firmware_pin);
@@ -203,13 +231,30 @@ char * strndup(const char* str, size_t maxlen);
 
       void set_loglevel(int loglevel);
 
-        void set_encrypted_volume_read_only(const char *admin_pin);
+      /**
+       * Sets encrypted volume read-only.
+       * Supported from future versions of Storage.
+       * @param admin_pin Admin PIN
+       */
+      void set_encrypted_volume_read_only(const char *admin_pin);
 
-        void set_encrypted_volume_read_write(const char *admin_pin);
+      /**
+       * Sets encrypted volume read-write.
+       * Supported from future versions of Storage.
+       * @param admin_pin Admin PIN
+       */
+      void set_encrypted_volume_read_write(const char *admin_pin);
 
       int get_major_firmware_version();
 
       bool is_smartcard_in_use();
+
+      /**
+       * Function to determine unencrypted volume PIN type
+       * @param minor_firmware_version
+       * @return Returns true, if set unencrypted volume ro/rw pin type is User, false otherwise.
+       */
+      bool set_unencrypted_volume_rorw_pin_type_user(int minor_firmware_version) const;
     };
 }
 

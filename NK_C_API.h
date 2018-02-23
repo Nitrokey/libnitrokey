@@ -428,28 +428,55 @@ extern "C" {
 	 * Make unencrypted volume read-only.
 	 * Device hides unencrypted volume for a second therefore make sure
 	 * buffers are flushed before running.
-	 * Accepts: User PIN for Storage v0.48 and below, Admin PIN for Storage v0.49+
+	 * Does nothing if firmware version is not matched
+	 * Firmware range: Storage v0.50, v0.48 and below
 	 * Storage only
-	 * @param user_admin_pin 20 characters
+	 * @param user_pin 20 characters User PIN
 	 * @return command processing error code
 	 */
-	NK_C_API int NK_set_unencrypted_read_only(const char* user_admin_pin);
+	NK_C_API int NK_set_unencrypted_read_only(const char *user_pin);
 
 	/**
 	 * Make unencrypted volume read-write.
 	 * Device hides unencrypted volume for a second therefore make sure
 	 * buffers are flushed before running.
-	 * Accepts: User PIN for Storage v0.48 and below, Admin PIN for Storage v0.49+
+	 * Does nothing if firmware version is not matched
+	 * Firmware range: Storage v0.50, v0.48 and below
 	 * Storage only
-	 * @param user_admin_pin 20 characters
+	 * @param user_pin 20 characters User PIN
 	 * @return command processing error code
 	 */
-	NK_C_API int NK_set_unencrypted_read_write(const char* user_admin_pin);
+	NK_C_API int NK_set_unencrypted_read_write(const char *user_pin);
+
+	/**
+	 * Make unencrypted volume read-only.
+	 * Device hides unencrypted volume for a second therefore make sure
+	 * buffers are flushed before running.
+	 * Does nothing if firmware version is not matched
+	 * Firmware range: Storage v0.49, v0.51+
+	 * Storage only
+	 * @param admin_pin 20 characters Admin PIN
+	 * @return command processing error code
+	 */
+	NK_C_API int NK_set_unencrypted_read_only_admin(const char* admin_pin);
+
+	/**
+	 * Make unencrypted volume read-write.
+	 * Device hides unencrypted volume for a second therefore make sure
+	 * buffers are flushed before running.
+	 * Does nothing if firmware version is not matched
+	 * Firmware range: Storage v0.49, v0.51+
+	 * Storage only
+	 * @param admin_pin 20 characters Admin PIN
+	 * @return command processing error code
+	 */
+	NK_C_API int NK_set_unencrypted_read_write_admin(const char* admin_pin);
 
 	/**
 	 * Make encrypted volume read-only.
 	 * Device hides encrypted volume for a second therefore make sure
 	 * buffers are flushed before running.
+	 * Firmware range: v0.49 only, future (see firmware release notes)
 	 * Storage only
 	 * @param admin_pin 20 characters
 	 * @return command processing error code
@@ -460,14 +487,12 @@ extern "C" {
 	 * Make encrypted volume read-write.
 	 * Device hides encrypted volume for a second therefore make sure
 	 * buffers are flushed before running.
+	 * Firmware range: v0.49 only, future (see firmware release notes)
 	 * Storage only
 	 * @param admin_pin 20 characters
 	 * @return command processing error code
 	 */
 	NK_C_API int NK_set_encrypted_read_write(const char* admin_pin);
-
-
-
 
 	/**
 	 * Exports device's firmware to unencrypted volume.

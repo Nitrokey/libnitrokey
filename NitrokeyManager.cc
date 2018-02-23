@@ -771,6 +771,8 @@ using nitrokey::misc::strcpyT;
         case DeviceModel::STORAGE:{
           auto status = stick20::GetDeviceStatus::CommandTransaction::run(device);
           auto test_firmware = status.data().versionInfo.build_iteration != 0;
+          if (test_firmware)
+            LOG("Development firmware detected. Increasing minor version number.", nitrokey::log::Loglevel::WARNING);
           return status.data().versionInfo.minor + (test_firmware? 1 : 0);
         }
       }
@@ -834,23 +836,55 @@ using nitrokey::misc::strcpyT;
       stick20::SetupHiddenVolume::CommandTransaction::run(device, p);
     }
 
-    void NitrokeyManager::set_unencrypted_read_only(const char* user_admin_pin) {
-      //until 0.48 User PIN was sufficient, from 0.49 it needs Admin PIN
-      if (get_minor_firmware_version()<=48)
-        misc::execute_password_command<stick20::SendSetReadonlyToUncryptedVolume>(device, user_admin_pin);
-      else
-        misc::execute_password_command<stick20::SetUnencryptedVolumeReadOnlyAdmin>(device, user_admin_pin);
+    void NitrokeyManager::set_unencrypted_read_only_admin(const char* admin_pin) {
+      //from v0.49, v0.51+ it needs Admin PIN
+      if (set_unencrypted_volume_rorw_pin_type_user(get_minor_firmware_version())){
+        LOG("set_unencrypted_read_only_admin is not supported for this version of Storage device. "
+                "Please update firmware to v0.51+", nitrokey::log::Loglevel::WARNING);
+        return;
+      }
+      misc::execute_password_command<stick20::SetUnencryptedVolumeReadOnlyAdmin>(device, admin_pin);
     }
 
-    void NitrokeyManager::set_unencrypted_read_write(const char* user_admin_pin) {
-        //until 0.48 User PIN was sufficient, from 0.49 it needs Admin PIN
-      if (get_minor_firmware_version()<=48)
-        misc::execute_password_command<stick20::SendSetReadwriteToUncryptedVolume>(device, user_admin_pin);
-      else
-        misc::execute_password_command<stick20::SetUnencryptedVolumeReadWriteAdmin>(device, user_admin_pin);
+    void NitrokeyManager::set_unencrypted_read_only(const char *user_pin) {
+        //until v0.48 (incl. v0.50) User PIN was sufficient
+        LOG("set_unencrypted_read_only is deprecated. Use set_unencrypted_read_only_admin instead.",
+            nitrokey::log::Loglevel::WARNING);
+      if (!set_unencrypted_volume_rorw_pin_type_user(get_minor_firmware_version())){
+        LOG("set_unencrypted_read_only is not supported for this version of Storage device. Doing nothing.",
+            nitrokey::log::Loglevel::WARNING);
+        return;
+      }
+      misc::execute_password_command<stick20::SendSetReadonlyToUncryptedVolume>(device, user_pin);
     }
 
-    void NitrokeyManager::export_firmware(const char* admin_pin) {
+    void NitrokeyManager::set_unencrypted_read_write_admin(const char* admin_pin) {
+      //from v0.49, v0.51+ it needs Admin PIN
+      if (set_unencrypted_volume_rorw_pin_type_user(get_minor_firmware_version())){
+        LOG("set_unencrypted_read_write_admin is not supported for this version of Storage device. "
+                "Please update firmware to v0.51+.", nitrokey::log::Loglevel::WARNING);
+        return;
+      }
+      misc::execute_password_command<stick20::SetUnencryptedVolumeReadWriteAdmin>(device, admin_pin);
+    }
+
+    void NitrokeyManager::set_unencrypted_read_write(const char *user_pin) {
+        //until v0.48 (incl. v0.50) User PIN was sufficient
+      LOG("set_unencrypted_read_write is deprecated. Use set_unencrypted_read_write_admin instead.",
+          nitrokey::log::Loglevel::WARNING);
+      if (!set_unencrypted_volume_rorw_pin_type_user(get_minor_firmware_version())){
+        LOG("set_unencrypted_read_write is not supported for this version of Storage device. Doing nothing.",
+            nitrokey::log::Loglevel::WARNING);
+        return;
+      }
+      misc::execute_password_command<stick20::SendSetReadwriteToUncryptedVolume>(device, user_pin);
+    }
+
+    bool NitrokeyManager::set_unencrypted_volume_rorw_pin_type_user(const int minor_firmware_version) const {
+      return minor_firmware_version <= 48 || minor_firmware_version == 50;
+    }
+
+  void NitrokeyManager::export_firmware(const char* admin_pin) {
       misc::execute_password_command<stick20::ExportFirmware>(device, admin_pin);
     }
 

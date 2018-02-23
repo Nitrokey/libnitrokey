@@ -246,6 +246,8 @@ def test_hidden_volume_corruption(C):
     hidden_volume_password = b'hiddenpassword'
     p = lambda i: hidden_volume_password + bb(str(i))
     volumes_to_setup = 4
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     for i in range(volumes_to_setup):
         assert C.NK_create_hidden_volume(i, 20 + i * 10, 20 + i * 10 + i + 1, p(i)) == DeviceErrorCode.STATUS_OK
         assert C.NK_unlock_hidden_volume(p(i)) == DeviceErrorCode.STATUS_OK

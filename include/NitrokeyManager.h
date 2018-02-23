@@ -254,7 +254,7 @@ char * strndup(const char* str, size_t maxlen);
        * @param minor_firmware_version
        * @return Returns true, if set unencrypted volume ro/rw pin type is User, false otherwise.
        */
-      bool set_unencrypted_volume_rorw_pin_type_user(int minor_firmware_version) const;
+      bool set_unencrypted_volume_rorw_pin_type_user();
     };
 }
 

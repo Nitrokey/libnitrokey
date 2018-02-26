@@ -113,6 +113,7 @@ using nitrokey::misc::strcpyT;
     }
 
     std::vector<std::string> NitrokeyManager::list_devices_by_cpuID(){
+        using misc::toHex;
         //disconnect default device
         disconnect();
 
@@ -139,9 +140,9 @@ using nitrokey::misc::strcpyT;
                     std::string id;
                     try {
                         const auto status = get_status_storage();
-                        const auto sc_id = status.ActiveSmartCardID_u32;
-                        const auto sd_id = status.ActiveSD_CardID_u32;
-                        id = std::to_string(sc_id) + ":" + std::to_string(sd_id);
+                        const auto sc_id = toHex(status.ActiveSmartCardID_u32);
+                        const auto sd_id = toHex(status.ActiveSD_CardID_u32);
+                        id = sc_id + ":" + sd_id + "_p_" + p;
                     }
                     catch (const LongOperationInProgressException &e) {
                         LOGD1(std::string("Long operation in progress, setting ID to: ") + p);

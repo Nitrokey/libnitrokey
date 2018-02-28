@@ -99,6 +99,12 @@ TEST_CASE("Use API ID", "[BASIC]") {
     REQUIRE(v.size() > 0);
 
     //no refresh - should not reconnect to new devices
+    // Scenario:
+    // 1. Run test
+    // 2. Remove one of the devices and reinsert it after a while
+    // 3. Device should not be reconnected and test should not crash
+    // 4. Remove all devices - test should continue
+
     for (int j = 0; j < 100; j++) {
         for (auto i : v) {
             if (!nm->connect_with_ID(i)) continue;
@@ -121,6 +127,11 @@ TEST_CASE("Use API ID refresh", "[BASIC]") {
     nm->set_loglevel(2);
 
     //refresh in each iteration - should reconnect to new devices
+    // Scenario:
+    // 1. Run test
+    // 2. Remove one of the devices and reinsert it after a while
+    // 3. Device should be reconnected
+
     for(int j=0; j<100; j++) {
         auto v = nm->list_devices_by_cpuID();
         REQUIRE(v.size() > 0);

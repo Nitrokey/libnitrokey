@@ -43,7 +43,7 @@ def cast_pointer_to_tuple(obj, typen, len):
 
 
 def get_devices_firmware_version(C):
-    firmware = C.NK_get_major_firmware_version()
+    firmware = C.NK_get_minor_firmware_version()
     return firmware
 
 
@@ -54,7 +54,7 @@ def is_pro_rtm_07(C):
 
 def is_pro_rtm_08(C):
     firmware = get_devices_firmware_version(C)
-    return firmware == 8
+    return firmware in [8,9]
 
 
 def is_storage(C):
@@ -62,7 +62,8 @@ def is_storage(C):
     exact firmware storage is sent by other function
     """
     # TODO identify connected device directly
-    return not is_pro_rtm_08(C) and not is_pro_rtm_07(C)
+    firmware = get_devices_firmware_version(C)
+    return firmware >= 45
 
 
 def is_long_OTP_secret_handled(C):

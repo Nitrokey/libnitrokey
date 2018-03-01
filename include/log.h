@@ -23,8 +23,6 @@
 #define LOG_H
 
 #include <string>
-#include <cstddef>
-
 #include <functional>
 
 namespace nitrokey {

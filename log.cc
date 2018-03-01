@@ -19,14 +19,12 @@
  * SPDX-License-Identifier: LGPL-3.0
  */
 
+#include "log.h"
 #include <iostream>
-#include <string>
 #include <ctime>
 #include <iomanip>
-#include "log.h"
 
 #include <sstream>
-#include <NitrokeyManager.h>
 
 namespace nitrokey {
   namespace log {
@@ -61,7 +59,7 @@ namespace nitrokey {
       }
     }
 
-    void Log::setPrefix(const string prefix) {
+    void Log::setPrefix(const std::string prefix) {
       if (!prefix.empty()){
         Log::prefix = "["+prefix+"]";
       } else {

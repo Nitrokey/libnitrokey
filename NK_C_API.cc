@@ -616,8 +616,8 @@ extern "C" {
 			for (const auto a : v){
 				res += a+";";
 			}
-			if (res.size()>0) res.pop_back(); // remove last delimeter char
-			return strndup(res.c_str(), 4096);
+			if (res.size()>0) res.pop_back(); // remove last delimiter char
+			return strndup(res.c_str(), 8192); //this buffer size sets limit to over 200 devices ID's
 		});
 	}
 

@@ -70,6 +70,13 @@ char * strndup(const char* str, size_t maxlen);
         bool erase_hotp_slot(uint8_t slot_number, const char *temporary_password);
         std::vector<std::string> list_devices();
         std::vector<std::string> list_devices_by_cpuID();
+
+        /**
+         * Connect to the device using unique smartcard:datacard id.
+         * Needs list_device_by_cpuID() run first
+         * @param id Current ID of the target device
+         * @return true on success, false on failure
+         */
         bool connect_with_ID(const std::string id);
         bool connect_with_path (std::string path);
         bool connect(const char *device_model);

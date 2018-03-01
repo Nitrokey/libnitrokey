@@ -142,7 +142,8 @@ using nitrokey::misc::strcpyT;
                         const auto status = get_status_storage();
                         const auto sc_id = toHex(status.ActiveSmartCardID_u32);
                         const auto sd_id = toHex(status.ActiveSD_CardID_u32);
-                        id = sc_id + ":" + sd_id + "_p_" + p;
+                        id += sc_id + ":" + sd_id;
+                        id += "_p_" + p;
                     }
                     catch (const LongOperationInProgressException &e) {
                         LOGD1(std::string("Long operation in progress, setting ID to: ") + p);
@@ -162,18 +163,13 @@ using nitrokey::misc::strcpyT;
         }
         return res;
     }
-/**
- * Connect to the device using unique smartcard:datacard id.
- * Needs list_device_by_cpuID run first
- * @param id
- * @return
- */
+
     bool NitrokeyManager::connect_with_ID(const std::string id) {
         std::lock_guard<std::mutex> lock(mex_dev_com_manager);
 
         auto position = connected_devices_byID.find(id);
         if (position == connected_devices_byID.end()) {
-            LOGD1(std::string("Could not find device ")+id);
+            LOGD1(std::string("Could not find device ")+id + ". Refresh devices list with list_devices_by_cpuID().");
             return false;
         }
 

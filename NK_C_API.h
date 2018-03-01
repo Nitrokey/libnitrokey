@@ -269,6 +269,7 @@ extern "C" {
 	NK_C_API int NK_totp_set_time(uint64_t time);
 
 	NK_C_API int NK_totp_get_time();
+
 	//passwords
 	/**
 	 * Change administrator PIN
@@ -568,8 +569,32 @@ extern "C" {
 	 */
 	NK_C_API int NK_get_progress_bar_value();
 
-
+/**
+ * Returns a list of connected devices' id's, delimited by ';' character. Empty string is returned on no device found.
+ * Each ID could consist of:
+ * 1. SC_id:SD_id_p_path (about 40 bytes)
+ * 2. path (about 10 bytes)
+ * where 'path' is USB path (bus:num), 'SC_id' is smartcard ID, 'SD_id' is storage card ID and
+ * '_p_' and ':' are field delimiters.
+ * Case 2 (USB path only) is used, when the device cannot be asked about its status data (e.g. during a long operation,
+ * like clearing SD card.
+ * Internally connects to all available devices and creates a map between ids and connection objects.
+ * Side effects: changes active device to last detected Storage device.
+ * Storage only
+ * @example Example of returned data: '00005d19:dacc2cb4_p_0001:0010:02;000037c7:4cf12445_p_0001:000f:02;0001:000c:02'
+ * @return string delimited id's of connected devices
+ */
 	NK_C_API const char* NK_list_devices_by_cpuID();
+
+
+/**
+ * Connects to the device with given ID. ID's list could be created with NK_list_devices_by_cpuID.
+ * Requires calling to NK_list_devices_by_cpuID first. Connecting to arbitrary ID/USB path is not handled.
+ * On connection requests status from device and disconnects it / removes from map on connection failure.
+ * Storage only
+ * @param id Target device ID (example: '00005d19:dacc2cb4_p_0001:0010:02')
+ * @return 1 on successful connection, 0 otherwise
+ */
 	NK_C_API int NK_connect_with_ID(const char* id);
 
 

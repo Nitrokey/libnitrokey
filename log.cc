@@ -19,11 +19,10 @@
  * SPDX-License-Identifier: LGPL-3.0
  */
 
+#include "log.h"
 #include <iostream>
-#include <string>
 #include <ctime>
 #include <iomanip>
-#include "log.h"
 
 #include <sstream>
 
@@ -32,6 +31,9 @@ namespace nitrokey {
 
     Log *Log::mp_instance = nullptr;
     StdlogHandler stdlog_handler;
+
+    std::string Log::prefix = "";
+
 
     std::string LogHandler::loglevel_to_str(Loglevel lvl) {
       switch (lvl) {
@@ -52,8 +54,17 @@ namespace nitrokey {
     }
 
     void Log::operator()(const std::string &logstr, Loglevel lvl) {
-      if (mp_loghandler != nullptr)
-        if ((int) lvl <= (int) m_loglevel) mp_loghandler->print(logstr, lvl);
+      if (mp_loghandler != nullptr){
+        if ((int) lvl <= (int) m_loglevel) mp_loghandler->print(prefix+logstr, lvl);
+      }
+    }
+
+    void Log::setPrefix(const std::string prefix) {
+      if (!prefix.empty()){
+        Log::prefix = "["+prefix+"]";
+      } else {
+        Log::prefix = "";
+      }
     }
 
     void StdlogHandler::print(const std::string &str, Loglevel lvl) {

@@ -608,6 +608,27 @@ extern "C" {
 		});
 	}
 
+	NK_C_API const char* NK_list_devices_by_cpuID() {
+		auto nm = NitrokeyManager::instance();
+		return get_with_string_result([&]() {
+			auto v = nm->list_devices_by_cpuID();
+			std::string res;
+			for (const auto a : v){
+				res += a+";";
+			}
+			if (res.size()>0) res.pop_back(); // remove last delimiter char
+			return strndup(res.c_str(), 8192); //this buffer size sets limit to over 200 devices ID's
+		});
+	}
+
+	NK_C_API int NK_connect_with_ID(const char* id) {
+		auto m = NitrokeyManager::instance();
+		return get_with_result([&]() {
+			return m->connect_with_ID(id) ? 1 : 0;
+		});
+	}
+
+
 
 #ifdef __cplusplus
 }

@@ -23,8 +23,6 @@
 #define LOG_H
 
 #include <string>
-#include <cstddef>
-
 #include <functional>
 
 namespace nitrokey {
@@ -86,6 +84,11 @@ namespace nitrokey {
     private:
       LogHandler *mp_loghandler;
       Loglevel m_loglevel;
+      static std::string prefix;
+    public:
+      static void setPrefix(std::string prefix = std::string());
+
+    private:
 
       static Log *mp_instance;
     };
@@ -98,6 +101,7 @@ namespace nitrokey {
 #define LOGD(string) while(false){}
 #else
 #define LOG(string, level) nitrokey::log::Log::instance()((string), (level))
+#define LOGD1(string) nitrokey::log::Log::instance()((string), (nitrokey::log::Loglevel::DEBUG_L1))
 #define LOGD(string) nitrokey::log::Log::instance()((string), (nitrokey::log::Loglevel::DEBUG_L2))
 #endif
 

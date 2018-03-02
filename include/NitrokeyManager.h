@@ -30,6 +30,7 @@
 #include "stick20_commands.h"
 #include <vector>
 #include <memory>
+#include <unordered_map>
 
 namespace nitrokey {
     using namespace nitrokey::device;
@@ -67,6 +68,17 @@ char * strndup(const char* str, size_t maxlen);
         bool get_time(uint64_t time = 0);
         bool erase_totp_slot(uint8_t slot_number, const char *temporary_password);
         bool erase_hotp_slot(uint8_t slot_number, const char *temporary_password);
+        std::vector<std::string> list_devices();
+        std::vector<std::string> list_devices_by_cpuID();
+
+        /**
+         * Connect to the device using unique smartcard:datacard id.
+         * Needs list_device_by_cpuID() run first
+         * @param id Current ID of the target device
+         * @return true on success, false on failure
+         */
+        bool connect_with_ID(const std::string id);
+        bool connect_with_path (std::string path);
         bool connect(const char *device_model);
         bool connect();
         bool disconnect();
@@ -198,8 +210,16 @@ char * strndup(const char* str, size_t maxlen);
 
         static shared_ptr <NitrokeyManager> _instance;
         std::shared_ptr<Device> device;
+        std::string current_device_id;
+    public:
+        const string get_current_device_id() const;
 
-      stick10::ReadSlot::ResponsePayload get_OTP_slot_data(const uint8_t slot_number);
+    private:
+        std::unordered_map<std::string, shared_ptr<Device> > connected_devices;
+        std::unordered_map<std::string, shared_ptr<Device> > connected_devices_byID;
+
+
+        stick10::ReadSlot::ResponsePayload get_OTP_slot_data(const uint8_t slot_number);
       bool is_valid_hotp_slot_number(uint8_t slot_number) const;
         bool is_valid_totp_slot_number(uint8_t slot_number) const;
         bool is_valid_password_safe_slot_number(uint8_t slot_number) const;

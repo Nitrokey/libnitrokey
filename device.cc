@@ -20,6 +20,7 @@
  */
 
 #include <chrono>
+#include <iostream>
 #include <thread>
 #include <cstddef>
 #include <stdexcept>
@@ -68,7 +69,7 @@ bool Device::_disconnect() {
   LOG(std::string(__FUNCTION__) + std::string(m_model == DeviceModel::PRO ? "PRO" : "STORAGE"), Loglevel::DEBUG_L2);
   LOG(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
 
-  LOG(std::string("Disconnection success: ") + std::to_string(mp_devhandle == nullptr), Loglevel::DEBUG_L2);
+  LOG(std::string("Disconnection: handle already freed: ") + std::to_string(mp_devhandle == nullptr) + " ("+m_path+")", Loglevel::DEBUG_L1);
   if(mp_devhandle == nullptr) return false;
 
   hid_close(mp_devhandle);
@@ -92,10 +93,18 @@ bool Device::_connect() {
   LOG(std::string(__FUNCTION__) + std::string(" *IN* "), Loglevel::DEBUG_L2);
 
 //   hid_init(); // done automatically on hid_open
-  mp_devhandle = hid_open(m_vid, m_pid, nullptr);
+  if (m_path.empty()){
+    mp_devhandle = hid_open(m_vid, m_pid, nullptr);
+  } else {
+    mp_devhandle = hid_open_path(m_path.c_str());
+  }
   const bool success = mp_devhandle != nullptr;
-  LOG(std::string("Connection success: ") + std::to_string(success), Loglevel::DEBUG_L2);
+  LOG(std::string("Connection success: ") + std::to_string(success) + " ("+m_path+")", Loglevel::DEBUG_L1);
   return success;
+}
+
+void Device::set_path(const std::string path){
+  m_path = path;
 }
 
 int Device::send(const void *packet) {
@@ -160,6 +169,24 @@ int Device::recv(void *packet) {
   return status;
 }
 
+std::vector<std::string> Device::enumerate(){
+  //TODO make static
+  auto pInfo = hid_enumerate(m_vid, m_pid);
+  auto pInfo_ = pInfo;
+  std::vector<std::string> res;
+  while (pInfo != nullptr){
+    std::string a (pInfo->path);
+    res.push_back(a);
+    pInfo = pInfo->next;
+  }
+
+  if (pInfo_ != nullptr){
+    hid_free_enumeration(pInfo_);
+  }
+
+  return res;
+}
+
 bool Device::could_be_enumerated() {
   LOG(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
@@ -221,7 +248,7 @@ Stick10::Stick10():
 
 
 Stick20::Stick20():
-  Device(0x20a0, 0x4109, DeviceModel::STORAGE, 40ms, 25, 40ms)
+  Device(0x20a0, 0x4109, DeviceModel::STORAGE, 40ms, 55, 40ms)
   {
     setDefaultDelay();
   }

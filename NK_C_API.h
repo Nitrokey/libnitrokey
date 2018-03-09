@@ -371,6 +371,12 @@ extern "C" {
 	 */
 	NK_C_API int NK_get_minor_firmware_version();
 
+  /**
+   * Function to determine unencrypted volume PIN type
+   * @param minor_firmware_version
+   * @return Returns 1, if set unencrypted volume ro/rw pin type is User, 0 otherwise.
+   */
+	NK_C_API int NK_set_unencrypted_volume_rorw_pin_type_user();
 
 
 	/**

@@ -608,6 +608,13 @@ extern "C" {
 		});
 	}
 
+  NK_C_API int NK_set_unencrypted_volume_rorw_pin_type_user() {
+		auto m = NitrokeyManager::instance();
+		return get_with_result([&]() {
+			return m->set_unencrypted_volume_rorw_pin_type_user() ? 1 : 0;
+		});
+	}
+
 	NK_C_API const char* NK_list_devices_by_cpuID() {
 		auto nm = NitrokeyManager::instance();
 		return get_with_string_result([&]() {

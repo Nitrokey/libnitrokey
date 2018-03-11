@@ -21,14 +21,14 @@
 
 #include <cstring>
 #include <iostream>
-#include "include/NitrokeyManager.h"
-#include "include/LibraryException.h"
+#include "libnitrokey/NitrokeyManager.h"
+#include "libnitrokey/LibraryException.h"
 #include <algorithm>
 #include <unordered_map>
 #include <stick20_commands.h>
-#include "include/misc.h"
+#include "libnitrokey/misc.h"
 #include <mutex>
-#include "include/cxx_semantics.h"
+#include "libnitrokey/cxx_semantics.h"
 #include <functional>
 #include <stick10_commands.h>
 

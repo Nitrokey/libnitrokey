@@ -42,23 +42,23 @@ ENDIF()
 MESSAGE("${PROJECT_NAME}: Build type: ${CMAKE_BUILD_TYPE}")
 
 include_directories(hidapi)
-include_directories(include)
+include_directories(libnitrokey)
 set(SOURCE_FILES
-    include/command.h
-    include/command_id.h
-    include/cxx_semantics.h
-    include/device.h
-    include/device_proto.h
-    include/dissect.h
-    include/log.h
-    include/misc.h
-    include/NitrokeyManager.h
-    include/stick10_commands.h
-    include/stick20_commands.h
-    include/CommandFailedException.h
-    include/LibraryException.h
-    include/LongOperationInProgressException.h
-    include/stick10_commands_0.8.h
+    libnitrokey/command.h
+    libnitrokey/command_id.h
+    libnitrokey/cxx_semantics.h
+    libnitrokey/device.h
+    libnitrokey/device_proto.h
+    libnitrokey/dissect.h
+    libnitrokey/log.h
+    libnitrokey/misc.h
+    libnitrokey/NitrokeyManager.h
+    libnitrokey/stick10_commands.h
+    libnitrokey/stick20_commands.h
+    libnitrokey/CommandFailedException.h
+    libnitrokey/LibraryException.h
+    libnitrokey/LongOperationInProgressException.h
+    libnitrokey/stick10_commands_0.8.h
     command_id.cc
     device.cc
     log.cc
@@ -115,7 +115,7 @@ IF (LOG_VOLATILE_DATA)
 ENDIF()
 
 
-file(GLOB LIB_INCLUDES "include/*.h" "NK_C_API.h")
+file(GLOB LIB_INCLUDES "libnitrokey/*.h" "NK_C_API.h")
 install (FILES ${LIB_INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
 install (TARGETS nitrokey DESTINATION ${CMAKE_INSTALL_LIBDIR})
 

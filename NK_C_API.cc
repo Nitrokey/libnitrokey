@@ -21,10 +21,10 @@
 
 #include "NK_C_API.h"
 #include <iostream>
-#include "include/NitrokeyManager.h"
+#include "libnitrokey/NitrokeyManager.h"
 #include <cstring>
-#include "include/LibraryException.h"
-#include "include/cxx_semantics.h"
+#include "libnitrokey/LibraryException.h"
+#include "libnitrokey/cxx_semantics.h"
 
 #ifdef _MSC_VER
 #ifdef _WIN32

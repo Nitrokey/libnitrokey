@@ -25,9 +25,9 @@
 #include <cstddef>
 #include <stdexcept>
 #include "hidapi/hidapi.h"
-#include "include/misc.h"
-#include "include/device.h"
-#include "include/log.h"
+#include "libnitrokey/misc.h"
+#include "libnitrokey/device.h"
+#include "libnitrokey/log.h"
 #include <mutex>
 #include "DeviceCommunicationExceptions.h"
 #include "device.h"

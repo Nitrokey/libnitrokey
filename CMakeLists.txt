@@ -42,23 +42,23 @@ ENDIF()
 MESSAGE("${PROJECT_NAME}: Build type: ${CMAKE_BUILD_TYPE}")
 
 include_directories(hidapi)
-include_directories(include)
+include_directories(libnitrokey)
 set(SOURCE_FILES
-    include/command.h
-    include/command_id.h
-    include/cxx_semantics.h
-    include/device.h
-    include/device_proto.h
-    include/dissect.h
-    include/log.h
-    include/misc.h
-    include/NitrokeyManager.h
-    include/stick10_commands.h
-    include/stick20_commands.h
-    include/CommandFailedException.h
-    include/LibraryException.h
-    include/LongOperationInProgressException.h
-    include/stick10_commands_0.8.h
+    libnitrokey/command.h
+    libnitrokey/command_id.h
+    libnitrokey/cxx_semantics.h
+    libnitrokey/device.h
+    libnitrokey/device_proto.h
+    libnitrokey/dissect.h
+    libnitrokey/log.h
+    libnitrokey/misc.h
+    libnitrokey/NitrokeyManager.h
+    libnitrokey/stick10_commands.h
+    libnitrokey/stick20_commands.h
+    libnitrokey/CommandFailedException.h
+    libnitrokey/LibraryException.h
+    libnitrokey/LongOperationInProgressException.h
+    libnitrokey/stick10_commands_0.8.h
     command_id.cc
     device.cc
     log.cc
@@ -115,26 +115,28 @@ IF (LOG_VOLATILE_DATA)
 ENDIF()
 
 
-file(GLOB LIB_INCLUDES "include/*.h" "NK_C_API.h")
+file(GLOB LIB_INCLUDES "libnitrokey/*.h" "NK_C_API.h")
 install (FILES ${LIB_INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
 install (TARGETS nitrokey DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 IF(NOT WIN32)
     # Install Nitrokey udev rules
-    set(PKG_GET_UDEV_DIR ${PKG_CONFIG_EXECUTABLE} --variable=udevdir udev)
-    execute_process(COMMAND ${PKG_GET_UDEV_DIR} RESULT_VARIABLE ERR OUTPUT_VARIABLE UDEV_MAIN_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
-    IF(${ERR})
-        set(UDEV_MAIN_DIR "lib/udev/rules.d")
-    ELSE()
-        set(UDEV_MAIN_DIR "${UDEV_MAIN_DIR}/rules.d")
+    IF(NOT DEFINED CMAKE_INSTALL_UDEVRULESDIR)
+        set(PKG_GET_UDEV_DIR ${PKG_CONFIG_EXECUTABLE} --variable=udevdir udev)
+        execute_process(COMMAND ${PKG_GET_UDEV_DIR} RESULT_VARIABLE ERR OUTPUT_VARIABLE CMAKE_INSTALL_UDEVRULESDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+        IF(${ERR})
+            set(CMAKE_INSTALL_UDEVRULESDIR "lib/udev/rules.d")
+        ELSE()
+            set(CMAKE_INSTALL_UDEVRULESDIR "${CMAKE_INSTALL_UDEVRULESDIR}/rules.d")
+        ENDIF()
+        string(REGEX REPLACE "^/" "" CMAKE_INSTALL_UDEVRULESDIR "${CMAKE_INSTALL_UDEVRULESDIR}")
+        string(REGEX REPLACE "^usr/" "" CMAKE_INSTALL_UDEVRULESDIR "${CMAKE_INSTALL_UDEVRULESDIR}") # usual prefix is usr/local
+        message(STATUS "Setting udev rules dir to ${CMAKE_INSTALL_UDEVRULESDIR}")
     ENDIF()
-    string(REGEX REPLACE "^/" "" UDEV_MAIN_DIR "${UDEV_MAIN_DIR}")
-    string(REGEX REPLACE "^usr/" "" UDEV_MAIN_DIR "${UDEV_MAIN_DIR}") # usual prefix is usr/local
-    message(STATUS "Setting udev rules dir to ${UDEV_MAIN_DIR}")
 
     install(FILES
             ${CMAKE_SOURCE_DIR}/data/41-nitrokey.rules
-            DESTINATION ${UDEV_MAIN_DIR}
+            DESTINATION ${CMAKE_INSTALL_UDEVRULESDIR}
     )
 ENDIF()
 

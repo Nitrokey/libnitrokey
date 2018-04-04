@@ -80,6 +80,7 @@ char * strndup(const char* str, size_t maxlen);
         bool connect_with_ID(const std::string id);
         bool connect_with_path (std::string path);
         bool connect(const char *device_model);
+        bool connect(device::DeviceModel device_model);
         bool connect();
         bool disconnect();
         bool is_connected() throw() ;

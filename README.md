@@ -184,7 +184,7 @@ For additional documentation please check the following for [py.test installatio
 ## C++ tests
 There are also some unit tests implemented in C++, placed in unittest directory. They are not written as extensively as Python tests and are rather more a C++ low level interface check, often not using C++ API from `NitrokeyManager.cc`. Some of them are: [test_HOTP.cc](https://github.com/Nitrokey/libnitrokey/blob/master/unittest/test_HOTP.cc),
 [test.cc](https://github.com/Nitrokey/libnitrokey/blob/master/unittest/test.cc).
-Unit tests were written and tested on Ubuntu 16.04/16.10/17.04. To run them just execute binaries built in ./libnitrokey/build dir after enabling them by passing `-DCOMPILE_TESTS` option like in `cmake .. -DCOMPILE_TESTS && make`. 
+Unit tests were written and tested on Ubuntu 16.04/16.10/17.04. To run them just execute binaries built in ./libnitrokey/build dir after enabling them by passing `-DCOMPILE_TESTS=ON` option like in `cmake .. -DCOMPILE_TESTS=ON && make`. 
 
 
 The documentation of how it works could be found in nitrokey-app project's README on Github:

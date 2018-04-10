@@ -273,6 +273,21 @@ using nitrokey::misc::strcpyT;
         return device->connect();
     }
 
+    bool NitrokeyManager::connect(device::DeviceModel device_model) {
+        const char *model_string;
+        switch (device_model) {
+            case device::DeviceModel::PRO:
+                model_string = "P";
+                break;
+            case device::DeviceModel::STORAGE:
+                model_string = "S";
+                break;
+            default:
+                throw std::runtime_error("Unknown model");
+        }
+        return connect(model_string);
+    }
+
     shared_ptr<NitrokeyManager> NitrokeyManager::instance() {
       static std::mutex mutex;
       std::lock_guard<std::mutex> lock(mutex);

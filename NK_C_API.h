@@ -34,6 +34,21 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+        /**
+         * The Nitrokey device models supported by the API.
+         */
+        enum NK_device_model {
+            /**
+             * Nitrokey Pro.
+             */
+            NK_PRO,
+            /**
+             * Nitrokey Storage.
+             */
+            NK_STORAGE
+        };
+
 	/**
 	 * Set debug level of messages written on stderr
 	 * @param state state=True - most messages, state=False - only errors level
@@ -52,6 +67,13 @@ extern "C" {
 	 * @return 1 if connected, 0 if wrong model or cannot connect
 	 */
 	NK_C_API int NK_login(const char *device_model);
+
+	/**
+	 * Connect to device of given model. Currently library can be connected only to one device at once.
+	 * @param device_model NK_device_model: NK_PRO: Nitrokey Pro, NK_STORAGE: Nitrokey Storage
+	 * @return 1 if connected, 0 if wrong model or cannot connect
+	 */
+        NK_C_API int NK_login_enum(NK_device_model device_model);
 
 	/**
 	 * Connect to first available device, starting checking from Pro 1st to Storage 2nd.

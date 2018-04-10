@@ -985,17 +985,17 @@ using nitrokey::misc::strcpyT;
     }
 
     void NitrokeyManager::set_unencrypted_read_only_admin(const char* admin_pin) {
-      //from v0.49, v0.51+ it needs Admin PIN
+      //from v0.49, v0.52+ it needs Admin PIN
       if (set_unencrypted_volume_rorw_pin_type_user()){
         LOG("set_unencrypted_read_only_admin is not supported for this version of Storage device. "
-                "Please update firmware to v0.51+", nitrokey::log::Loglevel::WARNING);
+                "Please update firmware to v0.52+. Doing nothing.", nitrokey::log::Loglevel::WARNING);
         return;
       }
       misc::execute_password_command<stick20::SetUnencryptedVolumeReadOnlyAdmin>(device, admin_pin);
     }
 
     void NitrokeyManager::set_unencrypted_read_only(const char *user_pin) {
-        //until v0.48 (incl. v0.50) User PIN was sufficient
+        //until v0.48 (incl. v0.50 and v0.51) User PIN was sufficient
         LOG("set_unencrypted_read_only is deprecated. Use set_unencrypted_read_only_admin instead.",
             nitrokey::log::Loglevel::WARNING);
       if (!set_unencrypted_volume_rorw_pin_type_user()){
@@ -1007,17 +1007,17 @@ using nitrokey::misc::strcpyT;
     }
 
     void NitrokeyManager::set_unencrypted_read_write_admin(const char* admin_pin) {
-      //from v0.49, v0.51+ it needs Admin PIN
+      //from v0.49, v0.52+ it needs Admin PIN
       if (set_unencrypted_volume_rorw_pin_type_user()){
         LOG("set_unencrypted_read_write_admin is not supported for this version of Storage device. "
-                "Please update firmware to v0.51+.", nitrokey::log::Loglevel::WARNING);
+                "Please update firmware to v0.52+. Doing nothing.", nitrokey::log::Loglevel::WARNING);
         return;
       }
       misc::execute_password_command<stick20::SetUnencryptedVolumeReadWriteAdmin>(device, admin_pin);
     }
 
     void NitrokeyManager::set_unencrypted_read_write(const char *user_pin) {
-        //until v0.48 (incl. v0.50) User PIN was sufficient
+        //until v0.48 (incl. v0.50 and v0.51) User PIN was sufficient
       LOG("set_unencrypted_read_write is deprecated. Use set_unencrypted_read_write_admin instead.",
           nitrokey::log::Loglevel::WARNING);
       if (!set_unencrypted_volume_rorw_pin_type_user()){
@@ -1030,7 +1030,7 @@ using nitrokey::misc::strcpyT;
 
     bool NitrokeyManager::set_unencrypted_volume_rorw_pin_type_user(){
       auto minor_firmware_version = get_minor_firmware_version();
-      return minor_firmware_version <= 48 || minor_firmware_version == 50;
+      return minor_firmware_version <= 48 || minor_firmware_version == 50 || minor_firmware_version == 51;
     }
 
   void NitrokeyManager::export_firmware(const char* admin_pin) {

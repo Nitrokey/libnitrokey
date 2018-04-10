@@ -855,11 +855,11 @@ using nitrokey::misc::strcpyT;
     void NitrokeyManager::write_config(uint8_t numlock, uint8_t capslock, uint8_t scrolllock, bool enable_user_password,
                                        bool delete_user_password, const char *admin_temporary_password) {
         auto p = get_payload<stick10_08::WriteGeneralConfig>();
-        p.numlock = (uint8_t) numlock;
-        p.capslock = (uint8_t) capslock;
-        p.scrolllock = (uint8_t) scrolllock;
-        p.enable_user_password = (uint8_t) enable_user_password;
-        p.delete_user_password = (uint8_t) delete_user_password;
+        p.numlock = numlock;
+        p.capslock = capslock;
+        p.scrolllock = scrolllock;
+        p.enable_user_password = static_cast<uint8_t>(enable_user_password ? 1 : 0);
+        p.delete_user_password = static_cast<uint8_t>(delete_user_password ? 1 : 0);
         if (is_authorization_command_supported()){
           authorize_packet<stick10_08::WriteGeneralConfig, Authorize>(p, admin_temporary_password, device);
         } else {

@@ -155,8 +155,8 @@ extern "C" {
 	 * or outside the range to disable this function
 	 * @param capslock similar to numlock but with capslock
 	 * @param scrolllock similar to numlock but with scrolllock
-	 * @param enable_user_password set True to enable OTP PIN protection (request PIN each OTP code request)
-	 * @param delete_user_password set True to disable OTP PIN protection (request PIN each OTP code request)
+	 * @param enable_user_password set True to enable OTP PIN protection (require PIN each OTP code request)
+	 * @param delete_user_password (unused)
 	 * @param admin_temporary_password current admin temporary password
 	 * @return command processing error code
 	 */

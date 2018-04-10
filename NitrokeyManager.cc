@@ -78,7 +78,7 @@ using nitrokey::misc::strcpyT;
 
     NitrokeyManager::NitrokeyManager() : device(nullptr)
     {
-        set_debug(true);
+        set_debug(false);
     }
     NitrokeyManager::~NitrokeyManager() {
         std::lock_guard<std::mutex> lock(mex_dev_com_manager);

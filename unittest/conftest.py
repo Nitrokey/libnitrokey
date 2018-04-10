@@ -44,6 +44,7 @@ def C(request=None):
     cnt = 0
     a = iter(declarations)
     for declaration in a:
+        if 'NK_device_model' in declaration: continue
         if declaration.strip().startswith('NK_C_API'):
             declaration = declaration.replace('NK_C_API', '').strip()
             while ';' not in declaration:

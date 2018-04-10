@@ -73,7 +73,7 @@ extern "C" {
 	 * @param device_model NK_device_model: NK_PRO: Nitrokey Pro, NK_STORAGE: Nitrokey Storage
 	 * @return 1 if connected, 0 if wrong model or cannot connect
 	 */
-        NK_C_API int NK_login_enum(NK_device_model device_model);
+        NK_C_API int NK_login_enum(enum NK_device_model device_model);
 
 	/**
 	 * Connect to first available device, starting checking from Pro 1st to Storage 2nd.

@@ -161,6 +161,22 @@ extern "C" {
 		return 0;
 	}
 
+        NK_C_API int NK_login_enum(NK_device_model device_model) {
+                const char *model_string;
+                switch (device_model) {
+                    case NK_PRO:
+                        model_string = "P";
+                        break;
+                    case NK_STORAGE:
+                        model_string = "S";
+                        break;
+                    default:
+                        /* no such enum value -- return error code */
+                        return 0;
+                }
+                return NK_login(model_string);
+        }
+
 	NK_C_API int NK_logout() {
 		auto m = NitrokeyManager::instance();
 		return get_without_result([&]() {

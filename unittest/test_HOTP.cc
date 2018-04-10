@@ -36,7 +36,8 @@ using namespace nitrokey::misc;
 
 void hexStringToByte(uint8_t data[], const char* hexString){
   REQUIRE(strlen(hexString)%2==0);
-    char buf[2];
+    char buf[3];
+    buf[2] = '\0';
     for(int i=0; i<strlen(hexString); i++){
         buf[i%2] = hexString[i];
         if (i%2==1){

@@ -322,7 +322,9 @@ namespace nitrokey {
                     };
                     uint8_t temporary_admin_password[25];
 
-                    std::string dissect() const {
+                  bool isValid() const { return numlock < 2 && capslock < 2 && scrolllock < 2 && enable_user_password < 2; }
+
+                  std::string dissect() const {
                       std::stringstream ss;
                       ss << "numlock:\t" << (int)numlock << std::endl;
                       ss << "capslock:\t" << (int)capslock << std::endl;

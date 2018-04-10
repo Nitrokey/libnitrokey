@@ -389,7 +389,9 @@ class GetStatus : Command<CommandID::GET_STATUS> {
           } __packed;
       } __packed;
 
-    bool isValid() const { return numlock < 2 && capslock < 2 && scrolllock < 2 && enable_user_password < 2; }
+    static constexpr uint8_t special_HOTP_slots = 2;
+    bool isValid() const { return numlock < special_HOTP_slots && capslock < special_HOTP_slots
+                                  && scrolllock < special_HOTP_slots && enable_user_password < 2; }
 
     std::string get_card_serial_hex() const {
       return nitrokey::misc::toHex(card_serial_u32);

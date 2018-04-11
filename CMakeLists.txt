@@ -135,7 +135,7 @@ IF(NOT WIN32)
     ENDIF()
 
     install(FILES
-            ${CMAKE_SOURCE_DIR}/data/41-nitrokey.rules
+            ${CMAKE_CURRENT_SOURCE_DIR}/data/41-nitrokey.rules
             DESTINATION ${CMAKE_INSTALL_UDEVRULESDIR}
     )
 ENDIF()

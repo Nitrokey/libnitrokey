@@ -74,7 +74,7 @@ TEST_CASE("multiple devices with ID", "[BASIC]") {
   int t;
 
   string = strndup(s, 4096);
-  free ( (void*) s);
+  free (static_cast<void*>(const_cast<char*>(s)));
 
   while ((token = strsep(&string, ";")) != nullptr){
     if (strnlen(token, 4096) < 3) continue;

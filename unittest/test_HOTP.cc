@@ -38,7 +38,7 @@ void hexStringToByte(uint8_t data[], const char* hexString){
   REQUIRE(strlen(hexString)%2==0);
     char buf[3];
     buf[2] = '\0';
-    for(int i=0; i<strlen(hexString); i++){
+    for(size_t i=0; i<strlen(hexString); i++){
         buf[i%2] = hexString[i];
         if (i%2==1){
             data[i/2] = strtoul(buf, NULL, 16) & 0xFF;

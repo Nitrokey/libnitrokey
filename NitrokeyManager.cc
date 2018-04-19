@@ -51,6 +51,8 @@ char * strndup(const char* str, size_t maxlen){
 #endif
 #endif
 
+static const int user_tmp_pass_maxlen = 30;
+
 using nitrokey::misc::strcpyT;
 
     template <typename T>
@@ -397,13 +399,14 @@ using nitrokey::misc::strcpyT;
       return s.str();
     }
 
-    string NitrokeyManager::get_HOTP_code(uint8_t slot_number, const char *user_temporary_password) {
+
+  string NitrokeyManager::get_HOTP_code(uint8_t slot_number, const char *user_temporary_password) {
       if (!is_valid_hotp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
 
       if (is_authorization_command_supported()){
         auto gh = get_payload<GetHOTP>();
         gh.slot_number = get_internal_slot_number_for_hotp(slot_number);
-        if(user_temporary_password != nullptr && strlen(user_temporary_password)!=0){ //FIXME use string instead of strlen
+        if(user_temporary_password != nullptr && strnlen(user_temporary_password, user_tmp_pass_maxlen) != 0){ //FIXME use string instead of strlen
             authorize_packet<GetHOTP, UserAuthorize>(gh, user_temporary_password, device);
         }
         auto resp = GetHOTP::CommandTransaction::run(device, gh);
@@ -411,7 +414,7 @@ using nitrokey::misc::strcpyT;
       } else {
         auto gh = get_payload<stick10_08::GetHOTP>();
         gh.slot_number = get_internal_slot_number_for_hotp(slot_number);
-        if(user_temporary_password != nullptr && strlen(user_temporary_password)!=0) {
+        if(user_temporary_password != nullptr && strnlen(user_temporary_password, user_tmp_pass_maxlen) != 0) { //FIXME use strnlen instead of strlen
           strcpyT(gh.temporary_user_password, user_temporary_password);
         }
         auto resp = stick10_08::GetHOTP::CommandTransaction::run(device, gh);
@@ -440,7 +443,7 @@ using nitrokey::misc::strcpyT;
           gt.last_interval = last_interval;
           gt.last_totp_time = last_totp_time;
 
-          if(user_temporary_password != nullptr && strlen(user_temporary_password)!=0){ //FIXME use string instead of strlen
+          if(user_temporary_password != nullptr && strnlen(user_temporary_password, user_tmp_pass_maxlen) != 0){ //FIXME use string instead of strlen
               authorize_packet<GetTOTP, UserAuthorize>(gt, user_temporary_password, device);
           }
           auto resp = GetTOTP::CommandTransaction::run(device, gt);

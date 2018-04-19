@@ -85,7 +85,7 @@ const char* get_with_string_result(T func){
     catch (const DeviceCommunicationException &deviceException){
       NK_last_command_status = 256-deviceException.getType();
     }
-    return "";
+    return strndup("", MAXIMUM_STR_REPLY_LENGTH);
 }
 
 template <typename T>
@@ -640,7 +640,7 @@ extern "C" {
 				res += a+";";
 			}
 			if (res.size()>0) res.pop_back(); // remove last delimiter char
-			return strndup(res.c_str(), 8192); //this buffer size sets limit to over 200 devices ID's
+			return strndup(res.c_str(), MAXIMUM_STR_REPLY_LENGTH);
 		});
 	}
 

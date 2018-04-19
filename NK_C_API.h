@@ -28,12 +28,14 @@
 #ifdef _MSC_VER
 #define NK_C_API __declspec(dllexport)
 #else
-#define NK_C_API 
+#define NK_C_API
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+  static const int MAXIMUM_STR_REPLY_LENGTH = 8192;
 
         /**
          * The Nitrokey device models supported by the API.

@@ -212,7 +212,7 @@ extern "C" {
 	 * Write HOTP slot data to the device
 	 * @param slot_number HOTP slot number, slot_number<3
 	 * @param slot_name char[15](Pro) desired slot name
-	 * @param secret char[20](Pro) 160-bit secret
+	 * @param secret char[40](Pro) 160-bit secret as a hex string
 	 * @param hotp_counter uint32_t starting value of HOTP counter
 	 * @param use_8_digits should returned codes be 6 (false) or 8 digits (true)
 	 * @param use_enter press ENTER key after sending OTP code using double-pressed scroll/num/capslock
@@ -229,7 +229,7 @@ extern "C" {
 	 * Write TOTP slot data to the device
 	 * @param slot_number TOTP slot number, slot_number<15
 	 * @param slot_name char[15](Pro) desired slot name
-	 * @param secret char[20](Pro) 160-bit secret
+	 * @param secret char[40](Pro) 160-bit secret as a hex string
 	 * @param time_window uint16_t time window for this TOTP
 	 * @param use_8_digits should returned codes be 6 (false) or 8 digits (true)
 	 * @param use_enter press ENTER key after sending OTP code using double-pressed scroll/num/capslock

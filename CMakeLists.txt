@@ -185,6 +185,7 @@ IF (COMPILE_TESTS)
                 unittest/test1.cc
                 unittest/test_issues.cc
                 unittest/test_multiple_devices.cc
+                unittest/test_strdup.cpp
         )
 
     foreach(testsourcefile ${TESTS} )

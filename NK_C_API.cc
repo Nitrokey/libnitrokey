@@ -247,7 +247,7 @@ extern "C" {
 		auto m = NitrokeyManager::instance();
 		return get_with_string_result([&]() {
 			string && s = m->get_status_as_string();
-			char * rs = strndup(s.c_str(), max_string_field_length);
+			char * rs = strndup(s.c_str(), MAXIMUM_STR_REPLY_LENGTH);
 			clear_string(s);
 			return rs;
 		});

@@ -95,7 +95,7 @@ set_target_properties(nitrokey PROPERTIES
 
 OPTION(ERROR_ON_WARNING "Stop compilation on warning found (not supported for MSVC)" OFF)
 if (NOT MSVC)
-    set(COMPILE_FLAGS "-Wall -Wno-unused-function -Wcast-qual -Woverloaded-virtual")
+    set(COMPILE_FLAGS "-Wall -Wno-unused-function -Wcast-qual -Woverloaded-virtual -Wsign-compare -Wformat -Wformat-security")
     IF(NOT APPLE)
         if (ERROR_ON_WARNING)
             set(COMPILE_FLAGS "${COMPILE_FLAGS} -Werror")
@@ -167,34 +167,32 @@ ENDIF()
 IF(COMPILE_OFFLINE_TESTS)
     add_executable (test_offline unittest/test_offline.cc)
     target_link_libraries (test_offline ${EXTRA_LIBS} nitrokey catch)
+    SET_TARGET_PROPERTIES(test_offline PROPERTIES COMPILE_FLAGS ${COMPILE_FLAGS} )
     #run with 'make test' or 'ctest'
     include (CTest)
     add_test (runs test_offline)
 ENDIF()
 
 IF (COMPILE_TESTS)
-    #needs connected PRO device for success
-    #warning: it may delete data on the device
-    add_executable (test_C_API unittest/test_C_API.cpp)
-    target_link_libraries (test_C_API ${EXTRA_LIBS} nitrokey catch)
+    #needs connected Pro/Storage devices for success
+    #WARNING: it may delete data on the device
 
-    add_executable (test2 unittest/test2.cc)
-    target_link_libraries (test2 ${EXTRA_LIBS} nitrokey catch)
+        SET(TESTS
+                unittest/test_C_API.cpp
+                unittest/test2.cc
+                unittest/test3.cc
+                unittest/test_HOTP.cc
+                unittest/test1.cc
+                unittest/test_issues.cc
+                unittest/test_multiple_devices.cc
+        )
 
-    add_executable (test3 unittest/test3.cc)
-    target_link_libraries (test3 ${EXTRA_LIBS} nitrokey catch)
-
-    add_executable (test_HOTP unittest/test_HOTP.cc)
-    target_link_libraries (test_HOTP ${EXTRA_LIBS} nitrokey catch)
-
-    add_executable (test1 unittest/test.cc)
-    target_link_libraries (test1 ${EXTRA_LIBS} nitrokey catch)
-
-    add_executable (test_issues unittest/test_issues.cc)
-    target_link_libraries (test_issues ${EXTRA_LIBS} nitrokey catch)
-
-    add_executable (test_multiple_devices unittest/test_multiple_devices.cc)
-    target_link_libraries (test_multiple_devices ${EXTRA_LIBS} nitrokey catch)
+    foreach(testsourcefile ${TESTS} )
+        get_filename_component(testname ${testsourcefile} NAME_WE )
+        add_executable(${testname} ${testsourcefile} )
+        target_link_libraries(${testname} ${EXTRA_LIBS} nitrokey catch )
+        SET_TARGET_PROPERTIES(${testname} PROPERTIES COMPILE_FLAGS ${COMPILE_FLAGS} )
+    endforeach(testsourcefile)
 
 ENDIF()
 

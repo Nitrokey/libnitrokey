@@ -403,6 +403,8 @@ class GetStatus : Command<CommandID::GET_STATUS> {
           << "[" << firmware_version << "]" << "\t"
           << ::nitrokey::misc::hexdump(
           (const uint8_t *)(&firmware_version), sizeof firmware_version, false);
+      ss << "firmware_version_st.major:\t" << (int) firmware_version_st.major<< std::endl;
+      ss << "firmware_version_st.minor:\t" << (int) firmware_version_st.minor<< std::endl;
       ss << "card_serial_u32:\t" << std::hex << card_serial_u32 << std::endl;
       ss << "card_serial:\t"
          << ::nitrokey::misc::hexdump((const uint8_t *)(card_serial),

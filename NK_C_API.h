@@ -114,37 +114,37 @@ extern "C" {
 
 	/**
 	 * Authenticates the user on USER privilages with user_password and sets user's temporary password on device to user_temporary_password.
-	 * @param user_password char[25](Pro) current user password
-	 * @param user_temporary_password char[25](Pro) user temporary password to be set on device for further communication (authentication command)
+	 * @param user_password char[25] current user password
+	 * @param user_temporary_password char[25] user temporary password to be set on device for further communication (authentication command)
 	 * @return command processing error code
 	 */
 	NK_C_API int NK_user_authenticate(const char* user_password, const char* user_temporary_password);
 
 	/**
 	 * Authenticates the user on ADMIN privilages with admin_password and sets user's temporary password on device to admin_temporary_password.
-	 * @param admin_password char[25](Pro) current administrator PIN
-	 * @param admin_temporary_password char[25](Pro) admin temporary password to be set on device for further communication (authentication command)
+	 * @param admin_password char[25] current administrator PIN
+	 * @param admin_temporary_password char[25] admin temporary password to be set on device for further communication (authentication command)
 	 * @return command processing error code
 	 */
 	NK_C_API int NK_first_authenticate(const char* admin_password, const char* admin_temporary_password);
 
 	/**
 	 * Execute a factory reset.
-	 * @param admin_password char[20](Pro) current administrator PIN
+	 * @param admin_password char[20] current administrator PIN
 	 * @return command processing error code
 	 */
 	NK_C_API int NK_factory_reset(const char* admin_password);
 
 	/**
 	 * Generates AES key on the device
-	 * @param admin_password char[20](Pro) current administrator PIN
+	 * @param admin_password char[20] current administrator PIN
 	 * @return command processing error code
 	 */
 	NK_C_API int NK_build_aes_key(const char* admin_password);
 
 	/**
 	 * Unlock user PIN locked after 3 incorrect codes tries.
-	 * @param admin_password char[20](Pro) current administrator PIN
+	 * @param admin_password char[20] current administrator PIN
 	 * @return command processing error code
 	 */
 	NK_C_API int NK_unlock_user_password(const char *admin_password, const char *new_user_password);
@@ -181,14 +181,14 @@ extern "C" {
 	/**
 	 * Get name of given TOTP slot
 	 * @param slot_number TOTP slot number, slot_number<15
-	 * @return char[20](Pro) the name of the slot
+	 * @return char[20] the name of the slot
 	 */
 	NK_C_API const char * NK_get_totp_slot_name(uint8_t slot_number);
 
 	/**
 	 *
 	 * @param slot_number HOTP slot number, slot_number<3
-	 * @return char[20](Pro) the name of the slot
+	 * @return char[20] the name of the slot
 	 */
 	NK_C_API const char * NK_get_hotp_slot_name(uint8_t slot_number);
 
@@ -210,15 +210,16 @@ extern "C" {
 
 	/**
 	 * Write HOTP slot data to the device
-	 * @param slot_number HOTP slot number, slot_number<3
-	 * @param slot_name char[15](Pro) desired slot name
-	 * @param secret char[20](Pro) 160-bit secret
+	 * @param slot_number HOTP slot number, slot_number<3, 0-numbered
+	 * @param slot_name char[15] desired slot name. C string (requires ending '\0'; 16 bytes).
+	 * @param secret char[40] 160-bit or 320-bit (currently Pro v0.8 only) secret as a hex string. C string (requires ending '\0'; 41 bytes).
+	 * See NitrokeyManager::is_320_OTP_secret_supported.
 	 * @param hotp_counter uint32_t starting value of HOTP counter
 	 * @param use_8_digits should returned codes be 6 (false) or 8 digits (true)
 	 * @param use_enter press ENTER key after sending OTP code using double-pressed scroll/num/capslock
 	 * @param use_tokenID @see token_ID
 	 * @param token_ID @see https://openauthentication.org/token-specs/, 'Class A' section
-	 * @param temporary_password char[25](Pro) admin temporary password
+	 * @param temporary_password char[25] admin temporary password
 	 * @return command processing error code
 	 */
 	NK_C_API int NK_write_hotp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint64_t hotp_counter,
@@ -227,15 +228,16 @@ extern "C" {
 
 	/**
 	 * Write TOTP slot data to the device
-	 * @param slot_number TOTP slot number, slot_number<15
-	 * @param slot_name char[15](Pro) desired slot name
-	 * @param secret char[20](Pro) 160-bit secret
+	 * @param slot_number TOTP slot number, slot_number<15, 0-numbered
+	 * @param slot_name char[15] desired slot name. C string (requires ending '\0'; 16 bytes).
+	 * @param secret char[40] 160-bit or 320-bit (currently Pro v0.8 only) secret as a hex string. C string (requires ending '\0'; 41 bytes).
+	 * See NitrokeyManager::is_320_OTP_secret_supported.
 	 * @param time_window uint16_t time window for this TOTP
 	 * @param use_8_digits should returned codes be 6 (false) or 8 digits (true)
 	 * @param use_enter press ENTER key after sending OTP code using double-pressed scroll/num/capslock
 	 * @param use_tokenID @see token_ID
 	 * @param token_ID @see https://openauthentication.org/token-specs/, 'Class A' section
-	 * @param temporary_password char[20](Pro) admin temporary password
+	 * @param temporary_password char[20] admin temporary password
 	 * @return command processing error code
 	 */
 	NK_C_API int NK_write_totp_slot(uint8_t slot_number, const char *slot_name, const char *secret, uint16_t time_window,
@@ -252,7 +254,7 @@ extern "C" {
 	/**
 	 * Get HOTP code from the device (PIN protected)
 	 * @param slot_number HOTP slot number, slot_number<3
-	 * @param user_temporary_password char[25](Pro) user temporary password if PIN protected OTP codes are enabled,
+	 * @param user_temporary_password char[25] user temporary password if PIN protected OTP codes are enabled,
 	 * otherwise should be set to empty string - ''
 	 * @return HOTP code
 	 */
@@ -275,7 +277,7 @@ extern "C" {
 	 * @param challenge TOTP challenge
 	 * @param last_totp_time last time
 	 * @param last_interval last interval
-	 * @param user_temporary_password char[25](Pro) user temporary password if PIN protected OTP codes are enabled,
+	 * @param user_temporary_password char[25] user temporary password if PIN protected OTP codes are enabled,
 	 * otherwise should be set to empty string - ''
 	 * @return TOTP code
 	 */
@@ -295,16 +297,16 @@ extern "C" {
 	//passwords
 	/**
 	 * Change administrator PIN
-	 * @param current_PIN char[25](Pro) current PIN
-	 * @param new_PIN char[25](Pro) new PIN
+	 * @param current_PIN char[25] current PIN
+	 * @param new_PIN char[25] new PIN
 	 * @return command processing error code
 	 */
 	NK_C_API int NK_change_admin_PIN(const char *current_PIN, const char *new_PIN);
 
 	/**
 	 * Change user PIN
-	 * @param current_PIN char[25](Pro) current PIN
-	 * @param new_PIN char[25](Pro) new PIN
+	 * @param current_PIN char[25] current PIN
+	 * @param new_PIN char[25] new PIN
 	 * @return command processing error code
 	*/
 	NK_C_API int NK_change_user_PIN(const char *current_PIN, const char *new_PIN);
@@ -325,7 +327,7 @@ extern "C" {
 
 	/**
 	 * Enable password safe access
-	 * @param user_pin char[30](Pro) current user PIN
+	 * @param user_pin char[30] current user PIN
 	 * @return command processing error code
 	 */
 	NK_C_API int NK_enable_password_safe(const char *user_pin);
@@ -360,9 +362,9 @@ extern "C" {
 	/**
 	 * Write password safe data to the slot
 	 * @param slot_number password safe slot number, slot_number<16
-	 * @param slot_name char[11](Pro) name of the slot
-	 * @param slot_login char[32](Pro) login string
-	 * @param slot_password char[20](Pro) password string
+	 * @param slot_name char[11] name of the slot
+	 * @param slot_login char[32] login string
+	 * @param slot_password char[20] password string
 	 * @return command processing error code
 	 */
 	NK_C_API int NK_write_password_safe_slot(uint8_t slot_number, const char *slot_name,

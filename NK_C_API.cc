@@ -71,7 +71,7 @@ uint8_t * get_with_array_result(T func){
 }
 
 template <typename T>
-const char* get_with_string_result(T func){
+char* get_with_string_result(T func){
     NK_last_command_status = 0;
     try {
         return func();
@@ -85,7 +85,7 @@ const char* get_with_string_result(T func){
     catch (const DeviceCommunicationException &deviceException){
       NK_last_command_status = 256-deviceException.getType();
     }
-    return "";
+    return strndup("", MAXIMUM_STR_REPLY_LENGTH);
 }
 
 template <typename T>
@@ -243,17 +243,17 @@ extern "C" {
 	}
 
 
-	NK_C_API const char * NK_status() {
+	NK_C_API char * NK_status() {
 		auto m = NitrokeyManager::instance();
 		return get_with_string_result([&]() {
 			string && s = m->get_status_as_string();
-			char * rs = strndup(s.c_str(), max_string_field_length);
+			char * rs = strndup(s.c_str(), MAXIMUM_STR_REPLY_LENGTH);
 			clear_string(s);
 			return rs;
 		});
 	}
 
-	NK_C_API const char * NK_device_serial_number() {
+	NK_C_API char * NK_device_serial_number() {
 		auto m = NitrokeyManager::instance();
 		return get_with_string_result([&]() {
 			string && s = m->get_serial_number();
@@ -263,11 +263,11 @@ extern "C" {
 		});
 	}
 
-	NK_C_API const char * NK_get_hotp_code(uint8_t slot_number) {
+	NK_C_API char * NK_get_hotp_code(uint8_t slot_number) {
 		return NK_get_hotp_code_PIN(slot_number, "");
 	}
 
-	NK_C_API const char * NK_get_hotp_code_PIN(uint8_t slot_number, const char *user_temporary_password) {
+	NK_C_API char * NK_get_hotp_code_PIN(uint8_t slot_number, const char *user_temporary_password) {
 		auto m = NitrokeyManager::instance();
 		return get_with_string_result([&]() {
 			string && s = m->get_HOTP_code(slot_number, user_temporary_password);
@@ -277,12 +277,12 @@ extern "C" {
 		});
 	}
 
-	NK_C_API const char * NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
+	NK_C_API char * NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
 		uint8_t last_interval) {
 		return NK_get_totp_code_PIN(slot_number, challenge, last_totp_time, last_interval, "");
 	}
 
-	NK_C_API const char * NK_get_totp_code_PIN(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
+	NK_C_API char * NK_get_totp_code_PIN(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
 		uint8_t last_interval, const char *user_temporary_password) {
 		auto m = NitrokeyManager::instance();
 		return get_with_string_result([&]() {
@@ -327,14 +327,14 @@ extern "C" {
 		});
 	}
 
-	NK_C_API const char* NK_get_totp_slot_name(uint8_t slot_number) {
+	NK_C_API char* NK_get_totp_slot_name(uint8_t slot_number) {
 		auto m = NitrokeyManager::instance();
 		return get_with_string_result([&]() {
 			const auto slot_name = m->get_totp_slot_name(slot_number);
 			return slot_name;
 		});
 	}
-	NK_C_API const char* NK_get_hotp_slot_name(uint8_t slot_number) {
+	NK_C_API char* NK_get_hotp_slot_name(uint8_t slot_number) {
 		auto m = NitrokeyManager::instance();
 		return get_with_string_result([&]() {
 			const auto slot_name = m->get_hotp_slot_name(slot_number);
@@ -417,20 +417,20 @@ extern "C" {
 		});
 	}
 
-	NK_C_API const char *NK_get_password_safe_slot_name(uint8_t slot_number) {
+	NK_C_API char *NK_get_password_safe_slot_name(uint8_t slot_number) {
 		auto m = NitrokeyManager::instance();
 		return get_with_string_result([&]() {
 			return m->get_password_safe_slot_name(slot_number);
 		});
 	}
 
-	NK_C_API const char *NK_get_password_safe_slot_login(uint8_t slot_number) {
+	NK_C_API char *NK_get_password_safe_slot_login(uint8_t slot_number) {
 		auto m = NitrokeyManager::instance();
 		return get_with_string_result([&]() {
 			return m->get_password_safe_slot_login(slot_number);
 		});
 	}
-	NK_C_API const char *NK_get_password_safe_slot_password(uint8_t slot_number) {
+	NK_C_API char *NK_get_password_safe_slot_password(uint8_t slot_number) {
 		auto m = NitrokeyManager::instance();
 		return get_with_string_result([&]() {
 			return m->get_password_safe_slot_password(slot_number);
@@ -589,14 +589,14 @@ extern "C" {
 		});
 	}
 
-	NK_C_API const char* NK_get_status_storage_as_string() {
+	NK_C_API char* NK_get_status_storage_as_string() {
 		auto m = NitrokeyManager::instance();
 		return get_with_string_result([&]() {
 			return m->get_status_storage_as_string();
 		});
 	}
 
-	NK_C_API const char* NK_get_SD_usage_data_as_string() {
+	NK_C_API char* NK_get_SD_usage_data_as_string() {
 		auto m = NitrokeyManager::instance();
 		return get_with_string_result([&]() {
 			return m->get_SD_usage_data_as_string();
@@ -631,7 +631,7 @@ extern "C" {
 		});
 	}
 
-	NK_C_API const char* NK_list_devices_by_cpuID() {
+	NK_C_API char* NK_list_devices_by_cpuID() {
 		auto nm = NitrokeyManager::instance();
 		return get_with_string_result([&]() {
 			auto v = nm->list_devices_by_cpuID();
@@ -640,7 +640,7 @@ extern "C" {
 				res += a+";";
 			}
 			if (res.size()>0) res.pop_back(); // remove last delimiter char
-			return strndup(res.c_str(), 8192); //this buffer size sets limit to over 200 devices ID's
+			return strndup(res.c_str(), MAXIMUM_STR_REPLY_LENGTH);
 		});
 	}
 

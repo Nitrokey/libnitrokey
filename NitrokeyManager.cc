@@ -630,12 +630,12 @@ using nitrokey::misc::strcpyT;
       auto resp = WriteToTOTPSlot::CommandTransaction::run(device, payload);
     }
 
-    const char * NitrokeyManager::get_totp_slot_name(uint8_t slot_number) {
+    char * NitrokeyManager::get_totp_slot_name(uint8_t slot_number) {
         if (!is_valid_totp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         slot_number = get_internal_slot_number_for_totp(slot_number);
         return get_slot_name(slot_number);
     }
-    const char * NitrokeyManager::get_hotp_slot_name(uint8_t slot_number) {
+    char * NitrokeyManager::get_hotp_slot_name(uint8_t slot_number) {
         if (!is_valid_hotp_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         slot_number = get_internal_slot_number_for_hotp(slot_number);
         return get_slot_name(slot_number);
@@ -643,7 +643,7 @@ using nitrokey::misc::strcpyT;
 
   static const int max_string_field_length = 2*1024; //storage's status string is ~1k
 
-  const char * NitrokeyManager::get_slot_name(uint8_t slot_number)  {
+  char * NitrokeyManager::get_slot_name(uint8_t slot_number)  {
         auto payload = get_payload<GetSlotName>();
         payload.slot_number = slot_number;
         auto resp = GetSlotName::CommandTransaction::run(device, payload);
@@ -749,7 +749,7 @@ using nitrokey::misc::strcpyT;
         LockDevice::CommandTransaction::run(device);
     }
 
-    const char *NitrokeyManager::get_password_safe_slot_name(uint8_t slot_number) {
+    char * NitrokeyManager::get_password_safe_slot_name(uint8_t slot_number) {
         if (!is_valid_password_safe_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         auto p = get_payload<GetPasswordSafeSlotName>();
         p.slot_number = slot_number;
@@ -759,7 +759,7 @@ using nitrokey::misc::strcpyT;
 
     bool NitrokeyManager::is_valid_password_safe_slot_number(uint8_t slot_number) const { return slot_number < 16; }
 
-    const char *NitrokeyManager::get_password_safe_slot_login(uint8_t slot_number) {
+    char * NitrokeyManager::get_password_safe_slot_login(uint8_t slot_number) {
         if (!is_valid_password_safe_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         auto p = get_payload<GetPasswordSafeSlotLogin>();
         p.slot_number = slot_number;
@@ -767,7 +767,7 @@ using nitrokey::misc::strcpyT;
         return strndup((const char *) response.data().slot_login, max_string_field_length);
     }
 
-    const char *NitrokeyManager::get_password_safe_slot_password(uint8_t slot_number) {
+    char * NitrokeyManager::get_password_safe_slot_password(uint8_t slot_number) {
         if (!is_valid_password_safe_slot_number(slot_number)) throw InvalidSlotException(slot_number);
         auto p = get_payload<GetPasswordSafeSlotPassword>();
         p.slot_number = slot_number;
@@ -1059,7 +1059,7 @@ using nitrokey::misc::strcpyT;
       stick20::ChangeUpdatePassword::CommandTransaction::run(device, p);
     }
 
-    const char * NitrokeyManager::get_status_storage_as_string(){
+    char * NitrokeyManager::get_status_storage_as_string(){
       auto p = stick20::GetDeviceStatus::CommandTransaction::run(device);
       return strndup(p.data().dissect().c_str(), max_string_field_length);
     }
@@ -1069,7 +1069,7 @@ using nitrokey::misc::strcpyT;
       return p.data();
     }
 
-    const char * NitrokeyManager::get_SD_usage_data_as_string(){
+    char * NitrokeyManager::get_SD_usage_data_as_string(){
       auto p = stick20::GetSDCardOccupancy::CommandTransaction::run(device);
       return strndup(p.data().dissect().c_str(), max_string_field_length);
     }

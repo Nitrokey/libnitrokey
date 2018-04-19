@@ -93,13 +93,13 @@ extern "C" {
 	 * Return the debug status string. Debug purposes.
 	 * @return command processing error code
 	 */
-	NK_C_API const char * NK_status();
+	NK_C_API char * NK_status();
 
 	/**
 	 * Return the device's serial number string in hex.
 	 * @return string device's serial number in hex
 	 */
-	NK_C_API const char * NK_device_serial_number();
+	NK_C_API char * NK_device_serial_number();
 
 	/**
 	 * Get last command processing status. Useful for commands which returns the results of their own and could not return
@@ -185,14 +185,14 @@ extern "C" {
 	 * @param slot_number TOTP slot number, slot_number<15
 	 * @return char[20] the name of the slot
 	 */
-	NK_C_API const char * NK_get_totp_slot_name(uint8_t slot_number);
+	NK_C_API char * NK_get_totp_slot_name(uint8_t slot_number);
 
 	/**
 	 *
 	 * @param slot_number HOTP slot number, slot_number<3
 	 * @return char[20] the name of the slot
 	 */
-	NK_C_API const char * NK_get_hotp_slot_name(uint8_t slot_number);
+	NK_C_API char * NK_get_hotp_slot_name(uint8_t slot_number);
 
 	/**
 	 * Erase HOTP slot data from the device
@@ -251,7 +251,7 @@ extern "C" {
 	 * @param slot_number HOTP slot number, slot_number<3
 	 * @return HOTP code
 	 */
-	NK_C_API const char * NK_get_hotp_code(uint8_t slot_number);
+	NK_C_API char * NK_get_hotp_code(uint8_t slot_number);
 
 	/**
 	 * Get HOTP code from the device (PIN protected)
@@ -260,7 +260,7 @@ extern "C" {
 	 * otherwise should be set to empty string - ''
 	 * @return HOTP code
 	 */
-	NK_C_API const char * NK_get_hotp_code_PIN(uint8_t slot_number, const char *user_temporary_password);
+	NK_C_API char * NK_get_hotp_code_PIN(uint8_t slot_number, const char *user_temporary_password);
 
 	/**
 	 * Get TOTP code from the device
@@ -270,7 +270,7 @@ extern "C" {
 	 * @param last_interval last interval
 	 * @return TOTP code
 	 */
-	NK_C_API const char * NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
+	NK_C_API char * NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
 		uint8_t last_interval);
 
 	/**
@@ -283,7 +283,7 @@ extern "C" {
 	 * otherwise should be set to empty string - ''
 	 * @return TOTP code
 	 */
-	NK_C_API const char * NK_get_totp_code_PIN(uint8_t slot_number, uint64_t challenge,
+	NK_C_API char * NK_get_totp_code_PIN(uint8_t slot_number, uint64_t challenge,
 		uint64_t last_totp_time, uint8_t last_interval,
 		const char *user_temporary_password);
 
@@ -345,21 +345,21 @@ extern "C" {
 	 * @param slot_number password safe slot number, slot_number<16
 	 * @return slot name
 	 */
-	NK_C_API const char *NK_get_password_safe_slot_name(uint8_t slot_number);
+	NK_C_API char *NK_get_password_safe_slot_name(uint8_t slot_number);
 
 	/**
 	 * Get password safe slot login
 	 * @param slot_number password safe slot number, slot_number<16
 	 * @return login from the PWS slot
 	 */
-	NK_C_API const char *NK_get_password_safe_slot_login(uint8_t slot_number);
+	NK_C_API char *NK_get_password_safe_slot_login(uint8_t slot_number);
 
 	/**
 	 * Get the password safe slot password
 	 * @param slot_number password safe slot number, slot_number<16
 	 * @return password from the PWS slot
 	 */
-	NK_C_API const char *NK_get_password_safe_slot_password(uint8_t slot_number);
+	NK_C_API char *NK_get_password_safe_slot_password(uint8_t slot_number);
 
 	/**
 	 * Write password safe data to the slot
@@ -584,7 +584,7 @@ extern "C" {
 	 * Storage only
 	 * @return string with devices attributes
 	 */
-	NK_C_API const char* NK_get_status_storage_as_string();
+	NK_C_API char* NK_get_status_storage_as_string();
 
 	/**
 	 * Get SD card usage attributes as string.
@@ -592,7 +592,7 @@ extern "C" {
 	 * Storage only
 	 * @return string with SD card usage attributes
 	 */
-	NK_C_API const char* NK_get_SD_usage_data_as_string();
+	NK_C_API char* NK_get_SD_usage_data_as_string();
 
 	/**
 	 * Get progress value of current long operation.
@@ -616,7 +616,7 @@ extern "C" {
  * @example Example of returned data: '00005d19:dacc2cb4_p_0001:0010:02;000037c7:4cf12445_p_0001:000f:02;0001:000c:02'
  * @return string delimited id's of connected devices
  */
-	NK_C_API const char* NK_list_devices_by_cpuID();
+	NK_C_API char* NK_list_devices_by_cpuID();
 
 
 /**

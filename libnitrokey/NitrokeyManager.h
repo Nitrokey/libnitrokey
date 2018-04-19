@@ -93,8 +93,8 @@ char * strndup(const char* str, size_t maxlen);
         string get_status_as_string();
         string get_serial_number();
 
-        const char * get_totp_slot_name(uint8_t slot_number);
-        const char * get_hotp_slot_name(uint8_t slot_number);
+        char * get_totp_slot_name(uint8_t slot_number);
+        char * get_hotp_slot_name(uint8_t slot_number);
 
         void change_user_PIN(const char *current_PIN, const char *new_PIN);
         void change_admin_PIN(const char *current_PIN, const char *new_PIN);
@@ -108,9 +108,9 @@ char * strndup(const char* str, size_t maxlen);
 
         void lock_device();
 
-        const char *get_password_safe_slot_name(uint8_t slot_number);
-        const char *get_password_safe_slot_password(uint8_t slot_number);
-        const char *get_password_safe_slot_login(uint8_t slot_number);
+        char * get_password_safe_slot_name(uint8_t slot_number);
+        char * get_password_safe_slot_password(uint8_t slot_number);
+        char * get_password_safe_slot_login(uint8_t slot_number);
 
         void
     write_password_safe_slot(uint8_t slot_number, const char *slot_name, const char *slot_login,
@@ -187,10 +187,10 @@ char * strndup(const char* str, size_t maxlen);
 
         void send_startup(uint64_t seconds_from_epoch);
 
-        const char * get_status_storage_as_string();
+        char * get_status_storage_as_string();
         stick20::DeviceConfigurationResponsePacket::ResponsePayload get_status_storage();
 
-        const char *get_SD_usage_data_as_string();
+        char * get_SD_usage_data_as_string();
         std::pair<uint8_t,uint8_t> get_SD_usage_data();
 
 
@@ -227,7 +227,7 @@ char * strndup(const char* str, size_t maxlen);
         uint8_t get_internal_slot_number_for_hotp(uint8_t slot_number) const;
         uint8_t get_internal_slot_number_for_totp(uint8_t slot_number) const;
         bool erase_slot(uint8_t slot_number, const char *temporary_password);
-        const char * get_slot_name(uint8_t slot_number);
+        char * get_slot_name(uint8_t slot_number);
 
         template <typename ProCommand, PasswordKind StoKind>
         void change_PIN_general(const char *current_PIN, const char *new_PIN);

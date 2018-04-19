@@ -92,13 +92,13 @@ public:
   /*
    *	Sends packet of HID_REPORT_SIZE.
    */
-  virtual int send(const void *packet);
+  virtual int send(volatile void *packet);
 
   /*
    *	Gets packet of HID_REPORT_SIZE.
    *	Can sleep. See below.
    */
-  virtual int recv(void *packet);
+  virtual int recv(volatile void *packet);
 
   /***
    * Returns true if some device is visible by OS with given VID and PID

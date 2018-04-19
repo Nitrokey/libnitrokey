@@ -107,7 +107,7 @@ void Device::set_path(const std::string path){
   m_path = path;
 }
 
-int Device::send(const void *packet) {
+int Device::send(volatile void *packet) {
   LOG(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
   LOG(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
@@ -128,7 +128,7 @@ int Device::send(const void *packet) {
   return send_feature_report;
 }
 
-int Device::recv(void *packet) {
+int Device::recv(volatile void *packet) {
   LOG(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);
   LOG(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
@@ -141,7 +141,7 @@ int Device::recv(void *packet) {
       throw DeviceNotConnected("Attempted HID receive on an invalid descriptor.");
     }
 
-    status = (hid_get_feature_report(mp_devhandle, (unsigned char *)(packet),
+    status = (hid_get_feature_report(mp_devhandle, (volatile unsigned char *)(packet),
                                      HID_REPORT_SIZE));
 
     auto pwherr = hid_error(mp_devhandle);

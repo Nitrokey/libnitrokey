@@ -31,6 +31,7 @@
 #include "libnitrokey/cxx_semantics.h"
 #include <functional>
 #include <stick10_commands.h>
+#include "libnitrokey/log.h"
 
 std::mutex nitrokey::proto::send_receive_mtx;
 

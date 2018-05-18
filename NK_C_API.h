@@ -265,9 +265,9 @@ extern "C" {
 	/**
 	 * Get TOTP code from the device
 	 * @param slot_number TOTP slot number, slot_number<15
-	 * @param challenge TOTP challenge
-	 * @param last_totp_time last time
-	 * @param last_interval last interval
+	 * @param challenge TOTP challenge -- unused
+	 * @param last_totp_time last time -- unused
+	 * @param last_interval last interval --unused
 	 * @return TOTP code
 	 */
 	NK_C_API char * NK_get_totp_code(uint8_t slot_number, uint64_t challenge, uint64_t last_totp_time,
@@ -276,9 +276,9 @@ extern "C" {
 	/**
 	 * Get TOTP code from the device (PIN protected)
 	 * @param slot_number TOTP slot number, slot_number<15
-	 * @param challenge TOTP challenge
-	 * @param last_totp_time last time
-	 * @param last_interval last interval
+	 * @param challenge TOTP challenge -- unused
+	 * @param last_totp_time last time -- unused
+	 * @param last_interval last interval -- unused
 	 * @param user_temporary_password char[25] user temporary password if PIN protected OTP codes are enabled,
 	 * otherwise should be set to empty string - ''
 	 * @return TOTP code

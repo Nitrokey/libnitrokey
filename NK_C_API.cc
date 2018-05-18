@@ -360,6 +360,13 @@ extern "C" {
 		});
 	}
 
+	NK_C_API int NK_totp_set_time_soft(uint64_t time) {
+		auto m = NitrokeyManager::instance();
+		return get_without_result([&]() {
+			m->set_time_soft(time);
+		});
+        }
+
 	NK_C_API int NK_totp_get_time() {
 		auto m = NitrokeyManager::instance();
 		return get_without_result([&]() {

@@ -25,7 +25,7 @@
 
 #include <cstdio>
 #include <memory.h>
-#include "NK_C_API.h"
+#include "../NK_C_API.h"
 #include "catch.hpp"
 
 

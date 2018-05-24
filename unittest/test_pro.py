@@ -579,6 +579,8 @@ def test_get_code_user_authorize(C):
 
 @pytest.mark.otp
 def test_authorize_issue_admin(C):
+    skip_if_device_version_lower_than({'S': 43, 'P': 9})
+
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
 
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -592,6 +594,8 @@ def test_authorize_issue_admin(C):
 
 @pytest.mark.otp
 def test_authorize_issue_user(C):
+    skip_if_device_version_lower_than({'S': 43, 'P': 9})  # issue fixed in Pro v0.9, Storage version chosen arbitrary
+
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
 
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK

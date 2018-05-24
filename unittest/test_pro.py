@@ -577,6 +577,55 @@ def test_get_code_user_authorize(C):
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.otp
+def test_authorize_issue_admin(C):
+    skip_if_device_version_lower_than({'S': 43, 'P': 9})
+
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, True, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+
+    assert C.NK_first_authenticate(b"wrong pass", b"another temp pass") == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_NOT_AUTHORIZED
+
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, True, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+
+@pytest.mark.otp
+def test_authorize_issue_user(C):
+    skip_if_device_version_lower_than({'S': 43, 'P': 9})  # issue fixed in Pro v0.9, Storage version chosen arbitrary
+
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_totp_slot(0, b'python_otp_auth', bbRFC_SECRET, 30, True, False, False, b'',
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    # enable PIN protection of OTP codes with write_config
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, True, False, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    gs(C.NK_get_totp_code(0, 0, 0, 0))
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_NOT_AUTHORIZED
+
+    assert C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP) == DeviceErrorCode.STATUS_OK
+    gs(C.NK_get_totp_code_PIN(0, 0, 0, 0, DefaultPasswords.USER_TEMP))
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+
+    assert C.NK_user_authenticate(b"wrong pass", b"another temp pass") == DeviceErrorCode.WRONG_PASSWORD
+    gs(C.NK_get_totp_code_PIN(0, 0, 0, 0, DefaultPasswords.USER_TEMP))
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_NOT_AUTHORIZED
+
+    assert C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP) == DeviceErrorCode.STATUS_OK
+    gs(C.NK_get_totp_code_PIN(0, 0, 0, 0, DefaultPasswords.USER_TEMP))
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+
+    # disable PIN protection with write_config
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    code = gs(C.NK_get_totp_code(0, 0, 0, 0))
+    assert code != b''
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+
 def cast_pointer_to_tuple(obj, typen, len):
     # usage:
     #     config = cast_pointer_to_tuple(config_raw_data, 'uint8_t', 5)

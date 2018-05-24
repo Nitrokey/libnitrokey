@@ -90,6 +90,17 @@ extern "C" {
 	NK_C_API int NK_logout();
 
 	/**
+	 * Query the model of the connected device.  If the out argument is
+         * NULL or if there is no connected device, this function returns
+         * false.  Otherwise it returns true and sets the target of the out
+	 * pointer to the model of the connected device.
+	 *
+	 * @param out a pointer to write the model to
+	 * @return true if a device is connected and the out argument has been set
+	 */
+	NK_C_API bool NK_get_device_model(enum NK_device_model *out);
+
+	/**
 	 * Return the debug status string. Debug purposes.
 	 * @return command processing error code
 	 */

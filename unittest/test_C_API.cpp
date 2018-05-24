@@ -85,3 +85,20 @@ TEST_CASE("multiple devices with ID", "[BASIC]") {
 
   free (string);
 }
+
+TEST_CASE("Get device model", "[BASIC]") {
+    auto success = NK_get_device_model(nullptr);
+    REQUIRE(!success);
+
+    NK_logout();
+    NK_device_model model = static_cast<NK_device_model>(3);
+    success = NK_get_device_model(&model);
+    REQUIRE(!success);
+
+    auto result = NK_login_auto();
+    REQUIRE(result != 0);
+    success = NK_get_device_model(&model);
+    REQUIRE(success);
+    REQUIRE((model == NK_PRO || model == NK_STORAGE));
+    NK_logout();
+}

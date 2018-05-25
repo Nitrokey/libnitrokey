@@ -21,6 +21,7 @@
 
 #include "NK_C_API.h"
 #include <iostream>
+#include <tuple>
 #include "libnitrokey/NitrokeyManager.h"
 #include <cstring>
 #include "libnitrokey/LibraryException.h"
@@ -52,11 +53,11 @@ T* duplicate_vector_and_clear(std::vector<T> &v){
     return d;
 }
 
-template <typename T>
-uint8_t * get_with_array_result(T func){
+template <typename R, typename T>
+std::tuple<int, R> get_with_status(T func, R fallback) {
     NK_last_command_status = 0;
     try {
-        return func();
+        return std::make_tuple(0, func());
     }
     catch (CommandFailedException & commandFailedException){
         NK_last_command_status = commandFailedException.last_command_status;
@@ -67,43 +68,26 @@ uint8_t * get_with_array_result(T func){
     catch (const DeviceCommunicationException &deviceException){
       NK_last_command_status = 256-deviceException.getType();
     }
-    return nullptr;
+    return std::make_tuple(NK_last_command_status, fallback);
+}
+
+template <typename T>
+uint8_t * get_with_array_result(T func){
+    return std::get<1>(get_with_status<uint8_t*>(func, nullptr));
 }
 
 template <typename T>
 char* get_with_string_result(T func){
-    NK_last_command_status = 0;
-    try {
-        return func();
+    auto result = std::get<1>(get_with_status<char*>(func, nullptr));
+    if (result == nullptr) {
+        return strndup("", MAXIMUM_STR_REPLY_LENGTH);
     }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-    }
-    catch (LibraryException & libraryException){
-        NK_last_command_status = libraryException.exception_id();
-    }
-    catch (const DeviceCommunicationException &deviceException){
-      NK_last_command_status = 256-deviceException.getType();
-    }
-    return strndup("", MAXIMUM_STR_REPLY_LENGTH);
+    return result;
 }
 
 template <typename T>
 auto get_with_result(T func){
-    NK_last_command_status = 0;
-    try {
-        return func();
-    }
-    catch (CommandFailedException & commandFailedException){
-        NK_last_command_status = commandFailedException.last_command_status;
-    }
-    catch (LibraryException & libraryException){
-        NK_last_command_status = libraryException.exception_id();
-    }
-    catch (const DeviceCommunicationException &deviceException){
-      NK_last_command_status = 256-deviceException.getType();
-    }
-    return static_cast<decltype(func())>(0);
+    return std::get<1>(get_with_status(func, static_cast<decltype(func())>(0)));
 }
 
 template <typename T>

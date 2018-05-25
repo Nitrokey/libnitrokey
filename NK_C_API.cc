@@ -25,6 +25,7 @@
 #include <cstring>
 #include "libnitrokey/LibraryException.h"
 #include "libnitrokey/cxx_semantics.h"
+#include "version.h"
 
 #ifdef _MSC_VER
 #ifdef _WIN32
@@ -351,6 +352,18 @@ extern "C" {
 	NK_C_API void NK_set_debug_level(const int level) {
 		auto m = NitrokeyManager::instance();
 		m->set_loglevel(level);
+	}
+
+	NK_C_API unsigned int NK_get_major_library_version() {
+		return get_major_library_version();
+	}
+
+	NK_C_API unsigned int NK_get_minor_library_version() {
+		return get_minor_library_version();
+	}
+
+	NK_C_API const char* NK_get_library_version() {
+		return get_library_version();
 	}
 
 	NK_C_API int NK_totp_set_time(uint64_t time) {

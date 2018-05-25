@@ -41,6 +41,7 @@ IF (NOT CMAKE_BUILD_TYPE)
 ENDIF()
 MESSAGE("${PROJECT_NAME}: Build type: ${CMAKE_BUILD_TYPE}")
 
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/libnitrokey)
 include_directories(hidapi)
 include_directories(libnitrokey)
 set(SOURCE_FILES
@@ -115,7 +116,12 @@ IF (LOG_VOLATILE_DATA)
 ENDIF()
 
 
-file(GLOB LIB_INCLUDES "libnitrokey/*.h" "NK_C_API.h")
+# generate version.h
+exec_program("git" ${CMAKE_CURRENT_SOURCE_DIR} ARGS "describe --always" OUTPUT_VARIABLE PROJECT_VERSION_GIT)
+configure_file("libnitrokey/version.h.in" "libnitrokey/version.h" @ONLY)
+
+
+file(GLOB LIB_INCLUDES "libnitrokey/*.h" "NK_C_API.h" "${CMAKE_CURRENT_BINARY_DIR}/libnitrokey/version.h")
 install (FILES ${LIB_INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
 install (TARGETS nitrokey DESTINATION ${CMAKE_INSTALL_LIBDIR})
 

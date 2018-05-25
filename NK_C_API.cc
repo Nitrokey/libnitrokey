@@ -26,6 +26,7 @@
 #include <cstring>
 #include "libnitrokey/LibraryException.h"
 #include "libnitrokey/cxx_semantics.h"
+#include "libnitrokey/stick20_commands.h"
 
 #ifdef _MSC_VER
 #ifdef _WIN32
@@ -578,6 +579,39 @@ extern "C" {
 		return get_with_string_result([&]() {
 			return m->get_status_storage_as_string();
 		});
+	}
+
+	NK_C_API int NK_get_status_storage(NK_storage_status* out) {
+		if (out == nullptr) {
+			return -1;
+		}
+		auto m = NitrokeyManager::instance();
+		auto result = get_with_status([&]() {
+			return m->get_status_storage();
+		}, proto::stick20::DeviceConfigurationResponsePacket::ResponsePayload());
+		auto error_code = std::get<0>(result);
+		if (error_code != 0) {
+			return error_code;
+		}
+
+		auto status = std::get<1>(result);
+		out->unencrypted_volume_read_only = status.ReadWriteFlagUncryptedVolume_u8 != 0;
+		out->unencrypted_volume_active = status.VolumeActiceFlag_st.unencrypted;
+		out->encrypted_volume_read_only = status.ReadWriteFlagCryptedVolume_u8 != 0;
+		out->encrypted_volume_active = status.VolumeActiceFlag_st.encrypted;
+		out->hidden_volume_read_only = status.ReadWriteFlagHiddenVolume_u8 != 0;
+		out->hidden_volume_active = status.VolumeActiceFlag_st.hidden;
+		out->firmware_version_major = status.versionInfo.major;
+		out->firmware_version_minor = status.versionInfo.minor;
+		out->firmware_locked = status.FirmwareLocked_u8 != 0;
+		out->serial_number_sd_card = status.ActiveSD_CardID_u32;
+		out->serial_number_smart_card = status.ActiveSmartCardID_u32;
+		out->user_retry_count = status.UserPwRetryCount;
+		out->admin_retry_count = status.AdminPwRetryCount;
+		out->new_sd_card_found = status.NewSDCardFound_st.NewCard;
+		out->filled_with_random = (status.SDFillWithRandomChars_u8 & 0x01) != 0;
+		out->stick_initialized = status.StickKeysNotInitiated == 0;
+		return 0;
 	}
 
 	NK_C_API char* NK_get_SD_usage_data_as_string() {

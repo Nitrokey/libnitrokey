@@ -52,6 +52,77 @@ extern "C" {
         };
 
 	/**
+	 * Stores the status of a Storage device.
+	 */
+        struct NK_storage_status {
+		/**
+		 * Indicates whether the unencrypted volume is read-only.
+		 */
+		bool unencrypted_volume_read_only;
+		/**
+		 * Indicates whether the unencrypted volume is active.
+		 */
+		bool unencrypted_volume_active;
+		/**
+		 * Indicates whether the encrypted volume is read-only.
+		 */
+		bool encrypted_volume_read_only;
+		/**
+		 * Indicates whether the encrypted volume is active.
+		 */
+		bool encrypted_volume_active;
+		/**
+		 * Indicates whether the hidden volume is read-only.
+		 */
+		bool hidden_volume_read_only;
+		/**
+		 * Indicates whether the hidden volume is active.
+		 */
+		bool hidden_volume_active;
+		/**
+		 * The major firmware version, e. g. 0 in v0.40.
+		 */
+		uint8_t firmware_version_major;
+		/**
+		 * The minor firmware version, e. g. 40 in v0.40.
+		 */
+		uint8_t firmware_version_minor;
+		/**
+		 * Indicates whether the firmware is locked.
+		 */
+		bool firmware_locked;
+		/**
+		 * The serial number of the SD card in the Storage stick.
+		 */
+		uint32_t serial_number_sd_card;
+		/**
+		 * The serial number of the smart card in the Storage stick.
+		 */
+		uint32_t serial_number_smart_card;
+		/**
+		 * The number of remaining login attempts for the user PIN.
+		 */
+		uint8_t user_retry_count;
+		/**
+		 * The number of remaining login attempts for the admin PIN.
+		 */
+		uint8_t admin_retry_count;
+		/**
+		 * Indicates whether a new SD card was found.
+		 */
+		bool new_sd_card_found;
+		/**
+		 * Indicates whether the SD card is filled with random characters.
+		 */
+		bool filled_with_random;
+		/**
+		 * Indicates whether the stick has been initialized by generating
+		 * the AES keys.
+		 */
+		bool stick_initialized;
+        };
+
+	/**
 	 * Set debug level of messages written on stderr
 	 * @param state state=True - most messages, state=False - only errors level
 	 */
@@ -585,6 +656,17 @@ extern "C" {
 	 * @return string with devices attributes
 	 */
 	NK_C_API char* NK_get_status_storage_as_string();
+
+	/**
+	 * Get the Storage stick status and return the command processing
+	 * error code.  If the code is zero, i. e. the command was successful,
+	 * the storage status is written to the output pointer's target.
+	 * The output pointer must not be null.
+	 *
+	 * @param out the output pointer for the storage status
+	 * @return command processing error code
+	 */
+	NK_C_API int NK_get_status_storage(NK_storage_status* out);
 
 	/**
 	 * Get SD card usage attributes as string.

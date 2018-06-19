@@ -40,6 +40,7 @@ SOURCES = \
    $$PWD/DeviceCommunicationExceptions.cpp \
    $$PWD/log.cc \
    $$PWD/misc.cc \
+   $$PWD/version.cc \
    $$PWD/NitrokeyManager.cc \
    $$PWD/NK_C_API.cc
 

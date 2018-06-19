@@ -23,15 +23,27 @@
 
 namespace nitrokey {
     unsigned int get_major_library_version() {
+    #ifndef PROJECT_VERSION_MAJOR
         return @PROJECT_VERSION_MAJOR@;
+    #else
+        return PROJECT_VERSION_MAJOR;
+    #endif
     }
 
     unsigned int get_minor_library_version() {
+    #ifndef PROJECT_VERSION_MINOR
         return @PROJECT_VERSION_MINOR@;
+    #else
+        return PROJECT_VERSION_MINOR;
+    #endif
     }
 
     const char* get_library_version() {
+    #ifndef PROJECT_VERSION_GIT
         return "@PROJECT_VERSION_GIT@";
+    #else
+        return PROJECT_VERSION_GIT;
+    #endif
     }
 }
 

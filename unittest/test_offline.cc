@@ -160,3 +160,14 @@ TEST_CASE("Test device commands ids", "[fast]") {
   REQUIRE(STICK20_CMD_CHANGE_UPDATE_PIN == static_cast<uint8_t>(CommandID::CHANGE_UPDATE_PIN));
 
 }
+
+#include "version.h"
+TEST_CASE("Test version getter", "[fast]") {
+  REQUIRE(nitrokey::get_major_library_version() >= 3u);
+  REQUIRE(nitrokey::get_minor_library_version() >= 3u);
+  const char *library_version = nitrokey::get_library_version();
+  REQUIRE(library_version != nullptr);
+  std::string s = library_version;
+  REQUIRE(s.length() >= 8);
+  REQUIRE(s.find("g") != std::string::npos);
+}

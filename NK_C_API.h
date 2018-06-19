@@ -666,7 +666,7 @@ extern "C" {
 	 * @param out the output pointer for the storage status
 	 * @return command processing error code
 	 */
-	NK_C_API int NK_get_status_storage(NK_storage_status* out);
+	NK_C_API int NK_get_status_storage(struct NK_storage_status* out);
 
 	/**
 	 * Get SD card usage attributes as string.

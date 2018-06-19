@@ -41,7 +41,6 @@ IF (NOT CMAKE_BUILD_TYPE)
 ENDIF()
 MESSAGE("${PROJECT_NAME}: Build type: ${CMAKE_BUILD_TYPE}")
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/libnitrokey)
 include_directories(hidapi)
 include_directories(libnitrokey)
 set(SOURCE_FILES
@@ -67,7 +66,9 @@ set(SOURCE_FILES
     NitrokeyManager.cc
     NK_C_API.h
     NK_C_API.cc
-        DeviceCommunicationExceptions.cpp)
+    DeviceCommunicationExceptions.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/version.cc
+    )
 
 set(BUILD_SHARED_LIBS ON CACHE BOOL "Build all libraries as shared")
 add_library(nitrokey ${SOURCE_FILES})
@@ -118,10 +119,10 @@ ENDIF()
 
 # generate version.h
 exec_program("git" ${CMAKE_CURRENT_SOURCE_DIR} ARGS "describe --always" OUTPUT_VARIABLE PROJECT_VERSION_GIT)
-configure_file("libnitrokey/version.h.in" "libnitrokey/version.h" @ONLY)
+configure_file("version.cc.in" "version.cc" @ONLY)
 
 
-file(GLOB LIB_INCLUDES "libnitrokey/*.h" "NK_C_API.h" "${CMAKE_CURRENT_BINARY_DIR}/libnitrokey/version.h")
+file(GLOB LIB_INCLUDES "libnitrokey/*.h" "NK_C_API.h")
 install (FILES ${LIB_INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
 install (TARGETS nitrokey DESTINATION ${CMAKE_INSTALL_LIBDIR})
 

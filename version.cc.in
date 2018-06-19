@@ -19,21 +19,19 @@
  * SPDX-License-Identifier: LGPL-3.0
  */
 
-#ifndef LIBNITROKEY_VERSION_H
-#define LIBNITROKEY_VERSION_H
+#include "version.h"
 
 namespace nitrokey {
-unsigned int get_major_library_version() {
-    return @PROJECT_VERSION_MAJOR@;
+    unsigned int get_major_library_version() {
+        return @PROJECT_VERSION_MAJOR@;
+    }
+
+    unsigned int get_minor_library_version() {
+        return @PROJECT_VERSION_MINOR@;
+    }
+
+    const char* get_library_version() {
+        return "@PROJECT_VERSION_GIT@";
+    }
 }
 
-unsigned int get_minor_library_version() {
-    return @PROJECT_VERSION_MINOR@;
-}
-
-const char* get_library_version() {
-    return "@PROJECT_VERSION_GIT@";
-}
-}
-
-#endif

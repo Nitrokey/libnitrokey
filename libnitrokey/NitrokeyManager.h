@@ -65,6 +65,18 @@ char * strndup(const char* str, size_t maxlen);
         stick10::ReadSlot::ResponsePayload get_HOTP_slot_data(const uint8_t slot_number);
 
         bool set_time(uint64_t time);
+        /**
+         * Set the device time used for TOTP to the given time.  Contrary to
+         * {@code set_time(uint64_t)}, this command fails if {@code old_time}
+         * &gt; {@code time} or if {@code old_time} is zero (where {@code
+         * old_time} is the current time on the device).
+         *
+         * @param time new device time as Unix timestamp (seconds since
+         *        1970-01-01)
+         */
+        void set_time_soft(uint64_t time);
+
+        [[deprecated("get_time is deprecated -- use set_time_soft instead")]]
         bool get_time(uint64_t time = 0);
         bool erase_totp_slot(uint8_t slot_number, const char *temporary_password);
         bool erase_hotp_slot(uint8_t slot_number, const char *temporary_password);

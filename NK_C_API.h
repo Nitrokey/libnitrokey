@@ -386,6 +386,19 @@ extern "C" {
 	 */
 	NK_C_API int NK_totp_set_time(uint64_t time);
 
+	/**
+	 * Set the device time used for TOTP to the given time.  Contrary to
+	 * {@code set_time(uint64_t)}, this command fails if {@code old_time}
+	 * &gt; {@code time} or if {@code old_time} is zero (where {@code
+	 * old_time} is the current time on the device).
+	 *
+	 * @param time new device time as Unix timestamp (seconds since
+	 *        1970-01-01)
+	 * @return command processing error code
+	 */
+	NK_C_API int NK_totp_set_time_soft(uint64_t time);
+
+  [[deprecated("NK_totp_get_time is deprecated -- use NK_totp_set_time_soft instead")]]
 	NK_C_API int NK_totp_get_time();
 
 	//passwords

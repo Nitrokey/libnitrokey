@@ -358,11 +358,15 @@ extern "C" {
 		});
 	}
 
-	NK_C_API int NK_totp_get_time() {
+	NK_C_API int NK_totp_set_time_soft(uint64_t time) {
 		auto m = NitrokeyManager::instance();
 		return get_without_result([&]() {
-			m->get_time(0); // FIXME check how that should work
+			m->set_time_soft(time);
 		});
+        }
+
+	NK_C_API int NK_totp_get_time() {
+	  return 0;
 	}
 
 	NK_C_API int NK_change_admin_PIN(const char *current_PIN, const char *new_PIN) {

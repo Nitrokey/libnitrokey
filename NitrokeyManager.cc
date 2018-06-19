@@ -666,11 +666,15 @@ using nitrokey::misc::strcpyT;
         return false;
     }
 
-    bool NitrokeyManager::get_time(uint64_t time) {
+    void NitrokeyManager::set_time_soft(uint64_t time) {
         auto p = get_payload<SetTime>();
         p.reset = 0;
         p.time = time;
         SetTime::CommandTransaction::run(device, p);
+    }
+
+    bool NitrokeyManager::get_time(uint64_t time) {
+        set_time_soft(time);
         return true;
     }
 

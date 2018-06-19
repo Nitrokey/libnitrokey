@@ -75,7 +75,8 @@ char * strndup(const char* str, size_t maxlen);
          *        1970-01-01)
          */
         void set_time_soft(uint64_t time);
-        /* get_time is deprecated -- use set_time_soft instead */
+
+        [[deprecated("get_time is deprecated -- use set_time_soft instead")]]
         bool get_time(uint64_t time = 0);
         bool erase_totp_slot(uint8_t slot_number, const char *temporary_password);
         bool erase_hotp_slot(uint8_t slot_number, const char *temporary_password);

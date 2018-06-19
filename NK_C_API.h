@@ -398,7 +398,7 @@ extern "C" {
 	 */
 	NK_C_API int NK_totp_set_time_soft(uint64_t time);
 
-	/* NK_totp_get_time() is deprecated -- use NK_totp_set_time_soft */
+  [[deprecated("NK_totp_get_time is deprecated -- use NK_totp_set_time_soft instead")]]
 	NK_C_API int NK_totp_get_time();
 
 	//passwords

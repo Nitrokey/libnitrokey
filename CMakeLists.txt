@@ -66,7 +66,9 @@ set(SOURCE_FILES
     NitrokeyManager.cc
     NK_C_API.h
     NK_C_API.cc
-        DeviceCommunicationExceptions.cpp)
+    DeviceCommunicationExceptions.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/version.cc
+    )
 
 set(BUILD_SHARED_LIBS ON CACHE BOOL "Build all libraries as shared")
 add_library(nitrokey ${SOURCE_FILES})
@@ -113,6 +115,11 @@ OPTION(LOG_VOLATILE_DATA "Log volatile data (debug)" OFF)
 IF (LOG_VOLATILE_DATA)
     SET_TARGET_PROPERTIES(nitrokey PROPERTIES COMPILE_DEFINITIONS "LOG_VOLATILE_DATA")
 ENDIF()
+
+
+# generate version.h
+exec_program("git" ${CMAKE_CURRENT_SOURCE_DIR} ARGS "describe --always" OUTPUT_VARIABLE PROJECT_VERSION_GIT)
+configure_file("version.cc.in" "version.cc" @ONLY)
 
 
 file(GLOB LIB_INCLUDES "libnitrokey/*.h" "NK_C_API.h")

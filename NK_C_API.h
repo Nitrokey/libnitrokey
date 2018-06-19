@@ -132,7 +132,28 @@ extern "C" {
 	 * Set debug level of messages written on stderr
 	 * @param level (int) 0-lowest verbosity, 5-highest verbosity
 	 */
-  NK_C_API void NK_set_debug_level(const int level);
+	NK_C_API void NK_set_debug_level(const int level);
+
+	/**
+	 * Get the major library version, e. g. the 3 in v3.2.
+	 * @return the major library version
+	 */
+	NK_C_API unsigned int NK_get_major_library_version();
+
+	/**
+	 * Get the minor library version, e. g. the 2 in v3.2.
+	 * @return the minor library version
+	 */
+	NK_C_API unsigned int NK_get_minor_library_version();
+
+	/**
+	 * Get the library version as a string.  This is the output of
+	 * `git describe --always` at compile time, for example "v3.3" or
+	 * "v3.3-19-gaee920b".
+	 * The return value is a string literal and must not be freed.
+	 * @return the library version as a string
+	 */
+	NK_C_API const char* NK_get_library_version();
 
 	/**
 	 * Connect to device of given model. Currently library can be connected only to one device at once.

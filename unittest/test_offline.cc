@@ -162,7 +162,7 @@ TEST_CASE("Test device commands ids", "[fast]") {
 }
 
 
-TEST_CASE("Connect should not return true after second attempt", "[fast]") {
+TEST_CASE("Connect should not return true after the second attempt", "[fast]") {
   int result = 0;
 
   result = NK_login("S");
@@ -174,4 +174,15 @@ TEST_CASE("Connect should not return true after second attempt", "[fast]") {
   result = NK_logout();
   REQUIRE(result == 0);
 
+  result = NK_logout();
+  REQUIRE(result == 0);
+
+  result = NK_login("P");
+  REQUIRE(result == 0);
+
+  result = NK_login_auto();
+  REQUIRE(result == 0);
+
+  result = NK_logout();
+  REQUIRE(result == 0);
 }

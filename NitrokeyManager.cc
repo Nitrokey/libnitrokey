@@ -234,12 +234,14 @@ using nitrokey::misc::strcpyT;
     bool NitrokeyManager::connect() {
         std::lock_guard<std::mutex> lock(mex_dev_com_manager);
         vector< shared_ptr<Device> > devices = { make_shared<Stick10>(), make_shared<Stick20>() };
+        bool connected = false;
         for( auto & d : devices ){
             if (d->connect()){
                 device = std::shared_ptr<Device>(d);
+                connected = true;
             }
         }
-        return device != nullptr;
+        return connected;
     }
 
 

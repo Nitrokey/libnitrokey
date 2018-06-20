@@ -171,3 +171,28 @@ TEST_CASE("Test version getter", "[fast]") {
   REQUIRE(s.length() >= 8);
   REQUIRE(s.find("g") != std::string::npos);
 }
+
+TEST_CASE("Connect should not return true after the second attempt", "[fast]") {
+  int result = 0;
+
+  result = NK_login("S");
+  REQUIRE(result == 0);
+
+  result = NK_login_auto();
+  REQUIRE(result == 0);
+
+  result = NK_logout();
+  REQUIRE(result == 0);
+
+  result = NK_logout();
+  REQUIRE(result == 0);
+
+  result = NK_login("P");
+  REQUIRE(result == 0);
+
+  result = NK_login_auto();
+  REQUIRE(result == 0);
+
+  result = NK_logout();
+  REQUIRE(result == 0);
+}

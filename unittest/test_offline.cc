@@ -160,3 +160,29 @@ TEST_CASE("Test device commands ids", "[fast]") {
   REQUIRE(STICK20_CMD_CHANGE_UPDATE_PIN == static_cast<uint8_t>(CommandID::CHANGE_UPDATE_PIN));
 
 }
+
+
+TEST_CASE("Connect should not return true after the second attempt", "[fast]") {
+  int result = 0;
+
+  result = NK_login("S");
+  REQUIRE(result == 0);
+
+  result = NK_login_auto();
+  REQUIRE(result == 0);
+
+  result = NK_logout();
+  REQUIRE(result == 0);
+
+  result = NK_logout();
+  REQUIRE(result == 0);
+
+  result = NK_login("P");
+  REQUIRE(result == 0);
+
+  result = NK_login_auto();
+  REQUIRE(result == 0);
+
+  result = NK_logout();
+  REQUIRE(result == 0);
+}

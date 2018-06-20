@@ -238,28 +238,23 @@ extern "C" {
 	}
 
 
-	NK_C_API bool NK_get_device_model(enum NK_device_model *out) {
-		if (out == nullptr) {
-			return false;
-		}
+	NK_C_API enum NK_device_model NK_get_device_model() {
 		auto m = NitrokeyManager::instance();
 		try {
 			auto model = m->get_connected_device_model();
 			switch (model) {
 				case DeviceModel::PRO:
-				    *out = NK_PRO;
-				    return true;
+				    return NK_PRO;
 				case DeviceModel::STORAGE:
-				    *out = NK_STORAGE;
-				    return true;
+				    return NK_STORAGE;
 				default:
-				    /* unknown device -- should not happen */
-				    return false;
+				    /* unknown or not connected device */
+				    return NK_device_model::NK_DISCONNECTED;
 			}
 		} catch (const DeviceNotConnected& e) {
-			return false;
+			return NK_device_model::NK_DISCONNECTED;
 		}
-        }
+}
 
 
 	void clear_string(std::string &s) {

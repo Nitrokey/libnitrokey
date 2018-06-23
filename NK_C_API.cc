@@ -686,7 +686,12 @@ extern "C" {
 		});
 	}
 
-
+	NK_C_API int NK_wink() {
+		auto m = NitrokeyManager::instance();
+		return get_without_result([&]() {
+			return m->wink();
+		});
+	}
 
 #ifdef __cplusplus
 }

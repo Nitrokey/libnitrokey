@@ -288,6 +288,11 @@ char * strndup(const char* str, size_t maxlen);
        * @return Returns true, if set unencrypted volume ro/rw pin type is User, false otherwise.
        */
       bool set_unencrypted_volume_rorw_pin_type_user();
+
+      /**
+       * Blink red and green LED alternatively and infinitely (until device is reconnected).
+       */
+      void wink();
     };
 }
 

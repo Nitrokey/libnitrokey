@@ -745,7 +745,11 @@ extern "C" {
  */
 	NK_C_API int NK_connect_with_ID(const char* id);
 
-
+	/**
+	 * Blink red and green LED alternatively and infinitely (until device is reconnected).
+	 * @return command processing error code
+	 */
+	NK_C_API int NK_wink();
 
 #ifdef __cplusplus
 }

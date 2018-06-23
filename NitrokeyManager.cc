@@ -1137,5 +1137,8 @@ using nitrokey::misc::strcpyT;
         return current_device_id;
     }
 
+  void NitrokeyManager::wink(){
+    stick20::Wink::CommandTransaction::run(device);
+  };
 
 }

@@ -275,6 +275,12 @@ namespace nitrokey {
                     CommandTransaction;
             };
 
+          class Wink : Command<CommandID::WINK> {
+          public:
+            typedef Transaction<command_id(), struct EmptyPayload, struct EmptyPayload>
+                CommandTransaction;
+          };
+
             class CheckSmartcardUsage : Command<CommandID::CHECK_SMARTCARD_USAGE> {
             public:
                 typedef Transaction<command_id(), struct EmptyPayload, EmptyPayload>

@@ -1141,4 +1141,9 @@ using nitrokey::misc::strcpyT;
     stick20::Wink::CommandTransaction::run(device);
   };
 
+  stick20::ProductionTest::ResponsePayload NitrokeyManager::production_info(){
+    auto data = stick20::ProductionTest::CommandTransaction::run(device);
+    return data.data();
+  };
+
 }

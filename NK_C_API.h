@@ -122,10 +122,29 @@ extern "C" {
 		bool stick_initialized;
         };
 
-	/**
-	 * Set debug level of messages written on stderr
-	 * @param state state=True - most messages, state=False - only errors level
-	 */
+   struct NK_storage_ProductionTest{
+    uint8_t FirmwareVersion_au8[2];
+    uint8_t FirmwareVersionInternal_u8;
+    uint8_t SD_Card_Size_u8;
+    uint32_t CPU_CardID_u32;
+    uint32_t SmartCardID_u32;
+    uint32_t SD_CardID_u32;
+    uint8_t SC_UserPwRetryCount;
+    uint8_t SC_AdminPwRetryCount;
+    uint8_t SD_Card_ManufacturingYear_u8;
+    uint8_t SD_Card_ManufacturingMonth_u8;
+    uint16_t SD_Card_OEM_u16;
+    uint16_t SD_WriteSpeed_u16;
+    uint8_t SD_Card_Manufacturer_u8;
+  };
+
+  NK_C_API int NK_get_storage_production_info(struct NK_storage_ProductionTest * out);
+
+
+/**
+ * Set debug level of messages written on stderr
+ * @param state state=True - most messages, state=False - only errors level
+ */
 	NK_C_API void NK_set_debug(bool state);
 
 	/**

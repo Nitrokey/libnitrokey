@@ -631,7 +631,44 @@ extern "C" {
 		return 0;
 	}
 
-	NK_C_API char* NK_get_SD_usage_data_as_string() {
+  NK_C_API int NK_get_storage_production_info(NK_storage_ProductionTest * out){
+    if (out == nullptr) {
+      return -1;
+    }
+    auto m = NitrokeyManager::instance();
+    auto result = get_with_status([&]() {
+      return m->production_info();
+    }, proto::stick20::ProductionTest::ResponsePayload());
+
+		auto error_code = std::get<0>(result);
+		if (error_code != 0) {
+			return error_code;
+		}
+
+		stick20::ProductionTest::ResponsePayload status = std::get<1>(result);
+		// Cannot use memcpy without declaring C API struct packed
+    // (which is not parsed by Python's CFFI apparently), hence the manual way.
+#define a(x) out->x = status.x;
+		 a(FirmwareVersion_au8[0]);
+		 a(FirmwareVersion_au8[1]);
+		 a(FirmwareVersionInternal_u8);
+		 a(SD_Card_Size_u8);
+		 a(CPU_CardID_u32);
+		 a(SmartCardID_u32);
+		 a(SD_CardID_u32);
+		 a(SC_UserPwRetryCount);
+		 a(SC_AdminPwRetryCount);
+		 a(SD_Card_ManufacturingYear_u8);
+		 a(SD_Card_ManufacturingMonth_u8);
+		 a(SD_Card_OEM_u16);
+		 a(SD_WriteSpeed_u16);
+		 a(SD_Card_Manufacturer_u8);
+#undef a
+		return 0;
+  }
+
+
+NK_C_API char* NK_get_SD_usage_data_as_string() {
 		auto m = NitrokeyManager::instance();
 		return get_with_string_result([&]() {
 			return m->get_SD_usage_data_as_string();

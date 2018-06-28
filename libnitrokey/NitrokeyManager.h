@@ -293,6 +293,8 @@ char * strndup(const char* str, size_t maxlen);
        * Blink red and green LED alternatively and infinitely (until device is reconnected).
        */
       void wink();
+
+      stick20::ProductionTest::ResponsePayload production_info();
     };
 }
 

@@ -178,6 +178,10 @@ IF(COMPILE_OFFLINE_TESTS)
     #run with 'make test' or 'ctest'
     include (CTest)
     add_test (runs test_offline)
+
+    add_executable(test_minimal unittest/test_minimal.c)
+    target_link_libraries(test_minimal ${EXTRA_LIBS} nitrokey)
+    add_test(minimal test_minimal)
 ENDIF()
 
 IF (COMPILE_TESTS)

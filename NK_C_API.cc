@@ -156,6 +156,7 @@ extern "C" {
                     case NK_STORAGE:
                         model_string = "S";
                         break;
+                    case NK_DISCONNECTED:
                     default:
                         /* no such enum value -- return error code */
                         return 0;
@@ -222,6 +223,25 @@ extern "C" {
 			return duplicate_vector_and_clear(v);
 		});
 	}
+
+
+	NK_C_API enum NK_device_model NK_get_device_model() {
+		auto m = NitrokeyManager::instance();
+		try {
+			auto model = m->get_connected_device_model();
+			switch (model) {
+				case DeviceModel::PRO:
+				    return NK_PRO;
+				case DeviceModel::STORAGE:
+				    return NK_STORAGE;
+				default:
+				    /* unknown or not connected device */
+				    return NK_device_model::NK_DISCONNECTED;
+			}
+		} catch (const DeviceNotConnected& e) {
+			return NK_device_model::NK_DISCONNECTED;
+		}
+}
 
 
 	void clear_string(std::string &s) {

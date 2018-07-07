@@ -43,14 +43,18 @@ extern "C" {
          * The Nitrokey device models supported by the API.
          */
         enum NK_device_model {
+						/**
+						 * Use, if no supported device is connected
+						 */
+        		NK_DISCONNECTED = 0,
             /**
              * Nitrokey Pro.
              */
-            NK_PRO,
+            NK_PRO = 1,
             /**
              * Nitrokey Storage.
              */
-            NK_STORAGE
+            NK_STORAGE = 2
         };
 
 	/**
@@ -201,6 +205,14 @@ extern "C" {
 	 * @return command processing error code
 	 */
 	NK_C_API int NK_logout();
+
+	/**
+	 * Query the model of the connected device.
+	 * Returns the model of the connected device or NK_DISCONNECTED.
+	 *
+	 * @return true if a device is connected and the out argument has been set
+	 */
+	NK_C_API enum NK_device_model NK_get_device_model();
 
 	/**
 	 * Return the debug status string. Debug purposes.

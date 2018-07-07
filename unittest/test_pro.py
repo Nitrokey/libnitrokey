@@ -921,3 +921,8 @@ def test_TOTP_codes_from_nitrokeyapp(secret, C):
     lib_at = lambda : bb(oath.totp(secret, period=period))
     print (lib_at())
     assert lib_at() == code_device
+
+
+def test_get_device_model(C):
+    assert C.NK_get_device_model() != 0
+    # assert C.NK_get_device_model() != C.NK_DISCONNECTED

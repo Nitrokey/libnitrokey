@@ -170,6 +170,7 @@ extern "C" {
                     case NK_STORAGE:
                         model_string = "S";
                         break;
+                    case NK_DISCONNECTED:
                     default:
                         /* no such enum value -- return error code */
                         return 0;

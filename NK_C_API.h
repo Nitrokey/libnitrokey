@@ -25,6 +25,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "deprecated.h"
+
 #ifdef _MSC_VER
 #define NK_C_API __declspec(dllexport)
 #else
@@ -417,7 +419,8 @@ extern "C" {
 	 */
 	NK_C_API int NK_totp_set_time_soft(uint64_t time);
 
-  [[deprecated("NK_totp_get_time is deprecated -- use NK_totp_set_time_soft instead")]]
+	// NK_totp_get_time is deprecated -- use NK_totp_set_time_soft instead
+	DEPRECATED
 	NK_C_API int NK_totp_get_time();
 
 	//passwords

@@ -5,7 +5,7 @@ project(
   default_options : [
     'cpp_std=c++14'
   ],
-  meson_version : '>= 0.43.0',
+  meson_version : '>= 0.44.0',
 )
 cxx = meson.get_compiler('cpp')
 host_system = host_machine.system()
@@ -111,6 +111,12 @@ pkg.generate(
   requires_private : 'hidapi-libusb',
   description : 'Library for communicating with Nitrokey in a clean and easy manner',
   install : true,
+)
+
+dep_udev = dependency('udev')
+install_data(
+  'data/41-nitrokey.rules',
+  install_dir : '@0@/rules.d'.format(dep_udev.get_pkgconfig_variable('udevdir')),
 )
 
 if get_option('tests') or get_option('offline-tests')

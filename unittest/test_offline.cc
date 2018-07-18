@@ -169,13 +169,15 @@ TEST_CASE("Test version getter", "[fast]") {
   REQUIRE(nitrokey::get_minor_library_version() >= 3u);
   const char *library_version = nitrokey::get_library_version();
   REQUIRE(library_version != nullptr);
+  CAPTURE(library_version);
 
   // The library version has to match the pattern returned by git describe:
   // v<major>.<minor> or v<major>.<minor>-<n>-g<hash>, where <n> is the number
   // of commits since the last tag, and <hash> is the hash of the current
-  // commit.  (This assumes that all tags have the name v<major>.<minor>.)
+  // commit.  (This assumes that all tags have the name v<major>.<minor>.).
+  // Optional <patch> field is allowed as well.
   std::string s = library_version;
-  std::string version("v[0-9]+\\.[0-9]+");
+  std::string version("v[0-9]+\\.[0-9]+(\\.[0-9]+)?");
   std::string git_suffix("-[0-9]+-g[0-9a-z]+");
   std::regex pattern(version + "(" + git_suffix + "|)");
   REQUIRE(std::regex_match(s, pattern));

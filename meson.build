@@ -28,13 +28,31 @@ endif
 if get_option('log-volatile-data')
   libnitrokey_args += ['-DLOG_VOLATILE_DATA']
 endif
+
+version_array = meson.project_version().split('.')
+version_major = version_array[0].to_int()
+version_minor = version_array[1].to_int()
+version_data = configuration_data()
+version_data.set('PROJECT_VERSION_MAJOR', version_major)
+version_data.set('PROJECT_VERSION_MINOR', version_minor)
+# We don't want to substitute it by noop
+version_data.set('PROJECT_VERSION_GIT', '@VCS_TAG@')
+version_cc_in = configure_file(
+  input : 'version.cc.in',
+  output : 'version.cc.in',
+  configuration : version_data,
+)
+version_cc = vcs_tag(
+  input : version_cc_in,
+  output : 'version.cc',
+)
 libnitrokey = library(
-  'nitokey',
+  'nitrokey',
   sources : [
     'command_id.cc',
     'device.cc',
     'log.cc',
-    'version.cc',
+    version_cc,
     'misc.cc',
     'NitrokeyManager.cc',
     'NK_C_API.cc',

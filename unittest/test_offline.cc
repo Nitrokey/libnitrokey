@@ -179,7 +179,7 @@ TEST_CASE("Test version getter", "[fast]") {
   std::string s = library_version;
   std::string version("v[0-9]+\\.[0-9]+(\\.[0-9]+)?");
   std::string git_suffix("-[0-9]+-g[0-9a-z]+");
-  std::regex pattern(version + "(" + git_suffix + "|)");
+  std::regex pattern(version + "(" + git_suffix + ")?");
   REQUIRE(std::regex_match(s, pattern));
 }
 

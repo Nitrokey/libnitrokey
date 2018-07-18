@@ -53,6 +53,7 @@ version_cc_in = configure_file(
 version_cc = vcs_tag(
   input : version_cc_in,
   output : 'version.cc',
+  fallback : 'v@0@'.format(meson.project_version()),
 )
 libnitrokey = library(
   'nitrokey',

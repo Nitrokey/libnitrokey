@@ -47,7 +47,7 @@ version_cc = vcs_tag(
   output : 'version.cc',
 )
 libnitrokey = library(
-  'nitokey',
+  'nitrokey',
   sources : [
     'command_id.cc',
     'device.cc',

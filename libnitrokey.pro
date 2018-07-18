@@ -25,6 +25,7 @@ HEADERS = \
    $$PWD/libnitrokey/dissect.h \
    $$PWD/libnitrokey/LibraryException.h \
    $$PWD/libnitrokey/log.h \
+   $$PWD/libnitrokey/version.h \
    $$PWD/libnitrokey/LongOperationInProgressException.h \
    $$PWD/libnitrokey/misc.h \
    $$PWD/libnitrokey/NitrokeyManager.h \
@@ -39,6 +40,7 @@ SOURCES = \
    $$PWD/device.cc \
    $$PWD/DeviceCommunicationExceptions.cpp \
    $$PWD/log.cc \
+   $$PWD/version.cc \
    $$PWD/misc.cc \
    $$PWD/NitrokeyManager.cc \
    $$PWD/NK_C_API.cc

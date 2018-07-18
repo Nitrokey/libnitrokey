@@ -113,7 +113,12 @@ pkg.generate(
 )
 
 if get_option('tests') or get_option('offline-tests')
-  dep_catch = dependency('catch')
+  dep_catch = dependency('catch', required : false)
+  if not dep_catch.found()
+    dep_catch = declare_dependency(
+      include_directories : include_directories('unittest/Catch/single_include')
+    )
+  endif
   _catch = static_library(
     'catch',
     sources : [

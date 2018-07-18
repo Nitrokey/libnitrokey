@@ -76,6 +76,17 @@ Other build options (all take either `ON` or `OFF`):
 * NO_LOG (default: OFF) - do not compile LOG statements - will make library smaller, but without any diagnostic messages
 
 
+### Meson
+It is possible to use Meson and Ninja to build the project as well (currently available only `master` branch).
+Please run:
+```
+meson builddir
+cd builddir
+meson configure # to show available build flags
+ninja
+```
+
+Tests build with bundled Catch is not supported yet with this method.
 
 # Using libnitrokey with Python
 To use libnitrokey with Python a [CFFI](http://cffi.readthedocs.io/en/latest/overview.html) library is required (either 2.7+ or 3.0+). It can be installed with:

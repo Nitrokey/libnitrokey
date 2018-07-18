@@ -1,6 +1,6 @@
 project(
   'libnitrokey', 'cpp',
-  version : '3.1.0',
+  version : '3.4.1',
   license : 'LGPL-3.0+',
   default_options : [
     'cpp_std=c++14'
@@ -20,7 +20,7 @@ add_project_arguments(cxx.get_supported_arguments(test_cflags), language : 'cpp'
 
 dep_hidapi = dependency('hidapi-libusb')
 
-inc_libnitrokey = include_directories('include')
+inc_libnitrokey = include_directories('libnitrokey')
 libnitrokey_args = []
 if not get_option('log')
   libnitrokey_args += ['-DNO_LOG']
@@ -34,6 +34,7 @@ libnitrokey = library(
     'command_id.cc',
     'device.cc',
     'log.cc',
+    'version.cc',
     'misc.cc',
     'NitrokeyManager.cc',
     'NK_C_API.cc',
@@ -50,23 +51,23 @@ libnitrokey = library(
   install : true,
 )
 install_headers(
-  'include/CommandFailedException.h',
-  'include/command.h',
-  'include/command_id.h',
-  'include/cxx_semantics.h',
-  'include/DeviceCommunicationExceptions.h',
-  'include/device.h',
-  'include/device_proto.h',
-  'include/dissect.h',
-  'include/inttypes.h',
-  'include/LibraryException.h',
-  'include/log.h',
-  'include/LongOperationInProgressException.h',
-  'include/misc.h',
-  'include/NitrokeyManager.h',
-  'include/stick10_commands_0.8.h',
-  'include/stick10_commands.h',
-  'include/stick20_commands.h',
+  'libnitrokey/CommandFailedException.h',
+  'libnitrokey/command.h',
+  'libnitrokey/command_id.h',
+  'libnitrokey/cxx_semantics.h',
+  'libnitrokey/DeviceCommunicationExceptions.h',
+  'libnitrokey/device.h',
+  'libnitrokey/device_proto.h',
+  'libnitrokey/dissect.h',
+  'libnitrokey/LibraryException.h',
+  'libnitrokey/log.h',
+  'libnitrokey/LongOperationInProgressException.h',
+  'libnitrokey/misc.h',
+  'libnitrokey/version.h',
+  'libnitrokey/NitrokeyManager.h',
+  'libnitrokey/stick10_commands_0.8.h',
+  'libnitrokey/stick10_commands.h',
+  'libnitrokey/stick20_commands.h',
   subdir : meson.project_name(),
 )
 
@@ -110,12 +111,13 @@ tests = []
 if get_option('offline-tests')
   tests += [
     ['test_offline', 'test_offline.cc'],
+    ['test_minimal', 'test_minimal.cc'],
   ]
 endif
 if get_option('tests')
   tests += [
     ['test_C_API',  'test_C_API.cpp'],
-    ['test1',       'test.cc'],
+    ['test1',       'test1.cc'],
     ['test2',       'test2.cc'],
     ['test3',       'test3.cc'],
     ['test_HOTP',   'test_HOTP.cc'],

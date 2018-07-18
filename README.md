@@ -80,13 +80,10 @@ Other build options (all take either `ON` or `OFF`):
 It is possible to use Meson and Ninja to build the project as well (currently available only `master` branch).
 Please run:
 ```
-meson builddir
-cd builddir
-meson configure # to show available build flags
-ninja
+meson builddir <OPTIONS>
+meson configure builddir # to show available build flags
+ninja -C builddir
 ```
-
-Tests build with bundled Catch is not supported yet with this method.
 
 # Using libnitrokey with Python
 To use libnitrokey with Python a [CFFI](http://cffi.readthedocs.io/en/latest/overview.html) library is required (either 2.7+ or 3.0+). It can be installed with:

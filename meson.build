@@ -11,12 +11,20 @@ cxx = meson.get_compiler('cpp')
 host_system = host_machine.system()
 pkg = import('pkgconfig')
 
-test_cflags = [
+common_flags = [
   '-Wno-unused-function',
   '-Wcast-qual',
+]
+test_cxxflags = common_flags + [
   '-Woverloaded-virtual',
 ]
-add_project_arguments(cxx.get_supported_arguments(test_cflags), language : 'cpp')
+test_cflags = common_flags
+add_project_arguments(cxx.get_supported_arguments(test_cxxflags), language : 'cpp')
+if get_option('offline-tests')
+  add_languages('c', required: get_option('offline-tests'))
+  c = meson.get_compiler('c')
+  add_project_arguments(c.get_supported_arguments(test_cflags), language : 'c')
+endif
 
 dep_hidapi = dependency('hidapi-libusb')
 
@@ -105,23 +113,24 @@ pkg.generate(
 )
 
 if get_option('tests') or get_option('offline-tests')
-  # FIXME
-  _inc_catch = include_directories('/usr/include/catch')
-  if not cxx.has_header('catch.hpp', include_directories : _inc_catch)
-    error('Can\'t find catch.hpp')
+  dep_catch = dependency('catch', required : false)
+  if not dep_catch.found()
+    dep_catch = declare_dependency(
+      include_directories : include_directories('unittest/Catch/single_include')
+    )
   endif
   _catch = static_library(
     'catch',
     sources : [
       'unittest/catch_main.cpp',
     ],
-    include_directories : [
-      _inc_catch,
+    dependencies : [
+      dep_catch,
     ],
   )
   _dep_catch = declare_dependency(
     link_with : _catch,
-    include_directories : _inc_catch,
+    dependencies : dep_catch,
   )
 endif
 
@@ -129,7 +138,7 @@ tests = []
 if get_option('offline-tests')
   tests += [
     ['test_offline', 'test_offline.cc'],
-    ['test_minimal', 'test_minimal.cc'],
+    ['test_minimal', 'test_minimal.c'],
   ]
 endif
 if get_option('tests')

@@ -117,8 +117,22 @@ IF (LOG_VOLATILE_DATA)
 ENDIF()
 
 
+OPTION(ADD_GIT_INFO "Add information about source code version from Git repository" TRUE)
 # generate version.h
-exec_program("git" ${CMAKE_CURRENT_SOURCE_DIR} ARGS "describe --always" OUTPUT_VARIABLE PROJECT_VERSION_GIT)
+IF(ADD_GIT_INFO)
+execute_process(
+	COMMAND git describe --always --abbrev=4 HEAD
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	RESULT_VARIABLE PROJECT_VERSION_GIT_RETURN_CODE
+	OUTPUT_VARIABLE PROJECT_VERSION_GIT
+	OUTPUT_STRIP_TRAILING_WHITESPACE
+	ERROR_QUIET
+)
+ENDIF()
+IF((NOT ${ADD_GIT_INFO}) OR (${PROJECT_VERSION_GIT_RETURN_CODE}))
+	SET(PROJECT_VERSION_GIT "unknown")
+	MESSAGE(STATUS "Setting Git library version to: " ${PROJECT_VERSION_GIT} )
+ENDIF()
 configure_file("version.cc.in" "version.cc" @ONLY)
 
 

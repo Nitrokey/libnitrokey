@@ -11,12 +11,20 @@ cxx = meson.get_compiler('cpp')
 host_system = host_machine.system()
 pkg = import('pkgconfig')
 
-test_cflags = [
+common_flags = [
   '-Wno-unused-function',
   '-Wcast-qual',
+]
+test_cxxflags = common_flags + [
   '-Woverloaded-virtual',
 ]
-add_project_arguments(cxx.get_supported_arguments(test_cflags), language : 'cpp')
+test_cflags = common_flags
+add_project_arguments(cxx.get_supported_arguments(test_cxxflags), language : 'cpp')
+if get_option('offline-tests')
+  add_languages('c', required: get_option('offline-tests'))
+  c = meson.get_compiler('c')
+  add_project_arguments(c.get_supported_arguments(test_cflags), language : 'c')
+endif
 
 dep_hidapi = dependency('hidapi-libusb')
 
@@ -129,7 +137,7 @@ tests = []
 if get_option('offline-tests')
   tests += [
     ['test_offline', 'test_offline.cc'],
-    ['test_minimal', 'test_minimal.cc'],
+    ['test_minimal', 'test_minimal.c'],
   ]
 endif
 if get_option('tests')

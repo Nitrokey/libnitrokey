@@ -113,23 +113,19 @@ pkg.generate(
 )
 
 if get_option('tests') or get_option('offline-tests')
-  # FIXME
-  _inc_catch = include_directories('/usr/include/catch')
-  if not cxx.has_header('catch.hpp', include_directories : _inc_catch)
-    error('Can\'t find catch.hpp')
-  endif
+  dep_catch = dependency('catch')
   _catch = static_library(
     'catch',
     sources : [
       'unittest/catch_main.cpp',
     ],
-    include_directories : [
-      _inc_catch,
+    dependencies : [
+      dep_catch,
     ],
   )
   _dep_catch = declare_dependency(
     link_with : _catch,
-    include_directories : _inc_catch,
+    dependencies : dep_catch,
   )
 endif
 

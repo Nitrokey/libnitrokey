@@ -20,7 +20,7 @@
  */
 
 
-#include "catch.hpp"
+#include "catch2/catch.hpp"
 #include <iostream>
 #include "device_proto.h"
 #include "log.h"

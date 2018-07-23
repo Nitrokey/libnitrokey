@@ -26,7 +26,7 @@
 #include <cstdio>
 #include <memory.h>
 #include "../NK_C_API.h"
-#include "catch.hpp"
+#include "catch2/catch.hpp"
 
 
 static const int SHORT_STRING_LENGTH = 10;

@@ -25,7 +25,7 @@ static const char *const default_user_pin = "123456";
 const char * temporary_password = "123456789012345678901234";
 const char * RFC_SECRET = "12345678901234567890";
 
-#include "catch.hpp"
+#include "catch2/catch.hpp"
 
 #include <iostream>
 #include <string.h>

@@ -46,6 +46,7 @@ namespace nitrokey {
     class LogHandler {
     public:
       virtual void print(const std::string &, Loglevel lvl) = 0;
+      virtual ~LogHandler() = default;
     protected:
       std::string loglevel_to_str(Loglevel);
       std::string format_message_to_string(const std::string &str, const Loglevel &lvl);

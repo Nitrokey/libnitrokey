@@ -26,7 +26,7 @@ const char * const temporary_password = "123456789012345678901234";
 const char * const RFC_SECRET = "12345678901234567890";
 const char * const hidden_volume_pass = "123456789012345";
 
-#include "catch.hpp"
+#include "catch2/catch.hpp"
 
 #include <NitrokeyManager.h>
 

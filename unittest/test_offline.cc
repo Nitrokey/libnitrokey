@@ -19,7 +19,7 @@
  * SPDX-License-Identifier: LGPL-3.0
  */
 
-#include "catch.hpp"
+#include "catch2/catch.hpp"
 #include <NitrokeyManager.h>
 #include <memory>
 #include <string>

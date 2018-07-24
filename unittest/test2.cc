@@ -23,7 +23,7 @@
 static const char *const default_admin_pin = "12345678";
 static const char *const default_user_pin = "123456";
 
-#include "catch.hpp"
+#include "catch2/catch.hpp"
 
 #include <iostream>
 #include <string.h>

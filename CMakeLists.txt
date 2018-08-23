@@ -67,7 +67,7 @@ set(SOURCE_FILES
     NK_C_API.h
     NK_C_API.cc
     DeviceCommunicationExceptions.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/version.cc
+    ${CMAKE_CURRENT_BINARY_DIR}/version-libnk.cc
     )
 
 set(BUILD_SHARED_LIBS ON CACHE BOOL "Build all libraries as shared")
@@ -133,7 +133,7 @@ IF((NOT ${ADD_GIT_INFO}) OR (${PROJECT_VERSION_GIT_RETURN_CODE}))
 	SET(PROJECT_VERSION_GIT "unknown")
 	MESSAGE(STATUS "Setting Git library version to: " ${PROJECT_VERSION_GIT} )
 ENDIF()
-configure_file("version.cc.in" "version.cc" @ONLY)
+configure_file("version-libnk.cc.in" "version-libnk.cc" @ONLY)
 
 
 file(GLOB LIB_INCLUDES "libnitrokey/*.h" "NK_C_API.h")

@@ -46,13 +46,13 @@ version_data.set('PROJECT_VERSION_MINOR', version_minor)
 # We don't want to substitute it by noop
 version_data.set('PROJECT_VERSION_GIT', '@VCS_TAG@')
 version_cc_in = configure_file(
-  input : 'version.cc.in',
-  output : 'version.cc.in',
+  input : 'version-libnk.cc.in',
+  output : 'version-libnk.cc.in',
   configuration : version_data,
 )
 version_cc = vcs_tag(
   input : version_cc_in,
-  output : 'version.cc',
+  output : 'version-libnk.cc',
   fallback : 'v@0@'.format(meson.project_version()),
 )
 libnitrokey = library(
@@ -90,7 +90,7 @@ install_headers(
   'libnitrokey/log.h',
   'libnitrokey/LongOperationInProgressException.h',
   'libnitrokey/misc.h',
-  'libnitrokey/version.h',
+  'libnitrokey/version-libnk.h',
   'libnitrokey/NitrokeyManager.h',
   'libnitrokey/stick10_commands_0.8.h',
   'libnitrokey/stick10_commands.h',

@@ -13,6 +13,8 @@ QMAKE_TARGET_PRODUCT = libnitrokey
 QMAKE_TARGET_DESCRIPTION = Communicate with Nitrokey stick devices in a clean and easy manner
 QMAKE_TARGET_COPYRIGHT = Copyright (c) 2015-2018 Nitrokey UG
 
+message($$PWD)
+
 HEADERS = \
    $$PWD/hidapi/hidapi/hidapi.h \
    $$PWD/libnitrokey/command.h \
@@ -25,7 +27,7 @@ HEADERS = \
    $$PWD/libnitrokey/dissect.h \
    $$PWD/libnitrokey/LibraryException.h \
    $$PWD/libnitrokey/log.h \
-   $$PWD/libnitrokey/version.h \
+   $$PWD/libnitrokey/version-libnk.h \
    $$PWD/libnitrokey/LongOperationInProgressException.h \
    $$PWD/libnitrokey/misc.h \
    $$PWD/libnitrokey/NitrokeyManager.h \
@@ -40,7 +42,7 @@ SOURCES = \
    $$PWD/device.cc \
    $$PWD/DeviceCommunicationExceptions.cpp \
    $$PWD/log.cc \
-   $$PWD/version.cc \
+   $$PWD/version-libnk.cc \
    $$PWD/misc.cc \
    $$PWD/NitrokeyManager.cc \
    $$PWD/NK_C_API.cc
@@ -49,7 +51,7 @@ SOURCES = \
 tests {
     SOURCES += \
        $$PWD/unittest/catch_main.cpp \
-       $$PWD/unittest/test.cc \
+       $$PWD/unittest/test1.cc \
        $$PWD/unittest/test2.cc \
        $$PWD/unittest/test3.cc \
        $$PWD/unittest/test_C_API.cpp \

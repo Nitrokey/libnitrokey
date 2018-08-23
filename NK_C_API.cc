@@ -27,7 +27,7 @@
 #include "libnitrokey/LibraryException.h"
 #include "libnitrokey/cxx_semantics.h"
 #include "libnitrokey/stick20_commands.h"
-#include "version.h"
+#include "libnitrokey/version-libnk.h"
 
 #ifdef _MSC_VER
 #ifdef _WIN32

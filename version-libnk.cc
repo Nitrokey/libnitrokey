@@ -19,7 +19,7 @@
  * SPDX-License-Identifier: LGPL-3.0
  */
 
-#include "version.h"
+#include "version-libnk.h"
 
 namespace nitrokey {
     unsigned int get_major_library_version() {

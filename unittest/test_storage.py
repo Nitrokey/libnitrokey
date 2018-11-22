@@ -352,13 +352,14 @@ def test_change_update_password(C):
     assert C.NK_change_update_password(DefaultPasswords.UPDATE_TEMP, DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK
 
 
-@pytest.mark.skip(reason='no reversing method added yet')
+# @pytest.mark.skip(reason='no reversing method added yet')
 @pytest.mark.update
 def test_enable_firmware_update(C):
     skip_if_device_version_lower_than({'S': 50})
     wrong_password = b'aaaaaaaaaaa'
     assert C.NK_enable_firmware_update(wrong_password) == DeviceErrorCode.WRONG_PASSWORD
-    assert C.NK_enable_firmware_update(DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK
+    # skip actual test - reason: no reversing method added yet
+    # assert C.NK_enable_firmware_update(DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK
 
 
 @pytest.mark.other

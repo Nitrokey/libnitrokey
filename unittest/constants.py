@@ -48,6 +48,7 @@ class DeviceErrorCode:
     WRONG_PASSWORD = 4
     STATUS_NOT_AUTHORIZED = 5
     STATUS_AES_DEC_FAILED = 0xa
+    STATUS_UNKNOWN_ERROR = 100
 
 
 class LibraryErrors:

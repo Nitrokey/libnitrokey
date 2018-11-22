@@ -192,7 +192,8 @@ def test_enable_password_safe_after_factory_reset(C):
         assert C.NK_clear_new_sd_card_warning(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     enable_password_safe_result = C.NK_enable_password_safe(DefaultPasswords.USER)
     assert enable_password_safe_result == DeviceErrorCode.STATUS_AES_DEC_FAILED \
-           or is_storage(C) and enable_password_safe_result == DeviceErrorCode.WRONG_PASSWORD
+           or is_storage(C) and enable_password_safe_result in \
+           [DeviceErrorCode.WRONG_PASSWORD, DeviceErrorCode.STATUS_UNKNOWN_ERROR]  # UNKNOWN_ERROR since v0.51
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 

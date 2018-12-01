@@ -125,9 +125,11 @@ public:
   static void set_default_device_speed(int delay);
   void setDefaultDelay();
   void set_path(const std::string path);
+  void set_serial(const std::string serial);
 
 
-        private:
+
+    private:
   std::atomic<uint8_t> last_command_status;
   void _reconnect();
   bool _connect();
@@ -149,6 +151,7 @@ protected:
   std::chrono::milliseconds m_send_receive_delay;
   std::atomic<hid_device *>mp_devhandle;
   std::string m_path;
+  std::string m_serial;
 
   static std::atomic_int instances_count;
   static std::chrono::milliseconds default_delay ;

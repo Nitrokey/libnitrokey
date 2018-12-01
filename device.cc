@@ -29,6 +29,7 @@
 #include "libnitrokey/device.h"
 #include "libnitrokey/log.h"
 #include <mutex>
+#include <codecvt>
 #include "DeviceCommunicationExceptions.h"
 #include "device.h"
 
@@ -96,13 +97,23 @@ bool Device::_connect() {
 
 //   hid_init(); // done automatically on hid_open
   if (m_path.empty()){
-    mp_devhandle = hid_open(m_vid, m_pid, nullptr);
+    const wchar_t* serial = nullptr;
+    if (!m_serial.empty()){
+      std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+      auto wstr = converter.from_bytes(m_serial.c_str());
+      serial = wstr.c_str();
+    }
+    mp_devhandle = hid_open(m_vid, m_pid, serial);
   } else {
     mp_devhandle = hid_open_path(m_path.c_str());
   }
   const bool success = mp_devhandle != nullptr;
   LOG(std::string("Connection success: ") + std::to_string(success) + " ("+m_path+")", Loglevel::DEBUG_L1);
   return success;
+}
+
+void Device::set_serial(const std::string serial){
+  m_serial = serial;
 }
 
 void Device::set_path(const std::string path){

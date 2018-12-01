@@ -231,6 +231,22 @@ using nitrokey::misc::strcpyT;
         return true;
     }
 
+    bool NitrokeyManager::connect_with_serial(std::string serial) {
+        std::lock_guard<std::mutex> lock(mex_dev_com_manager);
+        vector< shared_ptr<Device> > devices = { make_shared<Stick10>(), make_shared<Stick20>() };
+        for (shared_ptr<Device> & p : devices){
+            p->set_path(serial);
+            if(p->connect()){
+              device = p; //previous device will be disconnected automatically
+              current_device_id = serial;
+              nitrokey::log::Log::setPrefix(serial);
+              LOGD1("Device successfully changed");
+              return true;
+            }
+        }
+        return false;
+    }
+
     bool NitrokeyManager::connect() {
         std::lock_guard<std::mutex> lock(mex_dev_com_manager);
         vector< shared_ptr<Device> > devices = { make_shared<Stick10>(), make_shared<Stick20>() };

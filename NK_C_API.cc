@@ -125,6 +125,13 @@ extern "C" {
 		return _copy;
 	}
 
+	NK_C_API int NK_login_with_serial(const char *serial) {
+		auto m = NitrokeyManager::instance();
+		return get_with_result([&]() {
+			return m->connect_with_serial(serial);
+		});
+	}
+
 	NK_C_API int NK_login(const char *device_model) {
 		auto m = NitrokeyManager::instance();
 		try {

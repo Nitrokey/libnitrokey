@@ -44,7 +44,7 @@ qmake ..
 make -j2
 ```
 
-### Windows MS Visual Studio 2017
+### Windows and Visual Studio 2017
 Lately Visual Studio has started handling CMake files directly. After opening the project's directory it should recognize it and initialize build system. Afterwards please run:
 1. `CMake -> Cache -> View Cache CMakeLists.txt -> CMakeLists.txt` to edit settings
 2. `CMake -> Build All` to build
@@ -167,21 +167,27 @@ The documentation of C API is included in the sources (could be  generated with 
 Please check [NK_C_API.h](NK_C_API.h) (C API) for high level commands and [include/NitrokeyManager.h](include/NitrokeyManager.h) (C++ API). All devices' commands are listed along with packet format in [include/stick10_commands.h](include/stick10_commands.h) and [include/stick20_commands.h](include/stick20_commands.h) respectively for Nitrokey Pro and Nitrokey Storage products.
 
 # Tests
-Warning! Before you run unittests please either change both your Admin and User PINs on your Nitrostick to defaults (`12345678` and `123456` respectively) or change the values in tests source code. If you do not change them the tests might lock your device and lose your data. If it's too late, you can reset your Nitrokey using instructions from [homepage](https://www.nitrokey.com/de/documentation/how-reset-nitrokey).
+**Warning!** Most of the tests will overwrite user data. The only user-data safe tests are specified in `unittest/test_safe.cpp` (see *C++ tests* chapter).
+
+**Warning!** Before you run unittests please change both your Admin and User PINs on your Nitrostick to defaults (`12345678` and `123456` respectively), or change the values in tests source code. If you do not change them, the tests might lock your device temporarily. If it's too late already, you can reset your Nitrokey using instructions from [homepage](https://www.nitrokey.com/de/documentation/how-reset-nitrokey).
 
 ## Python tests
-libnitrokey has a great suite of tests written in Python 3 under the path: `unittest/test_*.py`: 
+libnitrokey has a great suite of tests written in Python 3 under the path: [unittest/test_*.py](https://github.com/Nitrokey/libnitrokey/tree/master/unittest): 
 * `test_pro.py` - contains tests of OTP, Password Safe and PIN control functionality. Could be run on both Pro and Storage devices.
 * `test_storage.py` - contains tests of Encrypted Volumes functionality. Could be run only on Storage.
+
 The tests themselves show how to handle common requests to device.
 Before running please install all required libraries with:
 ```bash
 cd unittest
 pip install --user -r requirements.txt
 ```
+or use Python's environment managing tool like [pipenv](https://pipenv.readthedocs.io/en/latest/) or `virtualenv`.
+
+
 To run them please execute: 
 ```bash
-# substitute <dev> with either pro or storage
+# substitute <dev> with either 'pro' or 'storage'
 py.test -v test_<dev>.py
 # more specific use - run tests containing in name <test_name> 5 times:
 py.test -v test_<dev>.py -k <test_name> --count 5
@@ -190,9 +196,76 @@ py.test -v test_<dev>.py -k <test_name> --count 5
 For additional documentation please check the following for [py.test installation](http://doc.pytest.org/en/latest/getting-started.html). For better coverage [randomly plugin](https://pypi.python.org/pypi/pytest-randomly) is installed - it randomizes the test order allowing to detect unseen dependencies between the tests.
 
 ## C++ tests
-There are also some unit tests implemented in C++, placed in unittest directory. They are not written as extensively as Python tests and are rather more a C++ low level interface check, often not using C++ API from `NitrokeyManager.cc`. Some of them are: [test_HOTP.cc](https://github.com/Nitrokey/libnitrokey/blob/master/unittest/test_HOTP.cc),
-[test.cc](https://github.com/Nitrokey/libnitrokey/blob/master/unittest/test.cc).
-Unit tests were written and tested on Ubuntu 16.04/16.10/17.04. To run them just execute binaries built in ./libnitrokey/build dir after enabling them by passing `-DCOMPILE_TESTS=ON` option like in `cmake .. -DCOMPILE_TESTS=ON && make`. 
+There are also some unit tests implemented in C++, placed in unittest directory. The only user-data safe online test set here is [test_safe.cpp](https://github.com/Nitrokey/libnitrokey/blob/master/unittest/test_safe.cpp), which tries to connect to the device, and collect its status data. Example run for Storage:
+```text
+# Storage device inserted, firmware version v0.53
+$ ./test_safe
+[Wed Jan  2 13:31:17 2019][DEBUG_L1]    => GET_DEVICE_STATUS
+..
+[Wed Jan  2 13:31:17 2019][DEBUG_L1]    <= GET_DEVICE_STATUS 0 1
+[Wed Jan  2 13:31:17 2019][DEBUG_L1]    => GET_PASSWORD_RETRY_COUNT
+[Wed Jan  2 13:31:17 2019][DEBUG_L1]    <= GET_PASSWORD_RETRY_COUNT 0 0
+[Wed Jan  2 13:31:17 2019][DEBUG_L1]    => GET_DEVICE_STATUS
+..
+[Wed Jan  2 13:31:17 2019][DEBUG_L1]    <= GET_DEVICE_STATUS 0 1
+[Wed Jan  2 13:31:17 2019][DEBUG_L1]    => GET_USER_PASSWORD_RETRY_COUNT
+[Wed Jan  2 13:31:17 2019][DEBUG_L1]    <= GET_USER_PASSWORD_RETRY_COUNT 0 0
+[Wed Jan  2 13:31:17 2019][DEBUG_L1]    => GET_DEVICE_STATUS
+...
+[Wed Jan  2 13:31:17 2019][DEBUG_L1]    <= GET_DEVICE_STATUS 0 1
+ transmission_data.dissect():   _padding:
+0000    00 00 00 00 00 00 00 00 00 00 00 00 00 05 2e 01   ................
+0010    00 00 -- -- -- -- -- -- -- -- -- -- -- -- -- --   ..
+ (int) SendCounter_u8:  0
+ (int) SendDataType_u8: 3
+ (int) FollowBytesFlag_u8:      0
+ (int) SendSize_u8:     28
+
+ MagicNumber_StickConfig_u16:   13080
+ (int) ReadWriteFlagUncryptedVolume_u8: 1
+ (int) ReadWriteFlagCryptedVolume_u8:   0
+ (int) ReadWriteFlagHiddenVolume_u8:    0
+ (int) versionInfo.major:       0
+ (int) versionInfo.minor:       53
+ (int) versionInfo.build_iteration:     0
+ (int) FirmwareLocked_u8:       0
+ (int) NewSDCardFound_u8:       1
+ (int) NewSDCardFound_st.NewCard:       1
+ (int) NewSDCardFound_st.Counter:       0
+ (int) SDFillWithRandomChars_u8:        1
+ ActiveSD_CardID_u32:   3670817656
+ (int) VolumeActiceFlag_u8:     1
+ (int) VolumeActiceFlag_st.unencrypted: 1
+ (int) VolumeActiceFlag_st.encrypted:   0
+ (int) VolumeActiceFlag_st.hidden:      0
+ (int) NewSmartCardFound_u8:    0
+ (int) UserPwRetryCount:        3
+ (int) AdminPwRetryCount:       3
+ ActiveSmartCardID_u32: 24122
+ (int) StickKeysNotInitiated:   0
+
+[Wed Jan  2 13:31:17 2019][DEBUG_L1]    => GET_DEVICE_STATUS
+..
+[Wed Jan  2 13:31:17 2019][DEBUG_L1]    <= GET_DEVICE_STATUS 0 1
+00005e3a
+[Wed Jan  2 13:31:17 2019][DEBUG_L1]    => GET_DEVICE_STATUS
+....
+[Wed Jan  2 13:31:18 2019][DEBUG_L1]    <= GET_DEVICE_STATUS 0 1
+[Wed Jan  2 13:31:18 2019][DEBUG_L1]    => GET_DEVICE_STATUS
+...
+[Wed Jan  2 13:31:18 2019][DEBUG_L1]    <= GET_DEVICE_STATUS 0 1
+===============================================================================
+All tests passed (18 assertions in 6 test cases)
+```
+Test's execution configuration and verbosity could be manipulated - please see `./test_safe --help` for details.
+
+The other tests sets are not written as extensively as Python tests and are rather more a C++ low level interface check used during the library development, using either low-level components, C API from `NK_C_API.cc`, or C++ API from `NitrokeyManager.cc`. Some of them are: [test_HOTP.cc](https://github.com/Nitrokey/libnitrokey/blob/master/unittest/test_HOTP.cc),
+[test1.cc](https://github.com/Nitrokey/libnitrokey/blob/master/unittest/test1.cc). See more in [unittest](https://github.com/Nitrokey/libnitrokey/tree/master/unittest) directory.
+
+**Note: these are not device model agnostic, and will most probably destroy your data on the device.**
+
+
+Unit tests were checked on Ubuntu 16.04/16.10/17.04. To run them just execute binaries built in `./libnitrokey/build` dir, after enabling them by passing `-DCOMPILE_TESTS=ON` option to `cmake` - e.g.: `cmake .. -DCOMPILE_TESTS=ON && make`. 
 
 
 The documentation of how it works could be found in nitrokey-app project's README on Github:
@@ -206,7 +279,7 @@ firmware code should show how things works:
 
 # Known issues / tasks
 * Currently only one device can be connected at a time (experimental work could be found in `wip-multiple_devices` branch),
-* C++ API needs some reorganization to C++ objects (instead of pointers to arrays). This will be also preparing for integration with Pybind11,
+* C++ API needs some reorganization to C++ objects (instead of pointers to byte arrays). This will be also preparing for integration with Pybind11,
 * Fix compilation warnings.
 
 Other tasks might be listed either in [TODO](TODO) file or on project's issues page.

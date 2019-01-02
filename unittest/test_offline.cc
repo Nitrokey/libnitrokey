@@ -176,6 +176,7 @@ TEST_CASE("Test version getter", "[fast]") {
   // of commits since the last tag, and <hash> is the hash of the current
   // commit.  (This assumes that all tags have the name v<major>.<minor>.).
   // Optional <patch> field is allowed as well.
+  INFO("This test will fail, if the full git commit version was not collected during library build.");
   std::string s = library_version;
   std::string version("v[0-9]+\\.[0-9]+(\\.[0-9]+)?");
   std::string git_suffix("-[0-9]+-g[0-9a-z]+");

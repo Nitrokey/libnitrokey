@@ -1,5 +1,7 @@
 # Nitrokey U2F
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0664", GROUP="plugdev", ATTRS{idVendor}=="2581", ATTRS{idProduct}=="f1d0"
+# Nitrokey FIDO U2F
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="4287", TAG+="uaccess"
 
 SUBSYSTEM!="usb", GOTO="gnupg_rules_end"
 ACTION!="add", GOTO="gnupg_rules_end"

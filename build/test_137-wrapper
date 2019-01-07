@@ -10,20 +10,23 @@
 # make -f ./test_137-wrapper DELAY=90
 
 DELAY ?= 1
+TEST=./test_137
+GPG=[[ `gpg2 --decrypt test.gpg | wc -c` -gt 0 ]]
+
 test:
 	echo "DELAY=${DELAY}"
 	gpg2 --version
 	git describe --long
 	echo "start"
-	./test_137 -s
+	${TEST}
 	sleep ${DELAY}
-	[[ `gpg2 --decrypt test.gpg | wc -c` -gt 0 ]]
+	${GPG}
 	sleep ${DELAY}
-	./test_137 -s
+	${TEST}
 	sleep ${DELAY}
-	[[ `gpg2 --decrypt test.gpg | wc -c` -gt 0 ]]
+	${GPG}
 	sleep ${DELAY}
-	./test_137 -s
+	${TEST}
 
 
 .PHONY: test

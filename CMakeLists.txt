@@ -212,6 +212,7 @@ IF (COMPILE_TESTS)
                 unittest/test_multiple_devices.cc
                 unittest/test_strdup.cpp
                 unittest/test_safe.cpp
+                unittest/test_137.cc
         )
 
     foreach(testsourcefile ${TESTS} )

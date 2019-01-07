@@ -1,10 +1,30 @@
-#!/bin/bash
-gpg2 --decrypt Makefile.gpg | wc -lc
-sleep 1
-./test_137 -s
-sleep 1
-gpg2 --decrypt Makefile.gpg | wc -lc
-sleep 1
-./test_137 -s
-gpg2 --version
-git describe --long
+#!/bin/make -f
+
+# Needs set beforehand:
+# - RSA key generated on the device
+# - public key stored locally (it will be, if it was generated on this PC)
+# - prepared test.gpg file with: `gpg2 --encrypt test`
+#
+# Running:
+# ./test_137-wrapper # DELAY defaults to '1'
+# make -f ./test_137-wrapper DELAY=90
+
+DELAY ?= 1
+test:
+	echo "DELAY=${DELAY}"
+	gpg2 --version
+	git describe --long
+	echo "start"
+	./test_137 -s
+	sleep ${DELAY}
+	[[ `gpg2 --decrypt test.gpg | wc -c` -gt 0 ]]
+	sleep ${DELAY}
+	./test_137 -s
+	sleep ${DELAY}
+	[[ `gpg2 --decrypt test.gpg | wc -c` -gt 0 ]]
+	sleep ${DELAY}
+	./test_137 -s
+
+
+.PHONY: test
+

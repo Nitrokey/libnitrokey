@@ -780,6 +780,14 @@ extern "C" {
 	NK_C_API int NK_connect_with_ID(const char* id);
 
 	/**
+	 * Connects to a device with the given path.  The path is a USB device
+	 * path as returned by hidapi.
+	 * @param path the device path
+	 * @return 1 on successful connection, 0 otherwise
+	 */
+        NK_C_API int NK_connect_with_path(const char* path);
+
+	/**
 	 * Blink red and green LED alternatively and infinitely (until device is reconnected).
 	 * @return command processing error code
 	 */

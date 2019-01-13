@@ -743,6 +743,14 @@ NK_C_API char* NK_get_SD_usage_data_as_string() {
 		});
 	}
 
+	NK_C_API int NK_connect_with_path(const char* path) {
+		auto m = NitrokeyManager::instance();
+		return get_with_result([&]() {
+			return m->connect_with_path(path) ? 1 : 0;
+		});
+	 }
+
+
 	NK_C_API int NK_wink() {
 		auto m = NitrokeyManager::instance();
 		return get_without_result([&]() {

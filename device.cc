@@ -38,6 +38,10 @@ using namespace nitrokey::device;
 using namespace nitrokey::log;
 using namespace std::chrono;
 
+const uint16_t nitrokey::device::NITROKEY_VID = 0x20a0;
+const uint16_t nitrokey::device::NITROKEY_PRO_PID = 0x4108;
+const uint16_t nitrokey::device::NITROKEY_STORAGE_PID = 0x4109;
+
 std::atomic_int Device::instances_count{0};
 std::chrono::milliseconds Device::default_delay {0} ;
 
@@ -246,14 +250,14 @@ void Device::set_retry_delay(const std::chrono::milliseconds delay){
 }
 
 Stick10::Stick10():
-  Device(0x20a0, 0x4108, DeviceModel::PRO, 100ms, 5, 100ms)
+  Device(NITROKEY_VID, NITROKEY_PRO_PID, DeviceModel::PRO, 100ms, 5, 100ms)
   {
     setDefaultDelay();
   }
 
 
 Stick20::Stick20():
-  Device(0x20a0, 0x4109, DeviceModel::STORAGE, 40ms, 55, 40ms)
+  Device(NITROKEY_VID, NITROKEY_STORAGE_PID, DeviceModel::STORAGE, 40ms, 55, 40ms)
   {
     setDefaultDelay();
   }

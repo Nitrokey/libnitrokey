@@ -51,6 +51,19 @@ enum class DeviceModel{
 };
 
 /**
+ * The USB vendor ID for Nitrokey devices.
+ */
+extern const uint16_t NITROKEY_VID;
+/**
+ * The USB product ID for the Nitrokey Pro.
+ */
+extern const uint16_t NITROKEY_PRO_PID;
+/**
+ * The USB product ID for the Nitrokey Storage.
+ */
+extern const uint16_t NITROKEY_STORAGE_PID;
+
+/**
  * Information about a connected device.
  *
  * This struct contains the information about a connected device returned by

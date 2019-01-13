@@ -115,6 +115,29 @@ TEST_CASE("Use API", "[BASIC]") {
     auto v = nm->list_devices();
     REQUIRE(v.size() > 0);
 
+    for (auto i : v) {
+      std::cout << "Connect with: " << i.m_deviceModel << " " << i.m_path << " ";
+      std::wcout << i.m_serialNumber;
+      std::cout << " | " << std::boolalpha << nm->connect_with_path(i.m_path) << " |";
+      try {
+        auto status = nm->get_status();
+        std::cout << " " << status.card_serial_u32 << " "
+                  << status.get_card_serial_hex()
+                  << std::endl;
+      } catch (const LongOperationInProgressException &e) {
+        std::cout << "long operation in progress on " << i.m_path
+          << " " << std::to_string(e.progress_bar_value) << std::endl;
+      }
+    }
+}
+
+
+TEST_CASE("Use Storage API", "[BASIC]") {
+    auto nm = NitrokeyManager::instance();
+    nm->set_loglevel(2);
+    auto v = nm->list_devices();
+    REQUIRE(v.size() > 0);
+
     for (int i=0; i<10; i++){
         for (auto i : v) {
             if (i.m_deviceModel != DeviceModel::STORAGE)

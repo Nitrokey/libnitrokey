@@ -29,9 +29,17 @@ from tqdm import tqdm
 
 from conftest import skip_if_device_version_lower_than
 from constants import DefaultPasswords, DeviceErrorCode, bb
-from misc import gs, wait
+from misc import gs, wait, ffi
 
 pprint = pprint.PrettyPrinter(indent=4).pprint
+
+
+@pytest.mark.other
+@pytest.mark.info
+def test_list_devices(C):
+    infos = C.NK_list_devices()
+    assert infos != ffi.NULL
+    C.NK_free_device_info(infos)
 
 
 @pytest.mark.other

@@ -36,11 +36,23 @@ std::mutex mex_dev_com;
 
 using namespace nitrokey::device;
 using namespace nitrokey::log;
+using namespace nitrokey::misc;
 using namespace std::chrono;
 
 const uint16_t nitrokey::device::NITROKEY_VID = 0x20a0;
 const uint16_t nitrokey::device::NITROKEY_PRO_PID = 0x4108;
 const uint16_t nitrokey::device::NITROKEY_STORAGE_PID = 0x4109;
+
+Option<DeviceModel> nitrokey::device::product_id_to_model(uint16_t product_id) {
+  switch (product_id) {
+    case NITROKEY_PRO_PID:
+      return DeviceModel::PRO;
+    case NITROKEY_STORAGE_PID:
+      return DeviceModel::STORAGE;
+    default:
+      return {};
+  }
+}
 
 std::atomic_int Device::instances_count{0};
 std::chrono::milliseconds Device::default_delay {0} ;

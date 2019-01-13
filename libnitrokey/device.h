@@ -26,6 +26,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include "misc.h"
 
 #define HID_REPORT_SIZE 65
 
@@ -62,6 +63,12 @@ extern const uint16_t NITROKEY_PRO_PID;
  * The USB product ID for the Nitrokey Storage.
  */
 extern const uint16_t NITROKEY_STORAGE_PID;
+
+/**
+ * Convert the given USB product ID to a Nitrokey model.  If there is no model
+ * with that ID, return an absent value.
+ */
+misc::Option<DeviceModel> product_id_to_model(uint16_t product_id);
 
 /**
  * Information about a connected device.

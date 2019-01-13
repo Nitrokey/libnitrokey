@@ -44,6 +44,25 @@ def test_list_devices(C):
 
 @pytest.mark.other
 @pytest.mark.info
+def test_connect_with_path(C):
+    ids = gs(C.NK_list_devices_by_cpuID())
+    # NK_list_devices_by_cpuID already opened the devices, so we have to close
+    # them before trying to reconnect
+    assert C.NK_logout() == 0
+
+    devices_list = ids.split(b';')
+    for value in devices_list:
+        parts = value.split(b'_p_')
+        assert len(parts) < 3
+        if len(parts) == 2:
+            path = parts[1]
+        else:
+            path = parts[0]
+        assert C.NK_connect_with_path(path) == 1
+
+
+@pytest.mark.other
+@pytest.mark.info
 def test_get_status_storage_multiple(C):
     ids = gs(C.NK_list_devices_by_cpuID())
     print(ids)

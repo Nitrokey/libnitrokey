@@ -50,6 +50,27 @@ enum class DeviceModel{
     STORAGE
 };
 
+/**
+ * Information about a connected device.
+ *
+ * This struct contains the information about a connected device returned by
+ * hidapi when enumerating the connected devices.
+ */
+struct DeviceInfo {
+    /**
+     * The model of the connected device.
+     */
+    DeviceModel m_deviceModel;
+    /**
+     * The USB connection path for the device.
+     */
+    std::string m_path;
+    /**
+     * The serial number of the device.
+     */
+    std::wstring m_serialNumber;
+};
+
 #include <atomic>
 
 class Device {

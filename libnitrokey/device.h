@@ -148,12 +148,11 @@ public:
    */
   bool could_be_enumerated();
   /**
-   * Returns a vector with all connected Nitrokey devices of the same device
-   * type as this device.
+   * Returns a vector with all connected Nitrokey devices.
    *
    * @return information about all connected devices
    */
-  std::vector<DeviceInfo> enumerate();
+  static std::vector<DeviceInfo> enumerate();
 
 
         void show_stats();

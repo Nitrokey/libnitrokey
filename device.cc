@@ -188,16 +188,17 @@ int Device::recv(void *packet) {
 }
 
 std::vector<DeviceInfo> Device::enumerate(){
-  //TODO make static
-  auto pInfo = hid_enumerate(m_vid, m_pid);
+  auto pInfo = hid_enumerate(NITROKEY_VID, 0);
   auto pInfo_ = pInfo;
   std::vector<DeviceInfo> res;
   while (pInfo != nullptr){
-    std::string path(pInfo->path);
-    std::wstring serialNumber(pInfo->serial_number);
-    auto deviceModel = this->get_device_model();
-    DeviceInfo info = { deviceModel, path, serialNumber };
-    res.push_back(info);
+    auto deviceModel = product_id_to_model(pInfo->product_id);
+    if (deviceModel.has_value()) {
+      std::string path(pInfo->path);
+      std::wstring serialNumber(pInfo->serial_number);
+      DeviceInfo info = { deviceModel.value(), path, serialNumber };
+      res.push_back(info);
+    }
     pInfo = pInfo->next;
   }
 

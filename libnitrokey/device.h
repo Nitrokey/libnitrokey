@@ -92,7 +92,7 @@ struct DeviceInfo {
     /**
      * The serial number of the device.
      */
-    std::wstring m_serialNumber;
+    std::string m_serialNumber;
 };
 
 #include <atomic>

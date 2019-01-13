@@ -42,9 +42,8 @@ TEST_CASE("List devices", "[BASIC]") {
             std::cout << "Could not create device with model " << i.m_deviceModel << "\n";
             continue;
         }
-        std::cout << i.m_deviceModel << " " << i.m_path << " ";
-        std::wcout << i.m_serialNumber;
-        std::cout << " |";
+        std::cout << i.m_deviceModel << " " << i.m_path << " "
+          << i.m_serialNumber << " |";
         d->set_path(i.m_path);
         d->connect();
         auto res = GetStatus::CommandTransaction::run(d);
@@ -116,9 +115,8 @@ TEST_CASE("Use API", "[BASIC]") {
     REQUIRE(v.size() > 0);
 
     for (auto i : v) {
-      std::cout << "Connect with: " << i.m_deviceModel << " " << i.m_path << " ";
-      std::wcout << i.m_serialNumber;
-      std::cout << " | " << std::boolalpha << nm->connect_with_path(i.m_path) << " |";
+      std::cout << "Connect with: " << i.m_deviceModel << " " << i.m_path << " "
+        << i.m_serialNumber << " | " << std::boolalpha << nm->connect_with_path(i.m_path) << " |";
       try {
         auto status = nm->get_status();
         std::cout << " " << status.card_serial_u32 << " "

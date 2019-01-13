@@ -20,7 +20,9 @@
  */
 
 #include <chrono>
+#include <codecvt>
 #include <iostream>
+#include <locale>
 #include <thread>
 #include <cstddef>
 #include <stdexcept>
@@ -210,7 +212,9 @@ std::vector<DeviceInfo> Device::enumerate(){
     auto deviceModel = product_id_to_model(pInfo->product_id);
     if (deviceModel.has_value()) {
       std::string path(pInfo->path);
-      std::wstring serialNumber(pInfo->serial_number);
+      std::wstring serialNumberW(pInfo->serial_number);
+      std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+      std::string serialNumber = converter.to_bytes(serialNumberW);
       DeviceInfo info = { deviceModel.value(), path, serialNumber };
       res.push_back(info);
     }

@@ -34,6 +34,28 @@ using namespace nitrokey;
 
 
 TEST_CASE("List devices", "[BASIC]") {
+    auto v = Device::enumerate();
+    REQUIRE(v.size() > 0);
+    for (auto i : v){
+        auto d = Device::create(i.m_deviceModel);
+        if (!d) {
+            std::cout << "Could not create device with model " << i.m_deviceModel << "\n";
+            continue;
+        }
+        std::cout << i.m_deviceModel << " " << i.m_path << " ";
+        std::wcout << i.m_serialNumber;
+        std::cout << " |";
+        d->set_path(i.m_path);
+        d->connect();
+        auto res = GetStatus::CommandTransaction::run(d);
+        std::cout << " " << res.data().card_serial_u32 << " "
+                  << res.data().get_card_serial_hex()
+                  << std::endl;
+        d->disconnect();
+    }
+}
+
+TEST_CASE("List Storage devices", "[BASIC]") {
     shared_ptr<Stick20> d = make_shared<Stick20>();
     auto v = Device::enumerate();
     REQUIRE(v.size() > 0);

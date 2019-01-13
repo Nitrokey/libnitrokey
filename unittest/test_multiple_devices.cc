@@ -29,6 +29,7 @@ const char * RFC_SECRET = "12345678901234567890";
 #include <iostream>
 #include <NitrokeyManager.h>
 #include <stick20_commands.h>
+#include "../NK_C_API.h"
 
 using namespace nitrokey;
 
@@ -105,6 +106,24 @@ TEST_CASE("Regenerate AES keys", "[BASIC]") {
         //TODO watch out for multiple hid_exit calls
         d->disconnect();
     }
+}
+
+
+TEST_CASE("Use C API", "[BASIC]") {
+    auto ptr = NK_list_devices();
+    auto first_ptr = ptr;
+    REQUIRE(ptr != nullptr);
+
+    while (ptr) {
+      std::cout << "Connect with: " << ptr->model << " " << ptr->path << " "
+        << ptr->serial_number << " | " << NK_connect_with_path(ptr->path) << " | ";
+      auto status = NK_status();
+      std::cout << status << std::endl;
+      free(status);
+      ptr = ptr->next;
+    }
+
+    NK_free_device_info(first_ptr);
 }
 
 

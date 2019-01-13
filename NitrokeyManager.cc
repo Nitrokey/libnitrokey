@@ -29,6 +29,7 @@
 #include "libnitrokey/misc.h"
 #include <mutex>
 #include "libnitrokey/cxx_semantics.h"
+#include "libnitrokey/misc.h"
 #include <functional>
 #include <stick10_commands.h>
 
@@ -216,7 +217,26 @@ using nitrokey::misc::strcpyT;
             }
         }
 
-        auto p = make_shared<Stick20>();
+        auto info_ptr = hid_enumerate(NITROKEY_VID, 0);
+        auto first_info_ptr = info_ptr;
+        if (!info_ptr)
+          return false;
+
+        misc::Option<DeviceModel> model;
+        while (info_ptr && !model.has_value()) {
+            if (path == std::string(info_ptr->path)) {
+                model = product_id_to_model(info_ptr->product_id);
+            }
+            info_ptr = info_ptr->next;
+        }
+        hid_free_enumeration(first_info_ptr);
+
+        if (!model.has_value())
+            return false;
+
+        auto p = Device::create(model.value());
+        if (!p)
+            return false;
         p->set_path(path);
 
         if(!p->connect()) return false;

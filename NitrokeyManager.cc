@@ -105,16 +105,11 @@ using nitrokey::misc::strcpyT;
       return true;
     }
 
-    std::vector<std::string> NitrokeyManager::list_devices(){
+    std::vector<DeviceInfo> NitrokeyManager::list_devices(){
         std::lock_guard<std::mutex> lock(mex_dev_com_manager);
 
         auto p = make_shared<Stick20>();
-        auto device_infos = p->enumerate();
-        std::vector<std::string> strings;
-        strings.resize(device_infos.size());
-        std::transform(device_infos.begin(), device_infos.end(), strings.begin(),
-            [](auto device_info) { return device_info.m_path; });
-        return strings;
+        return p->enumerate();
     }
 
     std::vector<std::string> NitrokeyManager::list_devices_by_cpuID(){

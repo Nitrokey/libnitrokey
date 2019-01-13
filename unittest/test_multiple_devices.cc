@@ -90,7 +90,10 @@ TEST_CASE("Use API", "[BASIC]") {
     REQUIRE(v.size() > 0);
 
     for (int i=0; i<10; i++){
-        for (auto a : v) {
+        for (auto i : v) {
+            if (i.m_deviceModel != DeviceModel::STORAGE)
+                continue;
+            auto a = i.m_path;
             std::cout <<"Connect with: " << a <<
             " " << std::boolalpha << nm->connect_with_path(a) << " ";
             try{

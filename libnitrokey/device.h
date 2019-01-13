@@ -26,6 +26,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <ostream>
 #include <vector>
 #include "misc.h"
 
@@ -51,6 +52,8 @@ enum class DeviceModel{
     PRO,
     STORAGE
 };
+
+std::ostream& operator<<(std::ostream& stream, DeviceModel model);
 
 /**
  * The USB vendor ID for Nitrokey devices.

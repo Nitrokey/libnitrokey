@@ -57,6 +57,21 @@ Option<DeviceModel> nitrokey::device::product_id_to_model(uint16_t product_id) {
 std::atomic_int Device::instances_count{0};
 std::chrono::milliseconds Device::default_delay {0} ;
 
+std::ostream& nitrokey::device::operator<<(std::ostream& stream, DeviceModel model) {
+  switch (model) {
+    case DeviceModel::PRO:
+      stream << "Pro";
+      break;
+    case DeviceModel::STORAGE:
+      stream << "Storage";
+      break;
+    default:
+      stream << "Unknown";
+      break;
+  }
+  return stream;
+}
+
 Device::Device(const uint16_t vid, const uint16_t pid, const DeviceModel model,
                const milliseconds send_receive_delay, const int retry_receiving_count,
                const milliseconds retry_timeout)

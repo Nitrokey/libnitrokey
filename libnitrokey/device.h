@@ -24,6 +24,7 @@
 #include <chrono>
 #include "hidapi/hidapi.h"
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 #include "misc.h"
@@ -153,6 +154,11 @@ public:
    * @return information about all connected devices
    */
   static std::vector<DeviceInfo> enumerate();
+
+  /**
+   * Create a Device of the given model.
+   */
+  static std::shared_ptr<Device> create(DeviceModel model);
 
 
         void show_stats();

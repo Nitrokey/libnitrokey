@@ -209,6 +209,17 @@ std::vector<DeviceInfo> Device::enumerate(){
   return res;
 }
 
+std::shared_ptr<Device> Device::create(DeviceModel model) {
+  switch (model) {
+    case DeviceModel::PRO:
+      return std::make_shared<Stick10>();
+    case DeviceModel::STORAGE:
+      return std::make_shared<Stick20>();
+    default:
+      return {};
+  }
+}
+
 bool Device::could_be_enumerated() {
   LOG(__FUNCTION__, Loglevel::DEBUG_L2);
   std::lock_guard<std::mutex> lock(mex_dev_com);

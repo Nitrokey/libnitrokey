@@ -109,7 +109,12 @@ using nitrokey::misc::strcpyT;
         std::lock_guard<std::mutex> lock(mex_dev_com_manager);
 
         auto p = make_shared<Stick20>();
-        return p->enumerate(); // make static
+        auto device_infos = p->enumerate();
+        std::vector<std::string> strings;
+        strings.resize(device_infos.size());
+        std::transform(device_infos.begin(), device_infos.end(), strings.begin(),
+            [](auto device_info) { return device_info.m_path; });
+        return strings;
     }
 
     std::vector<std::string> NitrokeyManager::list_devices_by_cpuID(){
@@ -130,7 +135,8 @@ using nitrokey::misc::strcpyT;
         auto d = make_shared<Stick20>();
         const auto v = d->enumerate();
         LOGD1("Discovering IDs");
-        for (auto & p: v){
+        for (auto & i: v){
+            auto p = i.m_path;
             d = make_shared<Stick20>();
             LOGD1( std::string("Found: ") + p );
             d->set_path(p);

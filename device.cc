@@ -171,14 +171,17 @@ int Device::recv(void *packet) {
   return status;
 }
 
-std::vector<std::string> Device::enumerate(){
+std::vector<DeviceInfo> Device::enumerate(){
   //TODO make static
   auto pInfo = hid_enumerate(m_vid, m_pid);
   auto pInfo_ = pInfo;
-  std::vector<std::string> res;
+  std::vector<DeviceInfo> res;
   while (pInfo != nullptr){
-    std::string a (pInfo->path);
-    res.push_back(a);
+    std::string path(pInfo->path);
+    std::wstring serialNumber(pInfo->serial_number);
+    auto deviceModel = this->get_device_model();
+    DeviceInfo info = { deviceModel, path, serialNumber };
+    res.push_back(info);
     pInfo = pInfo->next;
   }
 

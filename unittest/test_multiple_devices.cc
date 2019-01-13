@@ -37,7 +37,8 @@ TEST_CASE("List devices", "[BASIC]") {
     shared_ptr<Stick20> d = make_shared<Stick20>();
     auto v = d->enumerate();
     REQUIRE(v.size() > 0);
-    for (auto a : v){
+    for (auto i : v){
+        auto a = i.m_path;
         std::cout << a;
         d->set_path(a);
         d->connect();
@@ -57,7 +58,8 @@ TEST_CASE("Regenerate AES keys", "[BASIC]") {
     REQUIRE(v.size() > 0);
 
     std::vector<shared_ptr<Stick20>> devices;
-    for (auto a : v){
+    for (auto i : v){
+        auto a = i.m_path;
         std::cout << a << endl;
         d = make_shared<Stick20>();
         d->set_path(a);

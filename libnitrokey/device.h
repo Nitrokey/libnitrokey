@@ -127,7 +127,13 @@ public:
    * @return true if visible by OS
    */
   bool could_be_enumerated();
-  std::vector<std::string> enumerate();
+  /**
+   * Returns a vector with all connected Nitrokey devices of the same device
+   * type as this device.
+   *
+   * @return information about all connected devices
+   */
+  std::vector<DeviceInfo> enumerate();
 
 
         void show_stats();

@@ -128,6 +128,23 @@ extern "C" {
 		bool stick_initialized;
         };
 
+	/**
+	 * Data about the usage of the SD card.
+	 */
+	struct NK_SD_usage_data {
+		/**
+		 * The minimum write level, as a percentage of the total card
+		 * size.
+		 */
+		uint8_t write_level_min;
+		/**
+		 * The maximum write level, as a percentage of the total card
+		 * size.
+		 */
+		uint8_t write_level_max;
+	};
+
+
    struct NK_storage_ProductionTest{
     uint8_t FirmwareVersion_au8[2];
     uint8_t FirmwareVersionInternal_u8;
@@ -735,6 +752,17 @@ extern "C" {
 	 * @return command processing error code
 	 */
 	NK_C_API int NK_get_status_storage(struct NK_storage_status* out);
+
+	/**
+	 * Get SD card usage attributes. Usable during hidden volumes creation.
+	 * If the command was successful (return value 0), the usage data is
+	 * written to the output pointer’s target.  The output pointer must
+	 * not be null.
+	 * Storage only
+	 * @param out the output pointer for the usage data
+	 * @return command processing error code
+	 */
+	NK_C_API int NK_get_SD_usage_data(struct NK_SD_usage_data* out);
 
 	/**
 	 * Get SD card usage attributes as string.

@@ -697,9 +697,9 @@ NK_C_API char* NK_get_SD_usage_data_as_string() {
 
 	NK_C_API int NK_get_progress_bar_value() {
 		auto m = NitrokeyManager::instance();
-		return get_with_result([&]() {
+		return std::get<1>(get_with_status([&]() {
 			return m->get_progress_bar_value();
-		});
+		}, -2));
 	}
 
 	NK_C_API int NK_get_major_firmware_version() {

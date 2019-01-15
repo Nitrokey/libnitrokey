@@ -1,4 +1,5 @@
 cffi
 pytest-repeat
 pytest-randomly
+tqdm
 oath

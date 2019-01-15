@@ -57,6 +57,29 @@ extern "C" {
             NK_STORAGE = 2
         };
 
+        /**
+	 * The connection info for a Nitrokey device as a linked list.
+	 */
+	struct NK_device_info {
+		/**
+		 * The model of the Nitrokey device.
+		 */
+		enum NK_device_model model;
+		/**
+		 * The USB device path for NK_connect_with_path.
+		 */
+		char* path;
+		/**
+		 * The serial number.
+		 */
+		char* serial_number;
+		/**
+		 * The pointer to the next element of the linked list or null
+		 * if this is the last element in the list.
+		 */
+		struct NK_device_info* next;
+	};
+
 	/**
 	 * Stores the status of a Storage device.
 	 */
@@ -797,6 +820,19 @@ extern "C" {
  */
 	NK_C_API char* NK_list_devices_by_cpuID();
 
+	/**
+	 * Returns a linked list of all connected devices, or null if no devices
+	 * are connected or an error occured.  The linked list must be freed by
+	 * calling NK_free_device_info.
+	 * @return a linked list of all connected devices
+	 */
+	NK_C_API struct NK_device_info* NK_list_devices();
+
+	/**
+	 * Free a linked list returned by NK_list_devices.
+	 * @param the linked list to free or null
+	 */
+	NK_C_API void NK_free_device_info(struct NK_device_info* device_info);
 
 /**
  * Connects to the device with given ID. ID's list could be created with NK_list_devices_by_cpuID.
@@ -807,6 +843,14 @@ extern "C" {
  * @return 1 on successful connection, 0 otherwise
  */
 	NK_C_API int NK_connect_with_ID(const char* id);
+
+	/**
+	 * Connects to a device with the given path.  The path is a USB device
+	 * path as returned by hidapi.
+	 * @param path the device path
+	 * @return 1 on successful connection, 0 otherwise
+	 */
+        NK_C_API int NK_connect_with_path(const char* path);
 
 	/**
 	 * Blink red and green LED alternatively and infinitely (until device is reconnected).

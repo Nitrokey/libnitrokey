@@ -80,7 +80,7 @@ char * strndup(const char* str, size_t maxlen);
         bool get_time(uint64_t time = 0);
         bool erase_totp_slot(uint8_t slot_number, const char *temporary_password);
         bool erase_hotp_slot(uint8_t slot_number, const char *temporary_password);
-        std::vector<std::string> list_devices();
+        std::vector<DeviceInfo> list_devices();
         std::vector<std::string> list_devices_by_cpuID();
 
         /**

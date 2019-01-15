@@ -24,8 +24,11 @@
 #include <chrono>
 #include "hidapi/hidapi.h"
 #include <cstdint>
+#include <memory>
 #include <string>
+#include <ostream>
 #include <vector>
+#include "misc.h"
 
 #define HID_REPORT_SIZE 65
 
@@ -48,6 +51,48 @@ namespace device {
 enum class DeviceModel{
     PRO,
     STORAGE
+};
+
+std::ostream& operator<<(std::ostream& stream, DeviceModel model);
+
+/**
+ * The USB vendor ID for Nitrokey devices.
+ */
+extern const uint16_t NITROKEY_VID;
+/**
+ * The USB product ID for the Nitrokey Pro.
+ */
+extern const uint16_t NITROKEY_PRO_PID;
+/**
+ * The USB product ID for the Nitrokey Storage.
+ */
+extern const uint16_t NITROKEY_STORAGE_PID;
+
+/**
+ * Convert the given USB product ID to a Nitrokey model.  If there is no model
+ * with that ID, return an absent value.
+ */
+misc::Option<DeviceModel> product_id_to_model(uint16_t product_id);
+
+/**
+ * Information about a connected device.
+ *
+ * This struct contains the information about a connected device returned by
+ * hidapi when enumerating the connected devices.
+ */
+struct DeviceInfo {
+    /**
+     * The model of the connected device.
+     */
+    DeviceModel m_deviceModel;
+    /**
+     * The USB connection path for the device.
+     */
+    std::string m_path;
+    /**
+     * The serial number of the device.
+     */
+    std::string m_serialNumber;
 };
 
 #include <atomic>
@@ -106,7 +151,17 @@ public:
    * @return true if visible by OS
    */
   bool could_be_enumerated();
-  std::vector<std::string> enumerate();
+  /**
+   * Returns a vector with all connected Nitrokey devices.
+   *
+   * @return information about all connected devices
+   */
+  static std::vector<DeviceInfo> enumerate();
+
+  /**
+   * Create a Device of the given model.
+   */
+  static std::shared_ptr<Device> create(DeviceModel model);
 
 
         void show_stats();

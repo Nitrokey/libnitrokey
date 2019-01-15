@@ -29,15 +29,40 @@ const char * RFC_SECRET = "12345678901234567890";
 #include <iostream>
 #include <NitrokeyManager.h>
 #include <stick20_commands.h>
+#include "../NK_C_API.h"
 
 using namespace nitrokey;
 
 
 TEST_CASE("List devices", "[BASIC]") {
-    shared_ptr<Stick20> d = make_shared<Stick20>();
-    auto v = d->enumerate();
+    auto v = Device::enumerate();
     REQUIRE(v.size() > 0);
-    for (auto a : v){
+    for (auto i : v){
+        auto d = Device::create(i.m_deviceModel);
+        if (!d) {
+            std::cout << "Could not create device with model " << i.m_deviceModel << "\n";
+            continue;
+        }
+        std::cout << i.m_deviceModel << " " << i.m_path << " "
+          << i.m_serialNumber << " |";
+        d->set_path(i.m_path);
+        d->connect();
+        auto res = GetStatus::CommandTransaction::run(d);
+        std::cout << " " << res.data().card_serial_u32 << " "
+                  << res.data().get_card_serial_hex()
+                  << std::endl;
+        d->disconnect();
+    }
+}
+
+TEST_CASE("List Storage devices", "[BASIC]") {
+    shared_ptr<Stick20> d = make_shared<Stick20>();
+    auto v = Device::enumerate();
+    REQUIRE(v.size() > 0);
+    for (auto i : v){
+        if (i.m_deviceModel != DeviceModel::STORAGE)
+            continue;
+        auto a = i.m_path;
         std::cout << a;
         d->set_path(a);
         d->connect();
@@ -53,11 +78,14 @@ TEST_CASE("List devices", "[BASIC]") {
 
 TEST_CASE("Regenerate AES keys", "[BASIC]") {
     shared_ptr<Stick20> d = make_shared<Stick20>();
-    auto v = d->enumerate();
+    auto v = Device::enumerate();
     REQUIRE(v.size() > 0);
 
     std::vector<shared_ptr<Stick20>> devices;
-    for (auto a : v){
+    for (auto i : v){
+        if (i.m_deviceModel != DeviceModel::STORAGE)
+            continue;
+        auto a = i.m_path;
         std::cout << a << endl;
         d = make_shared<Stick20>();
         d->set_path(a);
@@ -81,14 +109,57 @@ TEST_CASE("Regenerate AES keys", "[BASIC]") {
 }
 
 
+TEST_CASE("Use C API", "[BASIC]") {
+    auto ptr = NK_list_devices();
+    auto first_ptr = ptr;
+    REQUIRE(ptr != nullptr);
+
+    while (ptr) {
+      std::cout << "Connect with: " << ptr->model << " " << ptr->path << " "
+        << ptr->serial_number << " | " << NK_connect_with_path(ptr->path) << " | ";
+      auto status = NK_status();
+      std::cout << status << std::endl;
+      free(status);
+      ptr = ptr->next;
+    }
+
+    NK_free_device_info(first_ptr);
+}
+
+
 TEST_CASE("Use API", "[BASIC]") {
     auto nm = NitrokeyManager::instance();
     nm->set_loglevel(2);
     auto v = nm->list_devices();
     REQUIRE(v.size() > 0);
 
+    for (auto i : v) {
+      std::cout << "Connect with: " << i.m_deviceModel << " " << i.m_path << " "
+        << i.m_serialNumber << " | " << std::boolalpha << nm->connect_with_path(i.m_path) << " |";
+      try {
+        auto status = nm->get_status();
+        std::cout << " " << status.card_serial_u32 << " "
+                  << status.get_card_serial_hex()
+                  << std::endl;
+      } catch (const LongOperationInProgressException &e) {
+        std::cout << "long operation in progress on " << i.m_path
+          << " " << std::to_string(e.progress_bar_value) << std::endl;
+      }
+    }
+}
+
+
+TEST_CASE("Use Storage API", "[BASIC]") {
+    auto nm = NitrokeyManager::instance();
+    nm->set_loglevel(2);
+    auto v = nm->list_devices();
+    REQUIRE(v.size() > 0);
+
     for (int i=0; i<10; i++){
-        for (auto a : v) {
+        for (auto i : v) {
+            if (i.m_deviceModel != DeviceModel::STORAGE)
+                continue;
+            auto a = i.m_path;
             std::cout <<"Connect with: " << a <<
             " " << std::boolalpha << nm->connect_with_path(a) << " ";
             try{

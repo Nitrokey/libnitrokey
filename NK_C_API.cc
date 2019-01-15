@@ -753,12 +753,80 @@ NK_C_API char* NK_get_SD_usage_data_as_string() {
 		});
 	}
 
+	bool copy_device_info(const DeviceInfo& source, NK_device_info* target) {
+		switch (source.m_deviceModel) {
+		case DeviceModel::PRO:
+			target->model = NK_PRO;
+			break;
+		case DeviceModel::STORAGE:
+			target->model = NK_STORAGE;
+			break;
+		default:
+			return false;
+		}
+
+		target->path = strndup(source.m_path.c_str(), MAXIMUM_STR_REPLY_LENGTH);
+		target->serial_number = strndup(source.m_serialNumber.c_str(), MAXIMUM_STR_REPLY_LENGTH);
+		target->next = nullptr;
+
+		return target->path && target->serial_number;
+	}
+
+	NK_C_API struct NK_device_info* NK_list_devices() {
+		auto nm = NitrokeyManager::instance();
+		return get_with_result([&]() -> NK_device_info* {
+			auto v = nm->list_devices();
+			if (v.empty())
+				return nullptr;
+
+			auto result = new NK_device_info();
+			auto ptr = result;
+			auto first = v.begin();
+			if (!copy_device_info(*first, ptr)) {
+				NK_free_device_info(result);
+				return nullptr;
+			}
+			v.erase(first);
+
+			for (auto& info : v) {
+				ptr->next = new NK_device_info();
+				ptr = ptr->next;
+
+				if (!copy_device_info(info, ptr)) {
+					NK_free_device_info(result);
+					return nullptr;
+				}
+			}
+			return result;
+		});
+	}
+
+	NK_C_API void NK_free_device_info(struct NK_device_info* device_info) {
+		if (!device_info)
+			return;
+
+		if (device_info->next)
+			NK_free_device_info(device_info->next);
+
+		free(device_info->path);
+		free(device_info->serial_number);
+		delete device_info;
+	}
+
 	NK_C_API int NK_connect_with_ID(const char* id) {
 		auto m = NitrokeyManager::instance();
 		return get_with_result([&]() {
 			return m->connect_with_ID(id) ? 1 : 0;
 		});
 	}
+
+	NK_C_API int NK_connect_with_path(const char* path) {
+		auto m = NitrokeyManager::instance();
+		return get_with_result([&]() {
+			return m->connect_with_path(path) ? 1 : 0;
+		});
+	 }
+
 
 	NK_C_API int NK_wink() {
 		auto m = NitrokeyManager::instance();

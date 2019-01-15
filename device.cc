@@ -20,7 +20,9 @@
  */
 
 #include <chrono>
+#include <codecvt>
 #include <iostream>
+#include <locale>
 #include <thread>
 #include <cstddef>
 #include <stdexcept>
@@ -36,10 +38,41 @@ std::mutex mex_dev_com;
 
 using namespace nitrokey::device;
 using namespace nitrokey::log;
+using namespace nitrokey::misc;
 using namespace std::chrono;
+
+const uint16_t nitrokey::device::NITROKEY_VID = 0x20a0;
+const uint16_t nitrokey::device::NITROKEY_PRO_PID = 0x4108;
+const uint16_t nitrokey::device::NITROKEY_STORAGE_PID = 0x4109;
+
+Option<DeviceModel> nitrokey::device::product_id_to_model(uint16_t product_id) {
+  switch (product_id) {
+    case NITROKEY_PRO_PID:
+      return DeviceModel::PRO;
+    case NITROKEY_STORAGE_PID:
+      return DeviceModel::STORAGE;
+    default:
+      return {};
+  }
+}
 
 std::atomic_int Device::instances_count{0};
 std::chrono::milliseconds Device::default_delay {0} ;
+
+std::ostream& nitrokey::device::operator<<(std::ostream& stream, DeviceModel model) {
+  switch (model) {
+    case DeviceModel::PRO:
+      stream << "Pro";
+      break;
+    case DeviceModel::STORAGE:
+      stream << "Storage";
+      break;
+    default:
+      stream << "Unknown";
+      break;
+  }
+  return stream;
+}
 
 Device::Device(const uint16_t vid, const uint16_t pid, const DeviceModel model,
                const milliseconds send_receive_delay, const int retry_receiving_count,
@@ -171,14 +204,20 @@ int Device::recv(void *packet) {
   return status;
 }
 
-std::vector<std::string> Device::enumerate(){
-  //TODO make static
-  auto pInfo = hid_enumerate(m_vid, m_pid);
+std::vector<DeviceInfo> Device::enumerate(){
+  auto pInfo = hid_enumerate(NITROKEY_VID, 0);
   auto pInfo_ = pInfo;
-  std::vector<std::string> res;
+  std::vector<DeviceInfo> res;
   while (pInfo != nullptr){
-    std::string a (pInfo->path);
-    res.push_back(a);
+    auto deviceModel = product_id_to_model(pInfo->product_id);
+    if (deviceModel.has_value()) {
+      std::string path(pInfo->path);
+      std::wstring serialNumberW(pInfo->serial_number);
+      std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+      std::string serialNumber = converter.to_bytes(serialNumberW);
+      DeviceInfo info = { deviceModel.value(), path, serialNumber };
+      res.push_back(info);
+    }
     pInfo = pInfo->next;
   }
 
@@ -187,6 +226,17 @@ std::vector<std::string> Device::enumerate(){
   }
 
   return res;
+}
+
+std::shared_ptr<Device> Device::create(DeviceModel model) {
+  switch (model) {
+    case DeviceModel::PRO:
+      return std::make_shared<Stick10>();
+    case DeviceModel::STORAGE:
+      return std::make_shared<Stick20>();
+    default:
+      return {};
+  }
 }
 
 bool Device::could_be_enumerated() {
@@ -243,14 +293,14 @@ void Device::set_retry_delay(const std::chrono::milliseconds delay){
 }
 
 Stick10::Stick10():
-  Device(0x20a0, 0x4108, DeviceModel::PRO, 100ms, 5, 100ms)
+  Device(NITROKEY_VID, NITROKEY_PRO_PID, DeviceModel::PRO, 100ms, 5, 100ms)
   {
     setDefaultDelay();
   }
 
 
 Stick20::Stick20():
-  Device(0x20a0, 0x4109, DeviceModel::STORAGE, 40ms, 55, 40ms)
+  Device(NITROKEY_VID, NITROKEY_STORAGE_PID, DeviceModel::STORAGE, 40ms, 55, 40ms)
   {
     setDefaultDelay();
   }

@@ -44,13 +44,13 @@ def C(request=None):
     cnt = 0
     a = iter(declarations)
     for declaration in a:
-        if declaration.strip().startswith('NK_C_API'):
+        if declaration.strip().startswith('NK_C_API') \
+                or declaration.strip().startswith('struct'):
             declaration = declaration.replace('NK_C_API', '').strip()
-            while ';' not in declaration:
-                declaration += (next(a)).strip()
-            # print(declaration)
+            while ');' not in declaration and '};' not in declaration:
+                declaration += (next(a)).strip()+'\n'
             ffi.cdef(declaration, override=True)
-            cnt +=1
+            cnt += 1
     print('Imported {} declarations'.format(cnt))
 
     C = None

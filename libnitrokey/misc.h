@@ -29,11 +29,36 @@
 #include "log.h"
 #include "LibraryException.h"
 #include <sstream>
+#include <stdexcept>
 #include <iomanip>
 
 
 namespace nitrokey {
 namespace misc {
+
+/**
+ * Simple replacement for std::optional (C++17).
+ */
+template<typename T>
+class Option {
+public:
+    Option() : m_hasValue(false), m_value() {}
+    Option(T value) : m_hasValue(true), m_value(value) {}
+
+    bool has_value() const {
+        return m_hasValue;
+    }
+    T value() const {
+        if (!m_hasValue) {
+            throw std::logic_error("Called Option::value without value");
+        }
+        return m_value;
+    }
+
+private:
+    bool m_hasValue;
+    T m_value;
+};
 
     template<typename T>
     std::string toHex(T value){

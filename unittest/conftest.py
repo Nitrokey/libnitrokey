@@ -21,9 +21,16 @@ SPDX-License-Identifier: LGPL-3.0
 
 import pytest
 
-from misc import ffi
+from misc import ffi, gs
 
 device_type = None
+
+from logging import getLogger, basicConfig, DEBUG
+
+basicConfig(format='* %(relativeCreated)6d %(filename)s:%(lineno)d %(message)s',level=DEBUG)
+log = getLogger('conftest')
+print = log.debug
+
 
 def skip_if_device_version_lower_than(allowed_devices):
     global device_type

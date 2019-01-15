@@ -164,7 +164,7 @@ All available functions for C and Python are listed in [NK_C_API.h](NK_C_API.h).
 
 ## Documentation
 The documentation of C API is included in the sources (could be  generated with doxygen if requested).
-Please check [NK_C_API.h](NK_C_API.h) (C API) for high level commands and [include/NitrokeyManager.h](include/NitrokeyManager.h) (C++ API). All devices' commands are listed along with packet format in [include/stick10_commands.h](include/stick10_commands.h) and [include/stick20_commands.h](include/stick20_commands.h) respectively for Nitrokey Pro and Nitrokey Storage products.
+Please check [NK_C_API.h](NK_C_API.h) (C API) for high level commands and [libnitrokey/NitrokeyManager.h](libnitrokey/NitrokeyManager.h) (C++ API). All devices' commands are listed along with packet format in [libnitrokey/stick10_commands.h](libnitrokey/stick10_commands.h) and [libnitrokey/stick20_commands.h](libnitrokey/stick20_commands.h) respectively for Nitrokey Pro and Nitrokey Storage products.
 
 # Tests
 **Warning!** Most of the tests will overwrite user data. The only user-data safe tests are specified in `unittest/test_safe.cpp` (see *C++ tests* chapter).

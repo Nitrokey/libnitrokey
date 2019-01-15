@@ -4,7 +4,7 @@
 # libnitrokey
 libnitrokey is a project to communicate with Nitrokey Pro and Storage devices in a clean and easy manner. Written in C++14, testable with `py.test` and `Catch` frameworks, with C API, Python access (through CFFI and C API, in future with Pybind11).
 
-The development of this project is aimed to make it itself a living documentation of communication protocol between host and the Nitrokey stick devices. The command packets' format is described here: [Pro v0.7](include/stick10_commands.h), [Pro v0.8](include/stick10_commands_0.8.h), [Storage](include/stick20_commands.h). Handling and additional operations are described here: [NitrokeyManager.cc](NitrokeyManager.cc).
+The development of this project is aimed to make it itself a living documentation of communication protocol between host and the Nitrokey stick devices. The command packets' format is described here: [Pro v0.7](libnitrokey/stick10_commands.h), [Pro v0.8](libnitrokey/stick10_commands_0.8.h), [Storage](libnitrokey/stick20_commands.h). Handling and additional operations are described here: [NitrokeyManager.cc](NitrokeyManager.cc).
 
 A C++14 complying compiler is required due to heavy use of variable templates. For feature support tables please check [table 1](https://gcc.gnu.org/projects/cxx-status.html#cxx14) or [table 2](http://en.cppreference.com/w/cpp/compiler_support).
 
@@ -164,7 +164,7 @@ All available functions for C and Python are listed in [NK_C_API.h](NK_C_API.h).
 
 ## Documentation
 The documentation of C API is included in the sources (could be  generated with doxygen if requested).
-Please check [NK_C_API.h](NK_C_API.h) (C API) for high level commands and [include/NitrokeyManager.h](include/NitrokeyManager.h) (C++ API). All devices' commands are listed along with packet format in [include/stick10_commands.h](include/stick10_commands.h) and [include/stick20_commands.h](include/stick20_commands.h) respectively for Nitrokey Pro and Nitrokey Storage products.
+Please check [NK_C_API.h](NK_C_API.h) (C API) for high level commands and [libnitrokey/NitrokeyManager.h](libnitrokey/NitrokeyManager.h) (C++ API). All devices' commands are listed along with packet format in [libnitrokey/stick10_commands.h](libnitrokey/stick10_commands.h) and [libnitrokey/stick20_commands.h](libnitrokey/stick20_commands.h) respectively for Nitrokey Pro and Nitrokey Storage products.
 
 # Tests
 **Warning!** Most of the tests will overwrite user data. The only user-data safe tests are specified in `unittest/test_safe.cpp` (see *C++ tests* chapter).

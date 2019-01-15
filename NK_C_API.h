@@ -747,7 +747,8 @@ extern "C" {
 	/**
 	 * Get progress value of current long operation.
 	 * Storage only
-	 * @return int in range 0-100 or -1 if device is not busy
+	 * @return int in range 0-100 or -1 if device is not busy or -2 if an
+	 *         error occured
 	 */
 	NK_C_API int NK_get_progress_bar_value();
 

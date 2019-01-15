@@ -687,6 +687,23 @@ extern "C" {
 		return 0;
   }
 
+	NK_C_API int NK_get_SD_usage_data(struct NK_SD_usage_data* out) {
+		if (out == nullptr)
+			return -1;
+		auto m = NitrokeyManager::instance();
+		auto result = get_with_status([&]() {
+			return m->get_SD_usage_data();
+		}, std::make_pair<uint8_t, uint8_t>(0, 0));
+		auto error_code = std::get<0>(result);
+		if (error_code != 0)
+			return error_code;
+
+		auto data = std::get<1>(result);
+		out->write_level_min = std::get<0>(data);
+		out->write_level_max = std::get<1>(data);
+
+		return 0;
+	}
 
 NK_C_API char* NK_get_SD_usage_data_as_string() {
 		auto m = NitrokeyManager::instance();

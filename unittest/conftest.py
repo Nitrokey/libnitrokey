@@ -33,6 +33,32 @@ def skip_if_device_version_lower_than(allowed_devices):
         pytest.skip('This device model is not applicable to run this test')
 
 
+class AtrrCallProx(object):
+    def __init__(self, C, name):
+        self.C = C
+        self.name = name
+
+    def __call__(self, *args, **kwargs):
+        print('Calling {}{}'.format(self.name, args))
+        res = self.C(*args, **kwargs)
+        res_s = res
+        try:
+            res_s = '{} => '.format(res) + '{}'.format(gs(res))
+        except Exception as e:
+            pass
+        print('Result of {}: {}'.format(self.name, res_s))
+        return res
+
+
+class AttrProxy(object):
+    def __init__(self, C, name):
+        self.C = C
+        self.name = name
+
+    def __getattr__(self, attr):
+        return AtrrCallProx(getattr(self.C, attr), attr)
+
+
 @pytest.fixture(scope="module")
 def C(request=None):
     fp = '../NK_C_API.h'
@@ -104,4 +130,5 @@ def C(request=None):
     # C.NK_set_debug(True)
     C.NK_set_debug_level(int(os.environ.get('LIBNK_DEBUG', 3)))
 
-    return C
+    return AttrProxy(C, "libnitrokey C")
+

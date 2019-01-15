@@ -24,6 +24,12 @@ import re
 
 
 def test_offline(C_offline):
+    C_offline.NK_set_debug(False)
+    C_offline.NK_set_debug_level(4)
+    assert C_offline.NK_get_major_library_version() == 3
+    assert C_offline.NK_get_minor_library_version() >= 3
+    assert C_offline.NK_login_auto() == 0
+    
     libnk_version = gs(C_offline.NK_get_library_version())
     assert libnk_version
     print(libnk_version)
@@ -31,9 +37,3 @@ def test_offline(C_offline):
     # v3.4.1-29-g1f3d
     search = re.search(b'v\d\.\d(\.\d)?', libnk_version)
     assert search is not None
-
-    C_offline.NK_set_debug(False)
-    C_offline.NK_set_debug_level(4)
-    assert C_offline.NK_get_major_library_version() == 3
-    assert C_offline.NK_get_minor_library_version() >= 3
-    assert C_offline.NK_login_auto() == 0

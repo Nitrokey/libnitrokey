@@ -21,9 +21,16 @@ SPDX-License-Identifier: LGPL-3.0
 
 import pytest
 
-from misc import ffi
+from misc import ffi, gs
 
 device_type = None
+
+from logging import getLogger, basicConfig, DEBUG
+
+basicConfig(format='* %(relativeCreated)6d %(filename)s:%(lineno)d %(message)s',level=DEBUG)
+log = getLogger('conftest')
+print = log.debug
+
 
 def skip_if_device_version_lower_than(allowed_devices):
     global device_type
@@ -33,8 +40,45 @@ def skip_if_device_version_lower_than(allowed_devices):
         pytest.skip('This device model is not applicable to run this test')
 
 
+class AtrrCallProx(object):
+    def __init__(self, C, name):
+        self.C = C
+        self.name = name
+
+    def __call__(self, *args, **kwargs):
+        print('Calling {}{}'.format(self.name, args))
+        res = self.C(*args, **kwargs)
+        res_s = res
+        try:
+            res_s = '{} => '.format(res) + '{}'.format(gs(res))
+        except Exception as e:
+            pass
+        print('Result of {}: {}'.format(self.name, res_s))
+        return res
+
+
+class AttrProxy(object):
+    def __init__(self, C, name):
+        self.C = C
+        self.name = name
+
+    def __getattr__(self, attr):
+        return AtrrCallProx(getattr(self.C, attr), attr)
+
+
+@pytest.fixture(scope="module")
+def C_offline(request=None):
+    print("Getting library without initializing connection")
+    return get_library(request, allow_offline=True)
+
+
 @pytest.fixture(scope="module")
 def C(request=None):
+    print("Getting library with connection initialized")
+    return get_library(request)
+
+
+def get_library(request, allow_offline=False):
     fp = '../NK_C_API.h'
 
     declarations = []
@@ -44,13 +88,13 @@ def C(request=None):
     cnt = 0
     a = iter(declarations)
     for declaration in a:
-        if declaration.strip().startswith('NK_C_API'):
+        if declaration.strip().startswith('NK_C_API') \
+                or declaration.strip().startswith('struct'):
             declaration = declaration.replace('NK_C_API', '').strip()
-            while ';' not in declaration:
-                declaration += (next(a)).strip()
-            # print(declaration)
+            while ');' not in declaration and '};' not in declaration:
+                declaration += (next(a)).strip()+'\n'
             ffi.cdef(declaration, override=True)
-            cnt +=1
+            cnt += 1
     print('Imported {} declarations'.format(cnt))
 
     C = None
@@ -82,12 +126,13 @@ def C(request=None):
     nk_login = C.NK_login_auto()
     if nk_login != 1:
         print('No devices detected!')
-    assert nk_login != 0  # returns 0 if not connected or wrong model or 1 when connected
-    global device_type
-    firmware_version = C.NK_get_minor_firmware_version()
-    model = 'P' if firmware_version < 20 else 'S'
-    device_type = (model, firmware_version)
-    print('Connected device: {} {}'.format(model, firmware_version))
+    if not allow_offline:
+        assert nk_login != 0  # returns 0 if not connected or wrong model or 1 when connected
+        global device_type
+        firmware_version = C.NK_get_minor_firmware_version()
+        model = 'P' if firmware_version < 20 else 'S'
+        device_type = (model, firmware_version)
+        print('Connected device: {} {}'.format(model, firmware_version))
 
     # assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # assert C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP) == DeviceErrorCode.STATUS_OK
@@ -104,4 +149,5 @@ def C(request=None):
     # C.NK_set_debug(True)
     C.NK_set_debug_level(int(os.environ.get('LIBNK_DEBUG', 3)))
 
-    return C
+    return AttrProxy(C, "libnitrokey C")
+

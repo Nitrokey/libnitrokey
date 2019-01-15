@@ -67,7 +67,18 @@ class AttrProxy(object):
 
 
 @pytest.fixture(scope="module")
+def C_offline(request=None):
+    print("Getting library without initializing connection")
+    return get_library(request, allow_offline=True)
+
+
+@pytest.fixture(scope="module")
 def C(request=None):
+    print("Getting library with connection initialized")
+    return get_library(request)
+
+
+def get_library(request, allow_offline=False):
     fp = '../NK_C_API.h'
 
     declarations = []
@@ -115,12 +126,13 @@ def C(request=None):
     nk_login = C.NK_login_auto()
     if nk_login != 1:
         print('No devices detected!')
-    assert nk_login != 0  # returns 0 if not connected or wrong model or 1 when connected
-    global device_type
-    firmware_version = C.NK_get_minor_firmware_version()
-    model = 'P' if firmware_version < 20 else 'S'
-    device_type = (model, firmware_version)
-    print('Connected device: {} {}'.format(model, firmware_version))
+    if not allow_offline:
+        assert nk_login != 0  # returns 0 if not connected or wrong model or 1 when connected
+        global device_type
+        firmware_version = C.NK_get_minor_firmware_version()
+        model = 'P' if firmware_version < 20 else 'S'
+        device_type = (model, firmware_version)
+        print('Connected device: {} {}'.format(model, firmware_version))
 
     # assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     # assert C.NK_user_authenticate(DefaultPasswords.USER, DefaultPasswords.USER_TEMP) == DeviceErrorCode.STATUS_OK

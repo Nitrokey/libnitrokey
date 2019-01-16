@@ -1,0 +1,17 @@
+# For better readability, the documentation and default settings are removed
+# from this file.  For more information on the Doxygen configuration, generate
+# a new Doxyfile using `doxygen -g` or have a look at the Doxygen manual at
+# http://www.doxygen.nl/manual/config.html
+#
+# This file is processed by CMake.  To generate the documentation, run `make
+# doc` in the build directory.
+
+PROJECT_NAME           = "@CMAKE_PROJECT_NAME@"
+PROJECT_NUMBER         = "@PROJECT_VERSION@"
+PROJECT_BRIEF          =
+OUTPUT_DIRECTORY       = doc
+STRIP_FROM_PATH        = @CMAKE_CURRENT_SOURCE_DIR@
+JAVADOC_AUTOBRIEF      = YES
+OPTIMIZE_OUTPUT_FOR_C  = YES
+WARN_NO_PARAMDOC       = YES
+INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/NK_C_API.h

@@ -33,6 +33,12 @@
 #define NK_C_API
 #endif
 
+/**
+ * \file
+ *
+ * C API for libnitrokey
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

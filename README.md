@@ -163,7 +163,7 @@ In case  no devices are connected, a friendly message will be printed.
 All available functions for C and Python are listed in [NK_C_API.h](NK_C_API.h). Please check `Documentation` section below.
 
 ## Documentation
-The documentation of C API is included in the sources (could be  generated with doxygen if requested).
+The documentation of C API is included in the sources (can be generated with `make doc` if Doxygen is installed).
 Please check [NK_C_API.h](NK_C_API.h) (C API) for high level commands and [include/NitrokeyManager.h](include/NitrokeyManager.h) (C++ API). All devices' commands are listed along with packet format in [include/stick10_commands.h](include/stick10_commands.h) and [include/stick20_commands.h](include/stick20_commands.h) respectively for Nitrokey Pro and Nitrokey Storage products.
 
 # Tests

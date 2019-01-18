@@ -395,3 +395,70 @@ def test_struct_multiline_prodtest(C):
         fwb=info_st.FirmwareVersionInternal_u8
         )
     print(info)
+
+@pytest.mark.other
+@pytest.mark.firmware
+def test_export_firmware_extended_fedora29(C):
+    """
+    Check, whether the firmware file is exported correctly, and in correct size.
+    Apparently, the auto-remounting side effect of the v0.46 change, is disturbing the export process.
+    Unmounting the UV just before the export gives the device 20/20 success rate.
+    Test case for issue https://github.com/Nitrokey/nitrokey-app/issues/399
+    """
+
+    skip_if_device_version_lower_than({'S': 43})
+    skip_if_not_fedora()
+
+    import pexpect
+    from time import sleep
+    import os
+    exist = os.path.exists
+
+    device = '/dev/sde1'
+    firmware_abs_path = '/run/media/sz/Nitrokey/firmware.bin'
+    pexpect.run(f'udisksctl mount -b {device}')
+    checks = 0
+    checks_add = 0
+
+    if exist(firmware_abs_path):
+        os.remove(firmware_abs_path)
+
+    assert not exist(firmware_abs_path)
+
+    ATTEMPTS = 20
+    for i in range(ATTEMPTS):
+        # if umount is disabled, success rate is 3/10, enabled: 10/10
+        # pexpect.run(f'udisksctl unmount -b {device}')
+        assert C.NK_export_firmware(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
+        pexpect.run(f'udisksctl mount -b {device}')
+        sleep(1)
+        firmware_file_exist = exist(firmware_abs_path)
+        if firmware_file_exist:
+            checks += 1
+            getsize = os.path.getsize(firmware_abs_path)
+            print('Firmware file exist, size: {}'.format(getsize))
+            checks_add += 1 if getsize >= 100 * 1024 else 0
+            # checks_add += 1 if os.path.getsize(firmware_abs_path) == 256*1024 else 0
+            os.remove(firmware_abs_path)
+        assert not exist(firmware_abs_path)
+
+    print('CHECK {} ; CHECK ADDITIONAL {}'.format(checks, checks_add))
+
+    assert checks == ATTEMPTS
+    assert checks_add == checks
+
+
+def skip_if_not_fedora():
+    import os
+    exist = os.path.exists
+
+    def skip():
+        pytest.skip('Fedora specific test, due to the mount path. Could be suited for Debian.')
+
+    os_release_fp = '/etc/os-release'
+    if not exist(os_release_fp):
+        skip()
+    with open(os_release_fp) as f:
+        os_release_lines = f.readlines()
+    if 'Fedora' not in os_release_lines[0]:
+        skip()

@@ -407,15 +407,15 @@ def test_export_firmware_extended_fedora29(C):
     """
 
     skip_if_device_version_lower_than({'S': 43})
-    skip_if_not_fedora()
+    skip_if_not_fedora('Fedora specific test, due to the mount path. Could be suited for Debian.')
 
     import pexpect
     from time import sleep
     import os
     exist = os.path.exists
 
-    device = '/dev/sde1'
-    firmware_abs_path = '/run/media/sz/Nitrokey/firmware.bin'
+    device = '/dev/sde1'  # FIXME autodetect the block device with udev
+    firmware_abs_path = '/run/media/sz/Nitrokey/firmware.bin'  # FIXME use the actual user name in mount path
     pexpect.run(f'udisksctl mount -b {device}')
     checks = 0
     checks_add = 0
@@ -448,12 +448,12 @@ def test_export_firmware_extended_fedora29(C):
     assert checks_add == checks
 
 
-def skip_if_not_fedora():
+def skip_if_not_fedora(message:str) -> None:
     import os
     exist = os.path.exists
 
     def skip():
-        pytest.skip('Fedora specific test, due to the mount path. Could be suited for Debian.')
+        pytest.skip(message)
 
     os_release_fp = '/etc/os-release'
     if not exist(os_release_fp):

@@ -131,8 +131,8 @@ execute_process(
 ENDIF()
 IF((NOT ${ADD_GIT_INFO}) OR (${PROJECT_VERSION_GIT_RETURN_CODE}))
 	SET(PROJECT_VERSION_GIT "unknown")
-	MESSAGE(STATUS "Setting Git library version to: " ${PROJECT_VERSION_GIT} )
 ENDIF()
+MESSAGE(STATUS "Setting Git library version to: " ${PROJECT_VERSION_GIT} )
 configure_file("version.cc.in" "version.cc" @ONLY)
 
 

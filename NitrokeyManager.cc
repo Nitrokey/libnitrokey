@@ -29,6 +29,7 @@
 #include "libnitrokey/misc.h"
 #include <mutex>
 #include "libnitrokey/cxx_semantics.h"
+#include "libnitrokey/misc.h"
 #include <functional>
 #include <stick10_commands.h>
 
@@ -105,11 +106,10 @@ using nitrokey::misc::strcpyT;
       return true;
     }
 
-    std::vector<std::string> NitrokeyManager::list_devices(){
+    std::vector<DeviceInfo> NitrokeyManager::list_devices(){
         std::lock_guard<std::mutex> lock(mex_dev_com_manager);
 
-        auto p = make_shared<Stick20>();
-        return p->enumerate(); // make static
+        return Device::enumerate();
     }
 
     std::vector<std::string> NitrokeyManager::list_devices_by_cpuID(){
@@ -127,11 +127,13 @@ using nitrokey::misc::strcpyT;
 
         LOGD1("Enumerating devices");
         std::vector<std::string> res;
-        auto d = make_shared<Stick20>();
-        const auto v = d->enumerate();
+        const auto v = Device::enumerate();
         LOGD1("Discovering IDs");
-        for (auto & p: v){
-            d = make_shared<Stick20>();
+        for (auto & i: v){
+            if (i.m_deviceModel != DeviceModel::STORAGE)
+                continue;
+            auto p = i.m_path;
+            auto d = make_shared<Stick20>();
             LOGD1( std::string("Found: ") + p );
             d->set_path(p);
             try{
@@ -215,7 +217,26 @@ using nitrokey::misc::strcpyT;
             }
         }
 
-        auto p = make_shared<Stick20>();
+        auto info_ptr = hid_enumerate(NITROKEY_VID, 0);
+        auto first_info_ptr = info_ptr;
+        if (!info_ptr)
+          return false;
+
+        misc::Option<DeviceModel> model;
+        while (info_ptr && !model.has_value()) {
+            if (path == std::string(info_ptr->path)) {
+                model = product_id_to_model(info_ptr->product_id);
+            }
+            info_ptr = info_ptr->next;
+        }
+        hid_free_enumeration(first_info_ptr);
+
+        if (!model.has_value())
+            return false;
+
+        auto p = Device::create(model.value());
+        if (!p)
+            return false;
         p->set_path(path);
 
         if(!p->connect()) return false;

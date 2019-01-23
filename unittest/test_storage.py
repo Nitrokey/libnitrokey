@@ -24,7 +24,8 @@ import pytest
 
 from conftest import skip_if_device_version_lower_than
 from constants import DefaultPasswords, DeviceErrorCode, bb
-from misc import gs, wait
+from misc import gs, wait, ffi
+
 pprint = pprint.PrettyPrinter(indent=4).pprint
 
 
@@ -367,3 +368,30 @@ def test_send_startup(C):
     skip_if_device_version_lower_than({'S': 43})
     time_seconds_from_epoch = 0 # FIXME set proper date
     assert C.NK_send_startup(time_seconds_from_epoch) == DeviceErrorCode.STATUS_OK
+
+
+@pytest.mark.other
+def test_struct_multiline_prodtest(C):
+    info_st = ffi.new('struct NK_storage_ProductionTest *')
+    if info_st is None: raise Exception('Invalid value')
+    err = C.NK_get_storage_production_info(info_st)
+    assert err == 0
+    assert info_st.SD_Card_ManufacturingYear_u8 != 0
+    assert info_st.SD_Card_ManufacturingMonth_u8 != 0
+    assert info_st.SD_Card_Size_u8 != 0
+    assert info_st.FirmwareVersion_au8[0] == 0
+    assert info_st.FirmwareVersion_au8[1] >= 50
+
+    info = 'CPU:{CPU},SC:{SC},SD:{SD},' \
+           'SCM:{SCM},SCO:{SCO},DAT:{DAT},Size:{size},Firmware:{fw} - {fwb}'.format(
+        CPU='0x{:08x}'.format(info_st.CPU_CardID_u32),
+        SC='0x{:08x}'.format(info_st.SmartCardID_u32),
+        SD='0x{:08x}'.format(info_st.SD_CardID_u32),
+        SCM='0x{:02x}'.format(info_st.SD_Card_Manufacturer_u8),
+        SCO='0x{:04x}'.format(info_st.SD_Card_OEM_u16),
+        DAT='20{}.{}'.format(info_st.SD_Card_ManufacturingYear_u8, info_st.SD_Card_ManufacturingMonth_u8),
+        size=info_st.SD_Card_Size_u8,
+        fw='{}.{}'.format(info_st.FirmwareVersion_au8[0], info_st.FirmwareVersion_au8[1]),
+        fwb=info_st.FirmwareVersionInternal_u8
+        )
+    print(info)

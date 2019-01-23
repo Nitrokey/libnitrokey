@@ -57,6 +57,29 @@ extern "C" {
             NK_STORAGE = 2
         };
 
+        /**
+	 * The connection info for a Nitrokey device as a linked list.
+	 */
+	struct NK_device_info {
+		/**
+		 * The model of the Nitrokey device.
+		 */
+		enum NK_device_model model;
+		/**
+		 * The USB device path for NK_connect_with_path.
+		 */
+		char* path;
+		/**
+		 * The serial number.
+		 */
+		char* serial_number;
+		/**
+		 * The pointer to the next element of the linked list or null
+		 * if this is the last element in the list.
+		 */
+		struct NK_device_info* next;
+	};
+
 	/**
 	 * Stores the status of a Storage device.
 	 */
@@ -127,6 +150,23 @@ extern "C" {
 		 */
 		bool stick_initialized;
         };
+
+	/**
+	 * Data about the usage of the SD card.
+	 */
+	struct NK_SD_usage_data {
+		/**
+		 * The minimum write level, as a percentage of the total card
+		 * size.
+		 */
+		uint8_t write_level_min;
+		/**
+		 * The maximum write level, as a percentage of the total card
+		 * size.
+		 */
+		uint8_t write_level_max;
+	};
+
 
    struct NK_storage_ProductionTest{
     uint8_t FirmwareVersion_au8[2];
@@ -737,6 +777,17 @@ extern "C" {
 	NK_C_API int NK_get_status_storage(struct NK_storage_status* out);
 
 	/**
+	 * Get SD card usage attributes. Usable during hidden volumes creation.
+	 * If the command was successful (return value 0), the usage data is
+	 * written to the output pointer’s target.  The output pointer must
+	 * not be null.
+	 * Storage only
+	 * @param out the output pointer for the usage data
+	 * @return command processing error code
+	 */
+	NK_C_API int NK_get_SD_usage_data(struct NK_SD_usage_data* out);
+
+	/**
 	 * Get SD card usage attributes as string.
 	 * Usable during hidden volumes creation.
 	 * Storage only
@@ -747,7 +798,8 @@ extern "C" {
 	/**
 	 * Get progress value of current long operation.
 	 * Storage only
-	 * @return int in range 0-100 or -1 if device is not busy
+	 * @return int in range 0-100 or -1 if device is not busy or -2 if an
+	 *         error occured
 	 */
 	NK_C_API int NK_get_progress_bar_value();
 
@@ -768,6 +820,19 @@ extern "C" {
  */
 	NK_C_API char* NK_list_devices_by_cpuID();
 
+	/**
+	 * Returns a linked list of all connected devices, or null if no devices
+	 * are connected or an error occured.  The linked list must be freed by
+	 * calling NK_free_device_info.
+	 * @return a linked list of all connected devices
+	 */
+	NK_C_API struct NK_device_info* NK_list_devices();
+
+	/**
+	 * Free a linked list returned by NK_list_devices.
+	 * @param the linked list to free or null
+	 */
+	NK_C_API void NK_free_device_info(struct NK_device_info* device_info);
 
 /**
  * Connects to the device with given ID. ID's list could be created with NK_list_devices_by_cpuID.
@@ -778,6 +843,14 @@ extern "C" {
  * @return 1 on successful connection, 0 otherwise
  */
 	NK_C_API int NK_connect_with_ID(const char* id);
+
+	/**
+	 * Connects to a device with the given path.  The path is a USB device
+	 * path as returned by hidapi.
+	 * @param path the device path
+	 * @return 1 on successful connection, 0 otherwise
+	 */
+        NK_C_API int NK_connect_with_path(const char* path);
 
 	/**
 	 * Blink red and green LED alternatively and infinitely (until device is reconnected).

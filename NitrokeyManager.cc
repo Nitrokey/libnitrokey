@@ -937,7 +937,7 @@ using nitrokey::misc::strcpyT;
       return false;
     }
 
-    int NitrokeyManager::get_minor_firmware_version(){
+    uint8_t NitrokeyManager::get_minor_firmware_version(){
       switch(device->get_device_model()){
         case DeviceModel::PRO:{
           auto status_p = GetStatus::CommandTransaction::run(device);
@@ -953,7 +953,7 @@ using nitrokey::misc::strcpyT;
       }
       return 0;
     }
-    int NitrokeyManager::get_major_firmware_version(){
+    uint8_t NitrokeyManager::get_major_firmware_version(){
       switch(device->get_device_model()){
         case DeviceModel::PRO:{
           auto status_p = GetStatus::CommandTransaction::run(device);

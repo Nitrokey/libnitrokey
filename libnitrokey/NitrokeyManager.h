@@ -215,7 +215,7 @@ char * strndup(const char* str, size_t maxlen);
 
       template <typename S, typename A, typename T>
         void authorize_packet(T &package, const char *admin_temporary_password, shared_ptr<Device> device);
-        int get_minor_firmware_version();
+        uint8_t get_minor_firmware_version();
 
         explicit NitrokeyManager();
         void set_log_function(std::function<void(std::string)> log_function);
@@ -278,7 +278,7 @@ char * strndup(const char* str, size_t maxlen);
        */
       void set_encrypted_volume_read_write(const char *admin_pin);
 
-      int get_major_firmware_version();
+      uint8_t get_major_firmware_version();
 
       bool is_smartcard_in_use();
 

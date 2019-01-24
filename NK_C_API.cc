@@ -27,6 +27,7 @@
 #include "libnitrokey/LibraryException.h"
 #include "libnitrokey/cxx_semantics.h"
 #include "libnitrokey/stick20_commands.h"
+#include "libnitrokey/device_proto.h"
 #include "version.h"
 
 #ifdef _MSC_VER
@@ -44,6 +45,7 @@ char * strndup(const char* str, size_t maxlen) {
 
 using namespace nitrokey;
 
+const uint8_t NK_PWS_SLOT_COUNT = PWS_SLOT_COUNT;
 static uint8_t NK_last_command_status = 0;
 static const int max_string_field_length = 100;
 

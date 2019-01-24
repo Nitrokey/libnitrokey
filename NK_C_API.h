@@ -37,6 +37,11 @@
 extern "C" {
 #endif
 
+  /**
+   * The number of slots in the password safe.
+   */
+  extern const uint8_t NK_PWS_SLOT_COUNT;
+
   static const int MAXIMUM_STR_REPLY_LENGTH = 8192;
 
         /**

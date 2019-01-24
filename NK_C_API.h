@@ -33,6 +33,58 @@
 #define NK_C_API
 #endif
 
+/**
+ * \file
+ *
+ * C API for libnitrokey
+ *
+ * \mainpage
+ *
+ * **libnitrokey** provides access to Nitrokey Pro and Nitrokey Storage devices.
+ * This documentation describes libnitrokey’s C API.  For a list of the
+ * available functions, see the NK_C_API.h file.
+ *
+ * \section getting_started Example
+ *
+ * \code{.c}
+ * #include <stdio.h>
+ * #include <stdlib.h>
+ * #include <libnitrokey/NK_C_API.h>
+ *
+ * int main(void)
+ * {
+ *         if (NK_login_auto() != 1) {
+ *                 fprintf(stderr, "No Nitrokey found.\n");
+ *                 return 1;
+ *         }
+ *
+ *         NK_device_model model = NK_get_device_model();
+ *         printf("Connected to ");
+ *         switch (model) {
+ *         case NK_PRO:
+ *                 printf("a Nitrokey Pro");
+ *                 break;
+ *         case NK_STORAGE:
+ *                 printf("a Nitrokey Storage");
+ *                 break;
+ *         default:
+ *                 printf("an unsupported Nitrokey");
+ *                 break;
+ *         }
+ *
+ *         char* serial_number = NK_device_serial_number();
+ *         if (serial_number)
+ *             printf(" with serial number %s\n", serial_number);
+ *         else
+ *             printf(" -- could not query serial number!\n");
+ *         free(serial_number);
+ *
+ *         NK_logout();
+ *         return 0;
+ * }
+ * \endcode
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

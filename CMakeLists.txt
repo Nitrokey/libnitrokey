@@ -233,3 +233,12 @@ set (CPACK_RESOURCE_FILE_LICENSE
         "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set (CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 include (CPack)
+
+# Build Doxygen documentation for the C API
+find_package(Doxygen)
+if (DOXYGEN_FOUND)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+    add_custom_target(doc ${DOXYGEN_EXECUTABLE} Doxyfile
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Generating C API documentation with Doxygen" VERBATIM)
+endif(DOXYGEN_FOUND)

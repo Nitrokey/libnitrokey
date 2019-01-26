@@ -409,14 +409,36 @@ def test_export_firmware_extended_fedora29(C):
     skip_if_device_version_lower_than({'S': 43})
     skip_if_not_fedora('Fedora specific test, due to the mount path. Could be suited for Debian.')
 
-    import pexpect
     from time import sleep
     import os
     from os.path import exists as exist
+    import re
+    try:
+        import pyudev as pu
+        import pexpect
+    except:
+        pytest.skip('Skipping due to missing required packages: pyudev and pexpect.')
 
-    device = '/dev/sde1'  # FIXME autodetect the block device with udev
-    firmware_abs_path = '/run/media/sz/Nitrokey/firmware.bin'  # FIXME use the actual user name in mount path
-    pexpect.run(f'udisksctl mount -b {device}')
+    ctx = pu.Context()
+    devices = ctx.list_devices(subsystem='block', ID_VENDOR='Nitrokey')
+    device = None
+    for d in devices:
+        if d.device_type == 'partition':
+            device = '/dev/{}'.format(d.sys_name)
+            break
+    assert device, 'Device could not be found'
+
+    pexpect.run(f'udisksctl unmount -b {device}').decode()
+    sleep(1)
+    _res = pexpect.run(f'udisksctl mount -b {device}').decode()
+    firmware_abs_path = re.findall('at (/.*)\.', _res)
+    assert firmware_abs_path, 'Cannot get mount point'
+    firmware_abs_path = firmware_abs_path[0]
+
+    print('path: {}, device: {}'.format(firmware_abs_path, device))
+    assert firmware_abs_path, 'Cannot get mount point'
+    firmware_abs_path = firmware_abs_path + '/firmware.bin'
+
     checks = 0
     checks_add = 0
 
@@ -428,7 +450,7 @@ def test_export_firmware_extended_fedora29(C):
     ATTEMPTS = 20
     for i in range(ATTEMPTS):
         # if umount is disabled, success rate is 3/10, enabled: 10/10
-        # pexpect.run(f'udisksctl unmount -b {device}')
+        pexpect.run(f'udisksctl unmount -b {device}')
         assert C.NK_export_firmware(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
         pexpect.run(f'udisksctl mount -b {device}')
         sleep(1)

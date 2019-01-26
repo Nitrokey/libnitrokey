@@ -407,7 +407,7 @@ def test_export_firmware_extended_fedora29(C):
     """
 
     skip_if_device_version_lower_than({'S': 43})
-    skip_if_not_fedora('Fedora specific test, due to the mount path. Could be suited for Debian.')
+    skip_if_not_fedora('Tested on Fedora only. To check on other distros.')
 
     from time import sleep
     import os

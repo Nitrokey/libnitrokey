@@ -484,6 +484,7 @@ def test_export_firmware_extended_macos(C):
     import plistlib
 
     usb_devices = pexpect.run('system_profiler -xml SPUSBDataType')
+    assert b'Nitrokey' in usb_devices, 'No Nitrokey devices connected'
     usb_devices_parsed = plistlib.loads(usb_devices)
 
     assert isinstance(usb_devices_parsed, list), 'usb_devices_parsed has unexpected type'
@@ -520,6 +521,7 @@ def test_export_firmware_extended_macos(C):
     assert 'mount_point' in volume, 'could not get mount point'
     firmware_abs_path = volume['mount_point'] + '/firmware.bin'
     checks = 0
+    print('path: {}, device: {}'.format(firmware_abs_path, device))
     checks_add = 0
 
     if exist(firmware_abs_path):

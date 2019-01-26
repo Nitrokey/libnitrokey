@@ -499,13 +499,16 @@ def test_export_firmware_extended_macos(C):
     device_item = None
 
     for item in devices:
+        if '_items' in item:
+            # Fix for macOS 10.13.6, Python 3.6.2
+            item = item['_items'][0]
         if 'manufacturer' in item and item['manufacturer'] == 'Nitrokey':
             device_item = item
 
     # Try to get first volume of USB device
     try:
         volume = device_item['Media'][0]['volumes'][0]
-    except KeyError:
+    except (KeyError, TypeError):
         volume = None
 
     assert volume is not None, 'could not determine volume'

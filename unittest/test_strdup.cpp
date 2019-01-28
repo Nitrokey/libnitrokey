@@ -34,7 +34,7 @@ static const int SHORT_STRING_LENGTH = 10;
 TEST_CASE("Test strdup memory free error", "[BASIC]")
 {
   NK_set_debug(false);
-  char *c = NK_status(); /* error --> string literal */
+  char *c = NK_get_status_as_string(); /* error --> string literal */
   REQUIRE(c != nullptr);
   REQUIRE(strnlen(c, SHORT_STRING_LENGTH) == 0);
   puts(c);
@@ -48,7 +48,7 @@ TEST_CASE("Test strdup memory leak", "[BASIC]")
   if (!connected) return;
 
   REQUIRE(connected);
-  char *c = NK_status();  /* no error --> dynamically allocated */
+  char *c = NK_get_status_as_string();  /* no error --> dynamically allocated */
   REQUIRE(c != nullptr);
   REQUIRE(strnlen(c, SHORT_STRING_LENGTH) > 0);
   puts(c);

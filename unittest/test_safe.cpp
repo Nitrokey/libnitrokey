@@ -60,7 +60,7 @@ TEST_CASE("Status command for Pro or Storage", "[BASIC]") {
     auto const m = NK_get_device_model();
     REQUIRE(m != NK_DISCONNECTED);
     if (m == NK_PRO)
-        s = NK_status();
+        s = NK_get_status_as_string();
     else if (m == NK_STORAGE){
         s = NK_get_status_storage_as_string();
     }

@@ -117,7 +117,7 @@ TEST_CASE("Use C API", "[BASIC]") {
     while (ptr) {
       std::cout << "Connect with: " << ptr->model << " " << ptr->path << " "
         << ptr->serial_number << " | " << NK_connect_with_path(ptr->path) << " | ";
-      auto status = NK_status();
+      auto status = NK_get_status_as_string();
       std::cout << status << std::endl;
       free(status);
       ptr = ptr->next;

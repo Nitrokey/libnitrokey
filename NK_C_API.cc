@@ -252,6 +252,10 @@ extern "C" {
 
 
 	NK_C_API char * NK_status() {
+		return NK_get_status_as_string();
+	}
+
+	NK_C_API char * NK_get_status_as_string() {
 		auto m = NitrokeyManager::instance();
 		return get_with_string_result([&]() {
 			string && s = m->get_status_as_string();

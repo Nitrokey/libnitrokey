@@ -353,10 +353,20 @@ extern "C" {
 	NK_C_API enum NK_device_model NK_get_device_model();
 
 	/**
-	 * Return the debug status string. Debug purposes.
-	 * @return command processing error code
+	 * Return the debug status string. Debug purposes.  This function is
+	 * deprecated in favor of NK_get_status_as_string.
+	 * @return string representation of the status or an empty string
+	 *         if the command failed
 	 */
+	DEPRECATED
 	NK_C_API char * NK_status();
+
+	/**
+	 * Return the debug status string. Debug purposes.
+	 * @return string representation of the status or an empty string
+	 *         if the command failed
+	 */
+	NK_C_API char * NK_get_status_as_string();
 
 	/**
 	 * Get the stick status common to all Nitrokey devices and return the

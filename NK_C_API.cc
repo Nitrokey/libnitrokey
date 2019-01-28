@@ -261,6 +261,30 @@ extern "C" {
 		});
 	}
 
+	NK_C_API int NK_get_status(struct NK_status* out) {
+		if (out == nullptr) {
+			return -1;
+		}
+		auto m = NitrokeyManager::instance();
+		auto result = get_with_status([&]() {
+			return m->get_status();
+		}, proto::stick10::GetStatus::ResponsePayload());
+		auto error_code = std::get<0>(result);
+		if (error_code != 0) {
+			return error_code;
+		}
+
+		auto status = std::get<1>(result);
+		out->firmware_version_major = status.firmware_version_st.major;
+		out->firmware_version_minor = status.firmware_version_st.minor;
+		out->serial_number_smart_card = status.card_serial_u32;
+		out->config_numlock = status.numlock;
+		out->config_capslock = status.capslock;
+		out->config_scrolllock = status.scrolllock;
+		out->otp_user_password = status.enable_user_password != 0;
+		return 0;
+	}
+
 	NK_C_API char * NK_device_serial_number() {
 		auto m = NitrokeyManager::instance();
 		return get_with_string_result([&]() {

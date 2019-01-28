@@ -1,0 +1,53 @@
+#
+# Copyright (c) 2015-2019 Nitrokey UG
+#
+# This file is part of libnitrokey.
+#
+# libnitrokey is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# libnitrokey is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with libnitrokey. If not, see <http://www.gnu.org/licenses/>.
+#
+# SPDX-License-Identifier: LGPL-3.0
+#
+
+
+# this udev file should be used with udev 188 and newer
+ACTION!="add|change", GOTO="u2f_end"
+
+# Nitrokey U2F
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="2581", ATTRS{idProduct}=="f1d0", MODE="0664", GROUP+="plugdev"
+# Nitrokey FIDO U2F
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="4287", MODE="0660", GROUP+="plugdev"
+
+LABEL="u2f_end"
+
+
+SUBSYSTEM!="usb", GOTO="gnupg_rules_end"
+ACTION!="add", GOTO="gnupg_rules_end"
+
+# USB SmartCard Readers
+## Crypto Stick 1.2
+ATTR{idVendor}=="20a0", ATTR{idProduct}=="4107", ENV{ID_SMARTCARD_READER}="1", ENV{ID_SMARTCARD_READER_DRIVER}="gnupg", GROUP+="plugdev", TAG+="uaccess"
+## Nitrokey Pro
+ATTR{idVendor}=="20a0", ATTR{idProduct}=="4108", ENV{ID_SMARTCARD_READER}="1", ENV{ID_SMARTCARD_READER_DRIVER}="gnupg", GROUP+="plugdev", TAG+="uaccess"
+## Nitrokey Storage
+ATTR{idVendor}=="20a0", ATTR{idProduct}=="4109", ENV{ID_SMARTCARD_READER}="1", ENV{ID_SMARTCARD_READER_DRIVER}="gnupg", GROUP+="plugdev", TAG+="uaccess"
+## Nitrokey Start
+ATTR{idVendor}=="20a0", ATTR{idProduct}=="4211", ENV{ID_SMARTCARD_READER}="1", ENV{ID_SMARTCARD_READER_DRIVER}="gnupg", GROUP+="plugdev", TAG+="uaccess"
+## Nitrokey HSM
+ATTR{idVendor}=="20a0", ATTR{idProduct}=="4230", ENV{ID_SMARTCARD_READER}="1", ENV{ID_SMARTCARD_READER_DRIVER}="gnupg", GROUP+="plugdev", TAG+="uaccess"
+
+LABEL="gnupg_rules_end"
+
+
+# Nitrokey Storage dev Entry
+KERNEL=="sd?1", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="4109", SYMLINK+="nitrospace"

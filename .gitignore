@@ -2,6 +2,7 @@
 *.log
 *.o
 unittest/build/
+unittest/.pytest_cache/
 *.pyc
 core
 .cache/

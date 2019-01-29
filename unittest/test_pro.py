@@ -674,10 +674,22 @@ def test_factory_reset(C):
 
 
 @pytest.mark.status
-def test_get_status(C):
-    status = C.NK_status()
+def test_get_status_as_string(C):
+    status = C.NK_get_status_as_string()
     s = gs(status)
     assert len(s) > 0
+
+
+@pytest.mark.status
+def test_get_status(C):
+    status_st = ffi.new('struct NK_status *')
+    if not status_st:
+        raise Exception("Could not allocate status")
+    err = C.NK_get_status(status_st)
+    assert err == 0
+    assert status_st.firmware_version_major == 0
+    assert status_st.firmware_version_minor != 0
+
 
 @pytest.mark.status
 def test_get_serial_number(C):

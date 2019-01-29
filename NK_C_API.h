@@ -138,6 +138,47 @@ extern "C" {
 	};
 
 	/**
+	 * Stores the common device status for all Nitrokey devices.
+	 */
+	struct NK_status {
+		/**
+		 * The major firmware version, e. g. 0 in v0.40.
+		 */
+		uint8_t firmware_version_major;
+		/**
+		 * The minor firmware version, e. g. 40 in v0.40.
+		 */
+		uint8_t firmware_version_minor;
+		/**
+		 * The serial number of the smart card.
+		 */
+		uint32_t serial_number_smart_card;
+		/**
+		 * The HOTP slot to generate a password from if the numlock
+		 * key is pressed twice (slot 0-1, or any other value to
+		 * disable the function).
+		 */
+		uint8_t config_numlock;
+		/**
+		 * The HOTP slot to generate a password from if the capslock
+		 * key is pressed twice (slot 0-1, or any other value to
+		 * disable the function).
+		 */
+		uint8_t config_capslock;
+		/**
+		 * The HOTP slot to generate a password from if the scrolllock
+		 * key is pressed twice (slot 0-1, or any other value to
+		 * disable the function).
+		 */
+		uint8_t config_scrolllock;
+		/**
+		 * Indicates whether the user password is required to generate
+		 * an OTP value.
+		 */
+		bool otp_user_password;
+	};
+
+	/**
 	 * Stores the status of a Storage device.
 	 */
         struct NK_storage_status {
@@ -312,10 +353,31 @@ extern "C" {
 	NK_C_API enum NK_device_model NK_get_device_model();
 
 	/**
+	 * Return the debug status string. Debug purposes.  This function is
+	 * deprecated in favor of NK_get_status_as_string.
+	 * @return string representation of the status or an empty string
+	 *         if the command failed
+	 */
+	DEPRECATED
+	NK_C_API char * NK_status();
+
+	/**
 	 * Return the debug status string. Debug purposes.
+	 * @return string representation of the status or an empty string
+	 *         if the command failed
+	 */
+	NK_C_API char * NK_get_status_as_string();
+
+	/**
+	 * Get the stick status common to all Nitrokey devices and return the
+	 * command processing error code.  If the code is zero, i. e. the
+	 * command was successful, the storage status is written to the output
+	 * pointer's target.  The output pointer must not be null.
+	 *
+	 * @param out the output pointer for the status
 	 * @return command processing error code
 	 */
-	NK_C_API char * NK_status();
+	NK_C_API int NK_get_status(struct NK_status* out);
 
 	/**
 	 * Return the device's serial number string in hex.

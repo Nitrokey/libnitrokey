@@ -19,8 +19,10 @@
 # SPDX-License-Identifier: LGPL-3.0
 #
 
-
-# this udev file should be used with udev 188 and newer
+# Here rules in new style should be provided. Matching devices should be tagged with 'uaccess'.
+# File prefix number should be lower than 73, to be correctly processed by the Udev.
+# Recommended udev version: >= 188.
+#
 ACTION!="add|change", GOTO="u2f_end"
 
 # Nitrokey U2F

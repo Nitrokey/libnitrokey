@@ -556,8 +556,12 @@ using nitrokey::misc::strcpyT;
           break;
         }
         case DeviceModel::STORAGE: {
-          string counter = to_string(hotp_counter);
-          strcpyT(payload.slot_counter_s, counter.c_str());
+          if (get_minor_firmware_version() <= 53) {
+            string counter = to_string(hotp_counter);
+            strcpyT(payload.slot_counter_s, counter.c_str());
+          } else {
+            payload.slot_counter = hotp_counter;
+          }
           break;
         }
         default:

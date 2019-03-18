@@ -906,16 +906,16 @@ using nitrokey::misc::strcpyT;
       //authorization command is supported for versions equal or below:
         auto m = std::unordered_map<DeviceModel , int, EnumClassHash>({
                                                {DeviceModel::PRO, 7},
-                                               {DeviceModel::STORAGE, 999},
+                                               {DeviceModel::STORAGE, 53},
          });
         return get_minor_firmware_version() <= m[device->get_device_model()];
     }
 
     bool NitrokeyManager::is_320_OTP_secret_supported(){
-      //authorization command is supported for versions equal or below:
+        // 320 bit OTP secret is supported by version bigger or equal to:
         auto m = std::unordered_map<DeviceModel , int, EnumClassHash>({
                                                {DeviceModel::PRO, 8},
-                                               {DeviceModel::STORAGE, 999},
+                                               {DeviceModel::STORAGE, 54},
          });
         return get_minor_firmware_version() >= m[device->get_device_model()];
     }

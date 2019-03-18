@@ -709,7 +709,7 @@ def test_OTP_secret_started_from_null(C, secret):
     skip_if_device_version_lower_than({'S': 43, 'P': 8})
     if len(secret) > 40:
         # feature: 320 bit long secret handling
-        skip_if_device_version_lower_than({'P': 8})
+        skip_if_device_version_lower_than({'P': 8, 'S': 54})
 
     oath = pytest.importorskip("oath")
     lib_at = lambda t: bb(oath.hotp(secret, t, format='dec6'))
@@ -741,8 +741,8 @@ def test_HOTP_slots_read_write_counter(C, counter):
     :param counter:
     """
     if counter >= 1e7:
-        # Storage does not handle counters longer than 7 digits
-        skip_if_device_version_lower_than({'P': 7})
+        # Storage v0.53 and below does not handle counters longer than 7 digits
+        skip_if_device_version_lower_than({'P': 7, 'S': 54})
 
     secret = RFC_SECRET
     oath = pytest.importorskip("oath")
@@ -804,8 +804,8 @@ def test_TOTP_secrets(C, secret):
     skip_if_device_version_lower_than({'S': 44, 'P': 8})
 
     if len(secret)>20*2: #*2 since secret is in hex
-        # pytest.skip("Secret lengths over 20 bytes are not supported by NK Pro 0.7 and NK Storage")
-        skip_if_device_version_lower_than({'P': 8})
+        # pytest.skip("Secret lengths over 20 bytes are not supported by NK Pro 0.7 and NK Storage v0.53 and older")
+        skip_if_device_version_lower_than({'P': 8, 'S': 54})
     slot_number = 0
     time = 0
     period = 30
@@ -836,7 +836,7 @@ def test_HOTP_secrets(C, secret):
     feature needed: support for 320bit secrets
     """
     if len(secret)>40:
-        skip_if_device_version_lower_than({'P': 8})
+        skip_if_device_version_lower_than({'P': 8, 'S': 54})
 
     slot_number = 0
     counter = 0

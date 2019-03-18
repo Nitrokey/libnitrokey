@@ -23,7 +23,7 @@ import pytest
 
 from conftest import skip_if_device_version_lower_than
 from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET, bb, bbRFC_SECRET
-from misc import ffi, gs, wait, cast_pointer_to_tuple
+from misc import ffi, gs, wait, cast_pointer_to_tuple, has_binary_counter
 from misc import is_pro_rtm_07, is_pro_rtm_08, is_storage
 
 @pytest.mark.lock_device
@@ -409,7 +409,7 @@ def test_HOTP_counters(C):
 INT32_MAX = 2 ** 31 - 1
 @pytest.mark.otp
 def test_HOTP_64bit_counter(C):
-    if is_storage(C):
+    if not has_binary_counter(C):
         pytest.xfail('bug in NK Storage HOTP firmware - counter is set with a 8 digits string, '
                      'however int32max takes 10 digits to be written')
     oath = pytest.importorskip("oath")
@@ -434,7 +434,7 @@ def test_HOTP_64bit_counter(C):
 
 @pytest.mark.otp
 def test_TOTP_64bit_time(C):
-    if is_storage(C):
+    if not has_binary_counter(C):
         pytest.xfail('bug in NK Storage TOTP firmware')
     oath = pytest.importorskip("oath")
     T = 1

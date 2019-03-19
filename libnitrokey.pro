@@ -7,7 +7,7 @@ CONFIG   += c++14 shared debug
 TEMPLATE     = lib
 TARGET = nitrokey
 
-VERSION = 3.4.1
+VERSION = 3.5.0
 QMAKE_TARGET_COMPANY = Nitrokey
 QMAKE_TARGET_PRODUCT = libnitrokey
 QMAKE_TARGET_DESCRIPTION = Communicate with Nitrokey stick devices in a clean and easy manner

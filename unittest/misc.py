@@ -67,4 +67,8 @@ def is_storage(C):
 
 
 def is_long_OTP_secret_handled(C):
-    return is_pro_rtm_08(C) or is_storage(C) and get_devices_firmware_version(C) > 43
+    return is_pro_rtm_08(C) or is_storage(C) and get_devices_firmware_version(C) >= 54
+
+
+def has_binary_counter(C):
+    return is_pro_rtm_07(C) or is_storage(C) and get_devices_firmware_version(C) >= 54

@@ -28,7 +28,7 @@
 #include "libnitrokey/cxx_semantics.h"
 #include "libnitrokey/stick20_commands.h"
 #include "libnitrokey/device_proto.h"
-#include "version.h"
+#include "libnitrokey/version.h"
 
 #ifdef _MSC_VER
 #ifdef _WIN32

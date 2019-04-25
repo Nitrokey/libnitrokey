@@ -171,7 +171,7 @@ OPTION(COMPILE_OFFLINE_TESTS "Compile offline tests" FALSE)
 IF(COMPILE_OFFLINE_TESTS OR COMPILE_TESTS)
     find_package(PkgConfig)
     IF(PKG_CONFIG_FOUND)
-        pkg_check_modules(CATCH2 catch)
+        pkg_check_modules(CATCH2 catch2)
     ENDIF()
 
     if (CATCH2_FOUND)

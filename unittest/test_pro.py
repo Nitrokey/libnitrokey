@@ -947,10 +947,12 @@ def test_bootloader_password_change_pro(C):
 
     assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE, DefaultPasswords.UPDATE_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE_TEMP, DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK
-
+    # FIXME add tests for maximum password length
+    
 
 @pytest.mark.firmware
 def test_bootloader_run_pro(C):
     assert C.NK_enable_firmware_update_pro(DefaultPasswords.UPDATE_TEMP) == DeviceErrorCode.WRONG_PASSWORD
     # Not enabled due to lack of side-effect removal at this point
     # assert C.NK_enable_firmware_update_pro(DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK
+    # FIXME add tests for maximum password length

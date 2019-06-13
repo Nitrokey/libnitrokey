@@ -41,6 +41,8 @@ def test_too_long_strings(C):
                                 long_string) == LibraryErrors.TOO_LONG_STRING
     assert gs(C.NK_get_hotp_code_PIN(0, long_string)) == b""
     assert C.NK_get_last_command_status() == LibraryErrors.TOO_LONG_STRING
+    assert C.NK_change_firmware_password_pro(long_string, long_string) == LibraryErrors.TOO_LONG_STRING
+    assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE, long_string) == LibraryErrors.TOO_LONG_STRING
 
 
 def test_invalid_slot(C):

@@ -865,6 +865,23 @@ NK_C_API char* NK_get_SD_usage_data_as_string() {
 		});
 	}
 
+  NK_C_API int NK_enable_firmware_update_pro(const char* update_password){
+    auto m = NitrokeyManager::instance();
+    return get_without_result([&]() {
+      m->enable_firmware_update_pro(update_password);
+  });
+}
+
+  NK_C_API int NK_change_firmware_password_pro(const char *current_firmware_password, const char *new_firmware_password) {
+    auto m = NitrokeyManager::instance();
+    return get_without_result([&]() {
+      m->change_firmware_update_password_pro(current_firmware_password,
+                                             new_firmware_password);
+    });
+  }
+
+
+
 #ifdef __cplusplus
 }
 #endif

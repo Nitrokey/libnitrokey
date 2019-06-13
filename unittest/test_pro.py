@@ -939,3 +939,18 @@ def test_TOTP_codes_from_nitrokeyapp(secret, C):
 def test_get_device_model(C):
     assert C.NK_get_device_model() != 0
     # assert C.NK_get_device_model() != C.NK_DISCONNECTED
+
+
+@pytest.mark.firmware
+def test_bootloader_password_change_pro(C):
+    assert C.NK_change_firmware_password_pro(b'zxcasd', b'zxcasd') == DeviceErrorCode.WRONG_PASSWORD
+
+    assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE, DefaultPasswords.UPDATE_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE_TEMP, DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK
+
+
+@pytest.mark.firmware
+def test_bootloader_run_pro(C):
+    assert C.NK_enable_firmware_update_pro(DefaultPasswords.UPDATE_TEMP) == DeviceErrorCode.WRONG_PASSWORD
+    # Not enabled due to lack of side-effect removal at this point
+    # assert C.NK_enable_firmware_update_pro(DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK

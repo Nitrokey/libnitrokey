@@ -977,6 +977,24 @@ extern "C" {
 	 */
 	NK_C_API int NK_wink();
 
+
+	/**
+	 * Enable update mode on Nitrokey Pro.
+	 * Supported from v0.11.
+	 * @param update_password 20 bytes update password
+   * @return command processing error code
+	 */
+	NK_C_API int NK_enable_firmware_update_pro(const char* update_password);
+
+  /**
+   * Change update-mode password on Nitrokey Pro.
+   * Supported from v0.11.
+   * @param current_firmware_password 20 bytes update password
+   * @param new_firmware_password 20 bytes update password
+   * @return command processing error code
+   */
+  NK_C_API int NK_change_firmware_password_pro(const char *current_firmware_password, const char *new_firmware_password);
+
 #ifdef __cplusplus
 }
 #endif

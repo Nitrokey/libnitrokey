@@ -295,6 +295,10 @@ char * strndup(const char* str, size_t maxlen);
       void wink();
 
       stick20::ProductionTest::ResponsePayload production_info();
+
+      void enable_firmware_update_pro(const char *firmware_pin);
+
+      void change_firmware_update_password_pro(const char *firmware_pin_current, const char *firmware_pin_new);
     };
 }
 

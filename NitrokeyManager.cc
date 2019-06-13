@@ -1167,4 +1167,18 @@ using nitrokey::misc::strcpyT;
     return data.data();
   };
 
+  void NitrokeyManager::enable_firmware_update_pro(const char *firmware_pin) {
+    auto p = get_payload<FirmwareUpdate>();
+    strcpyT(p.firmware_password, firmware_pin);
+    FirmwareUpdate::CommandTransaction::run(device, p);
+  }
+
+  void
+  NitrokeyManager::change_firmware_update_password_pro(const char *firmware_pin_current, const char *firmware_pin_new) {
+    auto p = get_payload<FirmwarePasswordChange>();
+    strcpyT(p.firmware_password_current, firmware_pin_current);
+    strcpyT(p.firmware_password_new, firmware_pin_new);
+    FirmwarePasswordChange::CommandTransaction::run(device, p);
+  }
+
 }

@@ -67,7 +67,8 @@ private:
       oss << std::hex << std::setw(sizeof(value)*2) << std::setfill('0') << value;
       return oss.str();
     }
-
+    
+#define FIELD_WIDTH_MAX   (100)
   /**
    * Copies string from pointer to fixed size C-style array. Src needs to be a valid C-string - eg. ended with '\0'.
    * Throws when source is bigger than destination.
@@ -82,12 +83,13 @@ private:
 //            throw EmptySourceStringException(slot_number);
             return;
         const size_t s_dest = sizeof dest;
-        LOG(std::string("strcpyT sizes dest src ")
-                                       +std::to_string(s_dest)+ " "
-                                       +std::to_string(strlen(src))+ " "
-            ,nitrokey::log::Loglevel::DEBUG_L2);
-        if (strlen(src) > s_dest){
-            throw TooLongStringException(strlen(src), s_dest, src);
+    const size_t src_strlen = strnlen(src, FIELD_WIDTH_MAX);
+    LOG(std::string("strcpyT sizes dest src ")
+        + std::to_string(s_dest) + " "
+        + std::to_string(src_strlen) + " "
+            , nitrokey::log::Loglevel::DEBUG_L2);
+        if (src_strlen > s_dest){
+            throw TooLongStringException(src_strlen, s_dest, src);
         }
         strncpy((char*) &dest, src, s_dest);
     }

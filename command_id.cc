@@ -71,6 +71,10 @@ const char *commandid_to_string(CommandID id) {
       return "CHANGE_USER_PIN";
     case CommandID::CHANGE_ADMIN_PIN:
       return "CHANGE_ADMIN_PIN";
+    case CommandID::FIRMWARE_UPDATE:
+      return "FIRMWARE_UPDATE";
+    case CommandID::FIRMWARE_PASSWORD_CHANGE:
+      return "FIRMWARE_PASSWORD_CHANGE";
 
     case CommandID::ENABLE_CRYPTED_PARI:
       return "ENABLE_CRYPTED_PARI";

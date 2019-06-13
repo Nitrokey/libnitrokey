@@ -22,7 +22,7 @@ SPDX-License-Identifier: LGPL-3.0
 import pytest
 
 from conftest import skip_if_device_version_lower_than
-from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET, bb, bbRFC_SECRET
+from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET, bb, bbRFC_SECRET, LibraryErrors
 from misc import ffi, gs, wait, cast_pointer_to_tuple, has_binary_counter
 from misc import is_pro_rtm_07, is_pro_rtm_08, is_storage
 
@@ -939,3 +939,28 @@ def test_TOTP_codes_from_nitrokeyapp(secret, C):
 def test_get_device_model(C):
     assert C.NK_get_device_model() != 0
     # assert C.NK_get_device_model() != C.NK_DISCONNECTED
+
+
+@pytest.mark.firmware
+def test_bootloader_password_change_pro(C):
+    skip_if_device_version_lower_than({'P': 11})
+    assert C.NK_change_firmware_password_pro(b'zxcasd', b'zxcasd') == DeviceErrorCode.WRONG_PASSWORD
+
+    assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE, DefaultPasswords.UPDATE_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE_TEMP, DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK
+
+
+@pytest.mark.firmware
+def test_bootloader_run_pro(C):
+    skip_if_device_version_lower_than({'P': 11})
+    assert C.NK_enable_firmware_update_pro(DefaultPasswords.UPDATE_TEMP) == DeviceErrorCode.WRONG_PASSWORD
+    # Not enabled due to lack of side-effect removal at this point
+    # assert C.NK_enable_firmware_update_pro(DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK
+
+
+@pytest.mark.firmware
+def test_bootloader_password_change_pro_too_long(C):
+    skip_if_device_version_lower_than({'P': 11})
+    long_string = b'a' * 100
+    assert C.NK_change_firmware_password_pro(long_string, long_string) == LibraryErrors.TOO_LONG_STRING
+    assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE, long_string) == LibraryErrors.TOO_LONG_STRING

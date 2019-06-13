@@ -882,6 +882,41 @@ class BuildAESKey : Command<CommandID::NEW_AES_KEY> {
 
 };
 
+class FirmwareUpdate : Command<CommandID::FIRMWARE_UPDATE> {
+public:
+  struct CommandPayload {
+    uint8_t firmware_password[20];
+    std::string dissect() const {
+      std::stringstream ss;
+      print_to_ss_volatile(firmware_password);
+      return ss.str();
+      }
+  } __packed;
+
+  typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+    CommandTransaction;
+
+};
+
+class FirmwarePasswordChange : Command<CommandID::FIRMWARE_PASSWORD_CHANGE> {
+public:
+  struct CommandPayload {
+    uint8_t firmware_password_current[20];
+    uint8_t firmware_password_new[20];
+    std::string dissect() const {
+      std::stringstream ss;
+      print_to_ss_volatile(firmware_password_current);
+      print_to_ss_volatile(firmware_password_new);
+      return ss.str();
+    }
+  } __packed;
+
+  typedef Transaction<command_id(), struct CommandPayload, struct EmptyPayload>
+    CommandTransaction;
+
+};
+
+
 }
 }
 }

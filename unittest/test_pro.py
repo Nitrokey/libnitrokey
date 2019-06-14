@@ -432,26 +432,41 @@ def test_HOTP_64bit_counter(C):
     assert dev_res == lib_res
 
 
-@pytest.mark.otp
-def test_TOTP_64bit_time(C):
-    if not has_binary_counter(C):
-        pytest.xfail('bug in NK Storage TOTP firmware')
-    oath = pytest.importorskip("oath")
-    T = 1
-    lib_at = lambda t: bb(oath.totp(RFC_SECRET, t=t))
+def helper_set_TOTP_test_slot(C, slot_number):
     PIN_protection = False
-    slot_number = 1
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
                              DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_totp_slot(slot_number, b'python_test', bbRFC_SECRET, 30, False, False, False, b'',
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+
+
+def helper_set_time_on_device(C, t):
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_totp_set_time(t) == DeviceErrorCode.STATUS_OK
+
+
+@pytest.mark.otp
+@pytest.mark.parametrize("t_values",[
+        range(INT32_MAX - 5, INT32_MAX + 5, 1),
+        [2**31, 2**32, 2**33, 2**34, 2**40, 2**50, 2**60],
+        pytest.param([2**61-1, 2**62-1, 2**63-1, 2**64-1], marks=pytest.mark.xfail),
+    ])
+def test_TOTP_64bit_time(C, t_values):
+    if not has_binary_counter(C):
+        pytest.xfail('bug in NK Storage TOTP firmware')
+    oath = pytest.importorskip("oath")
+    T = 1
+    slot_number = 1
+    lib_at = lambda t: bb(oath.totp(RFC_SECRET, t=t))
+
+    helper_set_TOTP_test_slot(C, slot_number)
+
     dev_res = []
     lib_res = []
-    for t in range(INT32_MAX - 5, INT32_MAX + 5, 1):
-        assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-        assert C.NK_totp_set_time(t) == DeviceErrorCode.STATUS_OK
+    for t in t_values:
+        helper_set_time_on_device(C, t)
         code_device = gs((C.NK_get_totp_code(slot_number, T, 0, 30)))
         dev_res += (t, code_device)
         lib_res += (t, lib_at(t))

@@ -130,7 +130,8 @@ def get_library(request, allow_offline=False):
         assert nk_login != 0  # returns 0 if not connected or wrong model or 1 when connected
         global device_type
         firmware_version = C.NK_get_minor_firmware_version()
-        model = 'P' if firmware_version < 20 else 'S'
+        model = C.NK_get_device_model()
+        model = 'P' if model == 1 else 'S' if model == 2 else 'U'
         device_type = (model, firmware_version)
         print('Connected device: {} {}'.format(model, firmware_version))
 

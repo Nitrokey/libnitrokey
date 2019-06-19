@@ -443,6 +443,7 @@ using nitrokey::misc::strcpyT;
       return "";
     }
 
+    bool NitrokeyManager::is_internal_hotp_slot_number(uint8_t slot_number) const { return slot_number < 0x20; }
     bool NitrokeyManager::is_valid_hotp_slot_number(uint8_t slot_number) const { return slot_number < 3; }
     bool NitrokeyManager::is_valid_totp_slot_number(uint8_t slot_number) const { return slot_number < 0x10-1; } //15
     uint8_t NitrokeyManager::get_internal_slot_number_for_totp(uint8_t slot_number) const { return (uint8_t) (0x20 + slot_number); }
@@ -1120,11 +1121,31 @@ using nitrokey::misc::strcpyT;
     return get_TOTP_code(slot_number, 0, 0, 0, user_temporary_password);
   }
 
+  /**
+   * Returns ReadSlot structure, describing OTP slot configuration. Always return binary counter -
+   * does the necessary conversion, if needed, to unify the behavior across Pro and Storage.
+   * @private For internal use only
+   * @param slot_number which OTP slot to use (usual format)
+   * @return ReadSlot structure
+   */
   stick10::ReadSlot::ResponsePayload NitrokeyManager::get_OTP_slot_data(const uint8_t slot_number) {
     auto p = get_payload<stick10::ReadSlot>();
     p.slot_number = slot_number;
+    p.data_format = stick10::ReadSlot::CounterFormat::BINARY; // ignored for devices other than Storage v0.54+
     auto data = stick10::ReadSlot::CommandTransaction::run(device, p);
-    return data.data();
+
+    auto &payload = data.data();
+
+    // if fw <=v0.53 and asked binary - do the conversion from ASCII
+    if (device->get_device_model() == DeviceModel::STORAGE && get_minor_firmware_version() <= 53
+         && is_internal_hotp_slot_number(slot_number))
+    {
+      //convert counter from string to ull
+      auto counter_s = std::string(payload.slot_counter_s, payload.slot_counter_s + sizeof(payload.slot_counter_s));
+      payload.slot_counter = std::stoull(counter_s);
+    }
+
+    return payload;
   }
 
   stick10::ReadSlot::ResponsePayload NitrokeyManager::get_TOTP_slot_data(const uint8_t slot_number) {
@@ -1132,13 +1153,7 @@ using nitrokey::misc::strcpyT;
   }
 
   stick10::ReadSlot::ResponsePayload NitrokeyManager::get_HOTP_slot_data(const uint8_t slot_number) {
-    auto slot_data = get_OTP_slot_data(get_internal_slot_number_for_hotp(slot_number));
-    if (device->get_device_model() == DeviceModel::STORAGE){
-      //convert counter from string to ull
-      auto counter_s = std::string(slot_data.slot_counter_s, slot_data.slot_counter_s+sizeof(slot_data.slot_counter_s));
-      slot_data.slot_counter = std::stoull(counter_s);
-    }
-    return slot_data;
+    return get_OTP_slot_data(get_internal_slot_number_for_hotp(slot_number));
   }
 
   void NitrokeyManager::lock_encrypted_volume() {

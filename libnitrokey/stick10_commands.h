@@ -304,8 +304,13 @@ class GetHOTP : Command<CommandID::GET_CODE> {
 
 class ReadSlot : Command<CommandID::READ_SLOT> {
  public:
+  enum class CounterFormat {
+    ASCII = 0,
+    BINARY = 1,
+  };
   struct CommandPayload {
     uint8_t slot_number;
+    CounterFormat data_format; //Storage v0.54+ only: slot_counter value format: 0 - in ascii, 1 - binary
 
     bool isValid() const { return !(slot_number & 0xF0); }
 

@@ -995,6 +995,18 @@ extern "C" {
    */
   NK_C_API int NK_change_firmware_password_pro(const char *current_firmware_password, const char *new_firmware_password);
 
+
+// as in ReadSlot::ResponsePayload
+struct ReadSlot_t {
+  uint8_t slot_name[15];
+  uint8_t _slot_config;
+  uint8_t slot_token_id[13];
+  uint64_t slot_counter;
+};
+
+
+NK_C_API int NK_read_HOTP_slot(const uint8_t slot_num, struct ReadSlot_t* out);
+
 #ifdef __cplusplus
 }
 #endif

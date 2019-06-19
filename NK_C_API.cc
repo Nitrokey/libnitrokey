@@ -881,6 +881,29 @@ NK_C_API char* NK_get_SD_usage_data_as_string() {
   }
 
 
+  NK_C_API int NK_read_HOTP_slot(const uint8_t slot_num, struct ReadSlot_t* out){
+  if (out == nullptr)
+    return -1;
+  auto m = NitrokeyManager::instance();
+  auto result = get_with_status([&]() {
+    return m->get_HOTP_slot_data(slot_num);
+  }, stick10::ReadSlot::ResponsePayload() );
+  auto error_code = std::get<0>(result);
+  if (error_code != 0) {
+    return error_code;
+  }
+#define a(x) out->x = read_slot.x
+  stick10::ReadSlot::ResponsePayload read_slot = std::get<1>(result);
+  a(_slot_config);
+  a(slot_counter);
+#undef a
+#define m(x) memmove(out->x, read_slot.x, sizeof(read_slot.x))
+  m(slot_name);
+  m(slot_token_id);
+#undef m
+  return 0;
+}
+
 
 #ifdef __cplusplus
 }

@@ -979,3 +979,27 @@ def test_bootloader_password_change_pro_too_long(C):
     long_string = b'a' * 100
     assert C.NK_change_firmware_password_pro(long_string, long_string) == LibraryErrors.TOO_LONG_STRING
     assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE, long_string) == LibraryErrors.TOO_LONG_STRING
+
+
+@pytest.mark.otp
+@pytest.mark.parametrize('counter_mid', [10**3-1, 10**4-1, 10**7-1, 10**8-10, 2**16, 2**31-1, 2**32-1, 2**33, 2**50, 2**60, 2**63])  # 2**64-1
+def test_HOTP_counter_getter(C, counter_mid: int):
+    if len(str(counter_mid)) > 8:
+        skip_if_device_version_lower_than({'S': 54, 'P': 7})
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    use_pin_protection = False
+    use_8_digits = False
+    assert C.NK_write_config(255, 255, 255, use_pin_protection, not use_pin_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    read_slot_st = ffi.new('struct ReadSlot_t *')
+    if not read_slot_st:
+        raise Exception("Could not allocate status")
+    slot_number = 1
+    for counter in range(counter_mid-3, counter_mid+3):
+        # assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_write_hotp_slot(slot_number, b'python_test', bbRFC_SECRET, counter, use_8_digits, False, False, b'',
+                                    DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+        assert C.NK_read_HOTP_slot(slot_number, read_slot_st) == DeviceErrorCode.STATUS_OK
+        assert read_slot_st.slot_counter == counter
+
+

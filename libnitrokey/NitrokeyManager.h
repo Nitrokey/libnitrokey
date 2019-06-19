@@ -299,6 +299,7 @@ char * strndup(const char* str, size_t maxlen);
       void enable_firmware_update_pro(const char *firmware_pin);
 
       void change_firmware_update_password_pro(const char *firmware_pin_current, const char *firmware_pin_new);
+      bool is_internal_hotp_slot_number(uint8_t slot_number) const;
     };
 }
 

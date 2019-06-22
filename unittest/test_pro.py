@@ -1062,22 +1062,31 @@ def test_edge_OTP_slots(C):
 
 def test_OTP_all_rw(C):
     """
-    Write all OTP slots and read codes from them two times
+    Write all OTP slots and read codes from them two times.
+    All generated codes should be the same, which is checked as well.
     """
     for i in range(TOTP_slot_count):
         helper_set_TOTP_test_slot(C, i)
     for i in range(HOTP_slot_count):
         helper_set_HOTP_test_slot(C, i)
-    for i in range(2):
+    all_codes = []
+    for i in range(5):
+        this_loop_codes = []
         code_old = b''
+        helper_set_time_on_device(C, 30*i)
         for i in range(TOTP_slot_count):
             code = helper_get_TOTP_code(C, i)
             if code_old:
                 assert code == code_old
             code_old = code
+            this_loop_codes.append(('T', i, code))
         code_old = b''
         for i in range(HOTP_slot_count):
             code = helper_get_HOTP_code(C, i)
             if code_old:
                 assert code == code_old
             code_old = code
+            this_loop_codes.append(('H', i, code))
+        all_codes.append(this_loop_codes)
+    from pprint import pprint
+    pprint(all_codes)

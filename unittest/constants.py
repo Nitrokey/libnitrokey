@@ -57,3 +57,6 @@ class LibraryErrors:
     INVALID_HEX_STRING = 202
     TARGET_BUFFER_SIZE_SMALLER_THAN_SOURCE = 203
 
+
+HOTP_slot_count = 3
+TOTP_slot_count = 15

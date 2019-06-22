@@ -22,9 +22,10 @@ SPDX-License-Identifier: LGPL-3.0
 import pytest
 
 from conftest import skip_if_device_version_lower_than
-from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET, bb, bbRFC_SECRET, LibraryErrors
+from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET, bb, bbRFC_SECRET, LibraryErrors, HOTP_slot_count, \
+    TOTP_slot_count
 from misc import ffi, gs, wait, cast_pointer_to_tuple, has_binary_counter
-from misc import is_pro_rtm_07, is_pro_rtm_08, is_storage
+from misc import is_storage
 
 @pytest.mark.lock_device
 @pytest.mark.PWS
@@ -431,6 +432,10 @@ def test_HOTP_64bit_counter(C):
         lib_res += (t, lib_at(t))
     assert dev_res == lib_res
 
+def helper_set_HOTP_test_slot(C, slot_number):
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_hotp_slot(slot_number, b'python_test', bbRFC_SECRET, 0, False, False, True, b'', DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+
 
 def helper_set_TOTP_test_slot(C, slot_number):
     PIN_protection = False
@@ -591,6 +596,20 @@ def test_get_code_user_authorize(C):
     code = gs(C.NK_get_totp_code(0, 0, 0, 0))
     assert code != b''
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+
+
+def helper_get_TOTP_code(C,i):
+    code = gs(C.NK_get_totp_code(i, 0, 0, 30))
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+    assert code != b''
+    return code
+
+
+def helper_get_HOTP_code(C,i):
+    code = gs(C.NK_get_hotp_code(i))
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+    assert code != b''
+    return code
 
 
 @pytest.mark.otp
@@ -1039,3 +1058,26 @@ def test_edge_OTP_slots(C):
         helper_set_time_on_device(C, 1)
         code_totp = gs((C.NK_get_totp_code(TOTP_slot_number, 0, 0, 30)))
         assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+
+
+def test_OTP_all_rw(C):
+    """
+    Write all OTP slots and read codes from them two times
+    """
+    for i in range(TOTP_slot_count):
+        helper_set_TOTP_test_slot(C, i)
+    for i in range(HOTP_slot_count):
+        helper_set_HOTP_test_slot(C, i)
+    for i in range(2):
+        code_old = b''
+        for i in range(TOTP_slot_count):
+            code = helper_get_TOTP_code(C, i)
+            if code_old:
+                assert code == code_old
+            code_old = code
+        code_old = b''
+        for i in range(HOTP_slot_count):
+            code = helper_get_HOTP_code(C, i)
+            if code_old:
+                assert code == code_old
+            code_old = code

@@ -1003,3 +1003,39 @@ def test_HOTP_counter_getter(C, counter_mid: int):
         assert read_slot_st.slot_counter == counter
 
 
+def test_edge_OTP_slots(C):
+    # -> shows TOTP15 is not written
+    # -> assuming HOTP1 is written
+    # (optional) Write slot HOTP1
+    # Write slot TOTP15
+    # Wait
+    # Read slot TOTP15 details
+    # Read HOTP1 details
+    # returns SLOT_NOT_PROGRAMMED
+    # (next nkapp execution)
+    # -> shows HOTP1 is not written
+    # briefly writing TOTP15 clears HOTP1, and vice versa
+
+    read_slot_st = ffi.new('struct ReadSlot_t *')
+    if not read_slot_st:
+        raise Exception("Could not allocate status")
+    use_pin_protection = False
+    use_8_digits = False
+    assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_config(255, 255, 255, use_pin_protection, not use_pin_protection,
+                             DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    counter = 0
+    HOTP_slot_number = 1 -1
+    TOTP_slot_number = 15 -1  # 0 based
+    assert C.NK_write_totp_slot(TOTP_slot_number, b'python_test', bbRFC_SECRET, 30, False, False, False, b'',
+                                DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    assert C.NK_write_hotp_slot(HOTP_slot_number, b'python_test', bbRFC_SECRET, counter, use_8_digits, False, False, b'', DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    for i in range(5):
+        code_hotp = gs(C.NK_get_hotp_code(HOTP_slot_number))
+        assert code_hotp
+        assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+        assert C.NK_read_HOTP_slot(HOTP_slot_number, read_slot_st) == DeviceErrorCode.STATUS_OK
+        assert read_slot_st.slot_counter == (i+1)
+        helper_set_time_on_device(C, 1)
+        code_totp = gs((C.NK_get_totp_code(TOTP_slot_number, 0, 0, 30)))
+        assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK

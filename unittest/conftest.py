@@ -1,5 +1,5 @@
 """
-Copyright (c) 2015-2018 Nitrokey UG
+Copyright (c) 2015-2019 Nitrokey UG
 
 This file is part of libnitrokey.
 
@@ -30,6 +30,9 @@ from logging import getLogger, basicConfig, DEBUG
 basicConfig(format='* %(relativeCreated)6d %(filename)s:%(lineno)d %(message)s',level=DEBUG)
 log = getLogger('conftest')
 print = log.debug
+
+def get_device_type():
+    return device_type
 
 
 def skip_if_device_version_lower_than(allowed_devices):

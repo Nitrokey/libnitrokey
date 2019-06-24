@@ -59,4 +59,4 @@ class LibraryErrors:
 
 
 HOTP_slot_count = 3
-TOTP_slot_count = 15
+TOTP_slot_count = 14

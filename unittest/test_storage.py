@@ -1,5 +1,5 @@
 """
-Copyright (c) 2015-2018 Nitrokey UG
+Copyright (c) 2015-2019 Nitrokey UG
 
 This file is part of libnitrokey.
 

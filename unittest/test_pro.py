@@ -1,5 +1,5 @@
 """
-Copyright (c) 2015-2018 Nitrokey UG
+Copyright (c) 2015-2019 Nitrokey UG
 
 This file is part of libnitrokey.
 
@@ -535,11 +535,11 @@ def test_get_slot_names(C):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_erase_hotp_slot(0, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
 
-    for i in range(15):
+    for i in range(TOTP_slot_count):
         name = ffi.string(C.NK_get_totp_slot_name(i))
         if name == '':
             assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
-    for i in range(3):
+    for i in range(HOTP_slot_count):
         name = ffi.string(C.NK_get_hotp_slot_name(i))
         if name == '':
             assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
@@ -549,12 +549,12 @@ def test_get_slot_names(C):
 def test_get_OTP_codes(C):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    for i in range(15):
+    for i in range(TOTP_slot_count):
         code = gs(C.NK_get_totp_code(i, 0, 0, 0))
         if code == b'':
             assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
 
-    for i in range(3):
+    for i in range(HOTP_slot_count):
         code = gs(C.NK_get_hotp_code(i))
         if code == b'':
             assert C.NK_get_last_command_status() == DeviceErrorCode.NOT_PROGRAMMED
@@ -788,7 +788,7 @@ def test_HOTP_slots_read_write_counter(C, counter):
                              DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     dev_res = []
     lib_res = []
-    for slot_number in range(3):
+    for slot_number in range(HOTP_slot_count):
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         assert C.NK_write_hotp_slot(slot_number, b'HOTP rw' + bytes(slot_number), bb(secret), counter, use_8_digits, False, False, b"",
                                     DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -817,7 +817,7 @@ def test_TOTP_slots_read_write_at_time_period(C, time, period):
                              DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     dev_res = []
     lib_res = []
-    for slot_number in range(15):
+    for slot_number in range(TOTP_slot_count):
         assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
         assert C.NK_write_totp_slot(slot_number, b'TOTP rw' + bytes(slot_number), bb(secret), period, use_8_digits, False, False, b"",
                                     DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -1022,6 +1022,7 @@ def test_HOTP_counter_getter(C, counter_mid: int):
         assert read_slot_st.slot_counter == counter
 
 
+@pytest.mark.otp
 def test_edge_OTP_slots(C):
     # -> shows TOTP15 is not written
     # -> assuming HOTP1 is written
@@ -1045,7 +1046,7 @@ def test_edge_OTP_slots(C):
                              DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     counter = 0
     HOTP_slot_number = 1 -1
-    TOTP_slot_number = 15 -1  # 0 based
+    TOTP_slot_number = TOTP_slot_count -1  # 0 based
     assert C.NK_write_totp_slot(TOTP_slot_number, b'python_test', bbRFC_SECRET, 30, False, False, False, b'',
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_hotp_slot(HOTP_slot_number, b'python_test', bbRFC_SECRET, counter, use_8_digits, False, False, b'', DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -1057,9 +1058,11 @@ def test_edge_OTP_slots(C):
         assert read_slot_st.slot_counter == (i+1)
         helper_set_time_on_device(C, 1)
         code_totp = gs((C.NK_get_totp_code(TOTP_slot_number, 0, 0, 30)))
+        assert code_totp
         assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
 
 
+@pytest.mark.otp
 def test_OTP_all_rw(C):
     """
     Write all OTP slots and read codes from them two times.

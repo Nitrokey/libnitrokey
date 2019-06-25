@@ -434,7 +434,8 @@ def test_HOTP_64bit_counter(C):
 
 def helper_set_HOTP_test_slot(C, slot_number):
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_hotp_slot(slot_number, b'python_test', bbRFC_SECRET, 0, False, False, True, b'', DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+    slot_name = b'HOTP_test'[:-2] + '{:02}'.format(slot_number).encode()
+    assert C.NK_write_hotp_slot(slot_number, slot_name, bbRFC_SECRET, 0, False, False, True, b'', DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
 
 
 def helper_set_TOTP_test_slot(C, slot_number):
@@ -443,7 +444,8 @@ def helper_set_TOTP_test_slot(C, slot_number):
     assert C.NK_write_config(255, 255, 255, PIN_protection, not PIN_protection,
                              DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_write_totp_slot(slot_number, b'python_test', bbRFC_SECRET, 30, False, False, False, b'',
+    slot_name = b'TOTP_test'[:-2] + '{:02}'.format(slot_number).encode()
+    assert C.NK_write_totp_slot(slot_number, slot_name, bbRFC_SECRET, 30, False, False, False, b'',
                                 DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
 
 

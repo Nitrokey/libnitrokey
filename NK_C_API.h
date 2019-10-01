@@ -67,6 +67,9 @@
  *         case NK_STORAGE:
  *                 printf("a Nitrokey Storage");
  *                 break;
+ *         case NK_LIBREM:
+ *                 printf("a Librem Key");
+ *                 break;
  *         default:
  *                 printf("an unsupported Nitrokey");
  *                 break;
@@ -111,7 +114,11 @@ extern "C" {
             /**
              * Nitrokey Storage.
              */
-            NK_STORAGE = 2
+            NK_STORAGE = 2,
+            /**
+             * Librem Key.
+             */
+            NK_LIBREM = 3
         };
 
         /**
@@ -327,7 +334,7 @@ extern "C" {
 
 	/**
 	 * Connect to device of given model. Currently library can be connected only to one device at once.
-	 * @param device_model NK_device_model: NK_PRO: Nitrokey Pro, NK_STORAGE: Nitrokey Storage
+	 * @param device_model NK_device_model: NK_PRO: Nitrokey Pro, NK_STORAGE: Nitrokey Storage, NK_LIBREM: Librem Key
 	 * @return 1 if connected, 0 if wrong model or cannot connect
 	 */
         NK_C_API int NK_login_enum(enum NK_device_model device_model);

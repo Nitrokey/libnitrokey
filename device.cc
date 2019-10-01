@@ -45,14 +45,29 @@ const uint16_t nitrokey::device::NITROKEY_VID = 0x20a0;
 const uint16_t nitrokey::device::NITROKEY_PRO_PID = 0x4108;
 const uint16_t nitrokey::device::NITROKEY_STORAGE_PID = 0x4109;
 
-Option<DeviceModel> nitrokey::device::product_id_to_model(uint16_t product_id) {
-  switch (product_id) {
+const uint16_t nitrokey::device::PURISM_VID = 0x316d;
+const uint16_t nitrokey::device::LIBREM_KEY_PID = 0x4c4b;
+
+Option<DeviceModel> nitrokey::device::product_id_to_model(uint16_t vendor_id, uint16_t product_id) {
+  switch (vendor_id) {
+  case NITROKEY_VID:
+    switch (product_id) {
     case NITROKEY_PRO_PID:
       return DeviceModel::PRO;
     case NITROKEY_STORAGE_PID:
       return DeviceModel::STORAGE;
     default:
       return {};
+    }
+  case PURISM_VID:
+    switch (product_id) {
+    case LIBREM_KEY_PID:
+      return DeviceModel::LIBREM;
+    default:
+      return {};
+    }
+  default:
+    return {};
   }
 }
 
@@ -66,6 +81,9 @@ std::ostream& nitrokey::device::operator<<(std::ostream& stream, DeviceModel mod
       break;
     case DeviceModel::STORAGE:
       stream << "Storage";
+      break;
+    case DeviceModel::LIBREM:
+      stream << "Librem";
       break;
     default:
       stream << "Unknown";
@@ -99,7 +117,9 @@ bool Device::disconnect() {
 }
 
 bool Device::_disconnect() {
-  LOG(std::string(__FUNCTION__) + std::string(m_model == DeviceModel::PRO ? "PRO" : "STORAGE"), Loglevel::DEBUG_L2);
+  LOG(std::string(__FUNCTION__) +
+      std::string(m_model == DeviceModel::PRO ? "PRO" : (m_model == DeviceModel::STORAGE ? "STORAGE" : "LIBREM")),
+      Loglevel::DEBUG_L2);
   LOG(std::string(__FUNCTION__) +  std::string(" *IN* "), Loglevel::DEBUG_L2);
 
   if(mp_devhandle == nullptr) {
@@ -204,27 +224,33 @@ int Device::recv(void *packet) {
   return status;
 }
 
-std::vector<DeviceInfo> Device::enumerate(){
-  auto pInfo = hid_enumerate(NITROKEY_VID, 0);
-  auto pInfo_ = pInfo;
-  std::vector<DeviceInfo> res;
-  while (pInfo != nullptr){
-    auto deviceModel = product_id_to_model(pInfo->product_id);
-    if (deviceModel.has_value()) {
-      std::string path(pInfo->path);
-      std::wstring serialNumberW(pInfo->serial_number);
-      std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-      std::string serialNumber = converter.to_bytes(serialNumberW);
-      DeviceInfo info = { deviceModel.value(), path, serialNumber };
-      res.push_back(info);
+namespace {
+  void add_vendor_devices(std::vector<DeviceInfo>& res, uint16_t vendor_id){
+    auto pInfo = hid_enumerate(vendor_id, 0);
+    auto pInfo_ = pInfo;
+    while (pInfo != nullptr){
+      auto deviceModel = product_id_to_model(vendor_id, pInfo->product_id);
+      if (deviceModel.has_value()) {
+	std::string path(pInfo->path);
+	std::wstring serialNumberW(pInfo->serial_number);
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+	std::string serialNumber = converter.to_bytes(serialNumberW);
+	DeviceInfo info = { deviceModel.value(), path, serialNumber };
+	res.push_back(info);
+      }
+      pInfo = pInfo->next;
     }
-    pInfo = pInfo->next;
-  }
 
-  if (pInfo_ != nullptr){
-    hid_free_enumeration(pInfo_);
+    if (pInfo_ != nullptr){
+      hid_free_enumeration(pInfo_);
+    }
   }
+}
 
+std::vector<DeviceInfo> Device::enumerate(){
+  std::vector<DeviceInfo> res;
+  ::add_vendor_devices(res, NITROKEY_VID);
+  ::add_vendor_devices(res, PURISM_VID);
   return res;
 }
 
@@ -234,6 +260,8 @@ std::shared_ptr<Device> Device::create(DeviceModel model) {
       return std::make_shared<Stick10>();
     case DeviceModel::STORAGE:
       return std::make_shared<Stick20>();
+    case DeviceModel::LIBREM:
+      return std::make_shared<LibremKey>();
     default:
       return {};
   }
@@ -301,6 +329,13 @@ Stick10::Stick10():
 
 Stick20::Stick20():
   Device(NITROKEY_VID, NITROKEY_STORAGE_PID, DeviceModel::STORAGE, 40ms, 55, 40ms)
+  {
+    setDefaultDelay();
+  }
+
+
+LibremKey::LibremKey():
+  Device(PURISM_VID, LIBREM_KEY_PID, DeviceModel::LIBREM, 100ms, 5, 100ms)
   {
     setDefaultDelay();
   }

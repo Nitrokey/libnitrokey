@@ -29,6 +29,9 @@ ACTION!="add|change", GOTO="u2f_end"
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="2581", ATTRS{idProduct}=="f1d0", TAG+="uaccess"
 # Nitrokey FIDO U2F
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="4287", TAG+="uaccess"
+# Nitrokey FIDO2
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="42b1", TAG+="uaccess"
+
 
 LABEL="u2f_end"
 

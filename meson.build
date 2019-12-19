@@ -1,6 +1,6 @@
 project(
   'libnitrokey', 'cpp',
-  version : '3.4.1',
+  version : '3.5.0',
   license : 'LGPL-3.0+',
   default_options : [
     'cpp_std=c++14'
@@ -150,12 +150,15 @@ if get_option('offline-tests')
 endif
 if get_option('tests')
   tests += [
-    ['test_C_API',  'test_C_API.cpp'],
-    ['test1',       'test1.cc'],
-    ['test2',       'test2.cc'],
-    ['test3',       'test3.cc'],
-    ['test_HOTP',   'test_HOTP.cc'],
-    ['test_issues', 'test_issues.cc'],
+    ['test_C_API',            'test_C_API.cpp'],
+    ['test1',                 'test1.cc'],
+    ['test2',                 'test2.cc'],
+    ['test3',                 'test3.cc'],
+    ['test_HOTP',             'test_HOTP.cc'],
+    ['test_issues',           'test_issues.cc'],
+    ['test_multiple_devices', 'test_multiple_devices.cc'],
+    ['test_strdup',           'test_strdup.cpp'],
+    ['test_safe',             'test_safe.cpp'],
   ]
 endif
 foreach tst : tests

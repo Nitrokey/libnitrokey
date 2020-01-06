@@ -209,14 +209,16 @@ std::vector<DeviceInfo> Device::enumerate(){
   auto pInfo_ = pInfo;
   std::vector<DeviceInfo> res;
   while (pInfo != nullptr){
-    auto deviceModel = product_id_to_model(pInfo->product_id);
-    if (deviceModel.has_value()) {
-      std::string path(pInfo->path);
-      std::wstring serialNumberW(pInfo->serial_number);
-      std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-      std::string serialNumber = converter.to_bytes(serialNumberW);
-      DeviceInfo info = { deviceModel.value(), path, serialNumber };
-      res.push_back(info);
+    if (pInfo->path != nullptr && pInfo->serial_number != nullptr) {
+      auto deviceModel = product_id_to_model(pInfo->product_id);
+      if (deviceModel.has_value()) {
+        std::string path(pInfo->path);
+        std::wstring serialNumberW(pInfo->serial_number);
+        std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+        std::string serialNumber = converter.to_bytes(serialNumberW);
+        DeviceInfo info = { deviceModel.value(), path, serialNumber };
+        res.push_back(info);
+      }
     }
     pInfo = pInfo->next;
   }

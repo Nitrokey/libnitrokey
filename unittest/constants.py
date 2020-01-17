@@ -39,6 +39,9 @@ class DefaultPasswords:
     USER_TEMP = b'234234234'
     UPDATE = b'12345678'
     UPDATE_TEMP = b'123update123'
+    UPDATE_LONG = b'1234567890'*2
+    UPDATE_TOO_LONG = UPDATE_LONG + b'x'
+    UPDATE_TOO_SHORT = b'1234567'
 
 
 class DeviceErrorCode:

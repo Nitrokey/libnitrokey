@@ -41,7 +41,7 @@ class DefaultPasswords:
     UPDATE_TEMP = b'123update123'
     UPDATE_LONG = b'1234567890'*2
     UPDATE_TOO_LONG = UPDATE_LONG + b'x'
-    UPDATE_TOO_SHORT = b'1234567'
+    UPDATE_TOO_SHORT = UPDATE_LONG[:7]
 
 
 class DeviceErrorCode:

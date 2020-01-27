@@ -1018,7 +1018,7 @@ def test_bootloader_run_pro_wrong_password(C):
 @pytest.mark.firmware
 def test_bootloader_run_pro(C):
     # Not enabled due to lack of side-effect removal at this point
-    assert C.NK_enable_firmware_update_pro(DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK
+    assert C.NK_enable_firmware_update_pro(DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_DISCONNECTED
 
 
 @pytest.mark.firmware

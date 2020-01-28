@@ -155,3 +155,11 @@ def get_library(request, allow_offline=False):
 
     return AttrProxy(C, "libnitrokey C")
 
+
+def pytest_addoption(parser):
+    parser.addoption("--run-skipped", action="store_true",
+                     help="run the tests skipped by default, e.g. adding side effects")
+
+def pytest_runtest_setup(item):
+    if 'skip_by_default' in item.keywords and not item.config.getoption("--run-skipped"):
+        pytest.skip("need --run-skipped option to run this test")

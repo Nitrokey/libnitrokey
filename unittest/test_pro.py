@@ -1014,7 +1014,7 @@ def test_bootloader_run_pro_wrong_password(C):
     assert C.NK_enable_firmware_update_pro(DefaultPasswords.UPDATE_TEMP) == DeviceErrorCode.WRONG_PASSWORD
 
 
-@pytest.mark.skip
+@pytest.mark.skip_by_default
 @pytest.mark.firmware
 def test_bootloader_run_pro_real(C):
     # Not enabled due to lack of side-effect removal at this point

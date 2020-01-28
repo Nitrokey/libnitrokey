@@ -88,21 +88,21 @@ def test_write_all_password_safe_slots_and_read_10_times(C):
 @pytest.mark.slowtest
 @pytest.mark.xfail(reason="This test should be run directly after test_write_all_password_safe_slots_and_read_10_times")
 def test_read_all_password_safe_slots_10_times(C):
-    def fill(s, wid):
-        assert wid >= len(s)
+    def helper_fill(str_to_fill, target_width):
+        assert target_width >= len(str_to_fill)
         numbers = '1234567890'*4
-        s += numbers[:wid-len(s)]
-        assert len(s) == wid
-        return bb(s)
+        str_to_fill += numbers[:target_width - len(str_to_fill)]
+        assert len(str_to_fill) == target_width
+        return bb(str_to_fill)
 
-    def get_pass(suffix):
-        return fill('pass' + suffix, 20)
+    def helper_PWS_get_pass(suffix):
+        return helper_fill('pass' + suffix, 20)
 
-    def get_loginname(suffix):
-        return fill('login' + suffix, 32)
+    def helper_PWS_get_loginname(suffix):
+        return helper_fill('login' + suffix, 32)
 
-    def get_slotname(suffix):
-        return fill('slotname' + suffix, 11)
+    def helper_PWS_get_slotname(suffix):
+        return helper_fill('slotname' + suffix, 11)
 
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
@@ -111,9 +111,9 @@ def test_read_all_password_safe_slots_10_times(C):
     for j in range(0, 10):
         for i in range(0, PWS_slot_count):
             iss = str(i)
-            assert gs(C.NK_get_password_safe_slot_name(i)) == get_slotname(iss)
-            assert gs(C.NK_get_password_safe_slot_login(i)) == get_loginname(iss)
-            assert gs(C.NK_get_password_safe_slot_password(i)) == get_pass(iss)
+            assert gs(C.NK_get_password_safe_slot_name(i)) == helper_PWS_get_slotname(iss)
+            assert gs(C.NK_get_password_safe_slot_login(i)) == helper_PWS_get_loginname(iss)
+            assert gs(C.NK_get_password_safe_slot_password(i)) == helper_PWS_get_pass(iss)
 
 
 @pytest.mark.lock_device

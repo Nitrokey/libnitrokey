@@ -1029,6 +1029,23 @@ def test_bootloader_password_change_pro_too_long(C):
     assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE, long_string) == LibraryErrors.TOO_LONG_STRING
 
 
+@pytest.mark.skip_by_default
+@pytest.mark.firmware
+def test_bootloader_data_rention_test(C):
+    skip_if_device_version_lower_than({'P': 11})
+
+    def populate_device():
+        return False
+
+    def check_data_on_device():
+        return False
+
+    assert populate_device()
+    assert C.NK_enable_firmware_update_pro(DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_DISCONNECTED
+    input('Please press ENTER after uploading new firmware to the device')
+    assert check_data_on_device()
+
+
 @pytest.mark.otp
 @pytest.mark.parametrize('counter_mid', [10**3-1, 10**4-1, 10**7-1, 10**8-10, 2**16, 2**31-1, 2**32-1, 2**33, 2**50, 2**60, 2**63])  # 2**64-1
 def test_HOTP_counter_getter(C, counter_mid: int):

@@ -22,8 +22,9 @@ SPDX-License-Identifier: LGPL-3.0
 import pytest
 
 from conftest import skip_if_device_version_lower_than
-from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET, bb, bbRFC_SECRET, LibraryErrors, HOTP_slot_count, \
+from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET, bbRFC_SECRET, LibraryErrors, HOTP_slot_count, \
     TOTP_slot_count
+from helpers import helper_PWS_get_slotname, helper_PWS_get_loginname, helper_PWS_get_pass, bb
 from misc import ffi, gs, wait, cast_pointer_to_tuple, has_binary_counter
 from misc import is_storage
 
@@ -88,22 +89,6 @@ def test_write_all_password_safe_slots_and_read_10_times(C):
 @pytest.mark.slowtest
 @pytest.mark.xfail(reason="This test should be run directly after test_write_all_password_safe_slots_and_read_10_times")
 def test_read_all_password_safe_slots_10_times(C):
-    def helper_fill(str_to_fill, target_width):
-        assert target_width >= len(str_to_fill)
-        numbers = '1234567890'*4
-        str_to_fill += numbers[:target_width - len(str_to_fill)]
-        assert len(str_to_fill) == target_width
-        return bb(str_to_fill)
-
-    def helper_PWS_get_pass(suffix):
-        return helper_fill('pass' + suffix, 20)
-
-    def helper_PWS_get_loginname(suffix):
-        return helper_fill('login' + suffix, 32)
-
-    def helper_PWS_get_slotname(suffix):
-        return helper_fill('slotname' + suffix, 11)
-
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     PWS_slot_count = 16

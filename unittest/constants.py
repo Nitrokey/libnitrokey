@@ -21,8 +21,6 @@ SPDX-License-Identifier: LGPL-3.0
 
 from misc import to_hex
 
-def bb(x):
-    return bytes(x, encoding='ascii')
 
 
 RFC_SECRET_HR = '12345678901234567890'

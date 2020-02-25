@@ -24,8 +24,8 @@ import pytest
 from conftest import skip_if_device_version_lower_than
 from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET, bbRFC_SECRET, LibraryErrors, HOTP_slot_count, \
     TOTP_slot_count
-from helpers import helper_PWS_get_slotname, helper_PWS_get_loginname, helper_PWS_get_pass, bb
-from misc import ffi, gs, wait, cast_pointer_to_tuple, has_binary_counter
+from helpers import helper_PWS_get_slotname, helper_PWS_get_loginname, helper_PWS_get_pass
+from misc import ffi, gs, wait, cast_pointer_to_tuple, has_binary_counter, bb
 from misc import is_storage
 
 @pytest.mark.lock_device
@@ -51,37 +51,21 @@ def test_write_password_safe_slot(C):
 @pytest.mark.PWS
 @pytest.mark.slowtest
 def test_write_all_password_safe_slots_and_read_10_times(C):
-    def fill(s, wid):
-        assert wid >= len(s)
-        numbers = '1234567890'*4
-        s += numbers[:wid-len(s)]
-        assert len(s) == wid
-        return bb(s)
-
-    def get_pass(suffix):
-        return fill('pass' + suffix, 20)
-
-    def get_loginname(suffix):
-        return fill('login' + suffix, 32)
-
-    def get_slotname(suffix):
-        return fill('slotname' + suffix, 11)
-
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     PWS_slot_count = 16
     for i in range(0, PWS_slot_count):
         iss = str(i)
         assert C.NK_write_password_safe_slot(i,
-                                             get_slotname(iss), get_loginname(iss),
-                                             get_pass(iss)) == DeviceErrorCode.STATUS_OK
+                                             helper_PWS_get_slotname(iss), helper_PWS_get_loginname(iss),
+                                             helper_PWS_get_pass(iss)) == DeviceErrorCode.STATUS_OK
 
     for j in range(0, 10):
         for i in range(0, PWS_slot_count):
             iss = str(i)
-            assert gs(C.NK_get_password_safe_slot_name(i)) == get_slotname(iss)
-            assert gs(C.NK_get_password_safe_slot_login(i)) == get_loginname(iss)
-            assert gs(C.NK_get_password_safe_slot_password(i)) == get_pass(iss)
+            assert gs(C.NK_get_password_safe_slot_name(i)) == helper_PWS_get_slotname(iss)
+            assert gs(C.NK_get_password_safe_slot_login(i)) == helper_PWS_get_loginname(iss)
+            assert gs(C.NK_get_password_safe_slot_password(i)) == helper_PWS_get_pass(iss)
 
 
 @pytest.mark.lock_device

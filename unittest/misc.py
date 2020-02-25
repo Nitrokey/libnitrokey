@@ -72,3 +72,7 @@ def is_long_OTP_secret_handled(C):
 
 def has_binary_counter(C):
     return (not is_storage(C)) or (is_storage(C) and get_devices_firmware_version(C) >= 54)
+
+
+def bb(x):
+    return bytes(x, encoding='ascii')

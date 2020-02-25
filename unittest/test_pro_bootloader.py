@@ -1,7 +1,8 @@
 import pytest
 
-from conftest import skip_if_device_version_lower_than
+from conftest import skip_if_device_version_lower_than, library_device_reconnect
 from constants import DefaultPasswords, DeviceErrorCode, LibraryErrors
+from helpers import helper_populate_device, helper_check_device_for_data
 
 
 @pytest.mark.firmware
@@ -58,16 +59,12 @@ def test_bootloader_password_change_pro_too_long(C):
 
 @pytest.mark.skip_by_default
 @pytest.mark.firmware
-def test_bootloader_data_rention_test(C):
+def test_bootloader_data_rention(C):
     skip_if_device_version_lower_than({'P': 11})
 
-    def populate_device():
-        return False
-
-    def check_data_on_device():
-        return False
-
-    assert populate_device()
+    assert helper_populate_device(C)
     assert C.NK_enable_firmware_update_pro(DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_DISCONNECTED
     input('Please press ENTER after uploading new firmware to the device')
-    assert check_data_on_device()
+    C = library_device_reconnect(C)
+    assert helper_check_device_for_data(C)
+

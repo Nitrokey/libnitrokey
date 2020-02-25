@@ -18,10 +18,7 @@ along with libnitrokey. If not, see <http://www.gnu.org/licenses/>.
 
 SPDX-License-Identifier: LGPL-3.0
 """
-
-from misc import to_hex
-
-
+from misc import to_hex, bb
 
 RFC_SECRET_HR = '12345678901234567890'
 RFC_SECRET = to_hex(RFC_SECRET_HR)  # '31323334353637383930...'
@@ -62,3 +59,4 @@ class LibraryErrors:
 
 HOTP_slot_count = 3
 TOTP_slot_count = 15
+PWS_SLOT_COUNT = 16

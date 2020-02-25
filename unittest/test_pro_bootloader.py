@@ -45,6 +45,7 @@ def test_bootloader_run_pro_wrong_password(C):
 @pytest.mark.skip_by_default
 @pytest.mark.firmware
 def test_bootloader_run_pro_real(C):
+    skip_if_device_version_lower_than({'P': 11})
     # Not enabled due to lack of side-effect removal at this point
     assert C.NK_enable_firmware_update_pro(DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_DISCONNECTED
 

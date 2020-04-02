@@ -451,6 +451,7 @@ extern "C" {
 
 	/**
 	 * Get currently set config - status of function Numlock/Capslock/Scrollock OTP sending and is enabled PIN protected OTP
+         * The return value must be freed using NK_free_config.
 	 * @see NK_write_config
 	 * @return  uint8_t general_config[5]:
 	 *            uint8_t numlock;
@@ -461,6 +462,12 @@ extern "C" {
 
 	 */
 	NK_C_API uint8_t* NK_read_config();
+
+        /**
+         * Free a value returned by NK_read_config.  May be called with a NULL
+         * argument.
+         */
+        NK_C_API void NK_free_config(uint8_t* config);
 
 	//OTP
 
@@ -634,9 +641,16 @@ extern "C" {
 
 	/**
 	 * Get password safe slots' status
+         * The return value must be freed using NK_free_password_safe_slot_status.
 	 * @return uint8_t[16] slot statuses - each byte represents one slot with 0 (not programmed) and 1 (programmed)
 	 */
 	NK_C_API uint8_t * NK_get_password_safe_slot_status();
+
+        /**
+         * Free a value returned by NK_get_password_safe_slot_status.  May be
+         * called with a NULL argument.
+         */
+        NK_C_API void NK_free_password_safe_slot_status(uint8_t* status);
 
 	/**
 	 * Get password safe slot name

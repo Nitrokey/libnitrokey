@@ -44,7 +44,7 @@ int main() {
 	uint8_t *config = NK_read_config();
 	if (config == NULL)
 		return 1;
-	free(config);
+	NK_free_config(config);
 
 	result = NK_enable_password_safe("123456");
 	if (result != 0)
@@ -54,7 +54,7 @@ int main() {
 	if (slot_status == NULL) {
 		return 1;
 	}
-	free(slot_status);
+	NK_free_password_safe_slot_status(slot_status);
 
 	NK_logout();
 

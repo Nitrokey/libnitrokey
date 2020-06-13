@@ -647,6 +647,30 @@ def test_read_write_config(C):
     config = cast_pointer_to_tuple(config_raw_data, 'uint8_t', 5)
     assert config == (0, 1, 2, True, False)
 
+    # use structs: read I
+    config_st = ffi.new('struct NK_config *')
+    if not config_st:
+        raise Exception("Could not allocate config")
+    assert C.NK_read_config_struct(config_st) == DeviceErrorCode.STATUS_OK
+    assert config_st.numlock == 0
+    assert config_st.capslock == 1
+    assert config_st.scrolllock == 2
+    assert config_st.enable_user_password
+    assert not config_st.disable_user_password
+
+    # use structs: write
+    config_st.numlock = 3
+    assert C.NK_write_config_struct(config_st[0], DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+
+    # use structs: read II
+    err = C.NK_read_config_struct(config_st)
+    assert err == 0
+    assert config_st.numlock == 3
+    assert config_st.capslock == 1
+    assert config_st.scrolllock == 2
+    assert config_st.enable_user_password
+    assert not config_st.disable_user_password
+
     # restore defaults and check
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK

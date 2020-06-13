@@ -272,6 +272,32 @@ extern "C" {
 		uint8_t write_level_max;
 	};
 
+        /**
+         * The general configuration of a Nitrokey device.
+         */
+        struct NK_config {
+            /**
+             * value in range [0-1] to send HOTP code from slot 'numlock' after double pressing numlock
+             * or outside the range to disable this function
+             */
+            uint8_t numlock;
+            /**
+	     * similar to numlock but with capslock
+             */
+            uint8_t capslock;
+            /**
+	     * similar to numlock but with scrolllock
+             */
+            uint8_t scrolllock;
+            /**
+             * True to enable OTP PIN protection (require PIN each OTP code request)
+             */
+            bool enable_user_password;
+            /**
+             * Unused.
+             */
+            bool disable_user_password;
+        };
 
    struct NK_storage_ProductionTest{
     uint8_t FirmwareVersion_au8[2];
@@ -465,6 +491,14 @@ extern "C" {
 		bool enable_user_password, bool delete_user_password, const char *admin_temporary_password);
 
 	/**
+	 * Write general config to the device
+	 * @param config the configuration data
+	 * @param admin_temporary_password current admin temporary password
+	 * @return command processing error code
+	 */
+	NK_C_API int NK_write_config_struct(struct NK_config config, const char *admin_temporary_password);
+
+	/**
 	 * Get currently set config - status of function Numlock/Capslock/Scrollock OTP sending and is enabled PIN protected OTP
          * The return value must be freed using NK_free_config.
 	 * @see NK_write_config
@@ -483,6 +517,15 @@ extern "C" {
          * argument.
          */
         NK_C_API void NK_free_config(uint8_t* config);
+
+	/**
+	 * Get currently set config and write it to the given pointer.
+         * @see NK_read_config
+	 * @see NK_write_config_struct
+         * @param out a pointer to the struct that should be written to
+	 * @return command processing error code
+	 */
+	NK_C_API int NK_read_config_struct(struct NK_config* out);
 
 	//OTP
 

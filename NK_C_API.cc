@@ -220,6 +220,12 @@ extern "C" {
 		});
 	}
 
+	NK_C_API int NK_write_config_struct(struct NK_config config,
+		const char *admin_temporary_password) {
+                return NK_write_config(config.numlock, config.capslock, config.scrolllock, config.enable_user_password,
+                    config.disable_user_password, admin_temporary_password);
+        }
+
 
 	NK_C_API uint8_t* NK_read_config() {
 		auto m = NitrokeyManager::instance();
@@ -232,6 +238,21 @@ extern "C" {
         NK_C_API void NK_free_config(uint8_t* config) {
                 delete[] config;
         }
+
+	NK_C_API int NK_read_config_struct(struct NK_config* out) {
+		if (out == nullptr) {
+			return -1;
+		}
+		auto m = NitrokeyManager::instance();
+		return get_without_result([&]() {
+			auto v = m->read_config();
+                        out->numlock = v[0];
+                        out->capslock = v[1];
+                        out->scrolllock = v[2];
+                        out->enable_user_password = v[3];
+                        out->disable_user_password = v[4];
+		});
+	}
 
 
 	NK_C_API enum NK_device_model NK_get_device_model() {

@@ -229,6 +229,10 @@ extern "C" {
 		});
 	}
 
+        NK_C_API void NK_free_config(uint8_t* config) {
+                delete[] config;
+        }
+
 
 	NK_C_API enum NK_device_model NK_get_device_model() {
 		auto m = NitrokeyManager::instance();
@@ -459,6 +463,10 @@ extern "C" {
 		});
 
 	}
+
+        NK_C_API void NK_free_password_safe_slot_status(uint8_t* status) {
+                delete[] status;
+        }
 
 	NK_C_API uint8_t NK_get_user_retry_count() {
 		auto m = NitrokeyManager::instance();

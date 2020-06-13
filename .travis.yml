@@ -50,6 +50,21 @@ matrix:
         - python3 -m pip install -r unittest/requirements.txt --user
         - cd unittest && python3 -m pytest -sv test_offline.py
     - os: linux
+      dist: bionic
+      env: COMPILER_NAME=gcc CXX=g++-10 CC=gcc-10
+      addons:
+        apt:
+          packages:
+            - meson
+            - ninja
+            - libhidapi-dev
+            - g++-10
+          sources: *sources
+      script:
+        - mkdir build && meson build
+        - cd build && ninja
+        - env DESTDIR=install ninja install
+    - os: linux
       dist: trusty
       env: COMPILER_NAME=clang CXX=clang++-3.8 CC=clang-3.8
       addons:

@@ -155,6 +155,7 @@ if get_option('tests')
     ['test2',                 'test2.cc'],
     ['test3',                 'test3.cc'],
     ['test_HOTP',             'test_HOTP.cc'],
+    ['test_memory',           'test_memory.c'],
     ['test_issues',           'test_issues.cc'],
     ['test_multiple_devices', 'test_multiple_devices.cc'],
     ['test_strdup',           'test_strdup.cpp'],

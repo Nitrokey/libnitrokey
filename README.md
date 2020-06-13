@@ -91,6 +91,7 @@ To use libnitrokey with Python a [CFFI](http://cffi.readthedocs.io/en/latest/ove
 pip install --user cffi # for python 2.x
 pip3 install cffi # for python 3.x
 ```
+## Python2
 Just import it, read the C API header and it is done! You have access to the library. Here is an example (in Python 2) printing HOTP code for Pro or Storage device, assuming it is run in root directory [(full example)](python_bindings_example.py):
 ```python
 #!/usr/bin/env python2
@@ -156,6 +157,88 @@ libnitrokey.NK_set_debug(False)  # do not show debug messages (log library only)
 hotp_slot_code = get_hotp_code(libnitrokey, 1)
 print('Getting HOTP code from Nitrokey device: ')
 print(hotp_slot_code)
+libnitrokey.NK_logout()  # disconnect device
+```
+In case  no devices are connected, a friendly message will be printed.
+All available functions for C and Python are listed in [NK_C_API.h](NK_C_API.h). Please check `Documentation` section below.
+
+## Python3
+Just import it, read the C API header and it is done! You have access to the library. Here is an example (in Python 3) printing HOTP code for Pro or Storage device, assuming it is run in root directory [(full example)](python3_bindings_example.py):
+```python
+#!/usr/bin/env python3
+import cffi
+
+ffi = cffi.FFI()
+get_string = ffi.string
+
+def get_library():
+    fp = 'NK_C_API.h'  # path to C API header
+
+    declarations = []
+    with open(fp, 'r') as f:
+        declarations = f.readlines()
+
+    cnt = 0
+    a = iter(declarations)
+    for declaration in a:
+        if declaration.strip().startswith('NK_C_API'):
+            declaration = declaration.replace('NK_C_API', '').strip()
+            while ';' not in declaration:
+                declaration += (next(a)).strip()
+            # print(declaration)
+            ffi.cdef(declaration, override=True)
+            cnt +=1
+    print('Imported {} declarations'.format(cnt))
+
+
+    C = None
+    import os, sys
+    path_build = os.path.join(".", "build")
+    paths = [
+            os.environ.get('LIBNK_PATH', None),
+            os.path.join(path_build,"libnitrokey.so"),
+            os.path.join(path_build,"libnitrokey.dylib"),
+            os.path.join(path_build,"libnitrokey.dll"),
+            os.path.join(path_build,"nitrokey.dll"),
+    ]
+    for p in paths:
+        if not p: continue
+        print("Trying " +p)
+        p = os.path.abspath(p)
+        if os.path.exists(p):
+            print("Found: "+p)
+            C = ffi.dlopen(p)
+            break
+        else:
+            print("File does not exist: " + p)
+    if not C:
+        print("No library file found")
+        sys.exit(1)
+
+    return C
+
+
+def get_hotp_code(lib, i):
+    return lib.NK_get_hotp_code(i)
+
+def connect_device(lib):
+	# lib.NK_login('S'.encode('ascii'))  # connect only to Nitrokey Storage device
+	# lib.NK_login('P'.encode('ascii'))  # connect only to Nitrokey Pro device
+	device_connected = lib.NK_login_auto()  # connect to any Nitrokey Stick
+	if device_connected:
+		print('Connected to Nitrokey device!')
+	else:
+	    print('Could not connect to Nitrokey device!')
+	    exit()
+
+libnitrokey = get_library()
+libnitrokey.NK_set_debug(False)  # do not show debug messages (log library only)
+
+connect_device(libnitrokey)
+
+hotp_slot_code = get_hotp_code(libnitrokey, 1)
+print('Getting HOTP code from Nitrokey device: ')
+print(ffi.string(hotp_slot_code).decode('ascii'))
 libnitrokey.NK_logout()  # disconnect device
 ```
 

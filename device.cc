@@ -233,7 +233,10 @@ namespace {
     auto pInfo = hid_enumerate(vendor_id, 0);
     auto pInfo_ = pInfo;
     while (pInfo != nullptr){
-      auto deviceModel = product_id_to_model(vendor_id, pInfo->product_id);
+      if (pInfo->path == nullptr || pInfo->serial_number == nullptr) {
+      continue;
+    }
+    auto deviceModel = product_id_to_model(vendor_id, pInfo->product_id);
       if (deviceModel.has_value()) {
 	std::string path(pInfo->path);
 	std::wstring serialNumberW(pInfo->serial_number);

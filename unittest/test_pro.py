@@ -704,6 +704,13 @@ def test_get_serial_number(C):
     print(('Serial number of the device: ', sn))
 
 
+@pytest.mark.status
+def test_get_serial_number_as_u32(C):
+    sn = C.NK_device_serial_number_as_u32()
+    assert sn > 0
+    print(('Serial number of the device (u32): ', sn))
+
+
 @pytest.mark.otp
 @pytest.mark.parametrize("secret", ['000001', '00'*10+'ff', '00'*19+'ff', '000102',
                                     '00'*29+'ff', '00'*39+'ff', '002EF43F51AFA97BA2B46418768123C9E1809A5B' ])

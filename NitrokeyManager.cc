@@ -392,23 +392,36 @@ using nitrokey::misc::strcpyT;
 
 
     string NitrokeyManager::get_serial_number() {
-        if (device == nullptr) { return ""; };
+      try {
+        auto serial_number = this->get_serial_number_as_u32();
+        if (serial_number == 0) {
+          return "NA";
+        } else {
+          return nitrokey::misc::toHex(serial_number);
+        }
+      } catch (DeviceNotConnected& e) {
+        return "";
+      }
+    }
+
+    uint32_t NitrokeyManager::get_serial_number_as_u32() {
+        if (device == nullptr) { throw DeviceNotConnected("device not connected"); }
       switch (device->get_device_model()) {
         case DeviceModel::LIBREM:
         case DeviceModel::PRO: {
           auto response = GetStatus::CommandTransaction::run(device);
-          return nitrokey::misc::toHex(response.data().card_serial_u32);
+          return response.data().card_serial_u32;
         }
           break;
 
         case DeviceModel::STORAGE:
         {
           auto response = stick20::GetDeviceStatus::CommandTransaction::run(device);
-          return nitrokey::misc::toHex(response.data().ActiveSmartCardID_u32);
+          return response.data().ActiveSmartCardID_u32;
         }
           break;
       }
-      return "NA";
+      return 0;
     }
 
     stick10::GetStatus::ResponsePayload NitrokeyManager::get_status(){

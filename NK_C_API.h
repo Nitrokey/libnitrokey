@@ -393,6 +393,14 @@ extern "C" {
 	NK_C_API char * NK_device_serial_number();
 
 	/**
+	 * Return the device's serial number string as an integer.  Use
+         * NK_last_command_status to check for an error if this function
+         * returns zero.
+	 * @return device's serial number as an integer
+	 */
+	NK_C_API uint32_t NK_device_serial_number_as_u32();
+
+	/**
 	 * Get last command processing status. Useful for commands which returns the results of their own and could not return
 	 * an error code.
 	 * @return previous command processing error code

@@ -304,6 +304,13 @@ extern "C" {
 		});
 	}
 
+	NK_C_API uint32_t NK_device_serial_number_as_u32() {
+		auto m = NitrokeyManager::instance();
+		return get_with_result([&]() {
+                        return m->get_serial_number_as_u32();
+		});
+	}
+
 	NK_C_API char * NK_get_hotp_code(uint8_t slot_number) {
 		return NK_get_hotp_code_PIN(slot_number, "");
 	}

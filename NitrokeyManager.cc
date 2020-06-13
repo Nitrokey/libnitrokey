@@ -230,7 +230,7 @@ using nitrokey::misc::strcpyT;
         misc::Option<DeviceModel> model;
         while (info_ptr && !model.has_value()) {
             if (path == std::string(info_ptr->path)) {
-                model = product_id_to_model(vendor_id, info_ptr->product_id);
+                model = product_id_to_model(info_ptr->vendor_id, info_ptr->product_id);
             }
             info_ptr = info_ptr->next;
         }

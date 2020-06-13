@@ -48,6 +48,10 @@ const uint16_t nitrokey::device::NITROKEY_STORAGE_PID = 0x4109;
 const uint16_t nitrokey::device::PURISM_VID = 0x316d;
 const uint16_t nitrokey::device::LIBREM_KEY_PID = 0x4c4b;
 
+Option<DeviceModel> nitrokey::device::product_id_to_model(uint16_t product_id) {
+    return product_id_to_model(NITROKEY_VID, product_id);
+}
+
 Option<DeviceModel> nitrokey::device::product_id_to_model(uint16_t vendor_id, uint16_t product_id) {
   switch (vendor_id) {
   case NITROKEY_VID:

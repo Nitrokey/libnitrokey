@@ -81,6 +81,7 @@ extern const uint16_t LIBREM_KEY_PID;
  * Convert the given USB product ID to a Nitrokey model.  If there is no model
  * with that ID, return an absent value.
  */
+misc::Option<DeviceModel> product_id_to_model(uint16_t product_id);
 misc::Option<DeviceModel> product_id_to_model(uint16_t vendor_id, uint16_t product_id);
 
 /**

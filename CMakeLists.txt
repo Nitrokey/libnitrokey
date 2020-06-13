@@ -29,6 +29,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(GNUInstallDirs)
 
+# Add -O0 to remove optimizations when using gcc
 set(ADD_FLAGS "-Os -s  -fno-rtti")
 IF(CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")

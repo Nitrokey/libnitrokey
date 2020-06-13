@@ -24,14 +24,6 @@ matrix:
             - git
           sources: &sources
             - ubuntu-toolchain-r-test
-      script:
-        - make -j2
-        - ctest -VV
-        - mkdir install && make install DESTDIR=install
-        - pip3 install pytest --user
-        - cd ../
-        - pip3 install -r unittest/requirements.txt --user
-        - cd unittest && python3 -m pytest -sv test_offline.py
     - os: linux
       dist: trusty
       env: COMPILER_NAME=gcc CXX=g++-7 CC=gcc-7
@@ -52,6 +44,14 @@ matrix:
             - libhidapi-dev
             - g++-10
           sources: *sources
+      script:
+        - make -j2
+        - ctest -VV
+        - mkdir install && make install DESTDIR=install
+        - pip3 install pytest --user
+        - cd ../
+        - pip3 install -r unittest/requirements.txt --user
+        - cd unittest && python3 -m pytest -sv test_offline.py
     - os: linux
       dist: trusty
       env: COMPILER_NAME=clang CXX=clang++-3.8 CC=clang-3.8

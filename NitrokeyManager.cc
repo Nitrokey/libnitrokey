@@ -217,7 +217,12 @@ using nitrokey::misc::strcpyT;
             }
         }
 
-        auto info_ptr = hid_enumerate(NITROKEY_VID, 0);
+	auto vendor_id = NITROKEY_VID;
+        auto info_ptr = hid_enumerate(vendor_id, 0);
+	if (!info_ptr) {
+	  vendor_id = PURISM_VID;
+	  info_ptr = hid_enumerate(vendor_id, 0);
+	}
         auto first_info_ptr = info_ptr;
         if (!info_ptr)
           return false;
@@ -225,7 +230,7 @@ using nitrokey::misc::strcpyT;
         misc::Option<DeviceModel> model;
         while (info_ptr && !model.has_value()) {
             if (path == std::string(info_ptr->path)) {
-                model = product_id_to_model(info_ptr->product_id);
+                model = product_id_to_model(info_ptr->vendor_id, info_ptr->product_id);
             }
             info_ptr = info_ptr->next;
         }
@@ -254,7 +259,8 @@ using nitrokey::misc::strcpyT;
 
     bool NitrokeyManager::connect() {
         std::lock_guard<std::mutex> lock(mex_dev_com_manager);
-        vector< shared_ptr<Device> > devices = { make_shared<Stick10>(), make_shared<Stick20>() };
+        vector< shared_ptr<Device> > devices = { make_shared<Stick10>(), make_shared<Stick20>(),
+						 make_shared<LibremKey>() };
         bool connected = false;
         for( auto & d : devices ){
             if (d->connect()){
@@ -290,6 +296,9 @@ using nitrokey::misc::strcpyT;
             case 'S':
                 device = make_shared<Stick20>();
                 break;
+            case 'L':
+                device = make_shared<LibremKey>();
+                break;
             default:
                 throw std::runtime_error("Unknown model");
         }
@@ -304,6 +313,9 @@ using nitrokey::misc::strcpyT;
                 break;
             case device::DeviceModel::STORAGE:
                 model_string = "S";
+                break;
+            case device::DeviceModel::LIBREM:
+                model_string = "L";
                 break;
             default:
                 throw std::runtime_error("Unknown model");
@@ -380,22 +392,36 @@ using nitrokey::misc::strcpyT;
 
 
     string NitrokeyManager::get_serial_number() {
-        if (device == nullptr) { return ""; };
+      try {
+        auto serial_number = this->get_serial_number_as_u32();
+        if (serial_number == 0) {
+          return "NA";
+        } else {
+          return nitrokey::misc::toHex(serial_number);
+        }
+      } catch (DeviceNotConnected& e) {
+        return "";
+      }
+    }
+
+    uint32_t NitrokeyManager::get_serial_number_as_u32() {
+        if (device == nullptr) { throw DeviceNotConnected("device not connected"); }
       switch (device->get_device_model()) {
+        case DeviceModel::LIBREM:
         case DeviceModel::PRO: {
           auto response = GetStatus::CommandTransaction::run(device);
-          return nitrokey::misc::toHex(response.data().card_serial_u32);
+          return response.data().card_serial_u32;
         }
           break;
 
         case DeviceModel::STORAGE:
         {
           auto response = stick20::GetDeviceStatus::CommandTransaction::run(device);
-          return nitrokey::misc::toHex(response.data().ActiveSmartCardID_u32);
+          return response.data().ActiveSmartCardID_u32;
         }
           break;
       }
-      return "NA";
+      return 0;
     }
 
     stick10::GetStatus::ResponsePayload NitrokeyManager::get_status(){
@@ -552,6 +578,7 @@ using nitrokey::misc::strcpyT;
       strcpyT(payload.slot_name, slot_name);
       strcpyT(payload.slot_token_id, token_ID);
       switch (device->get_device_model() ){
+        case DeviceModel::LIBREM:
         case DeviceModel::PRO: {
           payload.slot_counter = hotp_counter;
           break;
@@ -713,6 +740,7 @@ using nitrokey::misc::strcpyT;
     template <typename ProCommand, PasswordKind StoKind>
     void NitrokeyManager::change_PIN_general(const char *current_PIN, const char *new_PIN) {
         switch (device->get_device_model()){
+            case DeviceModel::LIBREM:
             case DeviceModel::PRO:
             {
                 auto p = get_payload<ProCommand>();
@@ -834,6 +862,7 @@ using nitrokey::misc::strcpyT;
 
     void NitrokeyManager::build_aes_key(const char *admin_password) {
         switch (device->get_device_model()) {
+            case DeviceModel::LIBREM:
             case DeviceModel::PRO: {
                 auto p = get_payload<BuildAESKey>();
                 strcpyT(p.admin_password, admin_password);
@@ -858,6 +887,7 @@ using nitrokey::misc::strcpyT;
 
     void NitrokeyManager::unlock_user_password(const char *admin_password, const char *new_user_password) {
       switch (device->get_device_model()){
+        case DeviceModel::LIBREM:
         case DeviceModel::PRO: {
           auto p = get_payload<stick10::UnlockUserPassword>();
           strcpyT(p.admin_password, admin_password);
@@ -907,6 +937,7 @@ using nitrokey::misc::strcpyT;
       //authorization command is supported for versions equal or below:
         auto m = std::unordered_map<DeviceModel , int, EnumClassHash>({
                                                {DeviceModel::PRO, 7},
+                                               {DeviceModel::LIBREM, 7},
                                                {DeviceModel::STORAGE, 53},
          });
         return get_minor_firmware_version() <= m[device->get_device_model()];
@@ -916,6 +947,7 @@ using nitrokey::misc::strcpyT;
         // 320 bit OTP secret is supported by version bigger or equal to:
         auto m = std::unordered_map<DeviceModel , int, EnumClassHash>({
                                                {DeviceModel::PRO, 8},
+                                               {DeviceModel::LIBREM, 8},
                                                {DeviceModel::STORAGE, 54},
          });
         return get_minor_firmware_version() >= m[device->get_device_model()];
@@ -940,6 +972,7 @@ using nitrokey::misc::strcpyT;
 
     uint8_t NitrokeyManager::get_minor_firmware_version(){
       switch(device->get_device_model()){
+        case DeviceModel::LIBREM:
         case DeviceModel::PRO:{
           auto status_p = GetStatus::CommandTransaction::run(device);
           return status_p.data().firmware_version_st.minor; //7 or 8
@@ -956,6 +989,7 @@ using nitrokey::misc::strcpyT;
     }
     uint8_t NitrokeyManager::get_major_firmware_version(){
       switch(device->get_device_model()){
+        case DeviceModel::LIBREM:
         case DeviceModel::PRO:{
           auto status_p = GetStatus::CommandTransaction::run(device);
           return status_p.data().firmware_version_st.major; //0

@@ -104,6 +104,7 @@ char * strndup(const char* str, size_t maxlen);
         stick10::GetStatus::ResponsePayload get_status();
         string get_status_as_string();
         string get_serial_number();
+        uint32_t get_serial_number_as_u32();
 
         char * get_totp_slot_name(uint8_t slot_number);
         char * get_hotp_slot_name(uint8_t slot_number);

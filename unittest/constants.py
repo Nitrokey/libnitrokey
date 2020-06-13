@@ -18,12 +18,7 @@ along with libnitrokey. If not, see <http://www.gnu.org/licenses/>.
 
 SPDX-License-Identifier: LGPL-3.0
 """
-
-from misc import to_hex
-
-def bb(x):
-    return bytes(x, encoding='ascii')
-
+from misc import to_hex, bb
 
 RFC_SECRET_HR = '12345678901234567890'
 RFC_SECRET = to_hex(RFC_SECRET_HR)  # '31323334353637383930...'
@@ -39,6 +34,9 @@ class DefaultPasswords:
     USER_TEMP = b'234234234'
     UPDATE = b'12345678'
     UPDATE_TEMP = b'123update123'
+    UPDATE_LONG = b'1234567890'*2
+    UPDATE_TOO_LONG = UPDATE_LONG + b'x'
+    UPDATE_TOO_SHORT = UPDATE_LONG[:7]
 
 
 class DeviceErrorCode:
@@ -49,6 +47,7 @@ class DeviceErrorCode:
     STATUS_NOT_AUTHORIZED = 5
     STATUS_AES_DEC_FAILED = 0xa
     STATUS_UNKNOWN_ERROR = 100
+    STATUS_DISCONNECTED = 255
 
 
 class LibraryErrors:
@@ -60,3 +59,4 @@ class LibraryErrors:
 
 HOTP_slot_count = 3
 TOTP_slot_count = 15
+PWS_SLOT_COUNT = 16

@@ -67,6 +67,10 @@ TEST_CASE("Test C++ side behaviour in offline", "[fast]") {
   REQUIRE(serial_number.empty());
 
   REQUIRE_THROWS_AS(
+    i->get_serial_number_as_u32(), DeviceNotConnected
+  );
+
+  REQUIRE_THROWS_AS(
     i->get_status(), DeviceNotConnected
   );
 

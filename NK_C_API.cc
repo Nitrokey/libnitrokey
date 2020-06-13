@@ -158,6 +158,9 @@ extern "C" {
                     case NK_STORAGE:
                         model_string = "S";
                         break;
+                    case NK_LIBREM:
+                        model_string = "L";
+                        break;
                     case NK_DISCONNECTED:
                     default:
                         /* no such enum value -- return error code */
@@ -236,6 +239,8 @@ extern "C" {
 				    return NK_PRO;
 				case DeviceModel::STORAGE:
 				    return NK_STORAGE;
+				case DeviceModel::LIBREM:
+				    return NK_LIBREM;
 				default:
 				    /* unknown or not connected device */
 				    return NK_device_model::NK_DISCONNECTED;
@@ -790,6 +795,9 @@ NK_C_API char* NK_get_SD_usage_data_as_string() {
 			break;
 		case DeviceModel::STORAGE:
 			target->model = NK_STORAGE;
+			break;
+		case DeviceModel::LIBREM:
+			target->model = NK_LIBREM;
 			break;
 		default:
 			return false;

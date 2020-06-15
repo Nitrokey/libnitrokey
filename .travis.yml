@@ -56,7 +56,7 @@ matrix:
         apt:
           packages:
             - meson
-            - ninja
+            - ninja-build
             - libhidapi-dev
             - g++-10
           sources: *sources

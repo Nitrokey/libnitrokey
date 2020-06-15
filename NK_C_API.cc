@@ -158,6 +158,9 @@ extern "C" {
                     case NK_STORAGE:
                         model_string = "S";
                         break;
+                    case NK_LIBREM:
+                        model_string = "L";
+                        break;
                     case NK_DISCONNECTED:
                     default:
                         /* no such enum value -- return error code */
@@ -217,12 +220,37 @@ extern "C" {
 		});
 	}
 
+	NK_C_API int NK_write_config_struct(struct NK_config config,
+		const char *admin_temporary_password) {
+                return NK_write_config(config.numlock, config.capslock, config.scrolllock, config.enable_user_password,
+                    config.disable_user_password, admin_temporary_password);
+        }
+
 
 	NK_C_API uint8_t* NK_read_config() {
 		auto m = NitrokeyManager::instance();
 		return get_with_array_result([&]() {
 			auto v = m->read_config();
 			return duplicate_vector_and_clear(v);
+		});
+	}
+
+        NK_C_API void NK_free_config(uint8_t* config) {
+                delete[] config;
+        }
+
+	NK_C_API int NK_read_config_struct(struct NK_config* out) {
+		if (out == nullptr) {
+			return -1;
+		}
+		auto m = NitrokeyManager::instance();
+		return get_without_result([&]() {
+			auto v = m->read_config();
+                        out->numlock = v[0];
+                        out->capslock = v[1];
+                        out->scrolllock = v[2];
+                        out->enable_user_password = v[3];
+                        out->disable_user_password = v[4];
 		});
 	}
 
@@ -236,6 +264,8 @@ extern "C" {
 				    return NK_PRO;
 				case DeviceModel::STORAGE:
 				    return NK_STORAGE;
+				case DeviceModel::LIBREM:
+				    return NK_LIBREM;
 				default:
 				    /* unknown or not connected device */
 				    return NK_device_model::NK_DISCONNECTED;
@@ -296,6 +326,13 @@ extern "C" {
 			char * rs = strndup(s.c_str(), max_string_field_length);
 			clear_string(s);
 			return rs;
+		});
+	}
+
+	NK_C_API uint32_t NK_device_serial_number_as_u32() {
+		auto m = NitrokeyManager::instance();
+		return get_with_result([&]() {
+                        return m->get_serial_number_as_u32();
 		});
 	}
 
@@ -447,6 +484,10 @@ extern "C" {
 		});
 
 	}
+
+        NK_C_API void NK_free_password_safe_slot_status(uint8_t* status) {
+                delete[] status;
+        }
 
 	NK_C_API uint8_t NK_get_user_retry_count() {
 		auto m = NitrokeyManager::instance();
@@ -790,6 +831,9 @@ NK_C_API char* NK_get_SD_usage_data_as_string() {
 			break;
 		case DeviceModel::STORAGE:
 			target->model = NK_STORAGE;
+			break;
+		case DeviceModel::LIBREM:
+			target->model = NK_LIBREM;
 			break;
 		default:
 			return false;

@@ -20,6 +20,7 @@ SPDX-License-Identifier: LGPL-3.0
 """
 
 import pytest
+import os, sys
 
 from misc import ffi, gs
 
@@ -82,47 +83,8 @@ def C(request=None):
 
 
 def get_library(request, allow_offline=False):
-    fp = '../NK_C_API.h'
-
-    declarations = []
-    with open(fp, 'r') as f:
-        declarations = f.readlines()
-
-    cnt = 0
-    a = iter(declarations)
-    for declaration in a:
-        if declaration.strip().startswith('NK_C_API') \
-                or declaration.strip().startswith('struct'):
-            declaration = declaration.replace('NK_C_API', '').strip()
-            while ');' not in declaration and '};' not in declaration:
-                declaration += (next(a)).strip()+'\n'
-            ffi.cdef(declaration, override=True)
-            cnt += 1
-    print('Imported {} declarations'.format(cnt))
-
-    C = None
-    import os, sys
-    path_build = os.path.join("..", "build")
-    paths = [
-            os.environ.get('LIBNK_PATH', None),
-            os.path.join(path_build,"libnitrokey.so"),
-            os.path.join(path_build,"libnitrokey.dylib"),
-            os.path.join(path_build,"libnitrokey.dll"),
-            os.path.join(path_build,"nitrokey.dll"),
-    ]
-    for p in paths:
-        if not p: continue
-        print("Trying " +p)
-        p = os.path.abspath(p)
-        if os.path.exists(p):
-            print("Found: "+p)
-            C = ffi.dlopen(p)
-            break
-        else:
-            print("File does not exist: " + p)
-    if not C:
-        print("No library file found")
-        sys.exit(1)
+    library_read_declarations()
+    C = library_open_lib()
 
     C.NK_set_debug_level(int(os.environ.get('LIBNK_DEBUG', 2)))
 
@@ -155,3 +117,63 @@ def get_library(request, allow_offline=False):
 
     return AttrProxy(C, "libnitrokey C")
 
+
+def library_open_lib():
+    C = None
+    path_build = os.path.join("..", "build")
+    paths = [
+        os.environ.get('LIBNK_PATH', None),
+        os.path.join(path_build, "libnitrokey.so"),
+        os.path.join(path_build, "libnitrokey.dylib"),
+        os.path.join(path_build, "libnitrokey.dll"),
+        os.path.join(path_build, "nitrokey.dll"),
+    ]
+    for p in paths:
+        if not p: continue
+        print("Trying " + p)
+        p = os.path.abspath(p)
+        if os.path.exists(p):
+            print("Found: " + p)
+            C = ffi.dlopen(p)
+            break
+        else:
+            print("File does not exist: " + p)
+    if not C:
+        print("No library file found")
+        sys.exit(1)
+    return C
+
+
+def library_read_declarations():
+    fp = '../NK_C_API.h'
+    declarations = []
+    with open(fp, 'r') as f:
+        declarations = f.readlines()
+    cnt = 0
+    a = iter(declarations)
+    for declaration in a:
+        if declaration.strip().startswith('NK_C_API') \
+                or declaration.strip().startswith('struct'):
+            declaration = declaration.replace('NK_C_API', '').strip()
+            while ');' not in declaration and '};' not in declaration:
+                declaration += (next(a)).strip() + '\n'
+            ffi.cdef(declaration, override=True)
+            cnt += 1
+    print('Imported {} declarations'.format(cnt))
+
+
+def pytest_addoption(parser):
+    parser.addoption("--run-skipped", action="store_true",
+                     help="run the tests skipped by default, e.g. adding side effects")
+
+def pytest_runtest_setup(item):
+    if 'skip_by_default' in item.keywords and not item.config.getoption("--run-skipped"):
+        pytest.skip("need --run-skipped option to run this test")
+
+
+def library_device_reconnect(C):
+    C.NK_logout()
+    C = library_open_lib()
+    C.NK_logout()
+    assert C.NK_login_auto() == 1, 'Device not found'
+    return C

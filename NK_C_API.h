@@ -67,6 +67,9 @@
  *         case NK_STORAGE:
  *                 printf("a Nitrokey Storage");
  *                 break;
+ *         case NK_LIBREM:
+ *                 printf("a Librem Key");
+ *                 break;
  *         default:
  *                 printf("an unsupported Nitrokey");
  *                 break;
@@ -111,7 +114,11 @@ extern "C" {
             /**
              * Nitrokey Storage.
              */
-            NK_STORAGE = 2
+            NK_STORAGE = 2,
+            /**
+             * Librem Key.
+             */
+            NK_LIBREM = 3
         };
 
         /**
@@ -265,6 +272,32 @@ extern "C" {
 		uint8_t write_level_max;
 	};
 
+        /**
+         * The general configuration of a Nitrokey device.
+         */
+        struct NK_config {
+            /**
+             * value in range [0-1] to send HOTP code from slot 'numlock' after double pressing numlock
+             * or outside the range to disable this function
+             */
+            uint8_t numlock;
+            /**
+	     * similar to numlock but with capslock
+             */
+            uint8_t capslock;
+            /**
+	     * similar to numlock but with scrolllock
+             */
+            uint8_t scrolllock;
+            /**
+             * True to enable OTP PIN protection (require PIN each OTP code request)
+             */
+            bool enable_user_password;
+            /**
+             * Unused.
+             */
+            bool disable_user_password;
+        };
 
    struct NK_storage_ProductionTest{
     uint8_t FirmwareVersion_au8[2];
@@ -327,7 +360,7 @@ extern "C" {
 
 	/**
 	 * Connect to device of given model. Currently library can be connected only to one device at once.
-	 * @param device_model NK_device_model: NK_PRO: Nitrokey Pro, NK_STORAGE: Nitrokey Storage
+	 * @param device_model NK_device_model: NK_PRO: Nitrokey Pro, NK_STORAGE: Nitrokey Storage, NK_LIBREM: Librem Key
 	 * @return 1 if connected, 0 if wrong model or cannot connect
 	 */
         NK_C_API int NK_login_enum(enum NK_device_model device_model);
@@ -384,6 +417,14 @@ extern "C" {
 	 * @return string device's serial number in hex
 	 */
 	NK_C_API char * NK_device_serial_number();
+
+	/**
+	 * Return the device's serial number string as an integer.  Use
+         * NK_last_command_status to check for an error if this function
+         * returns zero.
+	 * @return device's serial number as an integer
+	 */
+	NK_C_API uint32_t NK_device_serial_number_as_u32();
 
 	/**
 	 * Get last command processing status. Useful for commands which returns the results of their own and could not return
@@ -450,7 +491,16 @@ extern "C" {
 		bool enable_user_password, bool delete_user_password, const char *admin_temporary_password);
 
 	/**
+	 * Write general config to the device
+	 * @param config the configuration data
+	 * @param admin_temporary_password current admin temporary password
+	 * @return command processing error code
+	 */
+	NK_C_API int NK_write_config_struct(struct NK_config config, const char *admin_temporary_password);
+
+	/**
 	 * Get currently set config - status of function Numlock/Capslock/Scrollock OTP sending and is enabled PIN protected OTP
+         * The return value must be freed using NK_free_config.
 	 * @see NK_write_config
 	 * @return  uint8_t general_config[5]:
 	 *            uint8_t numlock;
@@ -461,6 +511,21 @@ extern "C" {
 
 	 */
 	NK_C_API uint8_t* NK_read_config();
+
+        /**
+         * Free a value returned by NK_read_config.  May be called with a NULL
+         * argument.
+         */
+        NK_C_API void NK_free_config(uint8_t* config);
+
+	/**
+	 * Get currently set config and write it to the given pointer.
+         * @see NK_read_config
+	 * @see NK_write_config_struct
+         * @param out a pointer to the struct that should be written to
+	 * @return command processing error code
+	 */
+	NK_C_API int NK_read_config_struct(struct NK_config* out);
 
 	//OTP
 
@@ -634,9 +699,16 @@ extern "C" {
 
 	/**
 	 * Get password safe slots' status
+         * The return value must be freed using NK_free_password_safe_slot_status.
 	 * @return uint8_t[16] slot statuses - each byte represents one slot with 0 (not programmed) and 1 (programmed)
 	 */
 	NK_C_API uint8_t * NK_get_password_safe_slot_status();
+
+        /**
+         * Free a value returned by NK_get_password_safe_slot_status.  May be
+         * called with a NULL argument.
+         */
+        NK_C_API void NK_free_password_safe_slot_status(uint8_t* status);
 
 	/**
 	 * Get password safe slot name

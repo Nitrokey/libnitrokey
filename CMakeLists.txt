@@ -216,6 +216,7 @@ IF (COMPILE_TESTS)
                 unittest/test_HOTP.cc
                 unittest/test1.cc
                 unittest/test_issues.cc
+		unittest/test_memory.c
                 unittest/test_multiple_devices.cc
                 unittest/test_strdup.cpp
                 unittest/test_safe.cpp

@@ -28,8 +28,8 @@ from collections import defaultdict
 from tqdm import tqdm
 
 from conftest import skip_if_device_version_lower_than
-from constants import DefaultPasswords, DeviceErrorCode, bb
-from misc import gs, wait, ffi
+from constants import DefaultPasswords, DeviceErrorCode
+from misc import gs, wait, ffi, bb
 
 pprint = pprint.PrettyPrinter(indent=4).pprint
 

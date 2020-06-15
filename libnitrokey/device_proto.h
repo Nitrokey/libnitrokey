@@ -249,7 +249,7 @@ namespace nitrokey {
               }
               dev->m_counters.total_comm_runs++;
 
-              int status;
+              int status = 0;
               OutgoingPacket outp;
               ResponsePacket resp;
 

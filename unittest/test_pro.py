@@ -22,9 +22,10 @@ SPDX-License-Identifier: LGPL-3.0
 import pytest
 
 from conftest import skip_if_device_version_lower_than
-from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET, bb, bbRFC_SECRET, LibraryErrors, HOTP_slot_count, \
+from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET, bbRFC_SECRET, LibraryErrors, HOTP_slot_count, \
     TOTP_slot_count
-from misc import ffi, gs, wait, cast_pointer_to_tuple, has_binary_counter
+from helpers import helper_PWS_get_slotname, helper_PWS_get_loginname, helper_PWS_get_pass
+from misc import ffi, gs, wait, cast_pointer_to_tuple, has_binary_counter, bb
 from misc import is_storage
 
 @pytest.mark.lock_device
@@ -50,37 +51,21 @@ def test_write_password_safe_slot(C):
 @pytest.mark.PWS
 @pytest.mark.slowtest
 def test_write_all_password_safe_slots_and_read_10_times(C):
-    def fill(s, wid):
-        assert wid >= len(s)
-        numbers = '1234567890'*4
-        s += numbers[:wid-len(s)]
-        assert len(s) == wid
-        return bb(s)
-
-    def get_pass(suffix):
-        return fill('pass' + suffix, 20)
-
-    def get_loginname(suffix):
-        return fill('login' + suffix, 32)
-
-    def get_slotname(suffix):
-        return fill('slotname' + suffix, 11)
-
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     PWS_slot_count = 16
     for i in range(0, PWS_slot_count):
         iss = str(i)
         assert C.NK_write_password_safe_slot(i,
-                                             get_slotname(iss), get_loginname(iss),
-                                             get_pass(iss)) == DeviceErrorCode.STATUS_OK
+                                             helper_PWS_get_slotname(iss), helper_PWS_get_loginname(iss),
+                                             helper_PWS_get_pass(iss)) == DeviceErrorCode.STATUS_OK
 
     for j in range(0, 10):
         for i in range(0, PWS_slot_count):
             iss = str(i)
-            assert gs(C.NK_get_password_safe_slot_name(i)) == get_slotname(iss)
-            assert gs(C.NK_get_password_safe_slot_login(i)) == get_loginname(iss)
-            assert gs(C.NK_get_password_safe_slot_password(i)) == get_pass(iss)
+            assert gs(C.NK_get_password_safe_slot_name(i)) == helper_PWS_get_slotname(iss)
+            assert gs(C.NK_get_password_safe_slot_login(i)) == helper_PWS_get_loginname(iss)
+            assert gs(C.NK_get_password_safe_slot_password(i)) == helper_PWS_get_pass(iss)
 
 
 @pytest.mark.lock_device
@@ -88,22 +73,6 @@ def test_write_all_password_safe_slots_and_read_10_times(C):
 @pytest.mark.slowtest
 @pytest.mark.xfail(reason="This test should be run directly after test_write_all_password_safe_slots_and_read_10_times")
 def test_read_all_password_safe_slots_10_times(C):
-    def fill(s, wid):
-        assert wid >= len(s)
-        numbers = '1234567890'*4
-        s += numbers[:wid-len(s)]
-        assert len(s) == wid
-        return bb(s)
-
-    def get_pass(suffix):
-        return fill('pass' + suffix, 20)
-
-    def get_loginname(suffix):
-        return fill('login' + suffix, 32)
-
-    def get_slotname(suffix):
-        return fill('slotname' + suffix, 11)
-
     assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     PWS_slot_count = 16
@@ -111,9 +80,9 @@ def test_read_all_password_safe_slots_10_times(C):
     for j in range(0, 10):
         for i in range(0, PWS_slot_count):
             iss = str(i)
-            assert gs(C.NK_get_password_safe_slot_name(i)) == get_slotname(iss)
-            assert gs(C.NK_get_password_safe_slot_login(i)) == get_loginname(iss)
-            assert gs(C.NK_get_password_safe_slot_password(i)) == get_pass(iss)
+            assert gs(C.NK_get_password_safe_slot_name(i)) == helper_PWS_get_slotname(iss)
+            assert gs(C.NK_get_password_safe_slot_login(i)) == helper_PWS_get_loginname(iss)
+            assert gs(C.NK_get_password_safe_slot_password(i)) == helper_PWS_get_pass(iss)
 
 
 @pytest.mark.lock_device
@@ -678,6 +647,30 @@ def test_read_write_config(C):
     config = cast_pointer_to_tuple(config_raw_data, 'uint8_t', 5)
     assert config == (0, 1, 2, True, False)
 
+    # use structs: read I
+    config_st = ffi.new('struct NK_config *')
+    if not config_st:
+        raise Exception("Could not allocate config")
+    assert C.NK_read_config_struct(config_st) == DeviceErrorCode.STATUS_OK
+    assert config_st.numlock == 0
+    assert config_st.capslock == 1
+    assert config_st.scrolllock == 2
+    assert config_st.enable_user_password
+    assert not config_st.disable_user_password
+
+    # use structs: write
+    config_st.numlock = 3
+    assert C.NK_write_config_struct(config_st[0], DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
+
+    # use structs: read II
+    err = C.NK_read_config_struct(config_st)
+    assert err == 0
+    assert config_st.numlock == 3
+    assert config_st.capslock == 1
+    assert config_st.scrolllock == 2
+    assert config_st.enable_user_password
+    assert not config_st.disable_user_password
+
     # restore defaults and check
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_write_config(255, 255, 255, False, True, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
@@ -752,6 +745,13 @@ def test_get_serial_number(C):
     sn = gs(sn)
     assert len(sn) > 0
     print(('Serial number of the device: ', sn))
+
+
+@pytest.mark.status
+def test_get_serial_number_as_u32(C):
+    sn = C.NK_device_serial_number_as_u32()
+    assert sn > 0
+    print(('Serial number of the device (u32): ', sn))
 
 
 @pytest.mark.otp
@@ -994,31 +994,6 @@ def test_TOTP_codes_from_nitrokeyapp(secret, C):
 def test_get_device_model(C):
     assert C.NK_get_device_model() != 0
     # assert C.NK_get_device_model() != C.NK_DISCONNECTED
-
-
-@pytest.mark.firmware
-def test_bootloader_password_change_pro(C):
-    skip_if_device_version_lower_than({'P': 11})
-    assert C.NK_change_firmware_password_pro(b'zxcasd', b'zxcasd') == DeviceErrorCode.WRONG_PASSWORD
-
-    assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE, DefaultPasswords.UPDATE_TEMP) == DeviceErrorCode.STATUS_OK
-    assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE_TEMP, DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK
-
-
-@pytest.mark.firmware
-def test_bootloader_run_pro(C):
-    skip_if_device_version_lower_than({'P': 11})
-    assert C.NK_enable_firmware_update_pro(DefaultPasswords.UPDATE_TEMP) == DeviceErrorCode.WRONG_PASSWORD
-    # Not enabled due to lack of side-effect removal at this point
-    # assert C.NK_enable_firmware_update_pro(DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK
-
-
-@pytest.mark.firmware
-def test_bootloader_password_change_pro_too_long(C):
-    skip_if_device_version_lower_than({'P': 11})
-    long_string = b'a' * 100
-    assert C.NK_change_firmware_password_pro(long_string, long_string) == LibraryErrors.TOO_LONG_STRING
-    assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE, long_string) == LibraryErrors.TOO_LONG_STRING
 
 
 @pytest.mark.otp

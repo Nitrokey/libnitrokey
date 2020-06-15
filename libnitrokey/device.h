@@ -50,7 +50,8 @@ namespace device {
 
 enum class DeviceModel{
     PRO,
-    STORAGE
+    STORAGE,
+    LIBREM
 };
 
 std::ostream& operator<<(std::ostream& stream, DeviceModel model);
@@ -67,12 +68,21 @@ extern const uint16_t NITROKEY_PRO_PID;
  * The USB product ID for the Nitrokey Storage.
  */
 extern const uint16_t NITROKEY_STORAGE_PID;
+/**
+ * The USB vendor ID for Purism devices.
+ */
+extern const uint16_t PURISM_VID;
+/**
+ * The USB product ID for the Librem Key.
+ */
+extern const uint16_t LIBREM_KEY_PID;
 
 /**
  * Convert the given USB product ID to a Nitrokey model.  If there is no model
  * with that ID, return an absent value.
  */
 misc::Option<DeviceModel> product_id_to_model(uint16_t product_id);
+misc::Option<DeviceModel> product_id_to_model(uint16_t vendor_id, uint16_t product_id);
 
 /**
  * Information about a connected device.
@@ -219,6 +229,12 @@ class Stick20 : public Device {
  public:
   Stick20();
 };
+
+class LibremKey : public Device {
+ public:
+  LibremKey();
+};
+
 }
 }
 #endif

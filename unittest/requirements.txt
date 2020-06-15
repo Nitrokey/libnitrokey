@@ -1,4 +1,5 @@
 cffi
+pytest
 pytest-repeat
 pytest-randomly
 tqdm

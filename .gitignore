@@ -9,3 +9,7 @@ core
 .idea/
 CMakeFiles/
 /.vs
+cmake-build-debug/
+build
+build-meson
+venv

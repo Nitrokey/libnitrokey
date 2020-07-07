@@ -158,6 +158,7 @@ char * strndup(const char* str, size_t maxlen);
          * Does nothing otherwise.
          * @param user_pin User PIN
          */
+        [[deprecated("set_unencrypted_read_only is deprecated. Use set_unencrypted_read_only_admin instead.")]]
         void set_unencrypted_read_only(const char *user_pin);
 
         /**
@@ -174,6 +175,7 @@ char * strndup(const char* str, size_t maxlen);
          * Does nothing otherwise.
          * @param user_pin User PIN
          */
+        [[deprecated("set_unencrypted_read_write is deprecated. Use set_unencrypted_read_write_admin instead")]]
         void set_unencrypted_read_write(const char *user_pin);
 
         /**

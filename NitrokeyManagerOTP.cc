@@ -325,3 +325,16 @@ nitrokey::NitrokeyManager::get_OTP_slot_data(const uint8_t slot_number) {
   nitrokey::proto::stick10::ReadSlot::ResponsePayload nitrokey::NitrokeyManager::get_HOTP_slot_data(const uint8_t slot_number) {
     return get_OTP_slot_data(get_internal_slot_number_for_hotp(slot_number));
   }
+  namespace nitrokey { // package type to auth, auth type
+                     // [Authorize,UserAuthorize]
+  template <typename S, typename A, typename T>
+  void NitrokeyManager::authorize_packet(T &package, const char *admin_temporary_password, shared_ptr<Device> device){
+    if (!is_authorization_command_supported()){
+      LOG("Authorization command not supported, skipping", Loglevel::WARNING);
+    }
+      auto auth = get_payload<A>();
+      strcpyT(auth.temporary_password, admin_temporary_password);
+      auth.crc_to_authorize = S::CommandTransaction::getCRC(package);
+      A::CommandTransaction::run(device, auth);
+  }
+    } // namespace nitrokey

@@ -77,6 +77,8 @@ set(SOURCE_FILES
     NitrokeyManagerStorage.h
     NitrokeyManagerOTP.cc
     NitrokeyManagerOTP.h
+    NitrokeyManagerPWS.h
+    NitrokeyManagerPWS.cc
     NK_C_API.h
     NK_C_API.cc
     NK_C_API_helpers.h
@@ -86,6 +88,7 @@ set(SOURCE_FILES
 
 set(SOURCE_FILES_storage
     ${COMMON_FILES}
+    NitrokeyManager.cc
     NitrokeyManagerStorage.cpp
     NitrokeyManagerStorage.h
     NK_C_API_helpers.h
@@ -140,6 +143,7 @@ endif()
 OPTION(NO_LOG "Compile without logging functionality and its strings (decreases size)" OFF)
 IF (NO_LOG)
     SET_TARGET_PROPERTIES(nitrokey PROPERTIES COMPILE_DEFINITIONS "NO_LOG")
+    SET_TARGET_PROPERTIES(nitrokey-storage PROPERTIES COMPILE_DEFINITIONS "NO_LOG")
 ENDIF()
 
 OPTION(LOG_VOLATILE_DATA "Log volatile data (debug)" OFF)

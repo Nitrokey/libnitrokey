@@ -40,6 +40,7 @@ uint8_t NK_last_command_status = 0;
 
 #include "NK_C_API_helpers.h"
 #include "NitrokeyManagerOTP.h"
+#include "NitrokeyManagerPWS.h"
 
 #ifdef __cplusplus
 extern "C" {

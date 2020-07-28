@@ -1,6 +1,5 @@
 #include "NitrokeyManagerStorage.h"
 
-//using namespace nitrokey;
 namespace nitrokey{
 
 using nitrokey::misc::strcpyT;

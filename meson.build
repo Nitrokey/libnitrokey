@@ -66,6 +66,13 @@ libnitrokey = library(
     'NitrokeyManager.cc',
     'NK_C_API.cc',
     'DeviceCommunicationExceptions.cpp',
+    'NitrokeyManagerStorage.cpp',
+    'NitrokeyManagerStorage.h',
+    'NitrokeyManagerOTP.cc',
+    'NitrokeyManagerOTP.h',
+    'NitrokeyManagerPWS.h',
+    'NitrokeyManagerPWS.cc',
+    'NK_C_API_storage.cpp',
   ],
   include_directories : [
     inc_libnitrokey,

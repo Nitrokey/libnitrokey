@@ -1,7 +1,3 @@
-//
-// Created by sz on 7/28/20.
-//
-
 #include "NitrokeyManagerPWS.h"
 #include "NitrokeyManagerOTP.h"
 #include "libnitrokey/LibraryException.h"

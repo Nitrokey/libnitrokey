@@ -40,10 +40,15 @@ namespace nitrokey {
     using namespace nitrokey::proto;
     using namespace nitrokey::log;
 
+template <typename T>
+typename T::CommandPayload get_payload(){
+  //Create, initialize and return by value command payload
+  typename T::CommandPayload st;
+  bzero(&st, sizeof(st));
+  return st;
+}
 
-#ifdef __WIN32
-char * strndup(const char* str, size_t maxlen);
-#endif
+#include "nk_strndup.h"
 
     class NitrokeyManager {
     public:

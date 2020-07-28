@@ -44,35 +44,56 @@ MESSAGE("${PROJECT_NAME}: Build type: ${CMAKE_BUILD_TYPE}")
 
 include_directories(hidapi)
 include_directories(libnitrokey)
+
+set(COMMON_FILES
+        libnitrokey/command.h
+        libnitrokey/command_id.h
+        libnitrokey/cxx_semantics.h
+        libnitrokey/device.h
+        libnitrokey/device_proto.h
+        libnitrokey/dissect.h
+        libnitrokey/log.h
+        libnitrokey/misc.h
+        libnitrokey/NitrokeyManager.h
+        libnitrokey/stick10_commands.h
+        libnitrokey/stick20_commands.h
+        libnitrokey/CommandFailedException.h
+        libnitrokey/LibraryException.h
+        libnitrokey/LongOperationInProgressException.h
+        libnitrokey/stick10_commands_0.8.h
+        command_id.cc
+        device.cc
+        log.cc
+        misc.cc
+        nk_strndup.c
+        DeviceCommunicationExceptions.cpp
+        ${CMAKE_CURRENT_BINARY_DIR}/version.cc
+        )
+
 set(SOURCE_FILES
-    libnitrokey/command.h
-    libnitrokey/command_id.h
-    libnitrokey/cxx_semantics.h
-    libnitrokey/device.h
-    libnitrokey/device_proto.h
-    libnitrokey/dissect.h
-    libnitrokey/log.h
-    libnitrokey/misc.h
-    libnitrokey/NitrokeyManager.h
-    libnitrokey/stick10_commands.h
-    libnitrokey/stick20_commands.h
-    libnitrokey/CommandFailedException.h
-    libnitrokey/LibraryException.h
-    libnitrokey/LongOperationInProgressException.h
-    libnitrokey/stick10_commands_0.8.h
-    command_id.cc
-    device.cc
-    log.cc
-    misc.cc
+   ${COMMON_FILES}
     NitrokeyManager.cc
+    NitrokeyManagerStorage.cpp
+    NitrokeyManagerStorage.h
     NK_C_API.h
     NK_C_API.cc
-    DeviceCommunicationExceptions.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/version.cc
+    NK_C_API_helpers.h
+    NK_C_API_storage.h
+    NK_C_API_storage.cpp
+    )
+
+set(SOURCE_FILES_storage
+    ${COMMON_FILES}
+    NitrokeyManagerStorage.cpp
+    NitrokeyManagerStorage.h
+    NK_C_API_helpers.h
+    NK_C_API_storage.h
+    NK_C_API_storage.cpp
     )
 
 set(BUILD_SHARED_LIBS ON CACHE BOOL "Build all libraries as shared")
 add_library(nitrokey ${SOURCE_FILES})
+add_library(nitrokey-storage ${SOURCE_FILES_storage})
 
 IF(APPLE)
     include_directories(hidapi/hidapi)
@@ -88,6 +109,7 @@ ELSEIF(UNIX)
         target_link_options(nitrokey PRIVATE "-Wl,-Map=output.map")
     ENDIF()
     target_link_libraries(nitrokey ${HIDAPI_LIBUSB_LDFLAGS})
+    target_link_libraries(nitrokey-storage ${HIDAPI_LIBUSB_LDFLAGS})
 ELSEIF(WIN32)
     include_directories(hidapi/hidapi)
     add_library(hidapi-libusb STATIC hidapi/windows/hid.c )
@@ -96,6 +118,9 @@ ELSEIF(WIN32)
 ENDIF()
 
 set_target_properties(nitrokey PROPERTIES
+	VERSION ${libnitrokey_VERSION}
+	SOVERSION ${libnitrokey_VERSION_MAJOR})
+set_target_properties(nitrokey-storage PROPERTIES
 	VERSION ${libnitrokey_VERSION}
 	SOVERSION ${libnitrokey_VERSION_MAJOR})
 

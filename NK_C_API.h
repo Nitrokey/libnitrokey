@@ -1082,5 +1082,6 @@ NK_C_API int NK_read_HOTP_slot(const uint8_t slot_num, struct ReadSlot_t* out);
 #ifdef __cplusplus
 }
 #endif
+extern uint8_t NK_last_command_status;
 
 #endif //LIBNITROKEY_NK_C_API_H

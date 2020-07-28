@@ -26,6 +26,9 @@ namespace nitrokey {
 namespace proto {
 
 const char *commandid_to_string(CommandID id) {
+#ifdef NO_LOG
+  return "";
+#endif
   switch (id) {
     case CommandID::GET_STATUS:
       return "GET_STATUS";

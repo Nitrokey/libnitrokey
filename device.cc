@@ -350,6 +350,10 @@ LibremKey::LibremKey():
 #include <sstream>
 #define p(x) ss << #x << " " << x << ", ";
 std::string Device::ErrorCounters::get_as_string() {
+#ifdef NO_LOG
+  return "";
+#endif
+
   std::stringstream ss;
   p(total_comm_runs);
   p(communication_successful);

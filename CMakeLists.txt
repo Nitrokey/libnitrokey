@@ -75,6 +75,8 @@ set(SOURCE_FILES
     NitrokeyManager.cc
     NitrokeyManagerStorage.cpp
     NitrokeyManagerStorage.h
+    NitrokeyManagerOTP.cc
+    NitrokeyManagerOTP.h
     NK_C_API.h
     NK_C_API.cc
     NK_C_API_helpers.h

@@ -37,9 +37,9 @@ using namespace nitrokey;
 
 const uint8_t NK_PWS_SLOT_COUNT = PWS_SLOT_COUNT;
 uint8_t NK_last_command_status = 0;
-static const int max_string_field_length = 100;
 
 #include "NK_C_API_helpers.h"
+#include "NitrokeyManagerOTP.h"
 
 #ifdef __cplusplus
 extern "C" {

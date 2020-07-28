@@ -4,7 +4,6 @@
 namespace nitrokey{
 
 using nitrokey::misc::strcpyT;
-constexpr int max_string_field_length = 2*1024; //storage's status string is ~1k
 
 //storage commands
 

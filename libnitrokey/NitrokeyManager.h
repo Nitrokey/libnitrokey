@@ -49,6 +49,7 @@ typename T::CommandPayload get_payload(){
 }
 
 #include "nk_strndup.h"
+constexpr int max_string_field_length = 2*1024; //storage's status string is ~1k
 
     class NitrokeyManager {
     public:

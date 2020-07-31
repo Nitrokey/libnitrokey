@@ -13,6 +13,7 @@
 #include "libnitrokey/device_proto.h"
 #include "libnitrokey/version.h"
 
+void clear_string(std::string &s);
 
 extern uint8_t NK_last_command_status;
 

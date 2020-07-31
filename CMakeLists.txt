@@ -81,6 +81,9 @@ set(SOURCE_FILES
     NitrokeyManagerPWS.cc
     NK_C_API.h
     NK_C_API.cc
+    NK_C_API_pws.cpp
+    NK_C_API_otp.cpp
+    NK_C_API_helpers.cpp
     NK_C_API_helpers.h
     NK_C_API_storage.h
     NK_C_API_storage.cpp
@@ -91,6 +94,9 @@ set(SOURCE_FILES_storage
     NitrokeyManager.cc
     NitrokeyManagerStorage.cpp
     NitrokeyManagerStorage.h
+    NK_C_API.h
+    NK_C_API.cc
+    NK_C_API_helpers.cpp
     NK_C_API_helpers.h
     NK_C_API_storage.h
     NK_C_API_storage.cpp

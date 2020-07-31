@@ -21,7 +21,6 @@
 
 #include <chrono>
 #include <codecvt>
-#include <iostream>
 #include <locale>
 #include <thread>
 #include <cstddef>

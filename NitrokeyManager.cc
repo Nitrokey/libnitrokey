@@ -29,7 +29,6 @@
 #include <algorithm>
 #include <cstring>
 #include <functional>
-#include <iostream>
 #include <mutex>
 #include <stick10_commands.h>
 #include <stick20_commands.h>

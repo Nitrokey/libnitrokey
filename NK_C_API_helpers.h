@@ -3,7 +3,6 @@
 
 
 #include "NK_C_API.h"
-#include <iostream>
 #include <tuple>
 #include "libnitrokey/NitrokeyManager.h"
 #include <cstring>

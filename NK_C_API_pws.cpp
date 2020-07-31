@@ -10,7 +10,6 @@
 #include "libnitrokey/stick20_commands.h"
 #include "libnitrokey/version.h"
 #include <cstring>
-#include <iostream>
 #include <tuple>
 
 #include "nk_strndup.h"

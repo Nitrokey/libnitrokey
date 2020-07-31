@@ -20,7 +20,9 @@
  */
 
 #include "NK_C_API.h"
+#ifndef NO_LOG
 #include <iostream>
+#endif
 #include <tuple>
 #include "libnitrokey/NitrokeyManager.h"
 #include <cstring>
@@ -63,11 +65,15 @@ extern "C" {
 		}
     catch (const DeviceCommunicationException &deviceException){
       NK_last_command_status = 256-deviceException.getType();
+#ifndef NO_LOG
       cerr << deviceException.what() << endl;
+#endif
       return 0;
     }
 		catch (std::runtime_error &e) {
-			cerr << e.what() << endl;
+#ifndef NO_LOG
+                  cerr << e.what() << endl;
+#endif
 			return 0;
 		}
 		return 0;

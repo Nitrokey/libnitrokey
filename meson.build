@@ -26,7 +26,11 @@ if get_option('offline-tests')
   add_project_arguments(c.get_supported_arguments(test_cflags), language : 'c')
 endif
 
-dep_hidapi = dependency('hidapi-libusb')
+if target_machine.system() == 'freebsd'
+  dep_hidapi = dependency('hidapi')
+else
+  dep_hidapi = dependency('hidapi-libusb')
+endif
 
 inc_libnitrokey = include_directories('libnitrokey')
 libnitrokey_args = []
@@ -113,7 +117,11 @@ pkg.generate(
   install : true,
 )
 
-dep_udev = dependency('udev')
+if target_machine.system() == 'freebsd'
+  dep_udev = dependency('libudev')
+else
+  dep_udev = dependency('udev')
+endif
 install_data(
   'data/41-nitrokey.rules',
   install_dir : '@0@/rules.d'.format(dep_udev.get_pkgconfig_variable('udevdir')),

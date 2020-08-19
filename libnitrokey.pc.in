@@ -4,7 +4,7 @@ includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
 Name: libnitrokey
 Description: Library for communicating with Nitrokey in a clean and easy manner
 Version: @libnitrokey_VERSION@
-Requires.private: hidapi-libusb
+Requires.private: @HIDAPI_LIBUSB_NAME@
 
 Libs: -L${libdir} -lnitrokey
 Cflags: -I${includedir}

@@ -107,12 +107,22 @@ ext_libnitrokey = declare_dependency(
   include_directories : inc_libnitrokey,
 )
 
+if meson.version().version_compare('>= 0.48.0') 
+  dep_hidapi_name = dep_hidapi.name()
+else
+  if target_machine.system() == 'freebsd'
+    dep_hidapi_name = 'hidapi'
+  else
+    dep_hidapi_name = 'hidapi-libusb'
+  endif
+endif
+
 pkg.generate(
   name : meson.project_name(),
   filebase : 'libnitrokey-1',
   libraries : libnitrokey,
   version : meson.project_version(),
-  requires_private : 'hidapi-libusb',
+  requires_private : dep_hidapi_name,
   description : 'Library for communicating with Nitrokey in a clean and easy manner',
   install : true,
 )

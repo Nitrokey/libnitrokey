@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/Nitrokey/libnitrokey.svg?branch=master)](https://travis-ci.org/Nitrokey/libnitrokey)
 [![Waffle.io - Columns and their card count](https://badge.waffle.io/Nitrokey/libnitrokey.svg?columns=ready,in%20progress,test,waiting%20for%20feedback)](https://waffle.io/Nitrokey/libnitrokey)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FNitrokey%2Flibnitrokey.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FNitrokey%2Flibnitrokey?ref=badge_shield)
 
 # libnitrokey
 libnitrokey is a project to communicate with Nitrokey Pro and Storage devices in a clean and easy manner. Written in C++14, testable with `py.test` and `Catch` frameworks, with C API, Python access (through CFFI and C API, in future with Pybind11).
@@ -369,6 +370,9 @@ Other tasks might be listed either in [TODO](TODO) file or on project's issues p
 
 # License
 This project is licensed under LGPL version 3. License text could be found under [LICENSE](LICENSE) file.
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FNitrokey%2Flibnitrokey.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FNitrokey%2Flibnitrokey?ref=badge_large)
 
 # Roadmap
 To check what issues will be fixed and when please check [milestones](https://github.com/Nitrokey/libnitrokey/milestones) page.

@@ -73,6 +73,8 @@ set(SOURCE_FILES
 set(BUILD_SHARED_LIBS ON CACHE BOOL "Build all libraries as shared")
 add_library(nitrokey ${SOURCE_FILES})
 
+set(HIDAPI_LIBUSB_NAME hidapi-libusb)
+
 IF(APPLE)
     include_directories(hidapi/hidapi)
     add_library(hidapi-libusb STATIC hidapi/mac/hid.c )
@@ -83,6 +85,7 @@ ELSEIF(UNIX)
     find_package(PkgConfig)
     IF(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
         pkg_search_module(HIDAPI_LIBUSB REQUIRED hidapi)
+        set(HIDAPI_LIBUSB_NAME hidapi)
     ELSE()
         pkg_search_module(HIDAPI_LIBUSB REQUIRED hidapi-libusb)
     ENDIF()

@@ -97,7 +97,7 @@ set_target_properties(nitrokey PROPERTIES
 
 OPTION(ERROR_ON_WARNING "Stop compilation on warning found (not supported for MSVC)" OFF)
 if (NOT MSVC)
-    set(COMPILE_FLAGS "-Wall -Wno-unused-function -Wcast-qual -Woverloaded-virtual -Wsign-compare -Wformat -Wformat-security")
+    set(COMPILE_FLAGS "-Wall -Wno-unused-function -Wcast-qual -Woverloaded-virtual -Wsign-compare -Wformat -Wformat-security -Wno-deprecated")
     IF(NOT APPLE)
         if (ERROR_ON_WARNING)
             set(COMPILE_FLAGS "${COMPILE_FLAGS} -Werror")

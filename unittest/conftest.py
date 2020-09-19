@@ -98,6 +98,7 @@ def get_library(request, allow_offline=False):
         model = C.NK_get_device_model()
         model = 'P' if model == 1 else 'S' if model == 2 else 'U'
         device_type = (model, firmware_version)
+        print('Connected library: {}'.format(gs(C.NK_get_library_version())))
         print('Connected device: {} {}'.format(model, firmware_version))
 
     # assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK

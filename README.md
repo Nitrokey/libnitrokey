@@ -95,7 +95,7 @@ pip3 install cffi # for python 3.x
 Just import it, read the C API header and it is done! You have access to the library. Here is an example (in Python 2) printing HOTP code for Pro or Storage device, assuming it is run in root directory [(full example)](python_bindings_example.py):
 
 <details>
-    <summary>Log (click to show)</summary>
+    <summary>Code snippet (click to show)</summary>
 
 
 ```python

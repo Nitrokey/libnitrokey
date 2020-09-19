@@ -837,7 +837,8 @@ extern "C" {
 	 * @param user_pin 20 characters User PIN
 	 * @return command processing error code
 	 */
-  [[deprecated("NK_set_unencrypted_read_only is deprecated. Use NK_set_unencrypted_read_only_admin instead")]]
+  //[[deprecated("NK_set_unencrypted_read_only is deprecated. Use NK_set_unencrypted_read_only_admin instead")]]
+  DEPRECATED
   NK_C_API int NK_set_unencrypted_read_only(const char *user_pin);
 
 	/**
@@ -850,7 +851,8 @@ extern "C" {
 	 * @param user_pin 20 characters User PIN
 	 * @return command processing error code
 	 */
-  [[deprecated("NK_set_unencrypted_read_write is deprecated. Use NK_set_unencrypted_read_write_admin instead")]]
+  //[[deprecated("NK_set_unencrypted_read_write is deprecated. Use NK_set_unencrypted_read_write_admin instead")]]
+  DEPRECATED
   NK_C_API int NK_set_unencrypted_read_write(const char *user_pin);
 
 	/**

@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/Nitrokey/libnitrokey.svg?branch=master)](https://travis-ci.org/Nitrokey/libnitrokey)
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/Nitrokey/libnitrokey.svg?columns=ready,in%20progress,test,waiting%20for%20feedback)](https://waffle.io/Nitrokey/libnitrokey)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FNitrokey%2Flibnitrokey.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FNitrokey%2Flibnitrokey?ref=badge_shield)
 
 # libnitrokey
 libnitrokey is a project to communicate with Nitrokey Pro and Storage devices in a clean and easy manner. Written in C++14, testable with `py.test` and `Catch` frameworks, with C API, Python access (through CFFI and C API, in future with Pybind11).
@@ -8,7 +8,7 @@ The development of this project is aimed to make it itself a living documentatio
 
 A C++14 complying compiler is required due to heavy use of variable templates. For feature support tables please check [table 1](https://gcc.gnu.org/projects/cxx-status.html#cxx14) or [table 2](http://en.cppreference.com/w/cpp/compiler_support).
 
-libnitrokey is developed and tested with the latest compilers: g++ 6.2, clang 3.8. We use Travis CI to test builds also on g++ 5.4 and under OSX compilers starting up from xcode 8.2 environment. 
+libnitrokey is developed and tested with a variety of compilers, starting from g++ 6.2 and clang 3.8. We use Travis CI to test builds also on g++ 5.4 and under OSX compilers starting up from xcode 9 environment. 
 
 ## Getting sources
 This repository uses `git submodules`.

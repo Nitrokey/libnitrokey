@@ -1,11 +1,10 @@
 language: generic
-sudo: false
 os: osx
 env:
   global:
     - CF="-DCOMPILE_OFFLINE_TESTS=1 -DERROR_ON_WARNING=ON"
 
-matrix:
+jobs:
   include:
     - osx_image: xcode11.5
     - osx_image: xcode9.1

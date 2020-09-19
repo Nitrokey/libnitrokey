@@ -604,6 +604,9 @@ extern "C" {
 		});
 	}
 
+  // deprecated, noop on v0.51 and older (excl. v0.49)
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 	NK_C_API int NK_set_unencrypted_read_only(const char *user_pin) {
 		auto m = NitrokeyManager::instance();
 		return get_without_result([&]() {
@@ -611,12 +614,14 @@ extern "C" {
 		});
 	}
 
-	NK_C_API int NK_set_unencrypted_read_write(const char *user_pin) {
+	// deprecated, noop on v0.51 and older (excl. v0.49)
+  NK_C_API int NK_set_unencrypted_read_write(const char *user_pin) {
 		auto m = NitrokeyManager::instance();
 		return get_without_result([&]() {
 			m->set_unencrypted_read_write(user_pin);
 		});
 	}
+#pragma GCC diagnostic pop
 
 	NK_C_API int NK_set_unencrypted_read_only_admin(const char *admin_pin) {
 		auto m = NitrokeyManager::instance();

@@ -837,7 +837,9 @@ extern "C" {
 	 * @param user_pin 20 characters User PIN
 	 * @return command processing error code
 	 */
-	NK_C_API int NK_set_unencrypted_read_only(const char *user_pin);
+  //[[deprecated("Use NK_set_unencrypted_read_only_admin instead")]]
+  DEPRECATED
+  NK_C_API int NK_set_unencrypted_read_only(const char *user_pin);
 
 	/**
 	 * Make unencrypted volume read-write.
@@ -849,7 +851,9 @@ extern "C" {
 	 * @param user_pin 20 characters User PIN
 	 * @return command processing error code
 	 */
-	NK_C_API int NK_set_unencrypted_read_write(const char *user_pin);
+  //[[deprecated("Use NK_set_unencrypted_read_write_admin instead")]]
+  DEPRECATED
+  NK_C_API int NK_set_unencrypted_read_write(const char *user_pin);
 
 	/**
 	 * Make unencrypted volume read-only.

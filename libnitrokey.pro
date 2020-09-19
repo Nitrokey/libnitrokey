@@ -7,11 +7,11 @@ CONFIG   += c++14 shared debug
 TEMPLATE     = lib
 TARGET = nitrokey
 
-VERSION = 3.5.0
+VERSION = 3.6.0
 QMAKE_TARGET_COMPANY = Nitrokey
 QMAKE_TARGET_PRODUCT = libnitrokey
 QMAKE_TARGET_DESCRIPTION = Communicate with Nitrokey stick devices in a clean and easy manner
-QMAKE_TARGET_COPYRIGHT = Copyright (c) 2015-2018 Nitrokey UG
+QMAKE_TARGET_COPYRIGHT = Copyright (c) 2015-2020 Nitrokey Gmbh
 
 HEADERS = \
    $$PWD/hidapi/hidapi/hidapi.h \

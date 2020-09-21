@@ -62,12 +62,13 @@ def test_data_lost(C):
 
     iterations = 0
     failed = []
+    errcnt = 0
     while True:
         iterations += 1
-        print(f"*** Starting iteration {iterations} (failed [{len(failed)}]{failed})")
+        print(f"*** Starting iteration {iterations} (failed {errcnt} [{len(failed)}]{failed})")
 
         for cmd_i , c in enumerate(commands):
-            assert c() == DeviceErrorCode.STATUS_OK
+            errcnt += 0 if c() == DeviceErrorCode.STATUS_OK else 1
             my_sleep(1)
             reinsert()
 
@@ -79,7 +80,7 @@ def test_data_lost(C):
                 print("".center(80, "*"))
                 print("".center(80, "*"))
                 my_sleep(3)
-                failed += cmd_i
+                failed.append(cmd_i)
         # print(f"Status: {get_status(C)}")
         assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
         my_sleep(1)

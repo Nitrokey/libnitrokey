@@ -41,7 +41,7 @@
  * \mainpage
  *
  * **libnitrokey** provides access to Nitrokey Pro and Nitrokey Storage devices.
- * This documentation describes libnitrokey’s C API.  For a list of the
+ * This documentation describes libnitrokey's C API.  For a list of the
  * available functions, see the NK_C_API.h file.
  *
  * \section getting_started Example
@@ -974,7 +974,7 @@ extern "C" {
 	/**
 	 * Get SD card usage attributes. Usable during hidden volumes creation.
 	 * If the command was successful (return value 0), the usage data is
-	 * written to the output pointer’s target.  The output pointer must
+	 * written to the output pointer's target.  The output pointer must
 	 * not be null.
 	 * Storage only
 	 * @param out the output pointer for the usage data

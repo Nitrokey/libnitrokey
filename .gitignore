@@ -1,6 +1,7 @@
 *.sw*
 *.log
 *.o
+build
 unittest/build/
 unittest/.pytest_cache/
 *.pyc

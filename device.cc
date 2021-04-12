@@ -234,6 +234,7 @@ namespace {
     auto pInfo_ = pInfo;
     while (pInfo != nullptr){
       if (pInfo->path == nullptr || pInfo->serial_number == nullptr) {
+      pInfo = pInfo->next;
       continue;
     }
     auto deviceModel = product_id_to_model(vendor_id, pInfo->product_id);

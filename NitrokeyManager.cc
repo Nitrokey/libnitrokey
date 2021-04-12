@@ -217,44 +217,44 @@ using nitrokey::misc::strcpyT;
             }
         }
 
-	auto vendor_id = NITROKEY_VID;
-        auto info_ptr = hid_enumerate(vendor_id, 0);
-	if (!info_ptr) {
-	  vendor_id = PURISM_VID;
-	  info_ptr = hid_enumerate(vendor_id, 0);
-	}
-        auto first_info_ptr = info_ptr;
-        if (!info_ptr)
-          return false;
+        auto vendor_ids = { NITROKEY_VID, PURISM_VID };
+        for (auto vendor_id : vendor_ids) {
+          auto info_ptr = hid_enumerate(vendor_id, 0);
+          if (!info_ptr) {
+            continue;
+          }
+          auto first_info_ptr = info_ptr;
 
-        misc::Option<DeviceModel> model;
-        while (info_ptr && !model.has_value()) {
-            if (path == std::string(info_ptr->path)) {
-                model = product_id_to_model(info_ptr->vendor_id, info_ptr->product_id);
-            }
-            info_ptr = info_ptr->next;
+          misc::Option<DeviceModel> model;
+          while (info_ptr && !model.has_value()) {
+              if (path == std::string(info_ptr->path)) {
+                  model = product_id_to_model(info_ptr->vendor_id, info_ptr->product_id);
+              }
+              info_ptr = info_ptr->next;
+          }
+          hid_free_enumeration(first_info_ptr);
+
+          if (!model.has_value())
+            continue;
+
+          auto p = Device::create(model.value());
+          if (!p)
+            continue;
+          p->set_path(path);
+
+          if(!p->connect()) continue;
+
+          if(cache_connections){
+              connected_devices [path] = p;
+          }
+
+          device = p; //previous device will be disconnected automatically
+          current_device_id = path;
+          nitrokey::log::Log::setPrefix(path);
+          LOGD1("Device successfully changed");
+          return true;
         }
-        hid_free_enumeration(first_info_ptr);
-
-        if (!model.has_value())
-            return false;
-
-        auto p = Device::create(model.value());
-        if (!p)
-            return false;
-        p->set_path(path);
-
-        if(!p->connect()) return false;
-
-        if(cache_connections){
-            connected_devices [path] = p;
-        }
-
-        device = p; //previous device will be disconnected automatically
-        current_device_id = path;
-        nitrokey::log::Log::setPrefix(path);
-        LOGD1("Device successfully changed");
-        return true;
+        return false;
     }
 
     bool NitrokeyManager::connect() {

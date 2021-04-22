@@ -28,6 +28,7 @@
 #include "stick10_commands.h"
 #include "stick10_commands_0.8.h"
 #include "stick20_commands.h"
+#include <cstddef>
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -63,6 +64,54 @@ char * strndup(const char* str, size_t maxlen);
         string get_TOTP_code(uint8_t slot_number, const char *user_temporary_password);
         stick10::ReadSlot::ResponsePayload get_TOTP_slot_data(const uint8_t slot_number);
         stick10::ReadSlot::ResponsePayload get_HOTP_slot_data(const uint8_t slot_number);
+
+        /**
+         * Returns the number of PWS slots provided by the connected device or
+         * zero if no device is connected.
+         */
+        uint8_t get_pws_slot_count();
+
+        /**
+         * Returns the maximum length of a PWS slot name in bytes for the
+         * connected device or zero if no device is connected.
+         */
+        size_t get_pws_name_length();
+
+        /**
+         * Returns the maximum length of a PWS login in bytes for the connected
+         * device or zero if no device is connected.
+         */
+        size_t get_pws_login_length();
+
+        /**
+         * Returns the maximum length of a PWS password in bytes for the
+         * connected device or zero if no device is connected.
+         */
+        size_t get_pws_password_length();
+
+        /**
+         * Returns the number of TOTP slots provided by the connected device or
+         * zero if no device is connected.
+         */
+        uint8_t get_totp_slot_count();
+
+        /**
+         * Returns the number of HOTP slots provided by the connected device or
+         * zero if no device is connected.
+         */
+        uint8_t get_hotp_slot_count();
+
+        /**
+         * Returns the maximum length of an OTP slot name in bytes for the
+         * connected device or zero if no device is connected.
+         */
+        size_t get_otp_name_length();
+
+        /**
+         * Returns the maximum length of an OTP secret in bytes for the
+         * connected device or zero if no device is connected.
+         */
+        size_t get_otp_secret_length();
 
         bool set_time(uint64_t time);
         /**

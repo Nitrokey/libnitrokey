@@ -132,6 +132,14 @@ def test_password_safe_slot_status(C):
     assert is_slot_programmed[1] == 1
 
 
+@pytest.mark.PWS
+def test_password_safe_properties(C):
+    assert C.NK_get_pws_slot_count() == 16
+    assert C.NK_get_pws_name_length() == 11
+    assert C.NK_get_pws_login_length() == 32
+    assert C.NK_get_pws_password_length() == 20
+
+
 @pytest.mark.aes
 def test_issue_device_locks_on_second_key_generation_in_sequence(C):
 #    if is_pro_rtm_07(C) or is_pro_rtm_08(C):
@@ -1070,3 +1078,11 @@ def test_OTP_all_rw(C):
         all_codes.append(this_loop_codes)
     from pprint import pprint
     pprint(all_codes)
+
+
+@pytest.mark.otp
+def test_otp_properties(C):
+    assert C.NK_get_hotp_slot_count() == 3
+    assert C.NK_get_totp_slot_count() == 15
+    assert C.NK_get_otp_name_length() == 15
+    assert C.NK_get_otp_secret_length() == 40

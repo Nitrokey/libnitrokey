@@ -390,6 +390,69 @@ using nitrokey::misc::strcpyT;
         }
     }
 
+    uint8_t NitrokeyManager::get_pws_slot_count() {
+        if (device == nullptr) {
+            return 0;
+        } else {
+            return PWS_SLOT_COUNT;
+        }
+    }
+
+    size_t NitrokeyManager::get_pws_name_length() {
+        if (device == nullptr) {
+            return 0;
+        } else {
+            return PWS_SLOTNAME_LENGTH;
+        }
+    }
+
+    size_t NitrokeyManager::get_pws_login_length() {
+        if (device == nullptr) {
+            return 0;
+        } else {
+            return PWS_LOGINNAME_LENGTH;
+        }
+    }
+
+    size_t NitrokeyManager::get_pws_password_length() {
+        if (device == nullptr) {
+            return 0;
+        } else {
+            return PWS_PASSWORD_LENGTH;
+        }
+    }
+
+    uint8_t NitrokeyManager::get_totp_slot_count() {
+        if (device == nullptr) {
+            return 0;
+        } else {
+            return TOTP_SLOT_COUNT;
+        }
+    }
+
+    uint8_t NitrokeyManager::get_hotp_slot_count() {
+        if (device == nullptr) {
+            return 0;
+        } else {
+            return HOTP_SLOT_COUNT;
+        }
+    }
+
+    size_t NitrokeyManager::get_otp_name_length() {
+        if (device == nullptr) {
+            return 0;
+        } else {
+            return OTP_SLOTNAME_LENGTH;
+        }
+    }
+
+    size_t NitrokeyManager::get_otp_secret_length() {
+        if (device == nullptr) {
+            return 0;
+        } else {
+            return OTP_SECRET_LENGTH;
+        }
+    }
 
     string NitrokeyManager::get_serial_number() {
       try {

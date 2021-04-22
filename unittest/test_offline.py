@@ -37,3 +37,13 @@ def test_offline(C_offline):
     # v3.4.1-29-g1f3d
     search = re.search(b'v\d\.\d(\.\d)?', libnk_version)
     assert search is not None
+
+    assert C_offline.NK_get_pws_slot_count() == 0
+    assert C_offline.NK_get_pws_name_length() == 0
+    assert C_offline.NK_get_pws_login_length() == 0
+    assert C_offline.NK_get_pws_password_length() == 0
+
+    assert C_offline.NK_get_hotp_slot_count() == 0
+    assert C_offline.NK_get_totp_slot_count() == 0
+    assert C_offline.NK_get_otp_name_length() == 0
+    assert C_offline.NK_get_otp_secret_length() == 0

@@ -336,6 +336,38 @@ extern "C" {
 		});
 	}
 
+	NK_C_API uint8_t NK_get_pws_slot_count() {
+		return NitrokeyManager::instance()->get_pws_slot_count();
+	}
+
+	NK_C_API size_t NK_get_pws_name_length() {
+		return NitrokeyManager::instance()->get_pws_name_length();
+	}
+
+	NK_C_API size_t NK_get_pws_login_length() {
+		return NitrokeyManager::instance()->get_pws_login_length();
+	}
+
+	NK_C_API size_t NK_get_pws_password_length() {
+		return NitrokeyManager::instance()->get_pws_password_length();
+	}
+
+	NK_C_API uint8_t NK_get_totp_slot_count() {
+		return NitrokeyManager::instance()->get_totp_slot_count();
+	}
+
+	NK_C_API uint8_t NK_get_hotp_slot_count() {
+		return NitrokeyManager::instance()->get_hotp_slot_count();
+	}
+
+	NK_C_API size_t NK_get_otp_name_length() {
+		return NitrokeyManager::instance()->get_otp_name_length();
+	}
+
+	NK_C_API size_t NK_get_otp_secret_length() {
+		return NitrokeyManager::instance()->get_otp_secret_length();
+	}
+
 	NK_C_API char * NK_get_hotp_code(uint8_t slot_number) {
 		return NK_get_hotp_code_PIN(slot_number, "");
 	}

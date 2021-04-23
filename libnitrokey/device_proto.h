@@ -52,6 +52,11 @@
 #define PWS_SEND_TAB 2
 #define PWS_SEND_CR 3
 
+#define HOTP_SLOT_COUNT 3
+#define TOTP_SLOT_COUNT 15
+#define OTP_SLOTNAME_LENGTH 15
+#define OTP_SECRET_LENGTH 40
+
 #include <mutex>
 #include "DeviceCommunicationExceptions.h"
 #define bzero(b,len) (memset((b), '\0', (len)), (void) 0)  

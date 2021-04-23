@@ -470,8 +470,8 @@ using nitrokey::misc::strcpyT;
     }
 
     bool NitrokeyManager::is_internal_hotp_slot_number(uint8_t slot_number) const { return slot_number < 0x20; }
-    bool NitrokeyManager::is_valid_hotp_slot_number(uint8_t slot_number) const { return slot_number < 3; }
-    bool NitrokeyManager::is_valid_totp_slot_number(uint8_t slot_number) const { return slot_number < 0x10-1; } //15
+    bool NitrokeyManager::is_valid_hotp_slot_number(uint8_t slot_number) const { return slot_number < HOTP_SLOT_COUNT; }
+    bool NitrokeyManager::is_valid_totp_slot_number(uint8_t slot_number) const { return slot_number < TOTP_SLOT_COUNT; }
     uint8_t NitrokeyManager::get_internal_slot_number_for_totp(uint8_t slot_number) const { return (uint8_t) (0x20 + slot_number); }
     uint8_t NitrokeyManager::get_internal_slot_number_for_hotp(uint8_t slot_number) const { return (uint8_t) (0x10 + slot_number); }
 
@@ -636,9 +636,8 @@ using nitrokey::misc::strcpyT;
       payload2.id = 0;
       auto secret_bin = misc::hex_string_to_byte(secret);
       auto remaining_secret_length = secret_bin.size();
-      const auto maximum_OTP_secret_size = 40;
-      if(remaining_secret_length > maximum_OTP_secret_size){
-        throw TargetBufferSmallerThanSource(remaining_secret_length, maximum_OTP_secret_size);
+      if(remaining_secret_length > OTP_SECRET_LENGTH){
+        throw TargetBufferSmallerThanSource(remaining_secret_length, OTP_SECRET_LENGTH);
       }
 
       while (remaining_secret_length>0){

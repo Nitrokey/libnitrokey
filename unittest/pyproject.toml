@@ -1,0 +1,22 @@
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "serial",
+    "aes",
+    "encrypted",
+    "factory_reset",
+    "firmware",
+    "hidden",
+    "info",
+    "lock_device",
+    "other",
+    "otp",
+    "pin",
+    "PWS",
+    "skip",
+    "skip_by_default",
+    "slowtest",
+    "status",
+    "unencrypted",
+    "update",
+]

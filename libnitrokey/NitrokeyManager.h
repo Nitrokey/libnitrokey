@@ -222,6 +222,7 @@ char * strndup(const char* str, size_t maxlen);
 
         explicit NitrokeyManager();
         void set_log_function(std::function<void(std::string)> log_function);
+        void set_log_function_raw(std::function<void(const std::string&, Loglevel)> log_function);
     private:
 
         static shared_ptr <NitrokeyManager> _instance;

@@ -67,6 +67,15 @@ namespace nitrokey {
 
     };
 
+    class RawFunctionalLogHandler : public LogHandler {
+      using log_function_type = std::function<void(const std::string&, Loglevel lvl)>;
+      log_function_type log_function;
+    public:
+      RawFunctionalLogHandler(log_function_type _log_function);
+      virtual void print(const std::string &, Loglevel lvl);
+
+    };
+
     extern StdlogHandler stdlog_handler;
 
     class Log {

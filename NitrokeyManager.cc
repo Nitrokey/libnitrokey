@@ -395,6 +395,69 @@ using nitrokey::misc::strcpyT;
         }
     }
 
+    uint8_t NitrokeyManager::get_pws_slot_count() {
+        if (device == nullptr) {
+            return 0;
+        } else {
+            return PWS_SLOT_COUNT;
+        }
+    }
+
+    size_t NitrokeyManager::get_pws_name_length() {
+        if (device == nullptr) {
+            return 0;
+        } else {
+            return PWS_SLOTNAME_LENGTH;
+        }
+    }
+
+    size_t NitrokeyManager::get_pws_login_length() {
+        if (device == nullptr) {
+            return 0;
+        } else {
+            return PWS_LOGINNAME_LENGTH;
+        }
+    }
+
+    size_t NitrokeyManager::get_pws_password_length() {
+        if (device == nullptr) {
+            return 0;
+        } else {
+            return PWS_PASSWORD_LENGTH;
+        }
+    }
+
+    uint8_t NitrokeyManager::get_totp_slot_count() {
+        if (device == nullptr) {
+            return 0;
+        } else {
+            return TOTP_SLOT_COUNT;
+        }
+    }
+
+    uint8_t NitrokeyManager::get_hotp_slot_count() {
+        if (device == nullptr) {
+            return 0;
+        } else {
+            return HOTP_SLOT_COUNT;
+        }
+    }
+
+    size_t NitrokeyManager::get_otp_name_length() {
+        if (device == nullptr) {
+            return 0;
+        } else {
+            return OTP_SLOTNAME_LENGTH;
+        }
+    }
+
+    size_t NitrokeyManager::get_otp_secret_length() {
+        if (device == nullptr) {
+            return 0;
+        } else {
+            return OTP_SECRET_LENGTH;
+        }
+    }
 
     string NitrokeyManager::get_serial_number() {
       try {
@@ -475,8 +538,8 @@ using nitrokey::misc::strcpyT;
     }
 
     bool NitrokeyManager::is_internal_hotp_slot_number(uint8_t slot_number) const { return slot_number < 0x20; }
-    bool NitrokeyManager::is_valid_hotp_slot_number(uint8_t slot_number) const { return slot_number < 3; }
-    bool NitrokeyManager::is_valid_totp_slot_number(uint8_t slot_number) const { return slot_number < 0x10-1; } //15
+    bool NitrokeyManager::is_valid_hotp_slot_number(uint8_t slot_number) const { return slot_number < HOTP_SLOT_COUNT; }
+    bool NitrokeyManager::is_valid_totp_slot_number(uint8_t slot_number) const { return slot_number < TOTP_SLOT_COUNT; }
     uint8_t NitrokeyManager::get_internal_slot_number_for_totp(uint8_t slot_number) const { return (uint8_t) (0x20 + slot_number); }
     uint8_t NitrokeyManager::get_internal_slot_number_for_hotp(uint8_t slot_number) const { return (uint8_t) (0x10 + slot_number); }
 
@@ -641,9 +704,8 @@ using nitrokey::misc::strcpyT;
       payload2.id = 0;
       auto secret_bin = misc::hex_string_to_byte(secret);
       auto remaining_secret_length = secret_bin.size();
-      const auto maximum_OTP_secret_size = 40;
-      if(remaining_secret_length > maximum_OTP_secret_size){
-        throw TargetBufferSmallerThanSource(remaining_secret_length, maximum_OTP_secret_size);
+      if(remaining_secret_length > OTP_SECRET_LENGTH){
+        throw TargetBufferSmallerThanSource(remaining_secret_length, OTP_SECRET_LENGTH);
       }
 
       while (remaining_secret_length>0){

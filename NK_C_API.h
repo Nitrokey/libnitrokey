@@ -23,6 +23,7 @@
 #define LIBNITROKEY_NK_C_API_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #include "deprecated.h"
@@ -541,6 +542,56 @@ extern "C" {
 	 * @return command processing error code
 	 */
 	NK_C_API int NK_read_config_struct(struct NK_config* out);
+
+	// OTP and PWS properties
+
+	/**
+	 * Returns the number of PWS slots provided by the connected device or
+	 * zero if no device is connected.
+	 */
+	NK_C_API uint8_t NK_get_pws_slot_count();
+
+	/**
+	 * Returns the maximum length of a PWS slot name in bytes for the
+	 * connected device or zero if no device is connected.
+	 */
+	NK_C_API size_t NK_get_pws_name_length();
+
+	/**
+	 * Returns the maximum length of a PWS login in bytes for the connected
+	 * device or zero if no device is connected.
+	 */
+	NK_C_API size_t NK_get_pws_login_length();
+
+	/**
+	 * Returns the maximum length of a PWS password in bytes for the
+	 * connected device or zero if no device is connected.
+	 */
+	NK_C_API size_t NK_get_pws_password_length();
+
+	/**
+	 * Returns the number of TOTP slots provided by the connected device or
+	 * zero if no device is connected.
+	 */
+	NK_C_API uint8_t NK_get_totp_slot_count();
+
+	/**
+	 * Returns the number of HOTP slots provided by the connected device or
+	 * zero if no device is connected.
+	 */
+	NK_C_API uint8_t NK_get_hotp_slot_count();
+
+	/**
+	 * Returns the maximum length of an OTP slot name in bytes for the
+	 * connected device or zero if no device is connected.
+	 */
+	NK_C_API size_t NK_get_otp_name_length();
+
+	/**
+	 * Returns the maximum length of an OTP secret in bytes for the
+	 * connected device or zero if no device is connected.
+	 */
+	NK_C_API size_t NK_get_otp_secret_length();
 
 	//OTP
 

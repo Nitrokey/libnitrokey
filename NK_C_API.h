@@ -331,6 +331,21 @@ extern "C" {
 	NK_C_API void NK_set_debug_level(const int level);
 
 	/**
+	 * Callback function for NK_set_log_function.  The first argument is
+	 * the log level (0 = Error, 1 = Warn, 2 = Info, 3 = DebugL1,
+	 * 4 = Debug, 5 = DebugL2) and the second argument is the log message.
+	 */
+	typedef void (*NK_log_function)(int, const char*);
+
+	/**
+	 * Set a custom log function.
+	 *
+	 * The log function is called for every log message that matches the
+	 * log level settings (see NK_set_debug and NK_set_debug_level).
+	 */
+	NK_C_API void NK_set_log_function(NK_log_function fn);
+
+	/**
 	 * Get the major library version, e. g. the 3 in v3.2.
 	 * @return the major library version
 	 */

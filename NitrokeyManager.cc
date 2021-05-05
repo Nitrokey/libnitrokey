@@ -277,6 +277,11 @@ using nitrokey::misc::strcpyT;
       nitrokey::log::Log::instance().set_handler(&handler);
     }
 
+    void NitrokeyManager::set_log_function_raw(std::function<void(const std::string&, Loglevel)> log_function) {
+      static nitrokey::log::RawFunctionalLogHandler handler(log_function);
+      nitrokey::log::Log::instance().set_handler(&handler);
+    }
+
     bool NitrokeyManager::set_default_commands_delay(int delay){
       if (delay < 20){
         LOG("Delay set too low: " + to_string(delay), Loglevel::WARNING);

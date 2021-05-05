@@ -426,6 +426,14 @@ extern "C" {
 		m->set_loglevel(level);
 	}
 
+	NK_C_API void NK_set_log_function(NK_log_function fn) {
+		auto m = NitrokeyManager::instance();
+		std::function<void(const std::string&, Loglevel)> log_function = [fn](auto s, auto lvl) {
+		    fn(static_cast<int>(lvl), s.c_str());
+		};
+		m->set_log_function_raw(log_function);
+        }
+
 	NK_C_API unsigned int NK_get_major_library_version() {
 		return get_major_library_version();
 	}

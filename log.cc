@@ -77,6 +77,10 @@ namespace nitrokey {
       log_function(s);
     }
 
+    void RawFunctionalLogHandler::print(const std::string &str, Loglevel lvl) {
+      log_function(str, lvl);
+    }
+
     std::string LogHandler::format_message_to_string(const std::string &str, const Loglevel &lvl) {
       static bool last_short = false;
       if (str.length() == 1){
@@ -97,6 +101,10 @@ namespace nitrokey {
     }
 
     FunctionalLogHandler::FunctionalLogHandler(log_function_type _log_function) {
+      log_function = _log_function;
+    }
+
+    RawFunctionalLogHandler::RawFunctionalLogHandler(log_function_type _log_function) {
       log_function = _log_function;
     }
   }

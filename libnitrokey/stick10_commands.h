@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018 Nitrokey UG
+ * Copyright (c) 2015-2019 Nitrokey UG
  *
  * This file is part of libnitrokey.
  *
@@ -820,7 +820,7 @@ class ChangeUserPin : Command<CommandID::CHANGE_USER_PIN> {
 class IsAESSupported : Command<CommandID::DETECT_SC_AES> {
  public:
   struct CommandPayload {
-    uint8_t user_password[20];
+    uint8_t user_password[30];
       std::string dissect() const {
         std::stringstream ss;
         print_to_ss_volatile(user_password);

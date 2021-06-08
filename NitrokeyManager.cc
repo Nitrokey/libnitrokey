@@ -432,7 +432,19 @@ using nitrokey::misc::strcpyT;
     stick10::GetStatus::ResponsePayload NitrokeyManager::get_status(){
       try{
         auto response = GetStatus::CommandTransaction::run(device);
-        return response.data();
+        auto data = response.data();
+        if (device != nullptr && device->get_device_model() == DeviceModel::STORAGE) {
+          // The GET_STATUS command does not work for the Nitrokey Storage,
+          // see https://github.com/Nitrokey/nitrokey-storage-firmware/issues/96
+          // Therefore, we have to use the GET_DEVICE_STATUS command to query
+          // the correct serial number and firmware version.
+          auto response2 = stick20::GetDeviceStatus::CommandTransaction::run(device);
+          auto data2 = response2.data();
+          data.firmware_version_st.major = data2.versionInfo.major;
+          data.firmware_version_st.minor = data2.versionInfo.minor;
+          data.card_serial_u32 = data2.ActiveSmartCardID_u32;
+        }
+        return data;
       }
       catch (DeviceSendingFailure &e){
 //        disconnect();

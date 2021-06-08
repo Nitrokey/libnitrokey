@@ -716,8 +716,27 @@ def test_get_status(C):
         raise Exception("Could not allocate status")
     err = C.NK_get_status(status_st)
     assert err == 0
+
+    # check firmware version
+    firmware_version_major = C.NK_get_major_firmware_version()
+    firmware_version_minor = C.NK_get_minor_firmware_version()
+
     assert status_st.firmware_version_major == 0
     assert status_st.firmware_version_minor != 0
+    assert status_st.firmware_version_major == firmware_version_major
+    assert status_st.firmware_version_minor == firmware_version_minor
+
+    # check serial number
+    serial_number = gs(C.NK_device_serial_number())
+    assert status_st.serial_number_smart_card != 0
+    assert '{:08x}'.format(status_st.serial_number_smart_card) == serial_number.decode('ascii')
+
+    # check config
+    config = C.NK_read_config()
+    assert status_st.config_numlock == config[0]
+    assert status_st.config_capslock == config[1]
+    assert status_st.config_scrolllock == config[2]
+    assert status_st.otp_user_password == config[3]
 
 
 @pytest.mark.status

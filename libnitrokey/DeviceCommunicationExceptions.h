@@ -69,5 +69,6 @@ public:
   uint8_t getType() const {return 5;};
 };
 
+// LongOperationInProgressException with type 6, see LongOperationInProgressException.h
 
 #endif //LIBNITROKEY_DEVICECOMMUNICATIONEXCEPTIONS_H

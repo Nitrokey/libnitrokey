@@ -33,6 +33,9 @@ build-bionic-gcc8:
   tags:
     - docker
   stage: build
+  before_script: 
+    - apt-get update
+    - apt-get -y install wget
   script: 
     - chmod +x ci-script/build.sh
     - ci-script/build.sh

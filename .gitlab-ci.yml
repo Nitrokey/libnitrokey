@@ -2,6 +2,7 @@ include: 'https://raw.githubusercontent.com/Nitrokey/common-ci-jobs/master/commo
 
 stages:
   - pull-github
+  - fetch
   - build
   - deploy
 
@@ -12,9 +13,8 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive #This seems to have no effect also set in webinterfac
   SCRIPTS_REPO: git@git.dotplex.com:nitrokey/gitlab-ci.git
   REPO_USER: nitrokey
-  REPO_NAME: heads
+  REPO_NAME: libnitrokey
   MAIN_BRANCH: master
-  DEVICE_FOLDER: "nitropad"
   COMMON_PULL: "true"
   COMMON_UPLOAD_NIGHTLY: "true"
   COMMON_GITHUB_RELEASE: "false"
@@ -25,6 +25,29 @@ variables:
 #registry.git.dotplex.com/nitrokey/libnitrokey/libnitrokey-bionic-gcc7    latest            1e90cda7bd9e   58 minutes ago   516MB
 #registry.git.dotplex.com/nitrokey/libnitrokey/libnitrokey-bionic-gcc6    latest            3156dc02e022   58 minutes ago   899MB
 #registry.git.dotplex.com/nitrokey/libnitrokey/libnitrokey-bionic-gcc5
+
+fetchAndPackage:
+  image: registry.git.dotplex.com/nitrokey/libnitrokey/libnitrokey-bionic-gcc8:latest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+  tags:
+    - docker
+  stage: fetch
+  before_script: 
+    - apt-get update
+    - apt-get -y install git wget
+  script: 
+    - chmod +x ci-script/package.sh
+    - ci-script/package.sh
+    - mkdir -p artifacts
+    - cp output/* artifacts
+  after_script:
+    - wget $icon_server/checkmark/$CI_COMMIT_REF_NAME/$CI_COMMIT_SHA/$CI_JOB_NAME/$CI_JOB_STATUS/${CI_JOB_URL#*/*/*/}
+  artifacts:
+    paths:
+      - artifacts
+      - libnitrokey-source-metadata
+    expire_in: 2 weeks
 
 build-bionic-gcc8:
   image: registry.git.dotplex.com/nitrokey/libnitrokey/libnitrokey-bionic-gcc8:latest
@@ -48,25 +71,3 @@ build-bionic-gcc8:
       - artifacts
     expire_in: 2 weeks
     
-
-fetchAndPackage:
-  image: registry.git.dotplex.com/nitrokey/libnitrokey/libnitrokey-bionic-gcc8:latest
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-  tags:
-    - docker
-  stage: build
-  before_script: 
-    - apt-get update
-    - apt-get -y install git wget
-  script: 
-    - chmod +x ci-script/package.sh
-    - ci-script/package.sh
-    - mkdir -p artifacts
-    - cp output/* artifacts
-  after_script:
-    - wget $icon_server/checkmark/$CI_COMMIT_REF_NAME/$CI_COMMIT_SHA/$CI_JOB_NAME/$CI_JOB_STATUS/${CI_JOB_URL#*/*/*/}
-  artifacts:
-    paths:
-      - artifacts
-    expire_in: 2 weeks

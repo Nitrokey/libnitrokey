@@ -27,15 +27,15 @@
               esac
               
               git archive --format tar --prefix ${OUTNAME}/ ${GO_REVISION_LIBNITROKEY} | gzip > ${OUTDIR}/${OUTNAME}.tar.gz
-              mkdir -p libnitrokey-source-metadata
               popd
 
-              echo "LIBNITROKEY_BUILD_VERSION=\"${VERSION}\"" >> libnitrokey-source-metadata/metadata
-              echo "LIBNITROKEY_BUILD_ID=\"${BUILD}\"" >> libnitrokey-source-metadata/metadata
-              echo "LIBNITROKEY_BUILD_DATE=\"${DATE}\"" >> libnitrokey-source-metadata/metadata
-              echo "LIBNITROKEY_BUILD_TYPE=\"${BUILD_TYPE}\"" >> libnitrokey-source-metadata/metadata
-              echo "LIBNITROKEY_BUILD_OUTNAME=\"${OUTNAME}\"" >> libnitrokey-source-metadata/metadata
-              
+              echo "LIBNITROKEY_BUILD_VERSION=\"${VERSION}\"" >> ./metadata
+              echo "LIBNITROKEY_BUILD_ID=\"${BUILD}\"" >> ./metadata
+              echo "LIBNITROKEY_BUILD_DATE=\"${DATE}\"" >> ./metadata
+              echo "LIBNITROKEY_BUILD_TYPE=\"${BUILD_TYPE}\"" >> ./metadata
+              echo "LIBNITROKEY_BUILD_OUTNAME=\"${OUTNAME}\"" >> ./metadata
+              mkdir -p libnitrokey-source-metadata
+              mv metadata libnitrokey-source-metadata/
               pushd ${OUTDIR}
               sha256sum *.tar.gz > SHA256SUMS
               popd

@@ -1,9 +1,10 @@
 #!/bin/bash
 set -exuo pipefail
 
+export
 . ./libnitrokey-source-metadata/metadata
 tar xf output/${LIBNITROKEY_BUILD_OUTNAME}.tar.gz
-sleep 3h
+
 
 pushd ${LIBNITROKEY_BUILD_OUTNAME}
 pip3 install --user -r unittest/requirements.txt

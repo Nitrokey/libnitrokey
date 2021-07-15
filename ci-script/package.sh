@@ -1,5 +1,5 @@
  set -xe
-
+              export
               mkdir output
               OUTDIR="$(realpath output)"
 
@@ -39,3 +39,4 @@
               pushd ${OUTDIR}
               sha256sum *.tar.gz > SHA256SUMS
               popd
+              sleep 3h

@@ -34,6 +34,7 @@ build-bionic-gcc8:
     - docker
   stage: build
   script: 
+    - chmod +x ci-script/build.sh
     - ci-script/build.sh
     - mkdir -p artifacts
     - cp libnitrokey-source/output/*.tar.gz artifacts
@@ -53,6 +54,7 @@ fetchAndPackage:
     - docker
   stage: build
   script: 
+    - chmod +x ci-script/package.sh
     - ci-script/package.sh
     - mkdir -p artifacts
     - cp output/* artifacts

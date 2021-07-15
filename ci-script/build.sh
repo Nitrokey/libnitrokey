@@ -1,9 +1,8 @@
 #!/bin/bash
 set -exuo pipefail
 
-#. ./libnitrokey-source-metadata/metadata
-LIBNITROKEY_BUILD_OUTNAME=libnk-build-name
-tar xf libnitrokey-source/output/${LIBNITROKEY_BUILD_OUTNAME}.tar.gz
+. ./libnitrokey-source-metadata/metadata
+tar xf output/${LIBNITROKEY_BUILD_OUTNAME}.tar.gz
 
 
 pushd ${LIBNITROKEY_BUILD_OUTNAME}

@@ -53,6 +53,9 @@ fetchAndPackage:
   tags:
     - docker
   stage: build
+  before_script: 
+    - apt-get update
+    - apt-get -y install git wget
   script: 
     - chmod +x ci-script/package.sh
     - ci-script/package.sh

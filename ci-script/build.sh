@@ -2,7 +2,7 @@
 set -exuo pipefail
 
 #. ./libnitrokey-source-metadata/metadata
-
+LIBNITROKEY_BUILD_OUTNAME=libnk-build-name
 tar xf libnitrokey-source/output/${LIBNITROKEY_BUILD_OUTNAME}.tar.gz
 
 

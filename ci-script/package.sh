@@ -30,8 +30,10 @@ echo "LIBNITROKEY_BUILD_ID=\"${BUILD}\"" >> ./metadata
 echo "LIBNITROKEY_BUILD_DATE=\"${DATE}\"" >> ./metadata
 echo "LIBNITROKEY_BUILD_TYPE=\"${CI_PIPELINE_SOURCE}\"" >> ./metadata
 echo "LIBNITROKEY_BUILD_OUTNAME=\"${OUTNAME}\"" >> ./metadata
+cat ./metadata
 mkdir -p libnitrokey-source-metadata
 mv metadata libnitrokey-source-metadata/
+cat libnitrokey-source-metadata/metadata
 pushd ${OUTDIR}
 sha256sum *.tar.gz > SHA256SUMS
 popd

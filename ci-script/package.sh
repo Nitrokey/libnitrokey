@@ -4,7 +4,7 @@ mkdir output
 OUTDIR="$(realpath output)"
 
 BASENAME="libnitrokey"
-pushd libnitrokey
+#pushd libnitrokey
 
 VERSION="$(git describe --abbrev=0)"
 BUILD="${VERSION}.${CI_COMMIT_SHORT_SHA}"

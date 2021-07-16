@@ -1,42 +1,37 @@
- set -xe
-              export
-              mkdir output
-              OUTDIR="$(realpath output)"
+set -exuo pipefail
+export
+mkdir output
+OUTDIR="$(realpath output)"
 
-              BASENAME="libnitrokey"
+BASENAME="libnitrokey"
+pushd libnitrokey
 
-              pushd libnitrokey
-              VERSION="$(git describe --abbrev=0 ${GO_REVISION_LIBNITROKEY})"
-              BUILD="${VERSION}.${GO_PIPELINE_COUNTER:-0}.${GO_STAGE_COUNTER:-0}"
-              DATE="$(date -Iseconds)"
+VERSION="$(git describe --abbrev=0)"
+BUILD="${VERSION}.${CI_COMMIT_SHORT_SHA}"
+DATE="$(date -Iseconds)"
+case "${CI_PIPELINE_SOURCE}" in
+  push)
+    OUTNAME="${BASENAME}-${BUILD}"
+    ;;
+  schedule)
+    OUTNAME="${BASENAME}-${DATE}"
+    ;;
+  web)
+    OUTNAME="${BASENAME}-${VERSION}"
+    ;;
+esac
 
-              BUILD_TYPE="continuous"
-              git describe --exact-match ${GO_REVISION_LIBNITROKEY} &>/dev/null && BUILD_TYPE="release"
-              [ "${GO_TRIGGER_USER}" == "timer" ] && BUILD_TYPE="nightly"
-              
-              case "${BUILD_TYPE}" in
-                continuous)
-                  OUTNAME="${BASENAME}-${BUILD}"
-                  ;;
-                nightly)
-                  OUTNAME="${BASENAME}-${DATE}"
-                  ;;
-                release)
-                  OUTNAME="${BASENAME}-${VERSION}"
-                  ;;
-              esac
-              
-              git archive --format tar --prefix ${OUTNAME}/ ${GO_REVISION_LIBNITROKEY} | gzip > ${OUTDIR}/${OUTNAME}.tar.gz
-              popd
+git archive --format tar --prefix ${OUTNAME}/ ${CI_COMMIT_SHA} | gzip > ${OUTDIR}/${OUTNAME}.tar.gz
+echo size:
+gzip -l ${OUTDIR}/${OUTNAME}.tar.gz
 
-              echo "LIBNITROKEY_BUILD_VERSION=\"${VERSION}\"" >> ./metadata
-              echo "LIBNITROKEY_BUILD_ID=\"${BUILD}\"" >> ./metadata
-              echo "LIBNITROKEY_BUILD_DATE=\"${DATE}\"" >> ./metadata
-              echo "LIBNITROKEY_BUILD_TYPE=\"${BUILD_TYPE}\"" >> ./metadata
-              echo "LIBNITROKEY_BUILD_OUTNAME=\"${OUTNAME}\"" >> ./metadata
-              mkdir -p libnitrokey-source-metadata
-              mv metadata libnitrokey-source-metadata/
-              pushd ${OUTDIR}
-              sha256sum *.tar.gz > SHA256SUMS
-              popd
-              sleep 3h
+echo "LIBNITROKEY_BUILD_VERSION=\"${VERSION}\"" >> ./metadata
+echo "LIBNITROKEY_BUILD_ID=\"${BUILD}\"" >> ./metadata
+echo "LIBNITROKEY_BUILD_DATE=\"${DATE}\"" >> ./metadata
+echo "LIBNITROKEY_BUILD_TYPE=\"${CI_PIPELINE_SOURCE}\"" >> ./metadata
+echo "LIBNITROKEY_BUILD_OUTNAME=\"${OUTNAME}\"" >> ./metadata
+mkdir -p libnitrokey-source-metadata
+mv metadata libnitrokey-source-metadata/
+pushd ${OUTDIR}
+sha256sum *.tar.gz > SHA256SUMS
+popd

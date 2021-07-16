@@ -1,7 +1,7 @@
 #!/bin/bash
 set -exuo pipefail
-
 export
+
 . ./libnitrokey-source-metadata/metadata
 tar xf output/${LIBNITROKEY_BUILD_OUTNAME}.tar.gz
 
@@ -20,7 +20,7 @@ mkdir build
 mkdir install
 
 pushd build
-cmake .. ${CF}
+cmake .. -DERROR_ON_WARNING=ON
 make -j2
 ctest -VV
 make install DESTDIR=../install

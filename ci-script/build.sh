@@ -20,7 +20,7 @@ mkdir build
 mkdir install
 
 pushd build
-cmake .. -DERROR_ON_WARNING=ON
+cmake .. -DERROR_ON_WARNING=ON -DCOMPILE_TESTS=ON 
 make -j2
 ctest -VV
 make install DESTDIR=../install

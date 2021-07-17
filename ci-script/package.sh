@@ -1,3 +1,4 @@
+#!/bin/bash
 set -exuo pipefail
 export
 mkdir output

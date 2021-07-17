@@ -335,7 +335,7 @@ extern "C" {
 	 * the log level (0 = Error, 1 = Warn, 2 = Info, 3 = DebugL1,
 	 * 4 = Debug, 5 = DebugL2) and the second argument is the log message.
 	 */
-	typedef void (*NK_log_function)(int, const char*);
+    NK_C_API typedef void (*NK_log_function)(int, const char*);
 
 	/**
 	 * Set a custom log function.

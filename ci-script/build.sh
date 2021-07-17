@@ -3,7 +3,7 @@ set -exuo pipefail
 export
 
 . ./libnitrokey-source-metadata/metadata
-tar xf output/${LIBNITROKEY_BUILD_OUTNAME}.tar.gz
+tar xf artifacts/${LIBNITROKEY_BUILD_OUTNAME}.tar.gz
 
 
 pushd ${LIBNITROKEY_BUILD_OUTNAME}
@@ -13,7 +13,7 @@ pip3 install --user -r unittest/requirements.txt
 ## Instead, we download the Catch2 header manually. The version is hardcoded, which is bad.
 ## TODO: figure out a better way to handle that
 ## One possibility is to install Catch2 system-wide on builder images.
-mkdir -p unittest/Catch/single_include/catch2
+smkdir -p unittest/Catch/single_include/catch2
 curl -L -o unittest/Catch/single_include/catch2/catch.hpp https://github.com/catchorg/Catch2/releases/download/v2.3.0/catch.hpp
 
 mkdir build

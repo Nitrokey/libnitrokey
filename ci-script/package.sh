@@ -1,8 +1,8 @@
 #!/bin/bash
 set -exuo pipefail
 export
-mkdir output
-OUTDIR="$(realpath output)"
+mkdir -p artifacts
+OUTDIR="$(realpath artifacts)"
 
 BASENAME="libnitrokey"
 #pushd libnitrokey

@@ -164,12 +164,19 @@ def library_read_declarations():
 
 
 def pytest_addoption(parser):
+    parser.addoption(
+        "--runslow", action="store_true", default=False, help="run slow tests"
+    )
     parser.addoption("--run-skipped", action="store_true",
                      help="run the tests skipped by default, e.g. adding side effects")
 
 def pytest_runtest_setup(item):
     if 'skip_by_default' in item.keywords and not item.config.getoption("--run-skipped"):
         pytest.skip("need --run-skipped option to run this test")
+
+def pytest_configure(config):
+    config.addinivalue_line("markers", "slow: mark test as slow to run")
+
 
 
 def library_device_reconnect(C):

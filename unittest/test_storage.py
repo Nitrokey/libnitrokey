@@ -396,6 +396,8 @@ def test_struct_multiline_prodtest(C):
         )
     print(info)
 
+
+@pytest.mark.skip(reason='additional test')
 @pytest.mark.other
 @pytest.mark.firmware
 def test_export_firmware_extended_fedora29(C):

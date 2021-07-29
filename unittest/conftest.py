@@ -76,7 +76,7 @@ def C_offline(request=None):
     return get_library(request, allow_offline=True)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def C(request=None):
     print("Getting library with connection initialized")
     return get_library(request)

@@ -352,15 +352,11 @@ def test_change_update_password(C):
     assert C.NK_change_update_password(DefaultPasswords.UPDATE, DefaultPasswords.UPDATE_TEMP) == DeviceErrorCode.STATUS_OK
     assert C.NK_change_update_password(DefaultPasswords.UPDATE_TEMP, DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK
 
-
-# @pytest.mark.skip(reason='no reversing method added yet')
+@pytest.mark.skip_by_default
 @pytest.mark.update
 def test_enable_firmware_update(C):
     skip_if_device_version_lower_than({'S': 50})
-    wrong_password = b'aaaaaaaaaaa'
-    assert C.NK_enable_firmware_update(wrong_password) == DeviceErrorCode.WRONG_PASSWORD
-    # skip actual test - reason: no reversing method added yet
-    # assert C.NK_enable_firmware_update(DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK
+    assert C.NK_enable_firmware_update(DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK
 
 
 @pytest.mark.other
@@ -396,6 +392,8 @@ def test_struct_multiline_prodtest(C):
         )
     print(info)
 
+
+@pytest.mark.skip(reason='additional test')
 @pytest.mark.other
 @pytest.mark.firmware
 def test_export_firmware_extended_fedora29(C):

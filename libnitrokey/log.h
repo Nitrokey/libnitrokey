@@ -24,6 +24,7 @@
 
 #include <string>
 #include <functional>
+#include <memory>
 
 namespace nitrokey {
   namespace log {
@@ -62,7 +63,7 @@ namespace nitrokey {
       using log_function_type = std::function<void(std::string)>;
       log_function_type log_function;
     public:
-      FunctionalLogHandler(log_function_type _log_function);
+      explicit FunctionalLogHandler(log_function_type _log_function);
       virtual void print(const std::string &, Loglevel lvl);
 
     };
@@ -80,10 +81,10 @@ namespace nitrokey {
 
       void operator()(const std::string &, Loglevel);
       void set_loglevel(Loglevel lvl) { m_loglevel = lvl; }
-      void set_handler(LogHandler *handler) { mp_loghandler = handler; }
+      void set_handler(std::shared_ptr<nitrokey::log::LogHandler> handler) { mp_loghandler = handler; }
 
     private:
-      LogHandler *mp_loghandler;
+      std::shared_ptr<LogHandler> mp_loghandler;
       Loglevel m_loglevel;
       static std::string prefix;
     public:

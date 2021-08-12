@@ -576,6 +576,7 @@ using nitrokey::misc::strcpyT;
     void NitrokeyManager::write_HOTP_slot_authorize(uint8_t slot_number, const char *slot_name, const char *secret,
                                                     uint64_t hotp_counter, bool use_8_digits, bool use_enter,
                                                     bool use_tokenID, const char *token_ID, const char *temporary_password) {
+      if (device == nullptr) { throw DeviceNotConnected("device not connected"); }
       auto payload = get_payload<WriteToHOTPSlot>();
       payload.slot_number = slot_number;
       auto secret_bin = misc::hex_string_to_byte(secret);
@@ -744,6 +745,7 @@ using nitrokey::misc::strcpyT;
 
     template <typename ProCommand, PasswordKind StoKind>
     void NitrokeyManager::change_PIN_general(const char *current_PIN, const char *new_PIN) {
+        if (device == nullptr) { throw DeviceNotConnected("device not connected"); }
         switch (device->get_device_model()){
             case DeviceModel::LIBREM:
             case DeviceModel::PRO:
@@ -791,6 +793,7 @@ using nitrokey::misc::strcpyT;
     }
 
     uint8_t NitrokeyManager::get_user_retry_count() {
+        if (device == nullptr) { throw DeviceNotConnected("device not connected"); }
         if(device->get_device_model() == DeviceModel::STORAGE){
           stick20::GetDeviceStatus::CommandTransaction::run(device);
         }
@@ -799,6 +802,7 @@ using nitrokey::misc::strcpyT;
     }
 
     uint8_t NitrokeyManager::get_admin_retry_count() {
+        if (device == nullptr) { throw DeviceNotConnected("device not connected"); }
         if(device->get_device_model() == DeviceModel::STORAGE){
           stick20::GetDeviceStatus::CommandTransaction::run(device);
         }
@@ -866,6 +870,7 @@ using nitrokey::misc::strcpyT;
     }
 
     void NitrokeyManager::build_aes_key(const char *admin_password) {
+        if (device == nullptr) { throw DeviceNotConnected("device not connected"); }
         switch (device->get_device_model()) {
             case DeviceModel::LIBREM:
             case DeviceModel::PRO: {
@@ -891,6 +896,7 @@ using nitrokey::misc::strcpyT;
     }
 
     void NitrokeyManager::unlock_user_password(const char *admin_password, const char *new_user_password) {
+      if (device == nullptr) { throw DeviceNotConnected("device not connected"); }
       switch (device->get_device_model()){
         case DeviceModel::LIBREM:
         case DeviceModel::PRO: {
@@ -939,6 +945,7 @@ using nitrokey::misc::strcpyT;
     }
 
     bool NitrokeyManager::is_authorization_command_supported(){
+        if (device == nullptr) { throw DeviceNotConnected("device not connected"); }
       //authorization command is supported for versions equal or below:
         auto m = std::unordered_map<DeviceModel , int, EnumClassHash>({
                                                {DeviceModel::PRO, 7},
@@ -949,6 +956,7 @@ using nitrokey::misc::strcpyT;
     }
 
     bool NitrokeyManager::is_320_OTP_secret_supported(){
+        if (device == nullptr) { throw DeviceNotConnected("device not connected"); }
         // 320 bit OTP secret is supported by version bigger or equal to:
         auto m = std::unordered_map<DeviceModel , int, EnumClassHash>({
                                                {DeviceModel::PRO, 8},
@@ -976,6 +984,7 @@ using nitrokey::misc::strcpyT;
     }
 
     uint8_t NitrokeyManager::get_minor_firmware_version(){
+      if (device == nullptr) { throw DeviceNotConnected("device not connected"); }
       switch(device->get_device_model()){
         case DeviceModel::LIBREM:
         case DeviceModel::PRO:{
@@ -993,6 +1002,7 @@ using nitrokey::misc::strcpyT;
       return 0;
     }
     uint8_t NitrokeyManager::get_major_firmware_version(){
+      if (device == nullptr) { throw DeviceNotConnected("device not connected"); }
       switch(device->get_device_model()){
         case DeviceModel::LIBREM:
         case DeviceModel::PRO:{
@@ -1168,6 +1178,7 @@ using nitrokey::misc::strcpyT;
    * @return ReadSlot structure
    */
   stick10::ReadSlot::ResponsePayload NitrokeyManager::get_OTP_slot_data(const uint8_t slot_number) {
+    if (device == nullptr) { throw DeviceNotConnected("device not connected"); }
     auto p = get_payload<stick10::ReadSlot>();
     p.slot_number = slot_number;
     p.data_format = stick10::ReadSlot::CounterFormat::BINARY; // ignored for devices other than Storage v0.54+

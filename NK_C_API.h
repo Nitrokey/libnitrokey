@@ -1095,6 +1095,13 @@ struct ReadSlot_t {
   uint64_t slot_counter;
 };
 
+struct GetRandom_t {
+    uint8_t op_success;
+    uint8_t size_effective;
+    uint8_t data[51];
+};
+
+NK_C_API int NK_get_random(const uint8_t len, struct GetRandom_t *out);
 
 NK_C_API int NK_read_HOTP_slot(const uint8_t slot_num, struct ReadSlot_t* out);
 

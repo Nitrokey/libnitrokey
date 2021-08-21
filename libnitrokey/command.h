@@ -26,6 +26,7 @@
 #include "cxx_semantics.h"
 
 #define print_to_ss(x) ( ss << " " << (#x) <<":\t" << (x) << std::endl );
+#define print_to_ss_int(x) ( ss << " " << (#x) <<":\t" << (int)(x) << std::endl );
 #ifdef LOG_VOLATILE_DATA
 #define print_to_ss_volatile(x) print_to_ss(x);
 #else

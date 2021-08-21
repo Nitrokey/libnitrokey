@@ -1070,3 +1070,32 @@ def test_OTP_all_rw(C):
         all_codes.append(this_loop_codes)
     from pprint import pprint
     pprint(all_codes)
+
+
+@pytest.mark.parametrize("count",[16, 32, 50, 51])
+def test_random(C, count):
+    data = ffi.new('struct GetRandom_t *')
+    req_count = count
+    res = C.NK_get_random(req_count, data)
+    assert res == DeviceErrorCode.STATUS_OK
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+    assert data.op_success == 1
+    assert data.size_effective == req_count
+    for i in range(req_count):
+        print(f'{hex(data.data[i])} ', end='')
+
+def test_random_collect(C):
+    collected = b''
+    data = ffi.new('struct GetRandom_t *')
+    req_count = 50
+    for i in range(1024//req_count+1):
+        res = C.NK_get_random(req_count, data)
+        assert res == DeviceErrorCode.STATUS_OK
+        assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+        assert data.op_success == 1
+        assert data.size_effective == req_count
+        collected +=bytes(data.data)
+    assert len(collected) > 1024
+    from binascii import hexlify
+    print(hexlify(collected))
+    print(len(collected))

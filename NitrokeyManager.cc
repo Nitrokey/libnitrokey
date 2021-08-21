@@ -1227,6 +1227,13 @@ using nitrokey::misc::strcpyT;
     FirmwareUpdate::CommandTransaction::run(device, p);
   }
 
+  GetRandom::ResponsePayload NitrokeyManager::get_random_pro(uint8_t size_requested) {
+    auto p = get_payload<GetRandom>();
+    p.size_requested = size_requested;
+    auto data = GetRandom::CommandTransaction::run(device, p);
+    return data.data();
+  }
+
   void
   NitrokeyManager::change_firmware_update_password_pro(const char *firmware_pin_current, const char *firmware_pin_new) {
     auto p = get_payload<FirmwarePasswordChange>();

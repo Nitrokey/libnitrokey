@@ -90,6 +90,7 @@ enum class CommandID : uint8_t {
   SEND_OTP_DATA = 0x17,
   FIRMWARE_UPDATE = 0x19,
   FIRMWARE_PASSWORD_CHANGE = 0x1A,
+  GET_RANDOM = 0x1B,
 
   ENABLE_CRYPTED_PARI = 0x20,
   DISABLE_CRYPTED_PARI = 0x20 + 1,
@@ -147,7 +148,7 @@ enum class CommandID : uint8_t {
   PW_SAFE_SEND_DATA = 0x69, //@unused
   SD_CARD_HIGH_WATERMARK = 0x70,
   DETECT_SC_AES = 0x6a,
-  NEW_AES_KEY = 0x6b
+  NEW_AES_KEY = 0x6b,
 };
 
 const char *commandid_to_string(CommandID id);

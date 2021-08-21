@@ -1077,6 +1077,7 @@ def test_OTP_all_rw(C):
 
 @pytest.mark.parametrize("count",[16, 32, 50, 51])
 def test_random(C, count):
+    skip_if_device_version_lower_than({'P': 14, 'S': 99})
     data = ffi.new('struct GetRandom_t *')
     req_count = count
     res = C.NK_get_random(req_count, data)
@@ -1084,10 +1085,11 @@ def test_random(C, count):
     assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
     assert data.op_success == 1
     assert data.size_effective == req_count
-    for i in range(req_count):
-        print(f'{hex(data.data[i])} ', end='')
+    print(f'{hexlify(bytes(data.data))}')
+
 
 def test_random_collect(C):
+    skip_if_device_version_lower_than({'P': 14, 'S': 99})
     collected = b''
     data = ffi.new('struct GetRandom_t *')
     req_count = 50
@@ -1098,7 +1100,7 @@ def test_random_collect(C):
         assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
         assert data.op_success == 1
         assert data.size_effective == req_count
-        collected +=bytes(data.data)
+        collected += bytes(data.data)
     toc = time.perf_counter()
     assert len(collected) > 1024
     print(hexlify(collected))

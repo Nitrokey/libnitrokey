@@ -18,6 +18,9 @@ along with libnitrokey. If not, see <http://www.gnu.org/licenses/>.
 
 SPDX-License-Identifier: LGPL-3.0
 """
+import time
+from binascii import hexlify
+from math import floor
 
 import pytest
 
@@ -1088,6 +1091,7 @@ def test_random_collect(C):
     collected = b''
     data = ffi.new('struct GetRandom_t *')
     req_count = 50
+    tic = time.perf_counter()
     for i in range(1024//req_count+1):
         res = C.NK_get_random(req_count, data)
         assert res == DeviceErrorCode.STATUS_OK
@@ -1095,7 +1099,7 @@ def test_random_collect(C):
         assert data.op_success == 1
         assert data.size_effective == req_count
         collected +=bytes(data.data)
+    toc = time.perf_counter()
     assert len(collected) > 1024
-    from binascii import hexlify
     print(hexlify(collected))
-    print(len(collected))
+    print(f'Time used to collect {len(collected)} bytes: {round(toc-tic,2)} -> {floor(len(collected) / (toc-tic))} Bps')

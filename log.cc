@@ -55,6 +55,7 @@ namespace nitrokey {
 
     void Log::operator()(const std::string &logstr, Loglevel lvl) {
       if (mp_loghandler != nullptr){
+        // FIXME crashes on exit because static object under mp_loghandler is not valid anymore, see NitrokeyManager::set_log_function
         if ((int) lvl <= (int) m_loglevel) mp_loghandler->print(prefix+logstr, lvl);
       }
     }

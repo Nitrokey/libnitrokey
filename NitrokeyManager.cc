@@ -273,11 +273,13 @@ using nitrokey::misc::strcpyT;
 
 
     void NitrokeyManager::set_log_function(std::function<void(std::string)> log_function){
+      // FIXME use move and pass to log handler, instead of keeping here static variable
       static nitrokey::log::FunctionalLogHandler handler(log_function);
       nitrokey::log::Log::instance().set_handler(&handler);
     }
 
     void NitrokeyManager::set_log_function_raw(std::function<void(const std::string&, Loglevel)> log_function) {
+      // FIXME use move and pass to log handler, instead of keeping here static variable
       static nitrokey::log::RawFunctionalLogHandler handler(log_function);
       nitrokey::log::Log::instance().set_handler(&handler);
     }

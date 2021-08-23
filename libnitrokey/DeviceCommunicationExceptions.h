@@ -34,7 +34,7 @@ class DeviceCommunicationException: public std::runtime_error
   std::string message;
   static std::atomic_int occurred;
 public:
-  DeviceCommunicationException(std::string _msg): std::runtime_error(_msg), message(_msg){
+  explicit DeviceCommunicationException(const std::string& _msg): std::runtime_error(_msg), message(_msg){
     ++occurred;
   }
   uint8_t getType() const {return 1;};

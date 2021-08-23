@@ -184,6 +184,8 @@ const char *commandid_to_string(CommandID id) {
       return "SEND_OTP_DATA";
     case CommandID::WINK:
       return "WINK";
+    case CommandID::GET_RANDOM:
+      return "GET_RANDOM";
   }
   return "UNKNOWN";
 }

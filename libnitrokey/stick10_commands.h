@@ -887,6 +887,41 @@ class BuildAESKey : Command<CommandID::NEW_AES_KEY> {
 
 };
 
+class GetRandom : Command<CommandID::GET_RANDOM> {
+ public:
+    static const int DATA_SIZE_MAX = 64 - 13;
+    struct CommandPayload {
+        uint8_t size_requested;
+
+        bool isValid() const { return size_requested < DATA_SIZE_MAX; }
+        std::string dissect() const {
+            std::stringstream ss;
+            print_to_ss_int(size_requested);
+            return ss.str();
+        }
+    } __packed;
+
+    struct ResponsePayload {
+        uint8_t op_success;
+        uint8_t size_effective;
+        uint8_t data[DATA_SIZE_MAX];
+
+        bool isValid() const { return true; }
+        std::string dissect() const {
+            std::stringstream ss;
+            print_to_ss_int(op_success);
+            print_to_ss_int(size_effective);
+            hexdump_to_ss(data);
+            return ss.str();
+        }
+    } __packed;
+
+
+    typedef Transaction<command_id(), struct CommandPayload, struct ResponsePayload>
+      CommandTransaction;
+
+};
+
 class FirmwareUpdate : Command<CommandID::FIRMWARE_UPDATE> {
 public:
   struct CommandPayload {

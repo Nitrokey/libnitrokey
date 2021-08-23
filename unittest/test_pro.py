@@ -18,6 +18,9 @@ along with libnitrokey. If not, see <http://www.gnu.org/licenses/>.
 
 SPDX-License-Identifier: LGPL-3.0
 """
+import time
+from binascii import hexlify
+from math import floor
 
 import pytest
 
@@ -1070,3 +1073,35 @@ def test_OTP_all_rw(C):
         all_codes.append(this_loop_codes)
     from pprint import pprint
     pprint(all_codes)
+
+
+@pytest.mark.parametrize("count",[16, 32, 50, 51])
+def test_random(C, count):
+    skip_if_device_version_lower_than({'P': 14, 'S': 99})
+    data = ffi.new('struct GetRandom_t *')
+    req_count = count
+    res = C.NK_get_random(req_count, data)
+    assert res == DeviceErrorCode.STATUS_OK
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+    assert data.op_success == 1
+    assert data.size_effective == req_count
+    print(f'{hexlify(bytes(data.data))}')
+
+
+def test_random_collect(C):
+    skip_if_device_version_lower_than({'P': 14, 'S': 99})
+    collected = b''
+    data = ffi.new('struct GetRandom_t *')
+    req_count = 50
+    tic = time.perf_counter()
+    for i in range(1024//req_count+1):
+        res = C.NK_get_random(req_count, data)
+        assert res == DeviceErrorCode.STATUS_OK
+        assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+        assert data.op_success == 1
+        assert data.size_effective == req_count
+        collected += bytes(data.data)
+    toc = time.perf_counter()
+    assert len(collected) > 1024
+    print(hexlify(collected))
+    print(f'Time used to collect {len(collected)} bytes: {round(toc-tic,2)} -> {floor(len(collected) / (toc-tic))} Bps')

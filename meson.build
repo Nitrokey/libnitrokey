@@ -1,6 +1,6 @@
 project(
   'libnitrokey', 'cpp',
-  version : '3.6.0',
+  version : '3.7.0',
   license : 'LGPL-3.0+',
   default_options : [
     'cpp_std=c++14'

@@ -187,7 +187,7 @@ namespace nitrokey {
               bzero(&p, sizeof(p));
             }
 
-            ~ClearingProxy() {
+            virtual ~ClearingProxy() {
               bzero(&packet, sizeof(packet));
             }
 

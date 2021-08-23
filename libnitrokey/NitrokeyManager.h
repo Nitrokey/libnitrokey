@@ -211,7 +211,7 @@ char * strndup(const char* str, size_t maxlen);
 
         int get_progress_bar_value();
 
-        ~NitrokeyManager();
+        virtual ~NitrokeyManager();
         bool is_authorization_command_supported();
         bool is_320_OTP_secret_supported();
 

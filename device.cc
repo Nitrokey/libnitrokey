@@ -355,6 +355,10 @@ std::string Device::ErrorCounters::get_as_string() {
   return "";
 #endif
 
+  if (total_comm_runs == 0) {
+      return "Statistics: no connection run";
+  }
+
   std::stringstream ss;
   p(total_comm_runs);
   p(communication_successful);

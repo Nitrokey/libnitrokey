@@ -244,7 +244,7 @@ namespace nitrokey {
               LOG(__FUNCTION__, Loglevel::DEBUG_L2);
 
               if (dev == nullptr){
-                LOG(std::string("Throw: Device not initialized"), Loglevel::DEBUG_L1);
+                LOG(std::string("Connection not established yet"), Loglevel::DEBUG_L2);
                 throw DeviceNotConnected("Device not initialized");
               }
               dev->m_counters.total_comm_runs++;

@@ -329,7 +329,7 @@ void Device::set_retry_delay(const std::chrono::milliseconds delay){
 }
 
 Stick10::Stick10():
-  Device(NITROKEY_VID, NITROKEY_PRO_PID, DeviceModel::PRO, 100ms, 5, 100ms)
+  Device(NITROKEY_VID, NITROKEY_PRO_PID, DeviceModel::PRO, 100ms, 15, 100ms)
   {
     setDefaultDelay();
   }
@@ -343,7 +343,7 @@ Stick20::Stick20():
 
 
 LibremKey::LibremKey():
-  Device(PURISM_VID, LIBREM_KEY_PID, DeviceModel::LIBREM, 100ms, 5, 100ms)
+  Device(PURISM_VID, LIBREM_KEY_PID, DeviceModel::LIBREM, 100ms, 15, 100ms)
   {
     setDefaultDelay();
   }

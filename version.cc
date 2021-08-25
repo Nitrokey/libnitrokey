@@ -23,10 +23,16 @@
 
 namespace nitrokey {
     unsigned int get_major_library_version() {
+#ifdef LIBNK_VERSION_MAJOR
+        return LIBNK_VERSION_MAJOR;
+#endif
         return 3;
     }
 
     unsigned int get_minor_library_version() {
+#ifdef LIBNK_VERSION_MINOR
+        return LIBNK_VERSION_MINOR;
+#endif
         return 0;
     }
 

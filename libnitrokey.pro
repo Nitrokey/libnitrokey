@@ -8,6 +8,9 @@ TEMPLATE     = lib
 TARGET = nitrokey
 
 VERSION = 3.7.0
+LIBNK_VERSION_MAJOR = 3
+LIBNK_VERSION_MINOR = 7
+
 QMAKE_TARGET_COMPANY = Nitrokey
 QMAKE_TARGET_PRODUCT = libnitrokey
 QMAKE_TARGET_DESCRIPTION = Communicate with Nitrokey stick devices in a clean and easy manner
@@ -79,8 +82,6 @@ INCLUDEPATH = \
     $$PWD/unittest \
     $$PWD/unittest/Catch/single_include
 
-#DEFINES = 
-
 unix:!macx{
         # Install rules for QMake (CMake is preffered though)
         udevrules.path = $$system(pkg-config --variable=udevdir udev)
@@ -100,3 +101,7 @@ unix:!macx{
         libbin.path = /usr/local/lib
         INSTALLS += libbin
 }
+
+DEFINES += LIBNK_GIT_VERSION=\"\\\"$$system(git describe --abbrev=4 --always)\\\"\" LIBNK_VERSION="\\\"$${VERSION}\\\""
+DEFINES += LIBNK_VERSION_MAJOR=$${LIBNK_VERSION_MAJOR} LIBNK_VERSION_MINOR=$${LIBNK_VERSION_MINOR}
+message($$DEFINES)

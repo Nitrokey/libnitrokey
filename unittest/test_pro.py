@@ -25,11 +25,17 @@ from math import floor
 import pytest
 
 from conftest import skip_if_device_version_lower_than
-from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET, bbRFC_SECRET, LibraryErrors, HOTP_slot_count, \
+from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET, bbRFC_SECRET, HOTP_slot_count, \
     TOTP_slot_count
 from helpers import helper_PWS_get_slotname, helper_PWS_get_loginname, helper_PWS_get_pass
 from misc import ffi, gs, wait, cast_pointer_to_tuple, has_binary_counter, bb
 from misc import is_storage
+
+
+@pytest.mark.aes
+def test_regenerate_aes_key_2(C):
+    test_regenerate_aes_key(C)
+
 
 @pytest.mark.lock_device
 @pytest.mark.PWS

@@ -3,8 +3,8 @@ from enum import Enum
 import pytest
 
 from constants import DefaultPasswords, DeviceErrorCode
-from misc import gs
-from test_pro import check_HOTP_RFC_codes
+from misc import gs, ffi
+from test_pro import check_HOTP_RFC_codes, test_random
 
 
 def test_destroy_encrypted_data_leaves_OTP_intact(C):
@@ -58,22 +58,35 @@ class Modes(Enum):
 
 @pytest.mark.firmware
 @pytest.mark.factory_reset
-@pytest.mark.parametrize("mode", map(Modes, range(4)))
+@pytest.mark.parametrize("mode", map(Modes, reversed(range(4))))
 def test_pro_factory_reset_breaks_update_password(C, mode: Modes):
     from test_pro_bootloader import test_bootloader_password_change_pro, test_bootloader_password_change_pro_length
     from test_pro import test_factory_reset
 
     func = {
-        0: lambda: True,
-        1: lambda: test_factory_reset(C) or True,
-        2: lambda: C.NK_factory_reset(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK,
-        3: lambda: C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK,
+        Modes.EmptyBody: lambda: True,
+        Modes.FactoryResetWithAES: lambda: test_factory_reset(C) or True,
+        Modes.FactoryReset: lambda: C.NK_factory_reset(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK,
+        Modes.AESGeneration: lambda: C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK,
     }
 
     def boot_test(C):
         test_bootloader_password_change_pro(C)
-        test_bootloader_password_change_pro_length(C)
+        # test_bootloader_password_change_pro_length(C)
 
+    def random(C):
+        data = ffi.new('struct GetRandom_t *')
+        req_count = 50
+        res = C.NK_get_random(req_count, data)
+        assert res == DeviceErrorCode.STATUS_OK
+        assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+        assert data.op_success == 1
+        assert data.size_effective == req_count
+
+    random(C)
     boot_test(C)
-    func[mode.value]()
+    random(C)
+    func[mode]()
+    random(C)  # fails here
     boot_test(C)
+    random(C)

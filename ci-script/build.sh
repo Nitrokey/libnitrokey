@@ -18,6 +18,7 @@ export
 
 mkdir build
 mkdir install
+sleep 3h
 
 pushd build
 cmake .. -DERROR_ON_WARNING=OFF -DCOMPILE_TESTS=ON 

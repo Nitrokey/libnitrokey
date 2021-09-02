@@ -69,3 +69,20 @@ def test_bootloader_data_rention(C):
     C = library_device_reconnect(C)
     assert helper_check_device_for_data(C)
 
+
+@pytest.mark.firmware
+def test_factory_reset_does_not_change_update_password(C):
+    """
+    Check if factory reset changes the update password, which should not happen
+    """
+    skip_if_device_version_lower_than({'P': 13})
+    from test_pro import test_factory_reset
+    # Revert effects of a broken test run, if needed
+    C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE_TEMP, DefaultPasswords.UPDATE)
+
+    # actual test
+    assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE, DefaultPasswords.UPDATE_TEMP) == DeviceErrorCode.STATUS_OK
+    test_factory_reset(C)
+    assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE, DefaultPasswords.UPDATE_TEMP) == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE_TEMP, DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK
+

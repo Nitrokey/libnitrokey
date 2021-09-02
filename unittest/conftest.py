@@ -78,6 +78,9 @@ def C_offline(request=None):
 
 @pytest.fixture(scope="session")
 def C(request=None):
+    import platform
+    print(f"Python version: {platform.python_version()}")
+    print(f"OS: {platform.system()} {platform.release()} {platform.version()}")
     print("Getting library with connection initialized")
     return get_library(request)
 

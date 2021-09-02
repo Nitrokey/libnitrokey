@@ -22,6 +22,7 @@ from enum import Enum
 from sys import stderr
 
 from misc import to_hex, bb
+from conftest import print
 
 RFC_SECRET_HR = '12345678901234567890'
 RFC_SECRET = to_hex(RFC_SECRET_HR)  # '31323334353637383930...'
@@ -69,7 +70,7 @@ class DeviceErrorCode(Enum):
         except:
             pass
         result = self.value == other
-        print(f'Returned {other_name}, expected {self.name} => {result}', file=stderr)
+        print(f'Returned {other_name}, expected {self.name} => {result}')
         return result
 
 class LibraryErrors(Enum):
@@ -85,7 +86,7 @@ class LibraryErrors(Enum):
         except:
             pass
         result = self.value == other
-        print(f'Returned {other_name}, expected {self.name} => {result}', file=stderr)
+        print(f'Returned {other_name}, expected {self.name} => {result}')
         return result
 
 

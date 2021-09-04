@@ -33,8 +33,6 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="42b1", TAG+="uaccess"
 # Nitrokey 3 NFC
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="42b3", TAG+="uaccess"
-# Nitrokey Pro Bootloader
-KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="42b4", TAG+="uaccess"
 
 LABEL="u2f_end"
 
@@ -47,6 +45,8 @@ ACTION!="add", GOTO="gnupg_rules_end"
 ATTR{idVendor}=="20a0", ATTR{idProduct}=="4107", ENV{ID_SMARTCARD_READER}="1", ENV{ID_SMARTCARD_READER_DRIVER}="gnupg", TAG+="uaccess"
 ## Nitrokey Pro
 ATTR{idVendor}=="20a0", ATTR{idProduct}=="4108", ENV{ID_SMARTCARD_READER}="1", ENV{ID_SMARTCARD_READER_DRIVER}="gnupg", TAG+="uaccess"
+## Nitrokey Pro Bootloader
+ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="42b4", TAG+="uaccess"
 ## Nitrokey Storage
 ATTR{idVendor}=="20a0", ATTR{idProduct}=="4109", ENV{ID_SMARTCARD_READER}="1", ENV{ID_SMARTCARD_READER_DRIVER}="gnupg", TAG+="uaccess"
 ## Nitrokey Start

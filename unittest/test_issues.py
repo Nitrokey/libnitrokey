@@ -1,6 +1,11 @@
+from enum import Enum
+
+import pytest
+
+from conftest import skip_if_device_version_lower_than
 from constants import DefaultPasswords, DeviceErrorCode
-from misc import gs
-from test_pro import check_HOTP_RFC_codes
+from misc import gs, ffi
+from test_pro import check_HOTP_RFC_codes, test_random
 
 
 def test_destroy_encrypted_data_leaves_OTP_intact(C):
@@ -9,6 +14,8 @@ def test_destroy_encrypted_data_leaves_OTP_intact(C):
     Test for Nitrokey Storage.
     Details: https://github.com/Nitrokey/libnitrokey/issues/199
     """
+    skip_if_device_version_lower_than({'S': 55})
+
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     # write password safe slot
     assert C.NK_write_password_safe_slot(0, b'slotname1', b'login1', b'pass1') == DeviceErrorCode.STATUS_OK
@@ -44,3 +51,46 @@ def test_destroy_encrypted_data_leaves_OTP_intact(C):
     # confirm OTP
     assert C.NK_first_authenticate(DefaultPasswords.ADMIN, DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
     assert gs(C.NK_get_hotp_slot_name(1)) == b'python_test'
+
+
+class Modes(Enum):
+    EmptyBody = 0
+    FactoryResetWithAES = 1
+    FactoryReset = 2
+    AESGeneration = 3
+
+@pytest.mark.firmware
+@pytest.mark.factory_reset
+@pytest.mark.parametrize("mode", map(Modes, reversed(range(4))))
+def test_pro_factory_reset_breaks_update_password(C, mode: Modes):
+    from test_pro_bootloader import test_bootloader_password_change_pro, test_bootloader_password_change_pro_length
+    from test_pro import test_factory_reset
+    skip_if_device_version_lower_than({'P': 14})
+
+    func = {
+        Modes.EmptyBody: lambda: True,
+        Modes.FactoryResetWithAES: lambda: test_factory_reset(C) or True,
+        Modes.FactoryReset: lambda: C.NK_factory_reset(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK,
+        Modes.AESGeneration: lambda: C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK,
+    }
+
+    def boot_test(C):
+        test_bootloader_password_change_pro(C)
+        # test_bootloader_password_change_pro_length(C)
+
+    def random(C):
+        data = ffi.new('struct GetRandom_t *')
+        req_count = 50
+        res = C.NK_get_random(req_count, data)
+        assert res == DeviceErrorCode.STATUS_OK
+        assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+        assert data.op_success == 1
+        assert data.size_effective == req_count
+
+    random(C)
+    boot_test(C)
+    random(C)
+    func[mode]()
+    random(C)  # fails here
+    boot_test(C)
+    random(C)

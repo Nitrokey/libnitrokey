@@ -25,11 +25,17 @@ from math import floor
 import pytest
 
 from conftest import skip_if_device_version_lower_than
-from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET, bbRFC_SECRET, LibraryErrors, HOTP_slot_count, \
+from constants import DefaultPasswords, DeviceErrorCode, RFC_SECRET, bbRFC_SECRET, HOTP_slot_count, \
     TOTP_slot_count
 from helpers import helper_PWS_get_slotname, helper_PWS_get_loginname, helper_PWS_get_pass
 from misc import ffi, gs, wait, cast_pointer_to_tuple, has_binary_counter, bb
 from misc import is_storage
+
+
+@pytest.mark.aes
+def test_regenerate_aes_key_2(C):
+    test_regenerate_aes_key(C)
+
 
 @pytest.mark.lock_device
 @pytest.mark.PWS
@@ -164,9 +170,13 @@ def test_enable_password_safe_after_factory_reset(C):
     if is_storage(C):
         assert C.NK_clear_new_sd_card_warning(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     enable_password_safe_result = C.NK_enable_password_safe(DefaultPasswords.USER)
-    assert enable_password_safe_result == DeviceErrorCode.STATUS_AES_DEC_FAILED \
-           or is_storage(C) and enable_password_safe_result in \
-           [DeviceErrorCode.WRONG_PASSWORD, DeviceErrorCode.STATUS_UNKNOWN_ERROR]  # UNKNOWN_ERROR since v0.51
+    pro_case = enable_password_safe_result in [DeviceErrorCode.STATUS_AES_DEC_FAILED,
+                                               DeviceErrorCode.STATUS_AES_CREATE_KEY_FAILED]  # STATUS_AES_CREATE_KEY_FAILED since v0.14
+    storage_case = enable_password_safe_result in [DeviceErrorCode.WRONG_PASSWORD,
+                                                   DeviceErrorCode.STATUS_UNKNOWN_ERROR]  # UNKNOWN_ERROR since v0.51
+    assert not is_storage(C) and pro_case \
+           or is_storage(C) and storage_case
+    C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_build_aes_key(DefaultPasswords.ADMIN) == DeviceErrorCode.STATUS_OK
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
 
@@ -246,6 +256,7 @@ def test_admin_retry_counts(C):
 @pytest.mark.lock_device
 @pytest.mark.pin
 def test_user_retry_counts_change_PIN(C):
+    # TODO can get device with AES key not set, and fail because of that - generate the key or reorder tests
     assert C.NK_change_user_PIN(DefaultPasswords.USER, DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     wrong_password = b'wrong_password'
     default_user_retry_count = 3

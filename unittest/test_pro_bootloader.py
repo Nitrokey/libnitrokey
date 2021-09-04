@@ -60,12 +60,30 @@ def test_bootloader_password_change_pro_too_long(C):
 
 @pytest.mark.skip_by_default
 @pytest.mark.firmware
-def test_bootloader_data_rention(C):
+def test_bootloader_data_retention(C):
     skip_if_device_version_lower_than({'P': 11})
+    # Not enabled due to lack of side-effect removal at this point
 
     assert helper_populate_device(C)
     assert C.NK_enable_firmware_update_pro(DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_DISCONNECTED
     input('Please press ENTER after uploading new firmware to the device')
     C = library_device_reconnect(C)
     assert helper_check_device_for_data(C)
+
+
+@pytest.mark.firmware
+def test_factory_reset_does_not_change_update_password(C):
+    """
+    Check if factory reset changes the update password, which should not happen
+    """
+    skip_if_device_version_lower_than({'P': 13})
+    from test_pro import test_factory_reset
+    # Revert effects of a broken test run, if needed
+    C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE_TEMP, DefaultPasswords.UPDATE)
+
+    # actual test
+    assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE, DefaultPasswords.UPDATE_TEMP) == DeviceErrorCode.STATUS_OK
+    test_factory_reset(C)
+    assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE, DefaultPasswords.UPDATE_TEMP) == DeviceErrorCode.WRONG_PASSWORD
+    assert C.NK_change_firmware_password_pro(DefaultPasswords.UPDATE_TEMP, DefaultPasswords.UPDATE) == DeviceErrorCode.STATUS_OK
 

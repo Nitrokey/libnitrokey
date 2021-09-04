@@ -2,6 +2,7 @@ from enum import Enum
 
 import pytest
 
+from conftest import skip_if_device_version_lower_than
 from constants import DefaultPasswords, DeviceErrorCode
 from misc import gs, ffi
 from test_pro import check_HOTP_RFC_codes, test_random
@@ -13,6 +14,8 @@ def test_destroy_encrypted_data_leaves_OTP_intact(C):
     Test for Nitrokey Storage.
     Details: https://github.com/Nitrokey/libnitrokey/issues/199
     """
+    skip_if_device_version_lower_than({'S': 55})
+
     assert C.NK_enable_password_safe(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
     # write password safe slot
     assert C.NK_write_password_safe_slot(0, b'slotname1', b'login1', b'pass1') == DeviceErrorCode.STATUS_OK
@@ -62,6 +65,7 @@ class Modes(Enum):
 def test_pro_factory_reset_breaks_update_password(C, mode: Modes):
     from test_pro_bootloader import test_bootloader_password_change_pro, test_bootloader_password_change_pro_length
     from test_pro import test_factory_reset
+    skip_if_device_version_lower_than({'P': 14})
 
     func = {
         Modes.EmptyBody: lambda: True,

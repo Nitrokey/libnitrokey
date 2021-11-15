@@ -1,0 +1,37 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'cpp', 'python' ]
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Init CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        languages: ${{ matrix.language }}
+
+    - run: |
+        sudo apt install libhidapi-dev libusb-1.0-0-dev
+        mkdir build; cd build
+        cmake ..
+        make -j4
+
+    - name: CodeQL Analysis
+      uses: github/codeql-action/analyze@v1

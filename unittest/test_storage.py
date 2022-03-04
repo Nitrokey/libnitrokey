@@ -18,9 +18,14 @@ along with libnitrokey. If not, see <http://www.gnu.org/licenses/>.
 
 SPDX-License-Identifier: LGPL-3.0
 """
-
+import dataclasses
 import pprint
+import secrets
+from datetime import datetime, timedelta
+from time import sleep
+
 import pytest
+from hypothesis import given, strategies as st, settings, Verbosity, assume
 
 from conftest import skip_if_device_version_lower_than
 from constants import DefaultPasswords, DeviceErrorCode
@@ -42,6 +47,15 @@ def get_dict_from_dissect(status):
     d = {k.strip(): v.strip() for k, v in x}
     return d
 
+
+def get_status_storage(C):
+    status_pointer = C.NK_get_status_storage_as_string()
+    assert C.NK_get_last_command_status() == DeviceErrorCode.STATUS_OK
+    status_string = gs(status_pointer)
+    assert len(status_string) > 0
+    status_dict = get_dict_from_dissect(status_string.decode('ascii'))
+    # assert int(status_dict['AdminPwRetryCount']) == default_admin_password_retry_count
+    return status_dict, C.NK_get_last_command_status()
 
 @pytest.mark.other
 @pytest.mark.info
@@ -572,8 +586,97 @@ def test_export_firmware_extended_macos(C):
     assert checks_add == checks
 
 
-def skip_if_not_macos(message:str) -> None:
+def skip_if_not_macos(message: str) -> None:
     import platform
 
     if platform.system() != 'Darwin':
         pytest.skip(message)
+
+
+from typing import Callable, Optional
+
+
+def helper_busy_wait(func: Callable, timeout=10) -> DeviceErrorCode:
+    start = datetime.now()
+    res = func()
+    while res == DeviceErrorCode.BUSY:
+        sleep(.5)
+        status_dict, res = get_status_storage(C)
+        print(status_dict)
+        if datetime.now() - start > timedelta(seconds=timeout):
+            print('Timeout, stopping')
+            return res
+    return res
+
+
+def helper_create_hidden_volume(C, slot, begin, end, password_in: Optional[bytes], should_work=True):
+    """
+    :param password_in:  if None, generate randomly per call
+    """
+    assert C.NK_lock_device() == DeviceErrorCode.STATUS_OK
+    assert C.NK_unlock_encrypted_volume(DefaultPasswords.USER) == DeviceErrorCode.STATUS_OK
+
+    password = password_in
+    if password_in is None:
+        password = secrets.token_hex(5)
+        password = password.encode('ascii')
+    assert not should_work ^ (helper_busy_wait(
+        lambda: C.NK_create_hidden_volume(slot, begin, end, password)) == DeviceErrorCode.STATUS_OK)
+
+    assert not should_work ^ (
+            helper_busy_wait(lambda: C.NK_unlock_hidden_volume(password)) == DeviceErrorCode.STATUS_OK)
+    if should_work:
+        assert helper_busy_wait(lambda: C.NK_lock_hidden_volume()) == DeviceErrorCode.STATUS_OK
+
+
+@dataclasses.dataclass
+class MalformedParams:
+    slot: int
+    begin: int
+    end: int
+    password: Optional[bytes] = None
+    should_work: bool = True
+
+    def as_list(self):
+        return [self.slot, self.begin, self.end, self.password, self.should_work]
+
+@pytest.mark.hidden
+@pytest.mark.parametrize("args", [
+    # correct calls
+    MalformedParams(slot=0, begin=1, end=2),
+    MalformedParams(slot=0, begin=0, end=100),
+    MalformedParams(slot=0, begin=99, end=100),
+    MalformedParams(slot=0, begin=0, end=1),
+    MalformedParams(slot=0, begin=0, end=1),
+
+    # password not empty
+    # password not longer than 20 characters
+    MalformedParams(slot=0, begin=1, end=2, password=b"", should_work=False),
+    MalformedParams(slot=0, begin=1, end=2, password=b"a" * 21, should_work=False),
+    MalformedParams(slot=0, begin=1, end=2, password=b"a" * 20),
+
+    # slot 0..3
+    MalformedParams(slot=5, begin=1, end=2, should_work=False),
+    MalformedParams(slot=55, begin=1, end=2, should_work=False),
+    # end 1..100
+    MalformedParams(slot=0, begin=0, end=101, should_work=False),
+    # begin 0..99
+    MalformedParams(slot=0, begin=100, end=100, should_work=False),
+    MalformedParams(slot=0, begin=50, end=49, should_work=False),
+    MalformedParams(slot=0, begin=50, end=50, should_work=False),
+], ids=str)
+def test_hidden_volume_malformed_parameters(C, args):
+    skip_if_device_version_lower_than({'S': 56})
+    helper_create_hidden_volume(C, *args.as_list())
+
+
+# password=st.text(min_size=10, max_size=20) # disabled to avoid failed tests due to unlocking previously correctly
+# configured HV with the same password used in failing example
+@given(slot=st.integers(min_value=0, max_value=3), begin=st.integers(min_value=0, max_value=99),
+       end=st.integers(min_value=1, max_value=100))
+@settings(max_examples=15, deadline=timedelta(seconds=10), verbosity=Verbosity.verbose)
+def test_hypo_hidden_volume_setup(C, slot, begin, end):
+    assume(begin < end)
+    # password = password.encode('utf-8')
+    password = None
+    helper_create_hidden_volume(C, slot, begin, end, password, should_work=True)

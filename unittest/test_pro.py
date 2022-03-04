@@ -673,13 +673,13 @@ def test_read_write_config(C):
     assert not config_st.disable_user_password
 
     # use structs: write
-    config_st.numlock = 3
+    config_st.numlock = 0xFF
     assert C.NK_write_config_struct(config_st[0], DefaultPasswords.ADMIN_TEMP) == DeviceErrorCode.STATUS_OK
 
     # use structs: read II
     err = C.NK_read_config_struct(config_st)
     assert err == 0
-    assert config_st.numlock == 3
+    assert config_st.numlock == 0xFF
     assert config_st.capslock == 1
     assert config_st.scrolllock == 2
     assert config_st.enable_user_password

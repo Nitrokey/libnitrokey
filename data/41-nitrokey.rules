@@ -51,6 +51,8 @@ ATTR{idVendor}=="20a0", ATTR{idProduct}=="4108", ENV{ID_SMARTCARD_READER}="1", E
 ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="42b4", TAG+="uaccess"
 ## Nitrokey Storage
 ATTR{idVendor}=="20a0", ATTR{idProduct}=="4109", ENV{ID_SMARTCARD_READER}="1", ENV{ID_SMARTCARD_READER_DRIVER}="gnupg", TAG+="uaccess"
+## Nitrokey Storage Bootloader
+ATTR{idVendor}=="03eb", ATTR{idProduct}=="2ff1", TAG+="uaccess"
 ## Nitrokey Start
 ATTR{idVendor}=="20a0", ATTR{idProduct}=="4211", ENV{ID_SMARTCARD_READER}="1", ENV{ID_SMARTCARD_READER_DRIVER}="gnupg", TAG+="uaccess"
 ## Nitrokey HSM

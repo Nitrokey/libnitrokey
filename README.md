@@ -1,6 +1,3 @@
-[![Build Status](https://travis-ci.org/Nitrokey/libnitrokey.svg?branch=master)](https://travis-ci.org/Nitrokey/libnitrokey)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FNitrokey%2Flibnitrokey.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FNitrokey%2Flibnitrokey?ref=badge_shield)
-
 # libnitrokey
 libnitrokey is a project to communicate with Nitrokey Pro and Storage devices in a clean and easy manner. Written in C++14, testable with `py.test` and `Catch` frameworks, with C API, Python access (through CFFI and C API, in future with Pybind11).
 
@@ -29,8 +26,20 @@ Following libraries are needed to use libnitrokey on Linux (names of the package
 - libusb-1.0-0-dev 
 
 
-## Compilation
+## Build
 libnitrokey uses CMake as its main build system. As a secondary option it offers building through Qt's qMake.
+
+### Docker Isolated Build
+
+To run a docker isolated build it suffices to run the helper command:
+
+```bash
+# build docker image, and execute the build
+$ make docker-build-all
+```
+
+Currently, Ubuntu 20.04 is used as a build base. Results will be placed in the `./build/` directory.
+
 ### Qt
 A Qt's .pro project file is provided for direct compilation and for inclusion to other projects.
 Using it directly is not recommended due to lack of dependencies check and not implemented library versioning.
@@ -77,7 +86,9 @@ Other build options (all take either `ON` or `OFF`):
 
 
 ### Meson
-It is possible to use Meson and Ninja to build the project as well (currently available only `master` branch).
+Note: Meson build is currently not tested. Please file a ticket in case it would not work for you.
+
+It is possible to use Meson and Ninja to build the project as well.
 Please run:
 ```
 meson builddir <OPTIONS>
@@ -92,6 +103,8 @@ pip install --user cffi # for python 2.x
 pip3 install cffi # for python 3.x
 ```
 ## Python2
+Note: Python 2 is not supported anymore.
+
 Just import it, read the C API header and it is done! You have access to the library. Here is an example (in Python 2) printing HOTP code for Pro or Storage device, assuming it is run in root directory [(full example)](python_bindings_example.py):
 
 <details>
@@ -269,6 +282,21 @@ Please check [NK_C_API.h](NK_C_API.h) (C API) for high level commands and [libni
 
 **Warning!** Before you run unittests please change both your Admin and User PINs on your Nitrostick to defaults (`12345678` and `123456` respectively), or change the values in tests source code. If you do not change them, the tests might lock your device temporarily. If it's too late already, you can reset your Nitrokey using instructions from [homepage](https://www.nitrokey.com/de/documentation/how-reset-nitrokey).
 
+## Helper
+
+Here are Python tests helper calls:
+
+```bash
+# setup, requires pipenv installed
+$ make tests-setup
+# For Nitrokey Pro
+$ make tests-pro
+# For Nitrokey Storage
+$ make tests-storage
+```
+
+See below for the further information.
+
 ## Python tests
 libnitrokey has a great suite of tests written in Python 3 under the path: [unittest/test_*.py](https://github.com/Nitrokey/libnitrokey/tree/master/unittest): 
 * `test_pro.py` - contains tests of OTP, Password Safe and PIN control functionality. Could be run on both Pro and Storage devices.
@@ -384,14 +412,13 @@ firmware code should show how things works:
 (for Nitrokey Pro, for Storage similarly).
 
 # Known issues / tasks
-* Currently only one device can be connected at a time (experimental work could be found in `wip-multiple_devices` branch),
-* C++ API needs some reorganization to C++ objects (instead of pointers to byte arrays). This will be also preparing for integration with Pybind11,
+* C++ API needs some reorganization to C++ objects (instead of pointers to byte arrays). This would be also preparation for Pybind11 integration;
 * Fix compilation warnings.
 
 Other tasks might be listed either in [TODO](TODO) file or on project's issues page.
 
 # License
-This project is licensed under LGPL version 3. License text could be found under [LICENSE](LICENSE) file.
+This project is licensed under LGPL version 3. License text can be found under [LICENSE](LICENSE) file.
 
 # Roadmap
 To check what issues will be fixed and when please check [milestones](https://github.com/Nitrokey/libnitrokey/milestones) page.

@@ -23,7 +23,7 @@ docker-clean:
 .PHONY: ci-build
 ci-build:
 	mkdir -p $(BUILD_DIR) && rm -rf $(BUILD_DIR)/*
-	cd $(BUILD_DIR) && cmake .. && $(MAKE) -j$(NPROC)
+	cd $(BUILD_DIR) && cmake .. && $(MAKE) -j$(NPROC) package
 	cd $(BUILD_DIR) && ctest -VV
 	cd $(BUILD_DIR) && mkdir -p install && $(MAKE) install DESTDIR=install
 	@echo "== Results available in $(BUILD_DIR)"

@@ -439,8 +439,7 @@ namespace nitrokey {
                   == stick20::device_status::busy_progressbar){
                 dev->m_counters.busy_progressbar++;
                 LOG(std::string("Throw: Long operation in progress exception"), Loglevel::DEBUG_L1);
-                throw LongOperationInProgressException(
-                    resp.command_id, resp.device_status, resp.storage_status.progress_bar_value);
+                throw LongOperationInProgressException(resp.storage_status.progress_bar_value);
               }
 
               if (!resp.isValid()) {

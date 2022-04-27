@@ -18,7 +18,8 @@ docker-build:
 
 .PHONY: docker-clean
 docker-clean:
-	sudo docker rmi $(IMAGE_NAME)
+	cd $(BUILD_DIR) && $(MAKE) clean
+	sudo docker rmi $(IMAGE_NAME) --force
 
 .PHONY: ci-build
 ci-build:
@@ -35,13 +36,23 @@ ci-tests:
 	pip install -r unittest/requirements.txt --user
 	cd unittest && python3 -m pytest -sv test_offline.py
 
-PYTEST_ARG=-vx
+REPORT_NAME=libnitrokey-tests-report.html
+PYTEST_ARG=-vx --randomly-dont-reorganize --template=html1/index.html --report=$(REPORT_NAME)
+
+tests-setup:
+	cd unittest && pipenv --python $(shell which python3) &&  pipenv install --dev
 
 .PHONY: tests-pro
 tests-pro:
-	cd unittest && pipenv run pytest $(PYTEST_ARG) test_pro.py
+	cd unittest && pipenv run pytest $(PYTEST_ARG) test_pro.py ; xdg-open $(REPORT_NAME)
 
 .PHONY: tests-storage
 tests-storage:
 	cd unittest && pipenv run pytest $(PYTEST_ARG) test_pro.py
-	cd unittest && pipenv run pytest $(PYTEST_ARG) test_storage.py
+	cd unittest && pipenv run pytest $(PYTEST_ARG) test_storage.py ; xdg-open $(REPORT_NAME)
+
+.PHONY: clean clean-all
+clean:
+	-rm $(REPORT_NAME)
+
+clean-all: clean docker-clean

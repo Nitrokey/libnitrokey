@@ -240,13 +240,14 @@ ENDIF()
 
 
 
-#SET(CPACK_GENERATOR
-#        "DEB;RPM")
-# build a CPack driven installer package
+SET(CPACK_GENERATOR
+        "DEB;RPM")
+    # build a CPack driven installer package
 include (InstallRequiredSystemLibraries)
 set (CPACK_RESOURCE_FILE_LICENSE
         "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set (CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+set (CPACK_PACKAGE_CONTACT "info@nitrokey.com")
 include (CPack)
 
 # Build Doxygen documentation for the C API

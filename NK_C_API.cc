@@ -829,7 +829,7 @@ NK_C_API char* NK_get_SD_usage_data_as_string() {
 		return get_with_string_result([&]() {
 			auto v = nm->list_devices_by_cpuID();
 			std::string res;
-			for (const auto a : v){
+			for (const auto& a : v){
 				res += a+";";
 			}
 			if (res.size()>0) res.pop_back(); // remove last delimiter char

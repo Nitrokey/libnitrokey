@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015-2019 Nitrokey UG
+# Copyright (c) 2015-2022 Nitrokey GmbH
 #
 # This file is part of libnitrokey.
 #
@@ -36,6 +36,8 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="42b2", MODE="0660", GROUP+="plugdev"
 # Nitrokey 3 NFC Bootloader
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="42dd", MODE="0660", GROUP+="plugdev"
+# Nitrokey 3 NFC Bootloader NRF
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="42e8", MODE="0660", GROUP+="plugdev"
 
 LABEL="u2f_end"
 

@@ -19,7 +19,7 @@ def main(input: click.File):
         if pid:
             res.append((name, vid[0], pid[0]))
 
-        res = sorted(res)
+    res = sorted(res)
     for r in res:
         if "dev Entry" in r[0]:
             continue

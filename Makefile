@@ -14,7 +14,12 @@ docker-build-image:
 
 .PHONY: docker-build
 docker-build:
-	sudo docker run -it -v $(PWD):/app $(IMAGE_NAME) bash -c "make ci-build"
+	sudo docker run -it --rm -v $(PWD):/app $(IMAGE_NAME) bash -c "make ci-build"
+
+DOCKERCMD=bash -c "make ci-package"
+.PHONY: docker-package
+docker-package:
+	sudo docker run -it --rm -v $(PWD):/app $(IMAGE_NAME) $(DOCKERCMD)
 
 .PHONY: docker-clean
 docker-clean:
@@ -29,6 +34,13 @@ ci-build:
 	cd $(BUILD_DIR) && mkdir -p install && $(MAKE) install DESTDIR=install
 	@echo "== Results available in $(BUILD_DIR)"
 	@date
+
+DGET_URL=https://people.debian.org/~patryk/tmp/libnitrokey/libnitrokey_3.7-1.dsc
+.PHONY: ci-package
+ci-package:
+	mkdir -p $(BUILD_DIR) && rm -rf $(BUILD_DIR)/*
+	cd $(BUILD_DIR) && dget $(DGET_URL)
+	cd $(BUILD_DIR) && cd libnitrokey-* && dpkg-buildpackage
 
 .PHONY: ci-tests
 ci-tests:

@@ -38,7 +38,16 @@ To run a docker isolated build it suffices to run the helper command:
 $ make docker-build-all
 ```
 
-Currently, Ubuntu 20.04 is used as a build base. Results will be placed in the `./build/` directory.
+Currently, Ubuntu 22.04 is used as a build base. Results will be placed in the `./build/` directory.
+
+Additionally, it is possible to check if the Debian package of selected version is able to build itself with the following command:
+```text
+# for the default 3.7 URL
+$ make docker-package
+
+# for the customized DGET url
+$ make docker-package DOCKERCMD="make ci-package DGET_URL=https://people.debian.org/~patryk/tmp/libnitrokey/libnitrokey_3.7-1.dsc"
+```
 
 ### Qt
 A Qt's .pro project file is provided for direct compilation and for inclusion to other projects.

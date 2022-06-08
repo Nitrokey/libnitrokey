@@ -114,7 +114,6 @@ pkg.generate(
   version : meson.project_version(),
   requires_private : dep_hidapi.name(),
   description : 'Library for communicating with Nitrokey in a clean and easy manner',
-  install : true,
 )
 
 if target_machine.system() == 'freebsd'

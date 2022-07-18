@@ -2,11 +2,11 @@
 set -exuo pipefail
 export
 
-. ./libnitrokey-source-metadata/metadata
-tar xf artifacts/${LIBNITROKEY_BUILD_OUTNAME}.tar.gz
+#. ./libnitrokey-source-metadata/metadata
+#tar xf artifacts/${LIBNITROKEY_BUILD_OUTNAME}.tar.gz
 
 
-pushd ${LIBNITROKEY_BUILD_OUTNAME}
+#pushd ${LIBNITROKEY_BUILD_OUTNAME}
 pip3 install --user -r unittest/requirements.txt
 
 ## This is quite sketchy but will work for now - we're using a tarball prepared by git archive, so we can't pull submodules.

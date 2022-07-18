@@ -11,7 +11,7 @@ variables:
   GIT_STRATEGY: clone     #This seems to have no effect also set in webinterface
   GIT_DEPTH: 0          #This seems to have no effect also set in webinterface
   GIT_SUBMODULE_STRATEGY: recursive #This seems to have no effect also set in webinterfac
-  SCRIPTS_REPO: git@git.dotplex.com:nitrokey/gitlab-ci.git
+  SCRIPTS_REPO: git@git.nitrokey.com:nitrokey/gitlab-ci.git
   REPO_USER: nitrokey
   REPO_NAME: libnitrokey
   MAIN_BRANCH: master
@@ -55,21 +55,21 @@ variables:
 
 build-bionic-gcc8:
   extends: .build
-  image: registry.git.dotplex.com/nitrokey/libnitrokey/libnitrokey-bionic-gcc8:latest
+  image: registry.git.nitrokey.com/nitrokey/libnitrokey/libnitrokey-bionic-gcc8:latest
 
 build-bionic-gcc7:
   extends: .build
-  image: registry.git.dotplex.com/nitrokey/libnitrokey/libnitrokey-bionic-gcc7:latest
+  image: registry.git.nitrokey.com/nitrokey/libnitrokey/libnitrokey-bionic-gcc7:latest
 
 build-bionic-gcc6:
   extends: .build
-  image: registry.git.dotplex.com/nitrokey/libnitrokey/libnitrokey-bionic-gcc6:latest
+  image: registry.git.nitrokey.com/nitrokey/libnitrokey/libnitrokey-bionic-gcc6:latest
 
 build-bionic-gcc5:
   extends: .build
-  image: registry.git.dotplex.com/nitrokey/libnitrokey/libnitrokey-bionic-gcc5:latest
+  image: registry.git.nitrokey.com/nitrokey/libnitrokey/libnitrokey-bionic-gcc5:latest
 
 build-bionic-llvm7:
   extends: .build
-  image: registry.git.dotplex.com/nitrokey/libnitrokey/libnitrokey-bionic-llvm7:latest
+  image: registry.git.nitrokey.com/nitrokey/libnitrokey/libnitrokey-bionic-llvm7:latest
     

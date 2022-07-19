@@ -18,7 +18,6 @@ pip3 install --user -r unittest/requirements.txt
 
 mkdir build
 mkdir install
-sleep 3h
 pushd build
 cmake .. -DERROR_ON_WARNING=OFF -DCOMPILE_TESTS=ON 
 make -j2

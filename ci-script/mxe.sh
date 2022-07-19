@@ -2,7 +2,7 @@
 set -exuo pipefail
 
 #. ./nitrokey-app-source-metadata/metadata
-LIBNITROKEY_BUILD_ARTIFACT_VERSION=${git describe}
+LIBNITROKEY_BUILD_ARTIFACT_VERSION=v90000 #${git describe}
 mkdir -p artifacts
 OUTDIR="$(realpath artifacts)"
 OUTNAME="libnitrokey-${LIBNITROKEY_BUILD_ARTIFACT_VERSION}.exe"

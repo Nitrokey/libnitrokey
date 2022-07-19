@@ -72,4 +72,24 @@ build-bionic-gcc5:
 build-bionic-llvm7:
   extends: .build
   image: registry.git.nitrokey.com/nitrokey/libnitrokey/libnitrokey-bionic-llvm7:latest
-    
+
+mxe:
+  image: registry.git.nitrokey.com/nitrokey/nitrokey-app/nitrokey-app-mxe-agent:latest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+  tags:
+    - docker
+  stage: build
+  before_script: 
+  #  - apt-get update
+  #  - apt-get -y install wget curl qttools5-dev git
+  script: 
+    - ci-scripts/mxe.sh
+  after_script:
+    - wget $icon_server/checkmark/$CI_COMMIT_REF_NAME/$CI_COMMIT_SHA/$CI_JOB_NAME/$CI_JOB_STATUS/${CI_JOB_URL#*/*/*/}
+  artifacts:
+    paths:
+      - artifacts
+    expire_in: 2 week

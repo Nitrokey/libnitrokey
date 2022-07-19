@@ -86,7 +86,7 @@ mxe:
   #  - apt-get update
   #  - apt-get -y install wget curl qttools5-dev git
   script: 
-    - ci-scripts/mxe.sh
+    - ci-script/mxe.sh
   after_script:
     - wget $icon_server/checkmark/$CI_COMMIT_REF_NAME/$CI_COMMIT_SHA/$CI_JOB_NAME/$CI_JOB_STATUS/${CI_JOB_URL#*/*/*/}
   artifacts:

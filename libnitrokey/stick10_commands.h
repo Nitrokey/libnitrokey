@@ -470,7 +470,7 @@ class GetUserPasswordRetryCount
             ss << std::hex << std::setfill('0') << std::setw(2) << (int)arr[i] << " ";
         }
         ss << std::endl;
-    };
+    }
 
 
 class GetPasswordSafeSlotStatus : Command<CommandID::GET_PW_SAFE_SLOT_STATUS> {

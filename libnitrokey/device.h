@@ -176,14 +176,14 @@ public:
 
         void show_stats();
 //  ErrorCounters get_stats(){ return m_counters; }
-  int get_retry_receiving_count() const { return m_retry_receiving_count; };
-  int get_retry_sending_count() const { return m_retry_sending_count; };
-  std::chrono::milliseconds get_retry_timeout() const { return m_retry_timeout; };
+  int get_retry_receiving_count() const { return m_retry_receiving_count; }
+  int get_retry_sending_count() const { return m_retry_sending_count; }
+  std::chrono::milliseconds get_retry_timeout() const { return m_retry_timeout; }
   std::chrono::milliseconds get_send_receive_delay() const {return m_send_receive_delay;}
 
-  int get_last_command_status() {int a = std::atomic_exchange(&last_command_status, static_cast<uint8_t>(0)); return a;};
-  void set_last_command_status(uint8_t _err) { last_command_status = _err;} ;
-  bool last_command_sucessfull() const {return last_command_status == 0;};
+  int get_last_command_status() {int a = std::atomic_exchange(&last_command_status, static_cast<uint8_t>(0)); return a;}
+  void set_last_command_status(uint8_t _err) { last_command_status = _err;}
+  bool last_command_sucessfull() const {return last_command_status == 0;}
   DeviceModel get_device_model() const {return m_model;}
   void set_receiving_delay(std::chrono::milliseconds delay);
   void set_retry_delay(std::chrono::milliseconds delay);

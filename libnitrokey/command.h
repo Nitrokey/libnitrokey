@@ -96,7 +96,7 @@ namespace stick20{
                       set_kind_admin_prefixed();
                       break;
                   }
-                };
+                }
 
             } __packed;
 

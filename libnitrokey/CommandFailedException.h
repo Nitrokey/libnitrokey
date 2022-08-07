@@ -41,7 +41,7 @@ public:
       LOG(std::string("CommandFailedException, status: ")+ std::to_string(last_command_status), nitrokey::log::Loglevel::DEBUG);
     }
 
-    virtual const char *what() const noexcept {
+    virtual const char *what() const noexcept override {
         return "Command execution has failed on device";
     }
 

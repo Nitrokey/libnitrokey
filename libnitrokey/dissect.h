@@ -43,11 +43,11 @@ class QueryDissector : semantics::non_constructible {
 
 #ifdef LOG_VOLATILE_DATA
     out << "Raw HID packet:" << std::endl;
-    out << ::nitrokey::misc::hexdump((const uint8_t *)(&pod), sizeof pod);
+    out << ::nitrokey::misc::hexdump(reinterpret_cast<const uint8_t *>(&pod), sizeof pod);
 #endif
 
     out << "Contents:" << std::endl;
-    out << "Command ID:\t" << commandid_to_string((CommandID)(pod.command_id))
+    out << "Command ID:\t" << commandid_to_string(static_cast<CommandID>(pod.command_id))
         << std::endl;
       out << "CRC:\t"
         << std::hex << std::setw(2) << std::setfill('0')
@@ -108,12 +108,12 @@ class ResponseDissector : semantics::non_constructible {
 
 #ifdef LOG_VOLATILE_DATA
     out << "Raw HID packet:" << std::endl;
-    out << ::nitrokey::misc::hexdump((const uint8_t *)(&pod), sizeof pod);
+    out << ::nitrokey::misc::hexdump(reinterpret_cast<const uint8_t *>(&pod), sizeof pod);
 #endif
 
     out << "Device status:\t" << pod.device_status + 0 << " "
         << status_translate_device(pod.device_status) << std::endl;
-    out << "Command ID:\t" << commandid_to_string((CommandID)(pod.command_id)) << " hex: " << std::hex << (int)pod.command_id
+    out << "Command ID:\t" << commandid_to_string(static_cast<CommandID>(pod.command_id)) << " hex: " << std::hex << static_cast<int>(pod.command_id)
         << std::endl;
     out << "Last command CRC:\t"
             << std::hex << std::setw(2) << std::setfill('0')
@@ -123,7 +123,7 @@ class ResponseDissector : semantics::non_constructible {
     out << "CRC:\t"
             << std::hex << std::setw(2) << std::setfill('0')
             << pod.crc << std::endl;
-    if((int)pod.command_id == pod.storage_status.command_id){
+    if(static_cast<int>(pod.command_id) == pod.storage_status.command_id){
       out << "Storage stick status (where applicable):" << std::endl;
 #define d(x) out << " "#x": \t"<< std::hex << std::setw(2) \
     << std::setfill('0')<< static_cast<int>(x) << std::endl;

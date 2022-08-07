@@ -91,7 +91,7 @@ private:
         if (src_strlen > s_dest){
             throw TooLongStringException(src_strlen, s_dest, src);
         }
-        strncpy((char*) &dest, src, s_dest);
+        strncpy(reinterpret_cast<char*>(&dest), src, s_dest);
     }
 
 #define bzero(b,len) (memset((b), '\0', (len)), (void) 0)  

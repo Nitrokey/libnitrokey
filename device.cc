@@ -179,7 +179,7 @@ int Device::send(const void *packet) {
       throw DeviceNotConnected("Attempted HID send on an invalid descriptor.");
     }
     send_feature_report = hid_send_feature_report(
-        mp_devhandle, (const unsigned char *)(packet), HID_REPORT_SIZE);
+        mp_devhandle, static_cast<const unsigned char *>(packet), HID_REPORT_SIZE);
     if (send_feature_report < 0) _reconnect();
     //add thread sleep?
     LOG(std::string("Sending attempt: ")+std::to_string(i+1) + " / 3" , Loglevel::DEBUG_L2);
@@ -200,7 +200,7 @@ int Device::recv(void *packet) {
       throw DeviceNotConnected("Attempted HID receive on an invalid descriptor.");
     }
 
-    status = (hid_get_feature_report(mp_devhandle, (unsigned char *)(packet),
+    status = (hid_get_feature_report(mp_devhandle, static_cast<unsigned char *>(packet),
                                      HID_REPORT_SIZE));
 
     auto pwherr = hid_error(mp_devhandle);

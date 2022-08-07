@@ -106,13 +106,13 @@ namespace nitrokey {
 
                     std::string dissect() const {
                       std::stringstream ss;
-                      print_to_ss( (int) volume_flag );
+                      print_to_ss( static_cast<int>(volume_flag) );
                       print_to_ss( kind );
                       print_to_ss_volatile(admin_pin);
                       return ss.str();
                     }
                     void set_kind_user() {
-                      kind = (uint8_t) 'P';
+                      kind = 'P';
                     }
                     void set_defaults(){
                       set_kind_user();
@@ -141,12 +141,12 @@ namespace nitrokey {
                   std::string dissect() const {
                     std::stringstream ss;
                     ss << "_padding:" << std::endl
-                       << ::nitrokey::misc::hexdump((const uint8_t *) (_padding),
+                       << ::nitrokey::misc::hexdump(reinterpret_cast<const uint8_t *>(_padding),
                                                     sizeof _padding);
-                    print_to_ss((int) SendCounter_u8);
-                    print_to_ss((int) SendDataType_u8);
-                    print_to_ss((int) FollowBytesFlag_u8);
-                    print_to_ss((int) SendSize_u8);
+                    print_to_ss(static_cast<int>(SendCounter_u8));
+                    print_to_ss(static_cast<int>(SendDataType_u8));
+                    print_to_ss(static_cast<int>(FollowBytesFlag_u8));
+                    print_to_ss(static_cast<int>(SendSize_u8));
                     return ss.str();
                   }
 
@@ -212,27 +212,27 @@ namespace nitrokey {
 
                       print_to_ss(transmission_data.dissect());
                       print_to_ss( MagicNumber_StickConfig_u16 );
-                      print_to_ss((int) ReadWriteFlagUncryptedVolume_u8 );
-                      print_to_ss((int) ReadWriteFlagCryptedVolume_u8 );
-                      print_to_ss((int) ReadWriteFlagHiddenVolume_u8 );
-                      print_to_ss((int) versionInfo.major );
-                      print_to_ss((int) versionInfo.minor );
-                      print_to_ss((int) versionInfo.build_iteration );
-                      print_to_ss((int) FirmwareLocked_u8 );
-                      print_to_ss((int) NewSDCardFound_u8 );
-                      print_to_ss((int) NewSDCardFound_st.NewCard );
-                      print_to_ss((int) NewSDCardFound_st.Counter );
-                      print_to_ss((int) SDFillWithRandomChars_u8 );
+                      print_to_ss(static_cast<int>(ReadWriteFlagUncryptedVolume_u8) );
+                      print_to_ss(static_cast<int>(ReadWriteFlagCryptedVolume_u8) );
+                      print_to_ss(static_cast<int>(ReadWriteFlagHiddenVolume_u8) );
+                      print_to_ss(static_cast<int>(versionInfo.major) );
+                      print_to_ss(static_cast<int>(versionInfo.minor) );
+                      print_to_ss(static_cast<int>(versionInfo.build_iteration) );
+                      print_to_ss(static_cast<int>(FirmwareLocked_u8) );
+                      print_to_ss(static_cast<int>(NewSDCardFound_u8) );
+                      print_to_ss(static_cast<int>(NewSDCardFound_st.NewCard) );
+                      print_to_ss(static_cast<int>(NewSDCardFound_st.Counter) );
+                      print_to_ss(static_cast<int>(SDFillWithRandomChars_u8) );
                       print_to_ss( ActiveSD_CardID_u32 );
-                      print_to_ss((int) VolumeActiceFlag_u8 );
-                      print_to_ss((int) VolumeActiceFlag_st.unencrypted );
-                      print_to_ss((int) VolumeActiceFlag_st.encrypted );
-                      print_to_ss((int) VolumeActiceFlag_st.hidden);
-                      print_to_ss((int) NewSmartCardFound_u8 );
-                      print_to_ss((int) UserPwRetryCount );
-                      print_to_ss((int) AdminPwRetryCount );
+                      print_to_ss(static_cast<int>(VolumeActiceFlag_u8) );
+                      print_to_ss(static_cast<int>(VolumeActiceFlag_st.unencrypted) );
+                      print_to_ss(static_cast<int>(VolumeActiceFlag_st.encrypted) );
+                      print_to_ss(static_cast<int>(VolumeActiceFlag_st.hidden) );
+                      print_to_ss(static_cast<int>(NewSmartCardFound_u8) );
+                      print_to_ss(static_cast<int>(UserPwRetryCount) );
+                      print_to_ss(static_cast<int>(AdminPwRetryCount) );
                       print_to_ss( ActiveSmartCardID_u32 );
-                      print_to_ss((int) StickKeysNotInitiated );
+                      print_to_ss(static_cast<int>(StickKeysNotInitiated) );
 
                       return ss.str();
                     }
@@ -296,10 +296,10 @@ namespace nitrokey {
                     uint8_t ReadLevelMax;
                     std::string dissect() const {
                       std::stringstream ss;
-                      print_to_ss((int) WriteLevelMin);
-                      print_to_ss((int) WriteLevelMax);
-                      print_to_ss((int) ReadLevelMin);
-                      print_to_ss((int) ReadLevelMax);
+                      print_to_ss(static_cast<int>(WriteLevelMin));
+                      print_to_ss(static_cast<int>(WriteLevelMax));
+                      print_to_ss(static_cast<int>(ReadLevelMin));
+                      print_to_ss(static_cast<int>(ReadLevelMax));
                       return ss.str();
                     }
                 } __packed;
@@ -319,9 +319,9 @@ namespace nitrokey {
                     uint8_t HiddenVolumePassword_au8[MAX_HIDDEN_VOLUME_PASSWORD_SIZE];
                     std::string dissect() const {
                       std::stringstream ss;
-                      print_to_ss((int) SlotNr_u8);
-                      print_to_ss((int) StartBlockPercent_u8);
-                      print_to_ss((int) EndBlockPercent_u8);
+                      print_to_ss(static_cast<int>(SlotNr_u8));
+                      print_to_ss(static_cast<int>(StartBlockPercent_u8));
+                      print_to_ss(static_cast<int>(EndBlockPercent_u8));
                       print_to_ss_volatile(HiddenVolumePassword_au8);
                       return ss.str();
                     }
@@ -361,20 +361,20 @@ namespace nitrokey {
                       std::stringstream ss;
 
                       print_to_ss(transmission_data.dissect());
-                      print_to_ss((int) FirmwareVersion_au8[0]);
-                      print_to_ss((int) FirmwareVersion_au8[1]);
-                      print_to_ss((int) FirmwareVersionInternal_u8);
-                      print_to_ss((int) SD_Card_Size_u8);
+                      print_to_ss(static_cast<int>(FirmwareVersion_au8[0]));
+                      print_to_ss(static_cast<int>(FirmwareVersion_au8[1]));
+                      print_to_ss(static_cast<int>(FirmwareVersionInternal_u8));
+                      print_to_ss(static_cast<int>(SD_Card_Size_u8));
                       print_to_ss( CPU_CardID_u32);
                       print_to_ss( SmartCardID_u32);
                       print_to_ss( SD_CardID_u32);
-                      print_to_ss((int) SC_UserPwRetryCount);
-                      print_to_ss((int) SC_AdminPwRetryCount);
-                      print_to_ss((int) SD_Card_ManufacturingYear_u8);
-                      print_to_ss((int) SD_Card_ManufacturingMonth_u8);
+                      print_to_ss(static_cast<int>(SC_UserPwRetryCount));
+                      print_to_ss(static_cast<int>(SC_AdminPwRetryCount));
+                      print_to_ss(static_cast<int>(SD_Card_ManufacturingYear_u8));
+                      print_to_ss(static_cast<int>(SD_Card_ManufacturingMonth_u8));
                       print_to_ss( SD_Card_OEM_u16);
                       print_to_ss( SD_WriteSpeed_u16);
-                      print_to_ss((int) SD_Card_Manufacturer_u8);
+                      print_to_ss(static_cast<int>(SD_Card_Manufacturer_u8));
                       return ss.str();
                     }
 

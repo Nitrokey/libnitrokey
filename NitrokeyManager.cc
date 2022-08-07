@@ -65,14 +65,14 @@ using nitrokey::misc::strcpyT;
 
     // package type to auth, auth type [Authorize,UserAuthorize]
     template <typename S, typename A, typename T>
-    void NitrokeyManager::authorize_packet(T &package, const char *admin_temporary_password, shared_ptr<Device> device){
+    void NitrokeyManager::authorize_packet(T &package, const char *admin_temporary_password, shared_ptr<Device> device_){
       if (!is_authorization_command_supported()){
         LOG("Authorization command not supported, skipping", Loglevel::WARNING);
       }
         auto auth = get_payload<A>();
         strcpyT(auth.temporary_password, admin_temporary_password);
         auth.crc_to_authorize = S::CommandTransaction::getCRC(package);
-        A::CommandTransaction::run(device, auth);
+        A::CommandTransaction::run(device_, auth);
     }
 
     shared_ptr <NitrokeyManager> NitrokeyManager::_instance = nullptr;

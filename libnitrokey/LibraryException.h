@@ -43,8 +43,8 @@ public:
     size_t target_size;
 
     TargetBufferSmallerThanSource(
-            size_t source_size, size_t target_size
-            ) : source_size(source_size),  target_size(target_size) {}
+            size_t source_size_, size_t target_size_
+            ) : source_size(source_size_),  target_size(target_size_) {}
 
     virtual const char *what() const noexcept override {
         std::string s = " ";
@@ -65,7 +65,7 @@ public:
 public:
     uint8_t invalid_char;
 
-    InvalidHexString (uint8_t invalid_char) : invalid_char( invalid_char) {}
+    InvalidHexString (uint8_t invalid_char_) : invalid_char(invalid_char_) {}
 
     virtual const char *what() const noexcept override {
         return "Invalid character in hex string";
@@ -82,7 +82,7 @@ public:
 public:
     uint8_t slot_selected;
 
-    InvalidSlotException(uint8_t slot_selected) : slot_selected(slot_selected) {}
+    InvalidSlotException(uint8_t slot_selected_) : slot_selected(slot_selected_) {}
 
     virtual const char *what() const noexcept override {
         return "Wrong slot selected";
@@ -102,8 +102,8 @@ public:
     std::size_t size_destination;
     std::string message;
 
-    TooLongStringException(size_t size_source, size_t size_destination, const std::string &message = "") : size_source(
-            size_source), size_destination(size_destination), message(message) {
+    TooLongStringException(size_t size_source_, size_t size_destination_, const std::string &message_ = "") : size_source(
+            size_source_), size_destination(size_destination_), message(message_) {
       LOG(std::string("TooLongStringException, size diff: ")+ std::to_string(size_source-size_destination), nitrokey::log::Loglevel::DEBUG);
 
     }

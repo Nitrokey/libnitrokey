@@ -30,8 +30,8 @@ public:
     unsigned char progress_bar_value;
 
     LongOperationInProgressException(
-        unsigned char _command_id, uint8_t last_command_status, unsigned char _progress_bar_value)
-    : CommandFailedException(_command_id, last_command_status), progress_bar_value(_progress_bar_value){
+        unsigned char command_id_, uint8_t last_command_status_, unsigned char progress_bar_value_)
+    : CommandFailedException(command_id_, last_command_status_), progress_bar_value(progress_bar_value_){
       LOG(
           std::string("LongOperationInProgressException, progress bar status: ")+
               std::to_string(progress_bar_value), nitrokey::log::Loglevel::DEBUG);

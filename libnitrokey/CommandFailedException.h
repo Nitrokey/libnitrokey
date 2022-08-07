@@ -35,9 +35,9 @@ public:
     const uint8_t last_command_id;
     const uint8_t last_command_status;
 
-    CommandFailedException(uint8_t last_command_id, uint8_t last_command_status) :
-        last_command_id(last_command_id),
-            last_command_status(last_command_status){
+    CommandFailedException(uint8_t last_command_id_, uint8_t last_command_status_) :
+        last_command_id(last_command_id_),
+            last_command_status(last_command_status_) {
       LOG(std::string("CommandFailedException, status: ")+ std::to_string(last_command_status), nitrokey::log::Loglevel::DEBUG);
     }
 

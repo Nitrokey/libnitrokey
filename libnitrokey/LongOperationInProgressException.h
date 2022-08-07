@@ -36,7 +36,7 @@ public:
           std::string("LongOperationInProgressException, progress bar status: ")+
               std::to_string(progress_bar_value), nitrokey::log::Loglevel::DEBUG);
     }
-    virtual const char *what() const throw() {
+    virtual const char *what() const noexcept {
       return "Device returned busy status with long operation in progress";
     }
 };

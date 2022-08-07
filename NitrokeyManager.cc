@@ -357,7 +357,7 @@ using nitrokey::misc::strcpyT;
     return res;
   }
 
-  bool NitrokeyManager::is_connected() throw(){
+  bool NitrokeyManager::is_connected() noexcept {
       std::lock_guard<std::mutex> lock(mex_dev_com_manager);
       if(device != nullptr){
         auto connected = device->could_be_enumerated();

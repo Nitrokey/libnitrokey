@@ -95,7 +95,7 @@ char * strndup(const char* str, size_t maxlen);
         bool connect(device::DeviceModel device_model);
         bool connect();
         bool disconnect();
-        bool is_connected() throw() ;
+        bool is_connected() noexcept ;
         bool could_current_device_be_enumerated();
       bool set_default_commands_delay(int delay);
 

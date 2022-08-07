@@ -38,7 +38,7 @@ public:
     ++occurred;
   }
   uint8_t getType() const {return 1;}
-//  virtual const char* what() const throw() override {
+//  virtual const char* what() const noexcept override {
 //    return message.c_str();
 //  }
   static bool has_occurred(){ return occurred > 0; }

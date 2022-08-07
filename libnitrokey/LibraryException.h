@@ -46,7 +46,7 @@ public:
             size_t source_size, size_t target_size
             ) : source_size(source_size),  target_size(target_size) {}
 
-    virtual const char *what() const throw() override {
+    virtual const char *what() const noexcept override {
         std::string s = " ";
         auto ts = [](size_t x){ return std::to_string(x); };
         std::string msg = std::string("Target buffer size is smaller than source: [source size, buffer size]")
@@ -67,7 +67,7 @@ public:
 
     InvalidHexString (uint8_t invalid_char) : invalid_char( invalid_char) {}
 
-    virtual const char *what() const throw() override {
+    virtual const char *what() const noexcept override {
         return "Invalid character in hex string";
     }
 
@@ -84,7 +84,7 @@ public:
 
     InvalidSlotException(uint8_t slot_selected) : slot_selected(slot_selected) {}
 
-    virtual const char *what() const throw() override {
+    virtual const char *what() const noexcept override {
         return "Wrong slot selected";
     }
 
@@ -108,7 +108,7 @@ public:
 
     }
 
-    virtual const char *what() const throw() override {
+    virtual const char *what() const noexcept override {
         //TODO add sizes and message data to final message
         return "Too long string has been supplied as an argument";
     }

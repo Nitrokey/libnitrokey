@@ -22,6 +22,7 @@
 #ifndef LIBNITROKEY_LIBRARYEXCEPTION_H
 #define LIBNITROKEY_LIBRARYEXCEPTION_H
 
+#include <mutex>
 #include <exception>
 #include <cstdint>
 #include <string>
@@ -31,6 +32,12 @@ class LibraryException: std::exception {
 public:
     virtual uint8_t exception_id()= 0;
 };
+
+// Use static string object for keeping the c_str message for the caller.
+// Strings collection used as an alternative to memory leaks done via strdup().
+// TargetBufferSmallerThanSource Exception should never happen in a correctly written library client.
+static std::vector<std::string> g_exception_messages;
+static std::mutex g_exception_message_mutex;
 
 class TargetBufferSmallerThanSource: public LibraryException {
 public:
@@ -47,11 +54,12 @@ public:
             ) : source_size(source_size_),  target_size(target_size_) {}
 
     virtual const char *what() const noexcept override {
+        std::lock_guard<std::mutex> lock(g_exception_message_mutex);
         std::string s = " ";
         auto ts = [](size_t x){ return std::to_string(x); };
-        std::string msg = std::string("Target buffer size is smaller than source: [source size, buffer size]")
-            +s+ ts(source_size) +s+ ts(target_size);
-        return msg.c_str();
+        g_exception_messages.emplace_back(std::string("Target buffer size is smaller than source: [source size, buffer size]")
+                              + s + ts(source_size) + s + ts(target_size));
+        return g_exception_messages.back().c_str();
     }
 
 };

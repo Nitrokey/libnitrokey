@@ -114,8 +114,8 @@ static uint32_t _crc32(uint32_t crc, uint32_t data) {
 
 uint32_t stm_crc32(const uint8_t *data, size_t size) {
   uint32_t crc = 0xffffffff;
-  const uint32_t *pend = (const uint32_t *)(data + size);
-  for (const uint32_t *p = (const uint32_t *)(data); p < pend; p++)
+  const uint32_t *pend = reinterpret_cast<const uint32_t *>(data + size);
+  for (const uint32_t *p = reinterpret_cast<const uint32_t *>(data); p < pend; p++)
     crc = _crc32(crc, *p);
   return crc;
 }

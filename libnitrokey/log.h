@@ -55,7 +55,7 @@ namespace nitrokey {
 
     class StdlogHandler : public LogHandler {
     public:
-      virtual void print(const std::string &, Loglevel lvl);
+      virtual void print(const std::string &, Loglevel lvl) override;
     };
 
     class FunctionalLogHandler : public LogHandler {
@@ -63,7 +63,7 @@ namespace nitrokey {
       log_function_type log_function;
     public:
       FunctionalLogHandler(log_function_type _log_function);
-      virtual void print(const std::string &, Loglevel lvl);
+      virtual void print(const std::string &, Loglevel lvl) override;
 
     };
 
@@ -72,7 +72,7 @@ namespace nitrokey {
       log_function_type log_function;
     public:
       RawFunctionalLogHandler(log_function_type _log_function);
-      virtual void print(const std::string &, Loglevel lvl);
+      virtual void print(const std::string &, Loglevel lvl) override;
 
     };
 

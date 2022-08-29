@@ -35,38 +35,38 @@ public:
     const uint8_t last_command_id;
     const uint8_t last_command_status;
 
-    CommandFailedException(uint8_t last_command_id, uint8_t last_command_status) :
-        last_command_id(last_command_id),
-            last_command_status(last_command_status){
+    CommandFailedException(uint8_t last_command_id_, uint8_t last_command_status_) :
+        last_command_id(last_command_id_),
+            last_command_status(last_command_status_) {
       LOG(std::string("CommandFailedException, status: ")+ std::to_string(last_command_status), nitrokey::log::Loglevel::DEBUG);
     }
 
-    virtual const char *what() const throw() {
+    virtual const char *what() const noexcept override {
         return "Command execution has failed on device";
     }
 
 
-    bool reason_timestamp_warning() const throw(){
+    bool reason_timestamp_warning() const noexcept {
       return last_command_status == static_cast<uint8_t>(cs::timestamp_warning);
     }
 
-    bool reason_AES_not_initialized() const throw(){
+    bool reason_AES_not_initialized() const noexcept {
       return last_command_status == static_cast<uint8_t>(cs::AES_dec_failed);
     }
 
-    bool reason_not_authorized() const throw(){
+    bool reason_not_authorized() const noexcept {
       return last_command_status == static_cast<uint8_t>(cs::not_authorized);
     }
 
-    bool reason_slot_not_programmed() const throw(){
+    bool reason_slot_not_programmed() const noexcept {
       return last_command_status == static_cast<uint8_t>(cs::slot_not_programmed);
     }
 
-    bool reason_wrong_password() const throw(){
+    bool reason_wrong_password() const noexcept {
       return last_command_status == static_cast<uint8_t>(cs::wrong_password);
     }
 
-    bool reason_smartcard_busy() const throw(){
+    bool reason_smartcard_busy() const noexcept {
       return last_command_status == static_cast<uint8_t>(cs2::smartcard_error);
     }
 

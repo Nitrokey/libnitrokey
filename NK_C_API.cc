@@ -554,15 +554,15 @@ extern "C" {
 
 	NK_C_API int NK_is_AES_supported(const char *user_password) {
 		auto m = NitrokeyManager::instance();
-		return get_with_result([&]() {
-			return (uint8_t)m->is_AES_supported(user_password);
+		return get_with_result([&]() -> uint8_t {
+			return m->is_AES_supported(user_password);
 		});
 	}
 
 	NK_C_API int NK_login_auto() {
 		auto m = NitrokeyManager::instance();
-		return get_with_result([&]() {
-			return (uint8_t)m->connect();
+		return get_with_result([&]() -> uint8_t {
+			return m->connect();
 		});
 	}
 

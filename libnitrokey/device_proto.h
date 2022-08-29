@@ -91,8 +91,8 @@ namespace nitrokey {
             uint32_t calculate_CRC() const {
               // w/o leading zero, a part of each HID packet
               // w/o 4-byte crc
-              return misc::stm_crc32((const uint8_t *) (this) + 1,
-                                     (size_t) (HID_REPORT_SIZE - 5));
+              return misc::stm_crc32(reinterpret_cast<const uint8_t *>(this) + 1,
+                                     static_cast<size_t>(HID_REPORT_SIZE - 5));
             }
 
             void update_CRC() { crc = calculate_CRC(); }
@@ -156,8 +156,8 @@ namespace nitrokey {
             uint32_t calculate_CRC() const {
               // w/o leading zero, a part of each HID packet
               // w/o 4-byte crc
-              return misc::stm_crc32((const uint8_t *) (this) + 1,
-                                     (size_t) (HID_REPORT_SIZE - 5));
+              return misc::stm_crc32(reinterpret_cast<const uint8_t *>(this) + 1,
+                                     static_cast<size_t>(HID_REPORT_SIZE - 5));
             }
 
             void update_CRC() { crc = calculate_CRC(); }

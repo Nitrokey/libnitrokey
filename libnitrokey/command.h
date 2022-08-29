@@ -26,14 +26,14 @@
 #include "cxx_semantics.h"
 
 #define print_to_ss(x) ( ss << " " << (#x) <<":\t" << (x) << std::endl );
-#define print_to_ss_int(x) ( ss << " " << (#x) <<":\t" << (int)(x) << std::endl );
+#define print_to_ss_int(x) ( ss << " " << (#x) <<":\t" << static_cast<int>(x) << std::endl );
 #ifdef LOG_VOLATILE_DATA
 #define print_to_ss_volatile(x) print_to_ss(x);
 #else
 #define print_to_ss_volatile(x) ( ss << " " << (#x) <<":\t" << "***********" << std::endl );
 #endif
 #define hexdump_to_ss(x) (ss << #x":\n"\
-                          << ::nitrokey::misc::hexdump((const uint8_t *) (&x), sizeof x, false));
+                          << ::nitrokey::misc::hexdump(reinterpret_cast<const uint8_t *>(&x), sizeof x, false));
 
 namespace nitrokey {
     namespace proto {
@@ -71,13 +71,13 @@ namespace stick20{
                   return ss.str();
                 }
                 void set_kind_admin() {
-                  kind = (uint8_t) 'A';
+                  kind = 'A';
                 }
                 void set_kind_admin_prefixed() {
-                  kind = (uint8_t) 'P';
+                  kind = 'P';
                 }
                 void set_kind_user() {
-                  kind = (uint8_t) 'P';
+                  kind = 'P';
                 }
 
                 void set_defaults(){
@@ -96,7 +96,7 @@ namespace stick20{
                       set_kind_admin_prefixed();
                       break;
                   }
-                };
+                }
 
             } __packed;
 

@@ -77,7 +77,7 @@ namespace nitrokey {
                     bool isValid() const { return !(slot_number & 0xF0); }
                     std::string dissect() const {
                       std::stringstream ss;
-                      ss << "slot_number:\t" << (int)(slot_number) << std::endl;
+                      ss << "slot_number:\t" << static_cast<int>(slot_number) << std::endl;
                       hexdump_to_ss(temporary_admin_password);
                       return ss.str();
                     }
@@ -109,10 +109,10 @@ namespace nitrokey {
                       std::stringstream ss;
                       hexdump_to_ss(temporary_admin_password);
                       ss << "type:\t" << type << std::endl;
-                      ss << "id:\t" << (int)id << std::endl;
+                      ss << "id:\t" << static_cast<int>(id) << std::endl;
 #ifdef LOG_VOLATILE_DATA
                       ss << "data:" << std::endl
-                         << ::nitrokey::misc::hexdump((const uint8_t *) (&data), sizeof data);
+                         << ::nitrokey::misc::hexdump(reinterpret_cast<const uint8_t *>(&data), sizeof data);
 #else
                       ss << " Volatile data not logged" << std::endl;
 #endif
@@ -131,7 +131,7 @@ namespace nitrokey {
                       std::stringstream ss;
 #ifdef LOG_VOLATILE_DATA
                       ss << "data:" << std::endl
-                         << ::nitrokey::misc::hexdump((const uint8_t *) (&data), sizeof data);
+                         << ::nitrokey::misc::hexdump(reinterpret_cast<const uint8_t *>&data), sizeof data);
 #else
                       ss << " Volatile data not logged" << std::endl;
 #endif
@@ -177,17 +177,17 @@ namespace nitrokey {
                     std::string dissect() const {
                       std::stringstream ss;
                       hexdump_to_ss(temporary_admin_password);
-                      ss << "slot_config:\t" << std::bitset<8>((int) _slot_config) << std::endl;
+                      ss << "slot_config:\t" << std::bitset<8>(static_cast<int>(_slot_config)) << std::endl;
                       ss << "\tuse_8_digits(0):\t" << use_8_digits << std::endl;
                       ss << "\tuse_enter(1):\t" << use_enter << std::endl;
                       ss << "\tuse_tokenID(2):\t" << use_tokenID << std::endl;
-                      ss << "slot_number:\t" << (int) (slot_number) << std::endl;
-                      ss << "slot_counter_or_interval:\t[" << (int) slot_counter_or_interval << "]\t"
-                         << ::nitrokey::misc::hexdump((const uint8_t *) (&slot_counter_or_interval), sizeof slot_counter_or_interval, false);
+                      ss << "slot_number:\t" << static_cast<int>(slot_number) << std::endl;
+                      ss << "slot_counter_or_interval:\t[" << static_cast<int>(slot_counter_or_interval) << "]\t"
+                         << ::nitrokey::misc::hexdump(reinterpret_cast<const uint8_t *>(&slot_counter_or_interval), sizeof slot_counter_or_interval, false);
 
                       ss << "slot_token_id:\t";
                       for (auto i : slot_token_id)
-                        ss << std::hex << std::setw(2) << std::setfill('0') << (int) i << " ";
+                        ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(i) << " ";
                       ss << std::endl;
 
                       return ss.str();
@@ -213,7 +213,7 @@ namespace nitrokey {
                     std::string dissect() const {
                       std::stringstream ss;
                       hexdump_to_ss(temporary_user_password);
-                      ss << "slot_number:\t" << (int)(slot_number) << std::endl;
+                      ss << "slot_number:\t" << static_cast<int>(slot_number) << std::endl;
                       return ss.str();
                     }
                 } __packed;
@@ -238,7 +238,7 @@ namespace nitrokey {
                     std::string dissect() const {
                       std::stringstream ss;
                       ss << "code:\t" << (code) << std::endl;
-                      ss << "slot_config:\t" << std::bitset<8>((int)_slot_config) << std::endl;
+                      ss << "slot_config:\t" << std::bitset<8>(static_cast<int>(_slot_config)) << std::endl;
                       ss << "\tuse_8_digits(0):\t" << use_8_digits << std::endl;
                       ss << "\tuse_enter(1):\t" << use_enter << std::endl;
                       ss << "\tuse_tokenID(2):\t" << use_tokenID << std::endl;
@@ -265,10 +265,10 @@ namespace nitrokey {
                     std::string dissect() const {
                       std::stringstream ss;
                       hexdump_to_ss(temporary_user_password);
-                      ss << "slot_number:\t" << (int)(slot_number) << std::endl;
+                      ss << "slot_number:\t" << static_cast<int>(slot_number) << std::endl;
                       ss << "challenge:\t" << (challenge) << std::endl;
                       ss << "last_totp_time:\t" << (last_totp_time) << std::endl;
-                      ss << "last_interval:\t" << (int)(last_interval) << std::endl;
+                      ss << "last_interval:\t" << static_cast<int>(last_interval) << std::endl;
                       return ss.str();
                     }
                 } __packed;
@@ -293,7 +293,7 @@ namespace nitrokey {
                     std::string dissect() const {
                       std::stringstream ss;
                       ss << "code:\t" << (code) << std::endl;
-                      ss << "slot_config:\t" << std::bitset<8>((int)_slot_config) << std::endl;
+                      ss << "slot_config:\t" << std::bitset<8>(static_cast<int>(_slot_config)) << std::endl;
                       ss << "\tuse_8_digits(0):\t" << use_8_digits << std::endl;
                       ss << "\tuse_enter(1):\t" << use_enter << std::endl;
                       ss << "\tuse_tokenID(2):\t" << use_tokenID << std::endl;
@@ -328,11 +328,11 @@ namespace nitrokey {
 
                   std::string dissect() const {
                       std::stringstream ss;
-                      ss << "numlock:\t" << (int)numlock << std::endl;
-                      ss << "capslock:\t" << (int)capslock << std::endl;
-                      ss << "scrolllock:\t" << (int)scrolllock << std::endl;
-                      ss << "enable_user_password:\t" << (bool) enable_user_password << std::endl;
-                      ss << "delete_user_password:\t" << (bool) delete_user_password << std::endl;
+                      ss << "numlock:\t" << static_cast<int>(numlock) << std::endl;
+                      ss << "capslock:\t" << static_cast<int>(capslock) << std::endl;
+                      ss << "scrolllock:\t" << static_cast<int>(scrolllock) << std::endl;
+                      ss << "enable_user_password:\t" << static_cast<bool>(enable_user_password) << std::endl;
+                      ss << "delete_user_password:\t" << static_cast<bool>(delete_user_password) << std::endl;
                       return ss.str();
                     }
                 } __packed;

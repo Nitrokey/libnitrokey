@@ -131,7 +131,7 @@ namespace nitrokey {
                       std::stringstream ss;
 #ifdef LOG_VOLATILE_DATA
                       ss << "data:" << std::endl
-                         << ::nitrokey::misc::hexdump(reinterpret_cast<const uint8_t *>&data), sizeof data);
+                         << ::nitrokey::misc::hexdump(reinterpret_cast<const uint8_t *> (&data), sizeof data);
 #else
                       ss << " Volatile data not logged" << std::endl;
 #endif

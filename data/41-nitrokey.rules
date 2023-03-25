@@ -31,11 +31,11 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="2581", ATTRS{idProduct
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="4287", TAG+="uaccess"
 # Nitrokey FIDO2
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="42b1", TAG+="uaccess"
-# Nitrokey 3
+# Nitrokey 3A Mini/3A NFC/3C NFC
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="42b2", TAG+="uaccess"
-# Nitrokey 3 Bootloader
+# Nitrokey 3A NFC Bootloader/3C NFC Bootloader
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="42dd", TAG+="uaccess"
-# Nitrokey 3 Bootloader NRF
+# Nitrokey 3A Mini Bootloader
 ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="42e8", TAG+="uaccess"
 
 LABEL="u2f_end"

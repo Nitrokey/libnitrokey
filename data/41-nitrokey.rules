@@ -59,6 +59,8 @@ ATTR{idVendor}=="03eb", ATTR{idProduct}=="2ff1", TAG+="uaccess"
 ATTR{idVendor}=="20a0", ATTR{idProduct}=="4211", ENV{ID_SMARTCARD_READER}="1", ENV{ID_SMARTCARD_READER_DRIVER}="gnupg", TAG+="uaccess"
 ## Nitrokey HSM
 ATTR{idVendor}=="20a0", ATTR{idProduct}=="4230", ENV{ID_SMARTCARD_READER}="1", ENV{ID_SMARTCARD_READER_DRIVER}="gnupg", TAG+="uaccess"
+# Nitrokey 3A Mini/3A NFC/3C NFC
+ATTR{idVendor}=="20a0", ATTR{idProduct}=="42b2", ENV{ID_SMARTCARD_READER}="1", ENV{ID_SMARTCARD_READER_DRIVER}="gnupg", TAG+="uaccess"
 
 LABEL="gnupg_rules_end"
 
